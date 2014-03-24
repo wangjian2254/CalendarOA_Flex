@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+    ADOBE SYSTEMS INCORPORATED
+    Copyright 2008 Adobe Systems Incorporated
+    All Rights Reserved.
+
+    NOTICE: Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the license agreement accompanying it.
+
+-->
+
+<!--- The default skin class for the Spark Button component.  
+
+       @see spark.components.Button
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:SparkButtonSkin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+             xmlns:s="library://ns.adobe.com/flex/spark" 
+             xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+             minWidth="21" minHeight="21" 
+             alpha.disabled="0.5">
+     
+    <fx:Metadata>
+        <![CDATA[ 
+        /** 
+         * @copy spark.skins.spark.ApplicationSkin#hostComponent
+         */
+        [HostComponent("spark.components.Button")]
+        ]]>
+    </fx:Metadata>
+    
+    <!-- states -->
+    <s:states>
+        <s:State name="up" />
+        <s:State name="over" />
+        <s:State name="down" />
+        <s:State name="disabled" />
+    </s:states>
+	
+	<s:Rect id="shadow" left="-1" right="-1" top="-1" bottom="-1" includeIn="over">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x000000" alpha="0.08"/>
+				<s:GradientEntry color="0x000000" alpha="0.08"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect id="shadow2" left="-2" right="-2" top="-2" bottom="-2" includeIn="over">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x000000" alpha="0.03"/>
+				<s:GradientEntry color="0x000000" alpha="0.03"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+    
+   
+    
+    <!-- layer 2: fill -->
+    <!--- @private -->
+    <s:Rect id="fill" left="0" right="0" top="0" bottom="0">
+		<s:fill>
+			<s:LinearGradient rotation="90">			
+				<s:GradientEntry color="0x6e95bc" ratio="0" color.over="0x629ccb" color.down="0x5691c1"/>
+				<s:GradientEntry color="0x6993bb" ratio=".1" color.over="0x629ccb" color.down="0x5691c1"/>				
+				<s:GradientEntry color="0x4485b3" ratio=".7" color.over="0x629ccb" color.down="0x5691c1"/>
+			</s:LinearGradient>
+		</s:fill>
+    </s:Rect>
+
+    <!-- layer 3: fill lowlight -->
+    <!--- @private -->
+    <s:Rect id="lowlight" left="1" right="1" top="1" bottom="1">
+        <s:fill>
+            <s:LinearGradient rotation="270">
+                <s:GradientEntry color="0x000000" ratio="0.0" alpha="0.0627" />
+                <s:GradientEntry color="0x000000" ratio="0.48" alpha="0.0099" />
+                <s:GradientEntry color="0x000000" ratio="0.48001" alpha="0" />
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    
+    <!-- layer 4: fill highlight -->
+    <!--- @private -->
+    <s:Rect id="highlight" left="1" right="1" top="1" bottom="1">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xFFFFFF"
+                                 ratio="0.0"
+                                 alpha="0" 
+                                 alpha.over="0.05" 
+                                 alpha.down="0.04"/>
+                <s:GradientEntry color="0xFFFFFF"
+                                 ratio="0.48"
+                                 alpha="0"
+                                 alpha.over="0.05"
+                                 alpha.down="0.04" />
+                <s:GradientEntry color="0xFFFFFF"
+                                 ratio="0.48001"
+                                 alpha="0" />
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    
+
+    <!--- @private -->
+    <s:Rect id="hldownstroke2" left="0" right="0" top="0" bottom="0">
+        <s:stroke>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry color="0x000000" alpha="0.3" ratio="0.0" />
+                <s:GradientEntry color="0x000000" alpha="0.3" ratio="0.0001" />
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Rect>
+	
+	<s:Rect left="1" top="1" bottom="1" width="1">
+		<s:fill>
+			<s:LinearGradient rotation="90">			
+				<s:GradientEntry color="0x75a0d8" ratio="0" color.over="0x81abe1" alpha.down="0"/>						
+				<s:GradientEntry color="0x739fd8" ratio="1" color.over="0x81ade5" alpha.down="0"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+
+  
+    
+    <!-- layer 8: text -->
+    <!--- @copy spark.components.supportClasses.ButtonBase#labelDisplay  -->
+    <s:Label id="labelDisplay"
+             textAlign="center"
+             maxDisplayedLines="1"
+             horizontalCenter="0" verticalCenter="1" verticalAlign="middle"
+             left="10" right="10" top="2" bottom="2" color="0xffffff">
+    </s:Label>
+    
+</s:SparkButtonSkin>

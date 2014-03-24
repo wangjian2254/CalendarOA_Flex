@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" width="400" height="300" borderVisible="false" backgroundAlpha="0.5" backgroundColor="#000000">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			private var num:int=0;
+			
+			public function showIn():void{
+				num++;
+					this.visible=true;
+//				if(num>0){
+					
+//				}
+			}
+			public function showOut():void{
+				num--;
+//				Alert.show(""+num,"Loading")
+				if(num==0){
+					this.visible=false;
+				}
+//				if(num>0){
+//					//this.visible=true;
+//				}else{
+//					num=0;
+//					if(open.running){
+//						open.stop();
+//						open.reset();
+//					}else{
+//						close.stop();
+//						close.reset();
+//						close.start();
+//					}
+//				}
+			}
+//			public function showIn():void{
+//				num++;
+//				if(num>0){
+//					if(!open.running){
+//						open.start();
+//					}
+//				}else{
+//					this.visible=false;
+//				}
+//			}
+//			public function showOut():void{
+//				num--;
+//				if(num>0){
+//					//this.visible=true;
+//				}else{
+//					num=0;
+//					if(open.running){
+//						open.stop();
+//						open.reset();
+//					}else{
+//						close.stop();
+//						close.reset();
+//						close.start();
+//					}
+//				}
+//			}
+			
+			private var open:Timer=new Timer(1000,1);
+			private var close:Timer=new Timer(1000,1);
+			private function openevent(e:TimerEvent):void{
+				this.visible=true;
+			}
+			private function closeevent(e:TimerEvent):void{
+				this.visible=false;
+			}
+			
+			private function init():void{
+				open.addEventListener(TimerEvent.TIMER,openevent);
+				close.addEventListener(TimerEvent.TIMER,closeevent);
+				
+				var request:URLRequest = new URLRequest("assets/loading.gif");  
+				_myGIFPlayer.load(request);  
+				img.addChild(_myGIFPlayer);  
+				_myGIFPlayer.addEventListener(GIFPlayerEvent.COMPLETE, onCompleteGIF);  
+				_myGIFPlayer.addEventListener(FrameEvent.FRAME_RENDERED, onFrameRendered); 
+			}
+		]]>
+	</fx:Script>
+	<fx:Script>  
+		<![CDATA[  
+		import flash.net.URLRequest;  
+		import org.bytearray.gif.player.GIFPlayer;  
+		import org.bytearray.gif.events.FileTypeEvent;  
+		import org.bytearray.gif.events.GIFPlayerEvent;  
+		import org.bytearray.gif.events.FrameEvent;  
+		import org.bytearray.gif.events.TimeoutEvent;  
+		private var _myGIFPlayer:GIFPlayer = new GIFPlayer();  
+		private var _totalFrame:Number;  
+		//private var _currentFrame:Number;  
+		
+		 
+		
+		private function onCompleteGIF(event:GIFPlayerEvent):void   
+		{  
+		_totalFrame = _myGIFPlayer.totalFrames;  
+//		totalframe.text = String(_totalFrame);   
+		}  
+		
+		private function onFrameRendered(event:FrameEvent):void   
+		{  
+//		currentframe.text = String(_myGIFPlayer.currentFrame);  
+		}  
+		
+		private function onTimeOut(event:TimeoutEvent):void   
+		{  
+		trace ("gif is error!");  
+		}  
+		
+		private function play():void   
+		{  
+		_myGIFPlayer.play();  
+		}  
+		
+		private function stop():void   
+		{  
+		_myGIFPlayer.stop();  
+		}  
+		
+		private function gotoandplay():void   
+		{  
+		var numFrame:Number = Math.floor(Math.random() * _totalFrame ) + 1;  
+		_myGIFPlayer.gotoAndPlay(numFrame);  
+//		gotoplaybtn.label = "gotoPlay(" + numFrame + ")";  
+		}  
+		
+		private function gotoandstop():void   
+		{  
+		var numFrame:Number = Math.floor(Math.random() * _totalFrame ) + 1;  
+		_myGIFPlayer.gotoAndStop(numFrame);  
+//		gotostopbtn.label = "gotoStop(" + numFrame + ")";  
+		}  
+		]]>  
+	</fx:Script>  
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:Image id="img" width="220" x="{(this.width-220)/2}" y="{(this.height-19)/2}">
+		
+	</mx:Image>
+</s:BorderContainer>

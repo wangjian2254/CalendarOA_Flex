@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
+						  xmlns:uicontrol="uicontrol.*"
+						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+	<fx:Script>
+		<![CDATA[
+			import events.CloseEvent;
+			import events.PageChangeEvent;
+			
+			import httpcontrol.CHTTPService;
+			import httpcontrol.HttpServiceUtil;
+			
+			import json.JParser;
+			
+			import model.DeptModel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.managers.CursorManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import util.ToolUtil;
+			[Bindable]
+			private var bz:String="左侧为关联科目;右侧为所有科目;双击单元格：完成增加、删除操作";
+			
+			
+			
+			[Bindable]
+			private var kjkmlist:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var tempkjkmlist:ArrayCollection=new ArrayCollection();
+			
+			private var file:FileReference;
+			private var byteArray:ByteArray;
+			private var bitmapData:BitmapData;
+			private var loader:Loader=new Loader();
+			
+			override public   function  init(e:FlexEvent):void{
+				ticketName.enabled=false;
+				refreshTaxKind();
+				
+				Security.allowDomain("*");
+				file=new FileReference();
+				file.addEventListener(Event.SELECT, fileReferenceSelectHandler);
+				file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA,uploadImageResult);
+				
+				
+			}
+			override public function closeContainer(e:events.CloseEvent):void{
+				dispatchEvent(e);
+				
+			}
+			
+
+			
+			private function refreshTaxKind():void{
+				ToolUtil.ticketRefresh(refresh);
+			}
+
+
+			
+
+
+			private function loadDataFault(e:FaultEvent):void{
+				Alert.show('操作失败',"提示");
+			}
+			
+
+			
+			//新增，保存，删除的处理函数
+			private function clickHander(e:ItemClickEvent):void{
+				ticketSave.enabled=false;
+				ticketDel.enabled=false;
+				
+				if(e.label=="新增根级"){
+					addTicket();
+					ticketSave.enabled=true;
+				}
+				if(e.label=="新增下级"){
+					if(kindTree.selectedItem&&kindTree.selectedItem.type=='ticket'){
+						addTicket();
+						ticketKindId.text = kindTree.selectedItem.id;
+						taxKind.text = kindTree.selectedItem.name;
+						ticketSave.enabled=true;
+						
+					}else{
+						if(kindTree.selectedItem){
+							Alert.show("财税票据无法添加下级","提示");
+						}else{
+							
+							Alert.show("请选择一个财税分类","提示");
+						}
+					}
+
+				}
+				
+				if(e.label=="新增同级"){
+					if(kindTree.selectedItem){
+						
+						if(kindTree.selectedItem.type =="ticket"){
+							addTicket();
+							ticketSave.enabled=true;
+							if(kindTree.getParentItem(kindTree.selectedItem)!=null){
+								ticketKindId.text = kindTree.getParentItem(kindTree.selectedItem).id;
+								taxKind.text = kindTree.getParentItem(kindTree.selectedItem).name;
+							}
+							
+						}
+						
+						
+					}else{
+						Alert.show("请选择一个财税分类或票据","提示");
+						
+					}
+
+				}
+				
+				
+				if(e.label=='同步数据'){
+					refreshTaxKind();
+				}
+
+				
+			}
+			
+			private function showNode():void{
+				ticketSave.enabled=false;
+				ticketDel.enabled=false;
+				
+				if(!kindTree.selectedItem){
+					return;
+				}
+				
+				if(kindTree.selectedItem.type =="ticket"){
+					addTicket();
+					ticketSave.enabled=true;
+					ticketDel.enabled=true;
+					ticketName.text = kindTree.selectedItem.name;
+					ticketDesc.text = kindTree.selectedItem.desc;
+					ticketId.text = kindTree.selectedItem.id;
+					if(kindTree.getParentItem(kindTree.selectedItem)!=null){
+						ticketKindId.text = kindTree.getParentItem(kindTree.selectedItem).id;
+						taxKind.text = kindTree.getParentItem(kindTree.selectedItem).name;
+					}
+					
+					imglist.removeAllElements();
+					var img:Image  = null;
+					for each(var imgurl:String in kindTree.selectedItem.imgs){
+						img = new Image();
+						img.doubleClickEnabled = true;
+						img.source = imgurl;
+						img.addEventListener(MouseEvent.DOUBLE_CLICK,deleteImage);
+						imglist.addElement(img);
+					}
+					
+				}
+				
+			}
+			
+	
+			
+			
+			private function addTicket():void{
+				ticketName.text = "";
+				ticketDesc.text = "";
+				taxKind.text = "";
+				ticketId.text = "";
+				ticketKindId.text = "";
+				
+				
+			}
+			
+			private function saveTicket():void{
+				var data:Object = new Object();
+				data["id"]=ticketId.text;
+				data["name"]=ticketName.text;
+				data["desc"]=ticketDesc.text;
+				data["fatherid"]=ticketKindId.text;
+				if(ticketName.text==""){
+					Alert.show("票据名称不能为空。","提示");
+					return ;
+				}
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveTicket",saveTicketResult,"POST").send(data);
+			}
+			
+			
+			
+			
+			
+			
+			private function saveTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					ticketId.text = result.result;
+					ticketDel.enabled=true;
+					
+					if(byteArray!=null){
+						file.removeEventListener(Event.COMPLETE,fileReferenceCompleteHandler);
+						file.addEventListener(Event.COMPLETE,completeHandle);
+						proceedWithUpload();
+					}else{
+						refreshTaxKind();
+					}
+				}
+			}
+			
+			
+			
+			private function saveKJKMTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					refreshTaxKind();
+				}
+			}
+			
+			
+			
+
+			
+			
+			
+			public function show(obj:Object):void{
+				
+				
+				
+			}
+			
+			
+			
+			public function refresh(result:Object,e:ResultEvent):void{
+				
+				kindTree.validateNow();
+				for each(var item:Object in ToolUtil.ticketList){
+					kindTree.expandChildrenOf(item,true);
+					
+				}
+				
+			}
+			
+			private function delTicket():void{
+				var data:Object = new Object();
+				data["id"] = ticketId.text;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/delTicket",delTicketResult,"POST").send(data);
+				
+			}
+			
+			private function delTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					addTicket();
+					refreshTaxKind();
+				}
+			}
+			
+			
+			private function kindlblFun(item:Object):String{
+				var s:String ="";
+				if(item.type=="kind"){
+					s+="[分类] ";
+				}
+				if(item.type=="ticket"){
+					s+="[票据] ";
+				}
+				if(item.type=="kjkm"){
+					s+="[科目] ";
+				}
+				s+=item.name;
+				if(item.type=="kind"&&!item.is_active){
+					s+="(不可用) ";
+				}
+				return s;
+			}
+			
+			private function iconFn(item:Object):Class{
+				if(item.hasOwnProperty("children")){
+					return null;
+				}
+				if(item.type=="kind"){
+					return addimg;
+				}
+				if(item.type=="ticket"){
+					return wximg;
+				}
+				if(item.type=="kjkm"){
+					return delimg;
+				}
+				return addimg;
+			}
+			
+			[Bindable]
+			private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增下级','ico':addimg},{'label':'新增根级','ico':addimg},{'label':'新增同级','ico':addimg},{'label':'同步数据','ico':refreshimg}]);
+			
+			
+			private var imgurl:String = null;
+			private function deleteImage(event:MouseEvent):void{
+				if(event.currentTarget is Image){
+//					Alert.show(event.currentTarget.source,"图片地址");
+					imgurl = event.currentTarget.source;
+					Alert.show("确认删除双击的图片?", "提示", Alert.YES | Alert.NO, null, deleteImg);
+				}
+			}
+			//上传图片到服务器
+			private function deleteImg(e:mx.events.CloseEvent):void
+			{
+				if (e.detail == Alert.YES){
+					var data:Object = new Object();
+					data["imgurl"] = imgurl;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ft/delImg",delImageResult,"POST").send(data);
+				}
+			}
+			
+			private function delImageResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					for(var i:Number=0;i<imglist.numElements;i++){
+						
+					var img:Image=imglist.getElementAt(i) as Image;
+						if(img.source == imgurl){
+							imglist.removeElement(img);
+							refreshTaxKind();
+							break;
+						}
+					}
+				}
+			}
+			
+			//选择上传的图片
+			private function choose():void
+			{
+				file.removeEventListener(Event.COMPLETE,completeHandle);
+				file.addEventListener(Event.COMPLETE,fileReferenceCompleteHandler);
+				var imageTypes:FileFilter=new FileFilter("Images (*.jpg, *.jpeg, *.png)", "*.jpg;*.jpeg;*.png");
+				var allTypes:Array=new Array(imageTypes);
+				file.browse(allTypes);
+				//                file.browse();
+			}
+			
+			private function toUpload():void
+			{
+				if (bitmapData == null)
+				{
+					Alert.show("请您先选择要上传的图片");
+				}
+				else
+				{
+					Alert.show("上传 " + file.name + " (共 " + Math.round(file.size) + " 字节)?", "确认上传", Alert.YES | Alert.NO, null, proceedWithUpload);
+				}
+			}
+			
+			//监听文件上传状态
+			private function onProgress(e:ProgressEvent):void
+			{
+//				lbProgress.text=" 已上传 " + e.bytesLoaded + " 字节，共 " + e.bytesTotal + " 字节";
+				var proc:uint=e.bytesLoaded / e.bytesTotal * 100;
+				bar.setProgress(proc, 100);
+				bar.label="当前进度: " + " " + proc + "%";
+				if (e.bytesLoaded == e.bytesTotal)
+				{
+					CursorManager.removeBusyCursor();
+				}
+			}
+			
+			//上传图片到服务器
+			private function proceedWithUpload():void
+			{
+				
+					//进度监听
+					file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+					var request:URLRequest=new URLRequest("/ft/imgUploaded?mid="+ticketId.text+"&mtype=ticket");
+					request.method = URLRequestMethod.POST; 
+					
+					request.contentType = "multipart/form-data"; 
+					
+					
+					bar.visible=true; 
+					
+					    
+					//设置鼠标忙状态
+					CursorManager.setBusyCursor();
+					try
+					{
+						file.upload(request,'file',true);    
+						
+					}
+					catch (error:Error)
+					{
+						Alert.show("上传失败");
+						bar.visible = false;
+					}
+					
+				
+			}
+			
+			//上传完成调用
+			private function completeHandle(event:Event):void
+			{
+				byteArray=null;
+				bar.visible = false;
+				img.source = null;
+				
+				refreshTaxKind();
+			}
+			
+			private function uploadImageResult(e:DataEvent):void{
+				try{
+					var result:Object=JParser.decode(e.data);
+					if(result.success==true){
+						
+						var img:Image = new Image();
+						img.source = result.result;
+						img.doubleClickEnabled = true;
+						img.addEventListener(MouseEvent.DOUBLE_CLICK,deleteImage);
+						imglist.addElement(img);
+						
+					}
+				}catch(error:Error){
+					
+					var i:Number =1;
+				}
+			}
+			
+			//载入本地图片
+			private function fileReferenceCompleteHandler(e:Event):void
+			{
+				byteArray=file.data;
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleteHandler);
+				loader.loadBytes(byteArray);
+				
+			}
+			
+			//图片载入完成显示在预览框中
+			private function loaderCompleteHandler(e:Event):void
+			{
+				var bitmap:Bitmap=Bitmap(loader.content);
+				bitmapData=bitmap.bitmapData;
+				img.source=bitmap;
+			}
+			
+			//选择文件动作监听
+			private function fileReferenceSelectHandler(e:Event):void
+			{
+				file.removeEventListener(ProgressEvent.PROGRESS, onProgress);
+				file.load();
+			}
+
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
+		<mx:HDividedBox width="100%" height="100%">
+		<s:BorderContainer width="40%" height="100%" id="panel" backgroundAlpha="0"   borderVisible="false">
+				<s:layout>
+					<s:VerticalLayout verticalAlign="top">
+						
+					</s:VerticalLayout>
+				</s:layout>
+			<s:BorderContainer  width="100%" height="25"  backgroundAlpha="0"  borderVisible="false">	
+				<s:layout>
+					<s:HorizontalLayout verticalAlign="middle" horizontalAlign="left" paddingLeft="25">
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				
+			</s:BorderContainer>
+				<mx:Tree id="kindTree"  iconFunction="iconFn" itemClick="showNode()"   width="100%" height="100%" dataProvider="{ToolUtil.ticketList}" labelField="name"  >
+					
+				</mx:Tree>
+		</s:BorderContainer>
+		<s:BorderContainer id="rightContainner" width="60%" height="100%" backgroundAlpha="0"  borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout gap="5">
+					
+				</s:VerticalLayout>
+				
+			</s:layout>
+			<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+				<s:layout>
+					<s:BasicLayout>
+						
+					</s:BasicLayout>
+				</s:layout>
+				<mx:ButtonBar dataProvider="{buttonArr}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30" top="7" bottom="7" left="10" itemClick="clickHander(event);">
+					
+				</mx:ButtonBar>
+				
+			</s:BorderContainer>
+			<s:Scroller width="100%" height="100%">
+				<s:Group width="100%" height="100%">
+					
+				
+					<s:BorderContainer width="100%"  borderVisible="false">
+						
+						<s:Form width="100%" id="form2"    x="10" y="10" visible="{ticketName.enabled}"  >
+							<mx:FormHeading label="票据" >
+								
+							</mx:FormHeading>
+							<s:FormItem label="票据名称:" textAlign="right">
+								
+								<s:TextArea  id="ticketName" width="500" height="70"  enabled="{ticketSave.enabled}">
+									
+								</s:TextArea>
+							</s:FormItem>
+							<s:FormItem label="票据备注:" textAlign="right">
+								
+								<s:TextArea  id="ticketDesc" width="500" height="120"  enabled="{ticketSave.enabled}">
+									
+								</s:TextArea>
+							</s:FormItem>
+							<s:FormItem label="父级:" textAlign="right">
+								<s:Label id="taxKind">
+									
+								</s:Label>
+							</s:FormItem>
+							<s:FormItem label="图片:" textAlign="right">
+								<s:BorderContainer borderVisible="false" width="100%">
+									<s:layout>
+										<s:HorizontalLayout gap="10">
+											
+										</s:HorizontalLayout>
+									</s:layout>
+									<s:Button label="选择图片" chromeColor="#faf0cc" height="30" click="choose()">
+									</s:Button>
+									<mx:Image id="img"
+											  width="350"
+											  height="200"
+											  x="36"
+											  y="44"/>
+
+								</s:BorderContainer>
+							</s:FormItem>
+							
+							
+							<s:FormItem>
+								<s:BorderContainer borderVisible="false" width="100%">
+									<s:layout>
+										<s:HorizontalLayout gap="10">
+											
+										</s:HorizontalLayout>
+									</s:layout>
+									<s:Button label="提交" chromeColor="#faf0cc" height="30" click="saveTicket()" id="ticketSave">
+									</s:Button>
+									<s:Button label="删除" chromeColor="#faf0cc" height="30" click="delTicket()" id="ticketDel">
+									</s:Button>
+								</s:BorderContainer>
+							</s:FormItem>
+							<s:FormItem label="图片:" textAlign="right">
+								<s:BorderContainer id="imglist" borderVisible="false" width="100%" doubleClickEnabled="true">
+									<s:layout>
+										<s:VerticalLayout gap="10">
+											
+										</s:VerticalLayout>
+									</s:layout>
+									
+									
+								</s:BorderContainer>
+							</s:FormItem>
+							<s:TextInput id="ticketId" visible="false">
+								
+							</s:TextInput>
+							<s:TextInput id="ticketKindId" visible="false">
+								
+							</s:TextInput>
+						</s:Form>
+						
+					</s:BorderContainer>
+				</s:Group>
+			</s:Scroller>
+			
+		</s:BorderContainer>
+			</mx:HDividedBox>
+	</s:BorderContainer>
+	<uicontrol:CProgressBar id="bar" width="100%" height="100%" visible="false">
+	</uicontrol:CProgressBar>
+	
+
+</control:CBorderContainer>

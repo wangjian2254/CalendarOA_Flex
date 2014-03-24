@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
+						  xmlns:uicontrol="uicontrol.*"
+						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+	<fx:Script>
+		<![CDATA[
+			import events.CloseEvent;
+			import events.PageChangeEvent;
+			
+			import httpcontrol.CHTTPService;
+			import httpcontrol.HttpServiceUtil;
+			
+			import model.DeptModel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import uicontrol.BBItemEdit;
+			
+			import util.ToolUtil;
+			
+			[Bindable]
+			private var list:ArrayCollection=new ArrayCollection();
+			private var bbitemlist:ArrayCollection=new ArrayCollection();
+			
+			override public   function  init(e:FlexEvent):void{
+				
+				bb.removeAllElements();
+				for each(var item:Object in ToolUtil.bbList){
+					var bbitem:BBItemEdit=new BBItemEdit();
+					bbitem.bbid = item.id;
+					bbitem.bbname = item.name;
+					bbitem.headArray = new ArrayCollection(item.children as Array);
+					
+					bb.addElement(bbitem);
+					bbitemlist.addItem(bbitem);
+				}
+				refreshTaxKind();
+			}
+			override public function closeContainer(e:CloseEvent):void{
+				dispatchEvent(e);
+				
+			}
+			
+			private function loadDataFault(e:FaultEvent):void{
+				Alert.show('操作失败',"提示");
+			}
+			
+			private function pagechange(e:PageChangeEvent):void
+				
+			{
+				
+//				datalist.dataProvider = e.Filter(datas)
+				
+			}
+			
+			//新增，保存，删除的处理函数
+			private function clickHander(e:ItemClickEvent):void{
+				if(e.label=="保存"){
+					saveData();
+				}
+				
+				
+			}
+			
+			private function saveData():void{
+				var obj:Object = new Object();
+				for each(var element:BBItemEdit in bbitemlist){
+					element.getData(obj);
+				}
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveBBFieldValuebyTicketKjkm",showSaveResult,"POST").send(obj)
+					
+			}
+			private function showSaveResult(result:Object,e:ResultEvent):void{
+				
+				if(result.success){
+					Alert.show("保存成功","提示");
+				}
+			}
+			
+			
+			public function showBB():void{
+				if(kindTree.selectedItem){
+					if(kindTree.selectedItem.type=="kjkm"){
+						var obj:Object=new Object();
+						obj["id"]=kindTree.selectedItem.id;
+						HttpServiceUtil.getCHTTPServiceAndResult("/ft/getBBFieldValuebyTicketKjkm",showBBResult,"POST").send(obj)
+					}
+				}
+			}
+			
+			public function showBBResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					for each(var element:BBItemEdit in bbitemlist){
+						element.bbvalue=result.result;
+						element.showData();
+					}
+				}
+			}
+			
+			
+
+			
+			
+			
+			private function kindlblFun(item:Object):String{
+				var s:String ="";
+				if(item.type=="kind"){
+					s+="[分类] ";
+				}
+				if(item.type=="ticket"){
+					s+="[票据] ";
+				}
+				if(item.type=="kjkm"){
+					s+="[科目] ";
+				}
+				s+=item.name;
+				if(item.type=="kind"&&!item.is_active){
+					s+="(不可用) ";
+				}
+				return s;
+			}
+			
+			private function iconFn(item:Object):Class{
+				if(item.type=="kind"){
+					return addimg;
+				}
+				if(item.type=="ticket"){
+					return wximg;
+				}
+				if(item.type=="kjkm"){
+					return delimg;
+				}
+				return addimg;
+			}
+			
+			private function changeHy():void{
+				refreshTaxKind();
+
+			}
+			private function refreshTaxKind():void{
+				var o:Object=new Object();
+				o['groupid']=hy.selectedItem.id;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/getTaxKind",refresh,"POST").send(o);
+			}
+			public function refresh(result:Object,e:ResultEvent):void{
+				if(result.success){
+					list = new ArrayCollection( result.result as Array);
+					
+				}
+				kindTree.validateNow();
+				for each(var item:Object in list){
+					kindTree.expandChildrenOf(item,true);
+					
+				}
+			}
+			
+			[Bindable]
+			private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'保存','ico':saveimg},{'label':'同步数据','ico':refreshimg}]);
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:VDividedBox top="5" bottom="5" right="5" left="5">
+		<s:BorderContainer width="100%" height="100%" id="panel" backgroundAlpha="0"   borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout verticalAlign="top">
+					
+				</s:VerticalLayout>
+			</s:layout>
+			<s:BorderContainer  width="100%" height="25"  backgroundAlpha="0"  borderVisible="false">	
+				<s:layout>
+					<s:HorizontalLayout verticalAlign="middle" horizontalAlign="left" paddingLeft="25">
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				<s:Label text="行业："    fontSize="14" height="25" verticalAlign="middle" textAlign="left" >
+					
+				</s:Label>
+				<mx:ComboBox id="hy" dataProvider="{ToolUtil.hyList}" labelField="name" width="100" change="changeHy()">
+					
+				</mx:ComboBox>
+			</s:BorderContainer>
+			<mx:Tree id="kindTree"  iconFunction="iconFn" itemClick="showBB()"   width="100%" height="100%" dataProvider="{list}" labelField="name" labelFunction="kindlblFun" >
+				
+			</mx:Tree>
+		</s:BorderContainer>
+		<s:BorderContainer id="rightContainner" width="100%" height="345" backgroundAlpha="0"  borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout gap="5">
+					
+				</s:VerticalLayout>
+				
+			</s:layout>
+			<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+				<s:layout>
+					<s:BasicLayout>
+						
+					</s:BasicLayout>
+				</s:layout>
+				<mx:ButtonBar dataProvider="{buttonArr}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30" top="7" bottom="7" left="10" itemClick="clickHander(event);">
+					
+				</mx:ButtonBar>
+				
+			</s:BorderContainer>
+			<s:Scroller width="100%" height="100%">
+				<s:Group width="100%" height="100%">
+					<s:BorderContainer  minWidth="500" id="bb" borderVisible="false" backgroundColor="#000000">
+						<s:layout>
+							<s:HorizontalLayout gap="0" horizontalAlign="left" verticalAlign="top">
+								
+							</s:HorizontalLayout>
+						</s:layout>
+					</s:BorderContainer>
+				</s:Group>
+			</s:Scroller>	
+			
+		</s:BorderContainer>
+	</mx:VDividedBox>
+
+</control:CBorderContainer>

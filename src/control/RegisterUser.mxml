@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="300" title="注册用户" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+			import httpcontrol.HttpServiceUtil;
+			import httpcontrol.RemoteUtil;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+			import util.UserUtil;
+			
+			public var userfn:Function;
+			
+			public function closeWin():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			public function save():void{
+				if(this.username.text==""||this.truename.text==""||
+					this.password.text==""||this.rpassword.text==""){
+					Alert.show("请填写完整信息。","提示");
+					return;
+				}
+				if(this.password.text==""||this.password.text!=this.rpassword.text){
+					Alert.show("密码和确认密码要一致。","提示");
+					return;
+				}
+				var obj:Object=new Object();
+				obj.username=username.text;
+				obj.truename = truename.text;
+				obj.password = password.text;
+				obj.isaction = 'true';
+				obj.ismanager = 'true';
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/regUser",refresh,"POST").send(obj);
+					
+				
+			}
+			public function refresh(r:Object,e:ResultEvent):void{
+				if(r.success){
+					Alert.show("注册成功","提示");
+					ToolUtil.sessionUserRefresh(userfn);
+					closeWin();
+				}else{
+//					Alert.show("修改密码失败","提示");
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:Form width="100%" id="form" >
+		
+		<s:FormItem label="用户名:" textAlign="right">
+			<s:TextInput id="username" width="200"  text="">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="昵称:" textAlign="right">
+			<s:TextInput id="truename"   width="200">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="密码:" textAlign="right">
+			<s:TextInput id="password" displayAsPassword="true"  width="200">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="确认密码:" textAlign="right">
+			<s:TextInput id="rpassword" displayAsPassword="true"  width="200">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem>
+			<s:Button label="注册" click="save()">
+				
+			</s:Button>
+		</s:FormItem>
+	</s:Form>
+</s:TitleWindow>

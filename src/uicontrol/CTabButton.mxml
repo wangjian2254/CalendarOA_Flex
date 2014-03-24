@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" backgroundAlpha="0" creationComplete="mouseU()" borderVisible="false" width="{btnLabel.width>80?btnLabel.width:80}"  click="clickBtn()" mouseDown="mouseD()" mouseUp="mouseU()" mouseOut="mouseU()" buttonMode="true" height="31">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<s:states>	
+		<s:State name="unSelected" />
+		<s:State name="selected" />
+	</s:states>
+	<fx:Script>
+		<![CDATA[
+			import control.CBorderContainer;
+			
+			import events.ChangeTabButtonEvent;
+			import events.CloseTabButtonEvent;
+			[Bindable]
+			public var label:String;
+			
+			[Bindable]
+			public var view:CBorderContainer;			
+
+			public function clickBtn():void{
+				var e:ChangeTabButtonEvent=new ChangeTabButtonEvent(ChangeTabButtonEvent.Change_TabButton,view,this,true);
+				dispatchEvent(e);
+			}
+			public function close():void{
+				var e:CloseTabButtonEvent=new CloseTabButtonEvent(CloseTabButtonEvent.Close_TabButton,view,this,true);
+				dispatchEvent(e);
+			}
+			//////
+		
+			[Bindable]
+			[Embed("assets/img/tabbutton/X_down.png")]
+			public var X_down:Class;
+			[Bindable]
+			[Embed("assets/img/tabbutton/X_hover.png")]
+			public var X_hover:Class;
+			[Bindable]
+			[Embed("assets/img/tabbutton/X_out.png")]
+			public var X_out:Class;
+			
+			private var _flag:String=STATUS_U;
+			public function get flag():String
+			{
+				return _flag;
+			}
+			
+			public function set flag(value:String):void
+			{
+				_flag = value;
+				mouseU();
+			}
+			
+			public static var STATUS_D:String="D";
+			public static var STATUS_U:String="U";			
+			
+			public function mouseU():void{				
+				if(STATUS_D==flag){
+					mouseD();
+				}else{							
+					this.currentState="selected";
+				}
+			}
+			public function mouseD():void{				
+				this.currentState="unSelected";
+			}
+			
+			public function closeO():void{
+				
+				this.clo.source=X_hover;
+			}
+			public function closeD():void{
+				
+				this.clo.source=X_down;
+			}
+			public function closeU():void{
+				this.clo.source=X_out;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<!-- layer 1: shadow -->
+	<!--- @private -->
+	<s:Rect id="shadow" left="-1" right="-1" top="0" bottom="-1" radiusX="5" includeIn="selected">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x000000"  alpha="0.15"/>
+				<s:GradientEntry color="0x000000" alpha="0.15"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<!-- fill -->
+	<!--- @private -->
+	<s:Rect id="fill" left="1" right="1" top="1" bottom="2" bottom.selected="1" radiusX="3">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
+				<s:GradientEntry color="0xe3e8ed" color.selected="0xfefefe" alpha="1" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect id="border" left="0" right="0" top="0" bottom="1" bottom.selected="0" radiusX="4">
+		<s:stroke>
+			<s:LinearGradientStroke rotation="90" weight="1">
+				<s:GradientEntry color="0x546679" alpha="1" />
+				<s:GradientEntry color="0x546679" alpha="1" />
+			</s:LinearGradientStroke>
+		</s:stroke>
+	</s:Rect>
+	
+	
+	<s:Rect id="fill2" left="0" right="0" top="0" height="5" radiusX="0">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x546679" alpha="1" />
+				<s:GradientEntry color="0x546679" alpha="1" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect id="fill3" left="1" right="1" top="0" height="5" radiusX="0">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
+				<s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect id="fill4" left="0" right="0" top="0" height="1" radiusX="0" includeIn="unSelected">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x000000" alpha="0.4" ratio="0"/>
+				<s:GradientEntry color="0x000000" alpha="0.4" ratio="1"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Rect id="fill5" left="0" right="0" top="1" height="1" radiusX="0"  includeIn="unSelected">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0x000000" alpha="0.2" ratio="0"/>
+				<s:GradientEntry color="0x000000" alpha="0.2" ratio="1"/>
+			</s:LinearGradient>
+		</s:fill>
+	</s:Rect>
+	
+	<s:Label id="btnLabel" text="{label}" minWidth="80" paddingLeft="10" paddingRight="{view.closeEnable?25:10}" textAlign="center" verticalAlign="middle" top="5" bottom="5"/>
+	<mx:Image id="clo" visible="{view.closeEnable}" source="{X_out}" click="close()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
+</s:BorderContainer>

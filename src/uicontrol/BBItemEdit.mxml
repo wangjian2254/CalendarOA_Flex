@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="170" minHeight="260" creationComplete="showHead()" borderVisible="true" backgroundColor="#000000" xmlns:uicontrol="uicontrol.*">
+	<s:layout>
+		<s:VerticalLayout gap="1"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			public var headArray:ArrayCollection=new ArrayCollection();
+			public var bbvalue:Object=new Object();
+			public var ticketid:String="";
+			public var ticketkjkmid:String="";
+			public var bbid:String="";
+			[Bindable]
+			public var bbname:String="";
+			
+			public function showHead():void{
+				headPanel.removeAllElements();
+				this.width=0;
+				for each(var head:Object in headArray){
+					var lbl:FieldLabel=new FieldLabel();
+
+					lbl.head=head.name;
+					lbl.fieldData=head.id;
+					
+					headPanel.addElement(lbl);
+					this.width+=lbl.width;
+				}
+			}
+			
+			public function showData():void{
+				bbvaluePanel.removeAllElements();
+				for (var i:Number=0;i< headPanel.numElements;i++){
+					var lbl:FieldLabel=headPanel.getElementAt(i) as FieldLabel;
+					var fieldV:FieldValue = new FieldValue();
+					fieldV.dataValue = bbvalue[lbl.fieldData];
+					fieldV.fieldData = lbl.fieldData;
+					bbvaluePanel.addElement(fieldV);
+				}
+			}
+			
+			public function getData(obj:Object):Object{
+//				var obj:Object=new Object();
+				if(!obj.hasOwnProperty("datafield")){
+					obj.datafield= new Array();
+				}
+				obj["kjkmticketid"]=bbvalue["kjkmticketid"];
+				for (var i:Number=0;i< bbvaluePanel.numElements;i++){
+					var fieldV:FieldValue = bbvaluePanel.getElementAt(i) as FieldValue;
+					if(fieldV.tad.text){
+						obj.datafield.push(fieldV.fieldData);
+						obj[fieldV.fieldData]=fieldV.tad.text;
+					}
+					
+				}
+				return obj;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:BorderContainer width="100%" height="35"   borderVisible="false">
+		<s:layout>
+			<s:HorizontalLayout gap="0">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:Label width="100%" height="35" textAlign="center"  text="{bbname}" fontSize="16" fontWeight="bold" verticalAlign="middle">
+			
+		</s:Label>
+	</s:BorderContainer>
+	<s:BorderContainer width="100%" height="35" id="headPanel"  borderVisible="false" backgroundColor="#000000">
+		<s:layout>
+			<s:HorizontalLayout gap="1">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<uicontrol:FieldLabel head=" " />
+		<uicontrol:FieldLabel head=" " />
+		<uicontrol:FieldLabel head=" " />
+		<uicontrol:FieldLabel head=" " />
+		<uicontrol:FieldLabel head=" " />
+		<uicontrol:FieldLabel head=" " />
+		<uicontrol:FieldLabel head=" " />
+			
+		
+	</s:BorderContainer>
+	<s:BorderContainer width="100%" height="200" id="bbvaluePanel"  borderVisible="false"  backgroundColor="#000000">
+		<s:layout>
+			<s:HorizontalLayout gap="1">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<uicontrol:FieldValue dataValue="请选择科目……" />
+		<uicontrol:FieldValue dataValue="请选择科目……" />
+		<uicontrol:FieldValue dataValue="请选择科目……" />
+		<uicontrol:FieldValue dataValue="请选择科目……" />
+		<uicontrol:FieldValue dataValue="请选择科目……" />
+		<uicontrol:FieldValue dataValue="请选择科目……" />
+	</s:BorderContainer>
+</s:BorderContainer>

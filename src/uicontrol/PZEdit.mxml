@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" height="220"  creationComplete="showFl()" borderVisible="false" xmlns:uicontrol="uicontrol.*">
+	<s:layout>
+		<s:VerticalLayout gap="1"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			import httpcontrol.HttpServiceUtil;
+			import mx.controls.Alert;
+			import util.ToolUtil;
+			import json.JParser;
+			
+			public var pzid:String="";
+			public var bid:String=null;
+			
+			[Bindable]
+			public var editenable:Boolean=true;
+			
+			[Bindable]
+			public var fllist:ArrayCollection=new ArrayCollection();
+			
+			private function addFl():void{
+				var data:Object = new Object();
+				data["kjkm"]= "";
+				data["fx"] = false;
+				fllist.addItem(data);
+				var v:Object =new Object();
+				v.columnIndex=0;
+				v.rowIndex = fllist.length-1;
+				flgrid.editedItemPosition=v;
+//				flgrid.
+			}
+			private function delFl():void{
+				if(flgrid.selectedItem){
+					fllist.removeItemAt(fllist.getItemIndex(flgrid.selectedItem));
+				}
+			}
+			
+			public function showFl():void{
+				if(!pzid){
+					return;
+				}
+				var data:Object = new Object();
+				data["pzid"]=pzid;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/getPZ",showPZResult,"POST").send(data);
+				
+			}
+			
+			public function showPZResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					desc.text = result.result.pzdesc;
+					fllist = new ArrayCollection(result.result.fllist as Array);
+				}
+			}
+			
+			public function uploadData():void{
+				if(!bid){
+					Alert.show("缺少关系数据。","提示");
+					return;
+				}
+				var data:Object = new Object();
+				data["bid"]=bid;
+				data["pzid"]=pzid;
+				data["desc"]= desc.text;
+				data["fl"]=JParser.encode(fllist);
+				
+				if(pzid==""&&fllist.length==0){
+					
+					return ;
+				}
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/savePZ",savePZResult,"POST").send(data);
+				
+			}
+			
+			public function savePZResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					pzid = result.result.pzid;
+					bid = result.result.bid;
+				}
+			}
+		    public function kjkmlbl(item:Object, column:DataGridColumn):String{
+				for each(var obj:Object in ToolUtil.kmList){
+					if(item.kjkm==obj.id){
+						return obj.name;
+					}
+				}
+				return "";
+			}
+		    public function fxlbl(item:Object, column:DataGridColumn):String{
+				if(item.fx){
+					return "借";
+				}
+				if(item.fx==false){
+					return "贷";
+				}
+				return "";
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:BorderContainer width="100%" height="30" borderVisible="false" visible="{editenable}">
+		<s:layout>
+			<s:HorizontalLayout gap="3" verticalAlign="middle" paddingLeft="5">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:Button chromeColor="#faf0cc" label="新增分录" click="addFl()">
+			
+		</s:Button>
+		<s:Button chromeColor="#faf0cc" label="删除分录" click="delFl()">
+			
+		</s:Button>
+	</s:BorderContainer>
+	<mx:DataGrid width="100%" height="100%" minHeight="150"  dataProvider="{fllist}" id="flgrid" editable="{editenable}">
+		<mx:columns>
+			<mx:DataGridColumn headerText="会计科目" labelFunction="kjkmlbl" dataField="kjkm" editorDataField="data" sortable="false" editable="{editenable}">
+				<mx:itemEditor>
+					<fx:Component>
+						<mx:HBox implements="mx.controls.listClasses.IDropInListItemRenderer,mx.managers.IFocusManagerComponent">
+							<fx:Script>
+								<![CDATA[
+									import mx.collections.ArrayCollection;
+									import mx.controls.dataGridClasses.DataGridListData;
+									import mx.controls.listClasses.BaseListData;
+									import mx.core.INavigatorContent;
+									
+									import util.ToolUtil;
+									private var _listData:DataGridListData;
+									// Define a property for returning the new value to the cell.
+									[Bindable]
+									private var _value:Object;  
+									
+									[Bindable]
+									private var list:ArrayCollection=new ArrayCollection();
+									
+									// Implement the drawFocus() method for the VBox.
+									override public function drawFocus(draw:Boolean):void {
+										cbo.setFocus();
+										cbo.open();
+										
+									}
+									
+									
+									
+									override public function get data():Object {
+										if(cbo==null){
+											return super.data;
+										}else{
+											if(cbo.selectedIndex==-1){
+												for each(var it:Object in cbo.dataProvider){
+													if(it[cbo.labelField]==cbo.data||it[cbo.valueField]==cbo.data){
+														return it[cbo.valueField]
+													}
+												}
+												return null;
+											}
+											return cbo.data;
+										}
+									}            
+									
+									override public function set data(value:Object):void {
+										super.data=value[_listData.dataField];
+										_value=value;
+										changeFilterValue();
+										cbo.setValue(value[_listData.dataField]);
+										
+										//												
+										//													changeFilterValue();
+									} 
+									
+									public function get listData():BaseListData
+									{
+										return _listData;
+									}
+									
+									public function set listData(value:BaseListData):void
+									{
+										_listData = DataGridListData(value);
+										cbo.listData = DataGridListData(value);
+									}
+									
+									public function changeCode():void{
+										if(cbo.selectedItem==null){
+											return;
+										}
+										
+									}
+									
+									public function changeFilterValue():void{
+										if(cbo.filtervalue!=_value.code){
+											cbo.filtervalue=_value.code;
+										}
+									}
+									
+								]]>
+							</fx:Script>
+							<uicontrol:FliterComboBox id="cbo"  dataProvider="{ToolUtil.kmList}"   labelField="name" valueField="id" change="changeCode()" height="{this.height}" width="{this.width}" styleName="fliterComboBox" dropdownWidth="200">
+								
+							</uicontrol:FliterComboBox>
+						</mx:HBox>
+					</fx:Component>
+				</mx:itemEditor>
+			</mx:DataGridColumn>
+			<mx:DataGridColumn headerText="方向" labelFunction="fxlbl" dataField="fx"  editorDataField="data" sortable="false" editable="{editenable}">
+				<mx:itemEditor>
+					<fx:Component>
+						<mx:HBox implements="mx.controls.listClasses.IDropInListItemRenderer,mx.managers.IFocusManagerComponent">
+							<fx:Script>
+								<![CDATA[
+									import mx.collections.ArrayCollection;
+									import mx.controls.dataGridClasses.DataGridListData;
+									import mx.controls.listClasses.BaseListData;
+									import mx.core.INavigatorContent;
+									
+									private var _listData:DataGridListData;
+									// Define a property for returning the new value to the cell.
+									[Bindable]
+									private var _value:Object;  
+									
+									[Bindable]
+									private var list:ArrayCollection=new ArrayCollection([{'name':"借","id":true},{'name':"贷","id":false}]);
+									
+									// Implement the drawFocus() method for the VBox.
+									override public function drawFocus(draw:Boolean):void {
+										cbo.setFocus();
+										cbo.open();
+										
+									}
+									
+									
+									
+									override public function get data():Object {
+										if(cbo==null){
+											return super.data;
+										}else{
+											if(cbo.selectedIndex==-1){
+//												for each(var it:Object in cbo.dataProvider){
+//													if(it[cbo.labelField]==cbo.data||it[cbo.valueField]==cbo.data){
+//														return it[cbo.valueField]
+//													}
+//												}
+												return "";
+											}
+											return cbo.data;
+										}
+									}            
+									
+									override public function set data(value:Object):void {
+										super.data=value[_listData.dataField];
+										_value=value;
+										changeFilterValue();
+										cbo.setValue(value[_listData.dataField]);
+										
+										//												
+										//													changeFilterValue();
+									} 
+									
+									public function get listData():BaseListData
+									{
+										return _listData;
+									}
+									
+									public function set listData(value:BaseListData):void
+									{
+										_listData = DataGridListData(value);
+										cbo.listData = DataGridListData(value);
+									}
+									
+									public function changeCode():void{
+										if(cbo.selectedItem==null){
+											return;
+										}
+										
+									}
+									
+									public function changeFilterValue():void{
+										if(cbo.filtervalue!=_value.code){
+											cbo.filtervalue=_value.code;
+										}
+									}
+									
+								]]>
+							</fx:Script>
+							<uicontrol:FliterComboBox id="cbo"  dataProvider="{list}"   labelField="name" valueField="id" change="changeCode()" height="{this.height}" width="{this.width}" styleName="fliterComboBox" dropdownWidth="200">
+								
+							</uicontrol:FliterComboBox>
+						</mx:HBox>
+					</fx:Component>
+				</mx:itemEditor>
+			</mx:DataGridColumn>
+		</mx:columns>
+	</mx:DataGrid>
+	<s:TextArea id="desc" width="100%" height="40">
+		
+	</s:TextArea>
+</s:BorderContainer>

@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
+						  xmlns:uicontrol="uicontrol.*"
+						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+	<fx:Script>
+		<![CDATA[
+			import events.CloseEvent;
+			import events.PageChangeEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import uicontrol.PZEdit;
+			
+			import util.ToolUtil;
+			
+			[Bindable]
+			private var businessList:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var kjkmList:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var kjzdList:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var ruleList:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var sfList:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var ticketList:ArrayCollection=new ArrayCollection();
+			
+			override public   function  init(e:FlexEvent):void{
+				ticketTree.validateNow();
+				for each(var item:Object in ToolUtil.ticketList){
+					ticketTree.expandChildrenOf(item,true);
+					
+				}
+				businessTree.validateNow();
+				for each(item in ToolUtil.businessList){
+					businessTree.expandChildrenOf(item,true);
+					
+				}
+				
+			}
+			override public function closeContainer(e:CloseEvent):void{
+				dispatchEvent(e);
+				
+			}
+			public function save(e:Event):void{
+				
+			}
+			
+			private function saveRule():void{
+				if(ruleName.text==""){
+					Alert.show("行业名称必须有值","提示");
+					return;
+				}
+				var obj:Object =new Object();
+				obj["name"]= ruleName.text;
+				obj["id"] = ruleId.text;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveRule",saveRuleResult,"POST").send(obj);
+				
+				
+			}
+			
+			private function saveRuleResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					ruleId.text = result.result;
+					ToolUtil.ruleRefresh();
+				}
+			}
+			
+			private function clearRule():void{
+				ruleName.text = "";
+				ruleId.text = "";
+			}
+			
+			private function showRule():void{
+				if(gridrule.selectedItem){
+					ruleName.text = gridrule.selectedItem.name;
+					ruleId.text = gridrule.selectedItem.id;
+				}
+				
+				showRelation();
+			}
+			
+			
+			private function saveDataResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					Alert.show(result.message,"提示");	
+					
+				}
+			}
+			
+			private function loadDataFault(e:FaultEvent):void{
+				Alert.show('操作失败',"提示");
+			}
+			
+			private function pagechange(e:PageChangeEvent):void
+				
+			{
+				
+				//				datalist.dataProvider = e.Filter(datas)
+				
+			}
+			
+			//新增，保存，删除的处理函数
+			private function clickHander(e:ItemClickEvent):void{
+				if(e.label=="保存关联"){
+					saveRelation();
+				}
+				if(e.label=="修改"){
+					
+				}
+				if(e.label=="删除关联"){
+					delRelation();
+				}
+				if(e.label=='同步数据'){
+				}
+				
+				
+			}
+			
+			public function add():void{
+			}
+			public function del():void{
+				
+			}
+			
+			public function show(obj:Object):void{
+				
+				
+			}
+			
+			
+			private function saveRelation():void{
+				var obj:Object = new Object();
+				if(gridrule.selectedItem==null){
+					Alert.show("请选择一个行业","提示");
+					return;
+				}
+				if(ticketTree.selectedItem==null||ticketTree.selectedItem.hasOwnProperty("children")){
+					Alert.show("请选择一个叶子票据","提示");
+					return;
+				}
+				if(businessTree.selectedItem==null){
+					Alert.show("请选择一个叶子业务","提示");
+					return;
+				}
+				
+				obj["ruleid"] = gridrule.selectedItem.id;
+				obj["ticketid"] = ticketTree.selectedItem.id;
+				obj["businessid"] = businessTree.selectedItem.id;
+				obj["kjzd"] = kjzd.text;
+				obj["sf"] = sf.text;
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveRelation",saveDataResult,"POST").send(obj);
+				
+				
+				
+				
+			}
+			private function delRelation():void{
+				var obj:Object = new Object();
+				if(gridrule.selectedItem==null){
+					Alert.show("请选择一个行业","提示");
+					return;
+				}
+				if(ticketTree.selectedItem==null||ticketTree.selectedItem.hasOwnProperty("children")){
+					Alert.show("请选择一个叶子票据","提示");
+					return;
+				}
+				if(businessTree.selectedItem==null){
+					Alert.show("请选择一个叶子业务","提示");
+					return;
+				}
+				
+				obj["ruleid"] = gridrule.selectedItem.id;
+				obj["ticketid"] = ticketTree.selectedItem.id;
+				obj["businessid"] = businessTree.selectedItem.id;
+				
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/delRelation",saveDataResult,"POST").send(obj);
+				
+				
+			}
+			private function getRuleResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					ruleList=new ArrayCollection(result.result as Array);
+					ticketList.removeAll();
+					businessList.removeAll();
+					kjkmList.removeAll();
+					kjzd.text="";
+					sf.text="";
+				}
+			}
+			
+			private function selectRule():void{
+				if(gridrule.selectedItem){
+					ruleName.text = gridrule.selectedItem.name;
+					ruleId.text = gridrule.selectedItem.id;
+					var obj:Object = new Object();
+					obj["ruleid"]=gridrule.selectedItem.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ft/getTicketByRule",selectRuleResult,"POST").send(obj);
+				}
+			}
+			
+			private function selectRuleResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					ticketList=new ArrayCollection(result.result as Array);
+					businessList.removeAll();
+					kjkmList.removeAll();
+					kjzd.text="";
+					sf.text="";
+				}
+			}
+			private function selectTicket():void{
+				if(gridrule.selectedItem){
+					var obj:Object = new Object();
+					obj["ruleid"]=gridrule.selectedItem.id;
+					obj["ticketid"]=ticketTree.selectedItem.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ft/getBusinessByTicket",selectTicketResult,"POST").send(obj);
+				}
+				
+			}
+			
+			private function showImage():void{
+				imglist.removeAllElements();
+				if(ticketTree.selectedItem){
+					if(ticketTree.selectedItem.desc){
+						var lbl:Label=new Label();
+						lbl.text = ticketTree.selectedItem.desc;
+						lbl.width= vdbkjzd.width-30;
+						imglist.addElement(lbl);
+					}
+					var img:Image  = null;
+					for each(var imgurl:String in ticketTree.selectedItem.imgs){
+						img = new Image();
+						img.source = imgurl;
+						imglist.addElement(img);
+					}
+				}
+				showRelation();
+			}
+			
+			private function selectTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					businessList=new ArrayCollection(result.result as Array);
+					kjkmList.removeAll();
+					kjzd.text="";
+					sf.text="";
+				}
+			}
+			private function selectBusiness():void{
+				if(ticketTree.selectedItem){
+					var obj:Object = new Object();
+					obj["ruleid"]=gridrule.selectedItem.id;
+					obj["ticketid"]=ticketTree.selectedItem.id;
+					obj["businessid"]=businessTree.selectedItem.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ft/getKMByBusiness",selectBusinessResult,"POST").send(obj);
+				}
+				
+			}
+			private function selectBusinessResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					kjzd.text=result.result.kjzd;
+					sf.text=result.result.sf;
+				}
+			}
+			private function showBusiness():void{
+				var data:Object =new Object();
+				data['bid']=businessTree.selectedItem.id;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/getPZbyBusiness",showPZ,"POST").send(data);
+				showRelation();
+				
+			}
+			private function showPZ(result:Object , e:ResultEvent):void{
+				pzlist.removeAllElements();
+				for each(var pid:String in result.result){
+					var pzview:PZEdit=new PZEdit();
+					pzview.editenable=false;
+					pzview.bid=businessTree.selectedItem.id;
+					pzview.pzid = pid;
+					pzlist.addElement(pzview);
+				}
+				
+			}
+			
+			private function  showRelation():void{
+				if(gridrule.selectedItem!=null&&ticketTree.selectedItem!=null&&businessTree.selectedItem!=null){
+					var obj:Object = new Object();
+					obj["ruleid"]=gridrule.selectedItem.id;
+					obj["ticketid"]=ticketTree.selectedItem.id;
+					obj["businessid"]=businessTree.selectedItem.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ft/getKJZDByKM",selectKjkmResult,"POST").send(obj);
+				}
+				
+			}
+			private function selectKjkmResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					
+					kjzd.text=result.result.kjzd;
+					sf.text=result.result.sf;
+					
+				}
+			}
+			
+			
+			
+			public function refresh(result:Object,e:ResultEvent):void{
+				if(result.message.success){
+				}
+			}
+			
+			private function iconFn(item:Object):Class{
+				if(item.hasOwnProperty("children")){
+					return null;
+				}
+				if(item.type=="business"){
+					return addimg;
+				}
+				if(item.type=="ticket"){
+					return wximg;
+				}
+				if(item.type=="km"){
+					return delimg;
+				}
+				return addimg;
+			}
+			
+			[Bindable]
+			private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'保存关联','ico':addimg},{'label':'删除关联','ico':delimg}]);
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<!--  allowMultipleSelection="true"  -->
+	</fx:Declarations>
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
+		<s:layout>
+			<s:VerticalLayout gap="3">
+				
+			</s:VerticalLayout>
+		</s:layout>
+		<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+		<s:layout>
+		<s:BasicLayout>
+		
+		</s:BasicLayout>
+		</s:layout>
+		<mx:ButtonBar dataProvider="{buttonArr}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30" top="7" bottom="7" left="10" itemClick="clickHander(event);">
+		
+		</mx:ButtonBar>
+		
+		</s:BorderContainer>
+		<mx:HDividedBox width="100%" height="100%">
+			<s:BorderContainer width="200" height="100%"  borderVisible="false">
+				<s:layout>
+					<s:VerticalLayout gap="3">
+						
+					</s:VerticalLayout>
+				</s:layout>
+				<mx:Form width="100%" >
+				<mx:FormHeading label="行业">
+				</mx:FormHeading>
+				<mx:FormItem label="名称">
+				<s:TextInput width="120" id="ruleName">
+				
+				</s:TextInput>
+				</mx:FormItem>
+				<mx:FormItem>
+				<s:BorderContainer borderVisible="false"  width="100%" height="100%">
+				<s:layout>
+				<s:HorizontalLayout gap="5">
+				
+				</s:HorizontalLayout>
+				</s:layout>
+				<s:Button label="保存" click="saveRule()">
+				</s:Button>
+				<s:Button label="新增" click="clearRule()">
+				</s:Button>
+				</s:BorderContainer>
+				
+				</mx:FormItem>
+				<s:TextInput visible="false" id="ruleId" >
+				
+				</s:TextInput>
+				</mx:Form>
+				<mx:DataGrid width="100%" height="100%" dataProvider="{ToolUtil.ruleList}" id="gridrule"  itemClick="showRule()" >
+					<mx:columns>
+						<mx:DataGridColumn headerText="行业" dataField="name">
+							
+						</mx:DataGridColumn>
+					</mx:columns>
+				</mx:DataGrid>
+			</s:BorderContainer>
+			<s:BorderContainer width="200" height="100%"  borderVisible="false">
+				<mx:Tree id="ticketTree"  iconFunction="iconFn" itemClick="showImage()"    width="100%" height="100%" dataProvider="{ToolUtil.ticketList}" labelField="name" >
+					
+				</mx:Tree>
+				
+			</s:BorderContainer>
+			<s:BorderContainer width="200" height="100%"  borderVisible="false">
+				
+				
+				<mx:Tree id="businessTree"  iconFunction="iconFn" itemClick="showBusiness()"    width="100%" height="100%" dataProvider="{ToolUtil.businessList}" labelField="businessname" >
+					
+				</mx:Tree>
+				
+			</s:BorderContainer>
+			
+			<mx:VDividedBox id="vdbkjzd" width="200" height="100%">
+				<s:Scroller width="100%" height="100%">
+					<s:Group width="100%" height="100%">
+				<s:BorderContainer width="100%"    borderVisible="false">
+					<s:layout>
+						<s:VerticalLayout gap="3">
+							
+						</s:VerticalLayout>
+					</s:layout>
+					
+					<s:Label text="会计制度" />
+					<s:TextArea width="100%" height="100" id="kjzd">
+						
+					</s:TextArea>
+					
+					<s:Label text="税法" />
+					<s:TextArea width="100%" height="100" id="sf">
+						
+					</s:TextArea>
+					<s:BorderContainer id="pzlist" width="100%" height="100%" borderVisible="false">
+						<s:layout>
+							<s:VerticalLayout gap="3">
+								
+							</s:VerticalLayout>
+						</s:layout>
+					</s:BorderContainer>
+				</s:BorderContainer>
+					</s:Group>
+				</s:Scroller>
+				
+				<s:Scroller width="100%" height="100%">
+					<s:Group width="100%" height="100%">
+						<s:BorderContainer id="imglist"   borderVisible="false">
+							<s:layout>
+								<s:VerticalLayout gap="3">
+									
+								</s:VerticalLayout>
+							</s:layout>
+							
+						</s:BorderContainer>
+					</s:Group>
+				</s:Scroller>
+			</mx:VDividedBox>
+			
+			
+		</mx:HDividedBox>
+	</s:BorderContainer>
+</control:CBorderContainer>

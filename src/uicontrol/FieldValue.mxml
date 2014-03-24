@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="170" height="100%" borderVisible="false" backgroundColor="#ffffff">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			[Bindable]
+			public var dataValue:String="";
+			
+			public var fieldData:String="";
+			
+			public function getData():String{
+				return tad.text;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:TextArea id="tad" width="100%" height="100%" text="{dataValue}" borderVisible="false" >
+		
+	</s:TextArea>
+</s:BorderContainer>

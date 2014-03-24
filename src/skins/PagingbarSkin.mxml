@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin>
+	<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300">
+		<fx:Script>
+			<![CDATA[
+	//			import httpcontrol.CHTTPService;
+	//			import httpcontrol.HttpServiceUtil;
+	//			
+	//			import mx.collections.ArrayCollection;
+	//			import mx.rpc.events.ResultEvent;
+	//			[Bindable]
+	//			public var url:String="";
+	//			public var source:ArrayCollection;
+	//			public var limitProperty:String="limit";
+	//			public var startProperty:String="start";
+	//			public var totalProperty:String="count";
+	//			public var rootProperty:String="";
+	//			[Bindable]
+	//			private var currentPage:Number=1;
+	//			private var limit:Number=10;
+	//			private var pageCount:Number=0;
+	//			[Bindable]
+	//			private var pages:Number=0;
+	//			public function handlerData(e:ResultEvent):Object{
+	//				return e.result;
+	//			}
+	//			private function success(e:ResultEvent):void{
+	//				var data:Object=handlerData(e);
+	//				if(rootProperty!=""){
+	//					source=new ArrayCollection(data[rootProperty] as Array);
+	//					pageCount=Math.ceil(Number(data[totalProperty])/limit);
+	//				}
+	//			}
+	//			private function loadData(o:Object):void{
+	//				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult(url,success,"POST");
+	//				http.send(o);
+	//				
+	//			}
+	//			private function beforeLoad(o:Object):Object{
+	//				return o;
+	//			}
+	//			private function getPara(flag:String):void{
+	//				var o={};
+	//				switch(flag){
+	//					case "first":
+	//						o[startProperty]=(currentPage=1)*limit;
+	//						o[limitProperty]=limit;
+	//						fstButton.enabled=false;
+	//						preButton.enabled=false;
+	//						netButton.enabled=true;
+	//						lstButton.enabled=true;
+	//						loadData(o);
+	//						break;
+	//					case "previous":
+	//						o[startProperty]=(currentPage = (currentPage-=1)<=0 ? 1:currentPage) *limit;
+	//						o[limitProperty]=limit;
+	//						if(currentPage==1){
+	//							fstButton.enabled=false;
+	//							preButton.enabled=false;
+	//							netButton.enabled=true;
+	//							lstButton.enabled=true;
+	//						}
+	//						loadData(o);
+	//						break;
+	//					case "next":
+	//						o[startProperty]=(currentPage = (currentPage+=1)>pageCount ? pageCount:currentPage) *limit;
+	//						o[limitProperty]=limit;
+	//						if(currentPage==pageCount){
+	//							fstButton.enabled=true;
+	//							preButton.enabled=true;
+	//							netButton.enabled=false;
+	//							lstButton.enabled=false;
+	//						}
+	//						loadData(o);
+	//						break;
+	//					case "last":
+	//						o[startProperty]=(currentPage=pageCount)*limit;
+	//						o[limitProperty]=limit;
+	//						fstButton.enabled=true;
+	//						preButton.enabled=true;
+	//						netButton.enabled=false;
+	//						lstButton.enabled=false;
+	//						loadData(o);
+	//						break;
+	//					case "goto":
+	//						o[startProperty]=(currentPage= Number(pageNumb.text)==0 ? 1: (Number(pageNumb.text)>pageCount) ? pageCount : currentPage)*limit;
+	//						o[limitProperty]=limit;
+	//						pageNumb.text=currentPage;
+	//						if(currentPage==1){
+	//							fstButton.enabled=false;
+	//							preButton.enabled=false;
+	//							netButton.enabled=true;
+	//							lstButton.enabled=true;
+	//						}
+	//						if(currentPage==pageCount){
+	//							fstButton.enabled=true;
+	//							preButton.enabled=true;
+	//							netButton.enabled=false;
+	//							lstButton.enabled=false;
+	//						}
+	//						loadData(o);
+	//						break;
+	//					case "fresh":
+	//						o[startProperty]=currentPage*limit;
+	//						o[limitProperty]=limit;
+	//						loadData(o);
+	//						break;
+	//				}
+	//			}
+				private function getPara(flag:String):void{
+					hostComponent.getPara(flag);
+				}
+			]]>
+		</fx:Script>
+		<fx:Declarations>
+			<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		</fx:Declarations>
+		<fx:Metadata>  
+		        [HostComponent("uicontrol.Pagingbar")]
+		</fx:Metadata>
+		<s:Button id='fstButton' label="首页" click="getPara('first')">
+			
+		</s:Button>
+		<s:Button id='preButton' label="上一页" click="getPara('previous')">
+			
+		</s:Button>
+		<s:Button id='netButton' label="下一页" click="getPara('next')">
+			
+		</s:Button>
+		<s:Button id='lstButton' label="末页" click="getPara('last')">
+			
+		</s:Button>
+		<s:Label text="第">
+			
+		</s:Label>
+		<s:TextInput id="pageNumb" restrict="0123456789" width="30" keyUp="getPara('goto')" text="{hostComponent.currentPage}">
+			
+		</s:TextInput>
+		<s:Label text="页/共">
+			
+		</s:Label>
+		<s:Label text="{hostComponent.pageCount}">
+			
+		</s:Label>
+		<s:Label text="页">
+			
+		</s:Label>
+		<s:Button id='freButton' label="刷新" click="getPara('fresh')">
+			
+		</s:Button>
+	</s:Group>
+</s:Skin>

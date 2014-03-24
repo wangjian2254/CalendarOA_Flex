@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
+						  xmlns:uicontrol="uicontrol.*"
+						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+	<fx:Script>
+		<![CDATA[
+			import events.CloseEvent;
+			import events.PageChangeEvent;
+			
+			import httpcontrol.CHTTPService;
+			import httpcontrol.HttpServiceUtil;
+			
+			import model.DeptModel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.messaging.AbstractConsumer;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import uicontrol.PZEdit;
+			
+			import util.ToolUtil;
+			[Bindable]
+			private var bz:String="左侧为关联科目;右侧为所有科目;双击单元格：完成增加、删除操作";
+			
+			
+			[Bindable]
+			private var kjkmlist:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var tempkjkmlist:ArrayCollection=new ArrayCollection();
+			
+			
+			
+			override public   function  init(e:FlexEvent):void{
+				ticketName.enabled=false;
+
+				refreshTaxKind();
+			}
+			override public function closeContainer(e:CloseEvent):void{
+				dispatchEvent(e);
+				
+			}
+			
+
+			
+			private function refreshTaxKind():void{
+				ToolUtil.businessRefresh(refresh);
+			}
+
+
+			
+
+
+			private function loadDataFault(e:FaultEvent):void{
+				Alert.show('操作失败',"提示");
+			}
+			
+
+			
+			//新增，保存，删除的处理函数
+			private function clickHander(e:ItemClickEvent):void{
+				ticketSave.enabled=false;
+				ticketDel.enabled=false;
+				
+				if(e.label=="新增根级"){
+					addTicket();
+					ticketSave.enabled=true;
+				}
+				if(e.label=="新增下级"){
+					if(kindTree.selectedItem&&kindTree.selectedItem.type=='business'){
+						addTicket();
+						ticketKindId.text = kindTree.selectedItem.id;
+						taxKind.text = kindTree.selectedItem.name;
+						ticketSave.enabled=true;
+						
+					}else{
+						if(kindTree.selectedItem){
+							Alert.show("财税票据无法添加下级","提示");
+						}else{
+							
+							Alert.show("请选择一个财税分类","提示");
+						}
+					}
+
+				}
+				
+				if(e.label=="新增同级"){
+					if(kindTree.selectedItem){
+						
+						if(kindTree.selectedItem.type =="business"){
+							addTicket();
+							ticketSave.enabled=true;
+							if(kindTree.getParentItem(kindTree.selectedItem)!=null){
+								ticketKindId.text = kindTree.getParentItem(kindTree.selectedItem).id;
+								taxKind.text = kindTree.getParentItem(kindTree.selectedItem).name;
+							}
+							
+						}
+						
+						
+					}else{
+						Alert.show("请选择一个财税分类或票据","提示");
+						
+					}
+
+				}
+				
+				
+				if(e.label=='同步数据'){
+					refreshTaxKind();
+				}
+
+				
+			}
+			
+			private function showNode():void{
+				ticketSave.enabled=false;
+				ticketDel.enabled=false;
+				
+				if(!kindTree.selectedItem){
+					return;
+				}
+				
+				if(kindTree.selectedItem.type =="business"){
+					addTicket();
+					ticketSave.enabled=true;
+					ticketDel.enabled=true;
+					ticketName.text = kindTree.selectedItem.name;
+					ticketId.text = kindTree.selectedItem.id;
+					num.value = kindTree.selectedItem.num;
+					if(kindTree.getParentItem(kindTree.selectedItem)!=null){
+						ticketKindId.text = kindTree.getParentItem(kindTree.selectedItem).id;
+						taxKind.text = kindTree.getParentItem(kindTree.selectedItem).name;
+					}
+					
+					pzlist.removeAllElements();
+					var data:Object =new Object();
+					data['bid']=kindTree.selectedItem.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ft/getPZbyBusiness",showPZ,"POST").send(data);
+					
+					
+				}
+				
+			}
+			
+			private function showPZ(result:Object , e:ResultEvent):void{
+				pzlist.removeAllElements();
+				
+				for each(var pid:String in result.result){
+					var pzview:PZEdit=new PZEdit();
+					pzview.bid=kindTree.selectedItem.id;
+					pzview.pzid = pid;
+					pzlist.addElement(pzview);
+				}
+				pzview=new PZEdit();
+				pzview.bid=kindTree.selectedItem.id;
+				pzlist.addElement(pzview);
+			}
+	
+			
+			
+			private function addTicket():void{
+				ticketName.text = "";
+				taxKind.text = "";
+				ticketId.text = "";
+				ticketKindId.text = "";
+				
+				
+			}
+			
+			private function saveTicket():void{
+				var data:Object = new Object();
+				data["id"]=ticketId.text;
+				data["name"]=ticketName.text;
+				data["num"]=num.value;
+				data["fatherid"]=ticketKindId.text;
+				if(ticketName.text==""){
+					Alert.show("票据名称不能为空。","提示");
+					return ;
+				}
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveBusiness",saveTicketResult,"POST").send(data);
+			}
+			
+			
+			
+			
+			
+			
+			private function saveTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					ticketId.text = result.result;
+					ticketDel.enabled=true;
+					refreshTaxKind();
+					
+					for(var i:Number=0;i<pzlist.numElements;i++){
+						var pzview:PZEdit = pzlist.getElementAt(i) as PZEdit;
+						pzview.bid = result.result;
+						pzview.uploadData();
+					}
+					
+					
+				}
+			}
+			
+			
+			
+			private function saveKJKMTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					refreshTaxKind();
+				}
+			}
+			
+			
+			
+
+			
+			
+			public function show(obj:Object):void{
+				
+				
+				
+			}
+			
+			
+			
+			public function refresh(result:Object,e:ResultEvent):void{
+				
+				kindTree.validateNow();
+				for each(var item:Object in ToolUtil.businessList){
+					kindTree.expandChildrenOf(item,true);
+					
+				}
+			}
+			
+			private function delTicket():void{
+				var data:Object = new Object();
+				data["id"] = ticketId.text;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/delBusiness",delTicketResult,"POST").send(data);
+				
+			}
+			
+			private function delTicketResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					addTicket();
+					refreshTaxKind();
+				}
+			}
+			
+			
+			private function kindlblFun(item:Object):String{
+				var s:String ="";
+				if(item.type=="kind"){
+					s+="[分类] ";
+				}
+				if(item.type=="ticket"){
+					s+="[票据] ";
+				}
+				if(item.type=="kjkm"){
+					s+="[科目] ";
+				}
+				s+=item.name;
+				if(item.type=="kind"&&!item.is_active){
+					s+="(不可用) ";
+				}
+				return s;
+			}
+			
+			private function iconFn(item:Object):Class{
+				if(item.hasOwnProperty("children")){
+					return null;
+				}
+				if(item.type=="kind"){
+					return addimg;
+				}
+				if(item.type=="ticket"){
+					return wximg;
+				}
+				if(item.type=="kjkm"){
+					return delimg;
+				}
+				return addimg;
+			}
+			
+			[Bindable]
+			private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增下级','ico':addimg},{'label':'新增根级','ico':addimg},{'label':'新增同级','ico':addimg},{'label':'同步数据','ico':refreshimg}]);
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
+		<s:layout>
+			<s:HorizontalLayout>
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:BorderContainer width="40%" height="100%" id="panel" backgroundAlpha="0"   borderVisible="false">
+				<s:layout>
+					<s:VerticalLayout verticalAlign="top">
+						
+					</s:VerticalLayout>
+				</s:layout>
+			<s:BorderContainer  width="100%" height="25"  backgroundAlpha="0"  borderVisible="false">	
+				<s:layout>
+					<s:HorizontalLayout verticalAlign="middle" horizontalAlign="left" paddingLeft="25">
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				
+			</s:BorderContainer>
+				<mx:Tree id="kindTree"  iconFunction="iconFn" itemClick="showNode()"   width="100%" height="100%" dataProvider="{ToolUtil.businessList}" labelField="businessname"  >
+					
+				</mx:Tree>
+		</s:BorderContainer>
+		<s:BorderContainer id="rightContainner" width="60%" height="100%" backgroundAlpha="0"  borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout gap="5">
+					
+				</s:VerticalLayout>
+				
+			</s:layout>
+			<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+				<s:layout>
+					<s:BasicLayout>
+						
+					</s:BasicLayout>
+				</s:layout>
+				<mx:ButtonBar dataProvider="{buttonArr}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30" top="7" bottom="7" left="10" itemClick="clickHander(event);">
+					
+				</mx:ButtonBar>
+				
+			</s:BorderContainer>
+			<s:Scroller width="100%" height="100%">
+				<s:Group width="100%" height="100%">
+					
+				
+					<s:BorderContainer width="100%"  borderVisible="false">
+						<s:layout>
+							<s:VerticalLayout gap="4">
+								
+							</s:VerticalLayout>
+						</s:layout>
+						<s:Form width="100%" id="form2"    x="10" y="10" visible="{ticketName.enabled}"  >
+							<mx:FormHeading label="业务" >
+								
+							</mx:FormHeading>
+							<s:FormItem label="业务名称:" textAlign="right">
+								
+								<s:TextArea  id="ticketName" width="500" height="100"  enabled="{ticketSave.enabled}">
+									
+								</s:TextArea>
+							</s:FormItem>
+							<s:FormItem label="父级:" textAlign="right">
+								<s:Label id="taxKind">
+									
+								</s:Label>
+							</s:FormItem>
+							<s:FormItem label="业务编码:" textAlign="right">
+								<s:NumericStepper id="num"  width="200" minimum="1" maximum="9" value="3">
+									
+								</s:NumericStepper>
+							</s:FormItem>
+							
+							
+							<s:FormItem>
+								<s:BorderContainer borderVisible="false" width="100%">
+									<s:layout>
+										<s:HorizontalLayout gap="10">
+											
+										</s:HorizontalLayout>
+									</s:layout>
+									<s:Button label="提交" chromeColor="#faf0cc" height="30" click="saveTicket()" id="ticketSave">
+									</s:Button>
+									<s:Button label="删除" chromeColor="#faf0cc" height="30" click="delTicket()" id="ticketDel">
+									</s:Button>
+								</s:BorderContainer>
+							</s:FormItem>
+							<s:TextInput id="ticketId" visible="false">
+								
+							</s:TextInput>
+							<s:TextInput id="ticketKindId" visible="false">
+								
+							</s:TextInput>
+						</s:Form>
+						<s:BorderContainer id="pzlist" width="100%"  borderVisible="false">
+							<s:layout>
+								<s:VerticalLayout gap="3">
+									
+								</s:VerticalLayout>
+							</s:layout>
+						</s:BorderContainer>
+					</s:BorderContainer>
+				</s:Group>
+			</s:Scroller>
+			
+		</s:BorderContainer>
+	</s:BorderContainer>
+</control:CBorderContainer>

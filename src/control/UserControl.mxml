@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
+						  xmlns:uicontrol="uicontrol.*"
+						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+	
+	<fx:Script>
+		<![CDATA[
+			import events.CloseEvent;
+			import events.PageChangeEvent;
+			
+			import httpcontrol.CHTTPService;
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+			
+			[Bindable]
+			private var list:ArrayCollection=new ArrayCollection();
+			
+			override public   function  init(e:FlexEvent):void{
+
+				var data:Object=new Object();
+				
+				
+				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ft/allmanager",getDataResult,"POST");
+				http.send(data);
+				return;
+				
+
+			}
+			override public function closeContainer(e:CloseEvent):void{
+				dispatchEvent(e);
+				
+			}
+			
+			private function getDataResult(o:Object,e:ResultEvent):void{
+				if(o&&o.success){
+					list = new ArrayCollection(o.result as Array);
+				}
+				
+			}
+			public function initpassword(e:Event):void{
+				var data:Object=getData();
+				if(data==null){
+					return;
+				}
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/initUser",initUserResult,"POST").send(data);
+			}
+			
+			private function initUserResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					Alert.show(result.message,"提示");
+				}
+			}
+			
+			public function save(e:Event):void{
+				var data:Object=getData();
+				if(data==null){
+					return;
+				}
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveUser",saveDataResult,"POST").send(data);
+			}
+			public function getData():Object{
+				var o:Object={};
+				o["username"]=username.text;
+				o["truename"]=truename.text;
+				
+				if(sfqy.selected){
+					o["isaction"]=true;
+				}else{
+					o["isaction"]=false;
+					
+				}
+				if(uTypeRadio.selectedValue=="1"){
+					o['ismanager']=true;
+				}else{
+					o['ismanager']=false;
+				}
+				
+				o["id"]=idField.text;
+				
+				return o;
+			}
+			private function saveDataResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					idField.text=result.result.id;
+					init(null);
+				}
+			}
+			
+			
+			private function loadDataFault(e:FaultEvent):void{
+				Alert.show('操作失败',"提示");
+			}
+			
+			
+			//新增，保存，删除的处理函数
+			private function clickHander(e:ItemClickEvent):void{
+				if(e.label=="新增"){
+					add();
+				}
+				if(e.label=="修改"){
+					if(peopgrid.selectedItem==null){
+						Alert.show("提示","请选择一条记录。");
+					}else{
+						show(peopgrid.selectedItem);
+					}
+				}
+				if(e.label=="删除"){
+					del();
+				}
+				if(e.label=='同步数据'){
+					//					InfoUtil.userRefresh(refreshScx);
+					init(null);
+				}
+				//				if(e.label=='测试打开部门管理'){
+				//					var obj:Object=new Object();
+				//					obj['test']="测试";
+				//					var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"dept",obj,true)
+				//					dispatchEvent(evt);
+				//				}
+				
+			}
+			
+			public function add():void{
+				username.enabled=true;
+				username.text="";
+				truename.text="";
+				
+				sfqy.selected=false;
+				idField.text="";
+			}
+			public function del():void{
+				var userArr:ArrayCollection=new ArrayCollection();
+				var obj:Object;
+				var item:Object;
+				for(var i:int=list.length-1;i>=0;i--){
+					item=list.getItemAt(i);
+					if(!item.selected){
+						continue;
+					}
+					obj=new Object();
+					if(item.hasOwnProperty("id")){
+						obj.id=item.id;
+						userArr.addItem(obj);
+					}
+					//					obj.name=item.name;
+					
+				}
+				if(userArr.length>0){
+					ToolUtil.deptRefresh(refresh);
+					ToolUtil.areaRefresh(refresh);
+					ToolUtil.userRefresh(refresh);
+					//					HttpServiceUtil.getCHTTPServiceAndResultAndFault("/htcsgl/_100_BaseInfosAction_deletedept.action",loadDataResult,loadDataFault,"POST").send(userArr);
+				}
+			}
+			
+			public function show(obj:Object):void{
+				username.enabled=false;
+				username.text=obj.username;
+				truename.text=obj.truename;
+				if(obj.ismanager){
+					uTypeRadio.selectedValue="1";
+				}else{
+					uTypeRadio.selectedValue="0";
+					
+				}
+
+				if(obj.isaction){
+					sfqy.selected=true;
+				}else{
+					sfqy.selected=false;
+					
+				}
+				idField.text=obj.id;
+			}
+			
+			
+			
+			public function refresh(result:Object,e:ResultEvent):void{
+				if(result.success){
+					add();
+					init(null);
+					//					InfoUtil.userRefresh(refreshScx);
+				}
+			}
+			
+			private function isUsered(item:Object, column:AdvancedDataGridColumn):String{
+				var str:String="";
+					if(item.isaction){
+						str="启用";
+					}else{
+						str="停止使用";
+					}
+				return str;
+			}
+			
+			
+			private function userType(item:Object, column:AdvancedDataGridColumn):String{
+				var str:String="";
+					if(item.ismanager){
+						str="编辑者";
+					}
+					
+				return str;
+			}
+				[Bindable]
+				private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增','ico':addimg},{'label':'修改','ico':saveimg},{'label':'同步数据','ico':refreshimg}]);
+				
+			private function pagechange(e:PageChangeEvent):void
+				
+			{
+				
+				//				datalist.dataProvider = e.Filter(datas)
+				
+			}
+				
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:RadioButtonGroup id="uTypeRadio" >
+			
+		</s:RadioButtonGroup>
+	</fx:Declarations>
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
+		<s:layout>
+			<s:HorizontalLayout>
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:BorderContainer width="30%" height="100%" id="panel" backgroundAlpha="0"   borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout verticalAlign="top">
+					
+				</s:VerticalLayout>
+			</s:layout>
+			<s:BorderContainer  width="100%" height="25"  backgroundAlpha="0"  borderVisible="false">	
+				<s:layout>
+					<s:VerticalLayout verticalAlign="top" paddingLeft="25">
+						
+					</s:VerticalLayout>
+				</s:layout>
+				<s:Label text="用户信息"  width="100%" fontFamily="黑体" fontSize="14" height="25" verticalAlign="middle" textAlign="left" fontWeight="bold">
+					
+				</s:Label>
+				</s:BorderContainer>
+				<s:Form width="100%" id="form" >
+					<s:FormItem label="用户名:" textAlign="right">
+						<s:TextInput id="username" width="200" >
+							
+						</s:TextInput>
+					</s:FormItem>
+					
+					<s:FormItem label="昵称:" textAlign="right">
+						<s:TextInput id="truename"  width="200">
+							
+						</s:TextInput>
+					</s:FormItem>
+					<s:FormItem label="密码:" textAlign="right">
+						<s:Label text="初始密码为：111111"/>
+					</s:FormItem>
+					
+					
+					<s:FormItem label="身份:" textAlign="right">
+						<s:RadioButton group="{uTypeRadio}"  label="游客"  value="0">
+							
+						</s:RadioButton>
+						<s:RadioButton group="{uTypeRadio}" label="编辑者"  value="1">
+							
+						</s:RadioButton>
+					</s:FormItem>
+					
+					
+					<s:FormItem label="启用:" textAlign="right">
+						<s:CheckBox id="sfqy" label="可用"/>
+					</s:FormItem>
+					<s:FormItem>
+						<s:BorderContainer borderVisible="false" width="100%">
+							<s:layout>
+								<s:HorizontalLayout gap="10">
+									
+								</s:HorizontalLayout>
+							</s:layout>
+							<s:Button label="保存" chromeColor="#faf0cc" height="30" click="save(event)">
+							</s:Button>
+							<s:Button label="初始化密码" chromeColor="#faf0cc" height="30" click="initpassword(event)">
+							</s:Button>
+						</s:BorderContainer>
+						
+					</s:FormItem>
+					<s:TextInput id="idField" visible="false">
+						
+					</s:TextInput>
+				</s:Form>
+		</s:BorderContainer>
+		<s:BorderContainer id="rightContainner" width="70%" height="100%" backgroundAlpha="0"  borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout gap="5">
+					
+				</s:VerticalLayout>
+				
+			</s:layout>
+			<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+				<s:layout>
+					<s:BasicLayout>
+						
+					</s:BasicLayout>
+				</s:layout>
+				<mx:ButtonBar dataProvider="{buttonArr}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30" top="7" bottom="7" left="10" itemClick="clickHander(event);">
+					
+				</mx:ButtonBar>
+				
+			</s:BorderContainer>
+			<uicontrol:MarkAdvancedDataGrid id="peopgrid" dataProvider="{list}"  isNewAdd="false" enabled="true" editable="false" width="100%" height="100%">
+				<uicontrol:columns>
+					<mx:AdvancedDataGridColumn headerText="选择" dataField="selected"  sortable="false" width="60"  editorDataField="selected" rendererIsEditor="true" >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:HBox horizontalAlign="center">
+									<fx:Script>
+										<![CDATA[
+											public function get selected():Boolean{
+												return cb.selected;
+											}
+											public function set selected(value:Boolean):void{
+												cb.selected=value;
+											}
+										]]>
+									</fx:Script>
+									
+									<mx:CheckBox id="cb" selected="{data.selected}" >
+										
+									</mx:CheckBox>
+								</mx:HBox>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn headerText="用户名" dataField="username">
+						
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn headerText="姓名" dataField="truename">
+						
+					</mx:AdvancedDataGridColumn>
+					
+					<mx:AdvancedDataGridColumn headerText="用户类型" dataField="usertype"  labelFunction="userType">
+						
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn headerText="是否启用" dataField="sfqy" labelFunction="isUsered">
+						
+					</mx:AdvancedDataGridColumn>
+				</uicontrol:columns>
+				
+			</uicontrol:MarkAdvancedDataGrid>
+
+		</s:BorderContainer>
+	</s:BorderContainer>
+</control:CBorderContainer>

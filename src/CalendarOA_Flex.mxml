@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()"  minWidth="955" minHeight="600" skinClass="skins.ApplicationSkinBlue" xmlns:httpcontrol="httpcontrol.*" xmlns:control="control.*" xmlns:uicontrol="uicontrol.*">
+	<fx:Style source="assets/customrControls.css">
+		
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import control.CBorderContainer;
+			import control.CalendarControl;
+			import control.ChangePassword;
+			import control.LoginUser;
+			import control.RegisterUser;
+			
+			import events.ChangeMenuEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			import httpcontrol.RemoteUtil;
+			
+			import model.User;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.Menu;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.events.MenuEvent;
+			import mx.managers.PopUpManager;
+			import mx.messaging.ChannelSet;
+			import mx.messaging.channels.AMFChannel;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.AsyncResponder;
+			import mx.rpc.AsyncToken;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import spark.components.Button;
+			
+			import util.InfoUtil;
+			import util.LoadingUtil;
+			import util.ToolUtil;
+			import util.UserUtil;
+			public function init():void{
+				ToolUtil.currentUserFun = currentUser;
+				LoadingUtil.loading=loading;
+				ToolUtil.init();
+				ToolUtil.sessionUserRefresh(currentUser);
+				menuXML.send();
+				gongNengStack.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr,changeMenu);
+				
+			}
+			private function welcome(result:Object,e:ResultEvent):void{
+				var event1:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
+				var xml1:XML=new XML("<menuitem label='日程管理' mod='calendar'></menuitem>");
+				event1.item=xml1; 
+				onMenuChange(event1);
+			}
+			private function currentUser(result:Object,e:ResultEvent):void{
+				if(result.success){
+					if(!result.result){
+						userinfoGroup.visible=false;
+						userinfoGroup2.visible = true;
+					}else{
+						userinfoGroup2.visible=false;
+						userinfoGroup.visible=true;
+					}
+					menuXML.send();
+				}
+			}
+			
+			private var myMenuXML:XML=null;
+			public function setMenu(evt:ResultEvent):void{
+				menuContainer.removeAllElements();
+				myMenuXML=new XML(evt.result.toString());
+				//				myMenuXML=evt.result as XML;
+				var xml:XML;
+				if(myMenuXML!=null){
+					for each(var xml1:XML in myMenuXML..menu){
+						xml=xml1 as XML;
+						var btn:Button=new Button();
+						btn.height=29;
+						btn.width=130;
+						btn.styleName="menuBtn";
+						btn.label=xml.attribute('label').toString()
+						btn.addEventListener(MouseEvent.MOUSE_OVER,showHandler);
+						menuContainer.addElement(btn);
+					}
+				}
+			}
+			
+			public function failMenu(evt:FaultEvent):void{
+				Alert.show("获取用户菜单失败。","提示");
+			}
+			
+			private function changeMenu(evt:ChangeMenuEvent):void{
+				var event:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
+				var label:String;
+				var mod:String;
+				var xml:XML;
+				var xml2:XML;
+				for each(var xml1:XML in myMenuXML..menuitem){
+					xml2=xml1 as XML;
+					if(xml2.attribute('mod').toString()==evt.getMenuMod()){
+						xml=xml2 as XML;
+						break;
+					}
+				}
+				event.item=xml; 
+				
+				onMenuChange(event,evt.getObj());
+			}
+			
+			private function resulthaschange(evt:ResultEvent, token:Object=null):void{
+				if(evt.result.success==true){
+					if(evt.result.result){
+						var event:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
+						var xml:XML=new XML("<menuitem label='用户管理' mod='people'></menuitem>");
+						//						xml.label="欢迎";
+						//						xml.mod="welcome";
+						event.item=xml; 
+						onMenuChange(event);
+					}else{
+						var event1:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
+						var xml1:XML=new XML("<menuitem label='用户管理' mod='people'></menuitem>");
+						event1.item=xml1; 
+						onMenuChange(event1);
+					}
+					
+				}
+			}
+			private function resultUser(evt:ResultEvent, token:Object=null):void{
+				if(evt.result.success==true){
+					var user:User=new User();
+					user.id=evt.result.result.id;
+					user.username=evt.result.result.username;
+					user.fullname=evt.result.result.last_name+evt.result.result.first_name;
+					user.user_permissions=new ArrayCollection(evt.result.result.user_permissions as Array);
+					user.groups=new ArrayCollection(evt.result.result.groups as Array);
+					UserUtil.user=user;
+				}
+				
+			}
+			
+			
+			
+			
+			private function iconFun(item:Object):Class{
+				var xml:XML=item as XML;
+				switch(xml.attribute('mod').toString()){
+					
+					//					case 'guanLi3':
+					//						return this.imgcz;
+					//						break;
+				}
+				return null;
+			}
+			
+			private var myMenu:Menu=new Menu();
+			private var menuflag:String;
+			protected function showHandler(event:MouseEvent):void
+			{
+				var btn:Button=event.currentTarget as Button;
+				var index:Number=0;
+				var xml:XML;
+				for each(var xml1:XML in myMenuXML..menu){
+					xml=xml1 as XML;
+					
+					if(xml.attribute('label').toString()==btn.label){
+						break;
+					}
+					index+=1;
+				}
+				if(myMenu!=null){
+					if(menuflag==btn.label){
+						return;
+					}
+					myMenu.hide();
+					myMenu=null;
+					menuflag=btn.label;
+				}
+				
+				
+				
+				myMenu = Menu.createMenu(null,myMenuXML.menu[index], false);
+				myMenu.labelField="@label";
+				myMenu.setStyle('font-family','黑体');
+				myMenu.setStyle('chromeColor','#dce2e7');
+				myMenu.iconFunction=iconFun;
+				myMenu.show(menuContainer.left+event.currentTarget.x, menuContainer.top+event.currentTarget.y+event.currentTarget.height);
+				myMenu.addEventListener(MouseEvent.CLICK,hideHandler);
+				myMenu.addEventListener(FlexEvent.HIDE,hideHandler);
+				myMenu.addEventListener(MenuEvent.CHANGE,onMenuChange);
+			}
+			
+			protected function hideHandler(event:Event):void
+			{
+				//				if(myMenu!=null){
+				//					
+				//					myMenu.hide();
+				//					myMenu=null;
+				//				}
+				menuflag=null;
+			}
+			
+			protected function onMenuChange(event:MenuEvent,obj:Object=null):void
+			{
+				//				if(obj!=null){
+				//					Alert.show(obj['test'],'d');
+				//				}
+				menuflag=null;
+				var xml:XML=event.item as XML;
+				var mod:String=xml.attribute('mod').toString();
+				website.text=xml.attribute('label').toString();
+				if(cbar.setView(mod)){
+					return;
+				}
+				var c:CBorderContainer;
+				switch(mod){
+					
+					case 'calendar':
+						c=new CalendarControl();
+						break;
+					
+					
+				}
+				if(c!=null){
+					c.label=xml.attribute('label').toString();
+					c.flag=mod;
+					c.param=obj;
+					cbar.addView(c);
+				}
+				
+			}
+			
+			public function login():void{
+				PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
+				
+			}
+			public function reg():void{
+				var changepassword:RegisterUser=RegisterUser(PopUpManager.createPopUp( 
+					this, RegisterUser , true) as spark.components.TitleWindow);
+				changepassword.userfn=currentUser;
+				changepassword.x=(this.width-changepassword.width)/2;
+				changepassword.y=(this.height-changepassword.height)/2;
+			}
+			
+			public function logout():void{
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/logout",currentUser,"POST").send();
+				Alert.show("您已经退出","提示");
+			}
+			
+			
+			
+			public function repassword():void{
+				var changepassword:ChangePassword=ChangePassword(PopUpManager.createPopUp( 
+					this, ChangePassword , true) as spark.components.TitleWindow);
+				changepassword.x=(this.width-changepassword.width)/2;
+				changepassword.y=(this.height-changepassword.height)/2;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
+		
+	</fx:Declarations>
+	<fx:Style source="assets/style.css"/>
+	<s:Group id="header" width="100%" height="109">
+		<s:layout>
+			<s:BasicLayout/>
+		</s:layout>
+		<s:Image source="assets/saaslogo.png" x="25" y="5"/>
+		
+		
+		<s:Group top="12" right="15" visible="false" id="userinfoGroup">
+			<s:layout>
+				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
+			</s:layout>	
+			<s:Label text="用户名:{ToolUtil.sessionUser.username} | 用户:{ToolUtil.sessionUser.truename}" styleName="textStyle2"/>	
+			<s:SkinnableContainer  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
+				<s:layout>
+					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
+				</s:layout>
+				
+				<mx:LinkButton x="0" y="2" height="25" label="登出"  styleName="textStyle1" click="logout()"/>
+				<s:Label text="|" styleName="textStyle1"/>
+				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
+			</s:SkinnableContainer>
+			
+		</s:Group>
+		<s:Group top="12" right="15" visible="true" id="userinfoGroup2">
+			<s:layout>
+				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
+			</s:layout>	
+			<s:SkinnableContainer  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
+				<s:layout>
+					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
+				</s:layout>
+				
+				<mx:LinkButton x="0" y="2" height="25" label="登录"  styleName="textStyle1" click="login()"/>
+				<s:Label text="|" styleName="textStyle1"/>
+				<mx:LinkButton x="0" y="2" height="25" label="注册" styleName="textStyle1" click="reg()"/>
+			</s:SkinnableContainer>
+			
+		</s:Group>
+		
+		<s:Group left="20" right="0" top="48" id="menuContainer" height="29" >
+			<s:layout>
+				<s:HorizontalLayout gap="-1" verticalAlign="middle"/>
+			</s:layout>	
+			<!--<s:Button width="130" height="29" label="基础管理" styleName="menuBtn" mouseOver="showHandler(event)"/>
+			<s:Button width="130" height="29" label="项目视图" styleName="menuBtn" mouseOver="showHandler(event)"/>
+			<s:Button width="130" height="29" label="我的自检" styleName="menuBtn" mouseOver="showHandler(event)"/>
+			<s:Button width="130" height="29" label="请假申请" styleName="menuBtn" mouseOver="showHandler(event)"/>-->
+		</s:Group>	
+		
+		<s:SkinnableContainer  height="28" top="77" left="0" right="0" skinClass="skins.locGroupSkin" id="locGroup" visible="true">
+			<s:layout>
+				<s:BasicLayout/>
+			</s:layout>
+			<s:Label text="当前位置： " left="20" top="8" styleName="textStyle3"/>
+			<s:Label id="website" left="85" top="8" styleName="textStyle3"/>
+			<mx:LinkButton label="重置页面" visible="false" top="3" right="12" color="0x353535"/>
+		</s:SkinnableContainer>		
+	</s:Group>
+	
+	<mx:ViewStack id="gongNengStack" top="105" left="0" right="0" bottom="33"  borderVisible="false" creationComplete="trace('view stack')"  >
+		
+		
+		
+	</mx:ViewStack>
+	
+	<uicontrol:CTabBar id="cbar" dataProvider="{gongNengStack}" left="2" right="2" width="100%" bottom="1" height="31" borderVisible="false"  creationComplete="trace('tabbar')">
+		
+	</uicontrol:CTabBar>
+	<control:Loading id="loading" width="100%" height="100%" visible="false">
+		
+	</control:Loading>
+</s:Application>
+

@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
+						  xmlns:uicontrol="uicontrol.*"
+						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+	<fx:Script>
+		<![CDATA[
+			import events.CloseEvent;
+			import events.PageChangeEvent;
+			
+			import httpcontrol.CHTTPService;
+			import httpcontrol.HttpServiceUtil;
+			
+			import model.DeptModel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.events.ListEvent;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import util.ToolUtil;
+			
+			[Bindable]
+			private var hyList:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var list:ArrayCollection=new ArrayCollection();
+			
+			override public   function  init(e:FlexEvent):void{
+				var gc:Array = new Array();
+				for each(var o:Object in knowgrid.groupedColumns){
+					gc.push(o);
+				}
+				var w:Number = 0;
+				for each(var item:Object in ToolUtil.bbList){
+					var h:AdvancedDataGridColumnGroup=new AdvancedDataGridColumnGroup();
+					h.headerText = item.name;
+					var headArr:ArrayCollection = new ArrayCollection(item.children as Array);
+					for each(var hitem:Object in headArr){
+						var c:AdvancedDataGridColumn=new AdvancedDataGridColumn();
+						c.headerText = hitem.name;
+						c.dataField = hitem.id;
+						c.width=170;
+						h.children.push(c);
+						w+=c.width;
+					}
+					gc.push(h);
+					
+				}
+				knowgrid.width = 470+w;
+				knowgrid.groupedColumns=gc;
+				knowgrid.invalidateList();
+				
+				
+				hyList = ObjectUtil.copy(ToolUtil.hyList) as ArrayCollection;
+				var i:Object = new Object();
+				i["id"]="";
+				i["name"] = "全部";
+				hyList.addItemAt(i,0);
+				hy.selectedIndex=0;
+			}
+			override public function closeContainer(e:CloseEvent):void{
+				dispatchEvent(e);
+				
+			}
+			
+		
+			private function query():void{
+				var obj:Object = new Object();
+				obj["hy"] = hy.selectedItem.id;
+				obj["key"] = key.text;
+				if (gaojiCbx.selected){
+					obj["kind"] = kind.text;
+					obj["ticket"] = ticket.text;
+					obj["kjkm"] = kjkm.text;
+				}
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ft/queryKnowledge",queryResult,"POST").send(obj);
+				
+			}
+			
+			private function queryResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					knowgrid.width -=flgroup.width;
+					list = new ArrayCollection(result.result.result as Array);
+					var n:Number = result.result.kindnum;
+					var arr:Array = new Array();
+					for(var i:Number=0;i<=n;i++){
+						var c:AdvancedDataGridColumn = new AdvancedDataGridColumn();
+						c.headerText="分类"+i;
+						c.dataField="kind"+i;
+						arr.push(c);
+					}
+					flgroup.children=arr;
+					flgroup.width=(n+1)*150;
+					
+					var gc:Array = new Array();
+					for each(var o:Object in knowgrid.groupedColumns){
+						gc.push(o);
+					}
+					knowgrid.groupedColumns=gc;
+					knowgrid.width+=flgroup.width;
+					
+				}
+			}
+			
+			private function gaojiQuery():void{
+				if(gaojiCbx.selected){
+					form.height=70;
+					gaojipanel.visible=true;
+				}else{
+					form.height=30;
+					gaojipanel.visible=false;
+				}
+			}
+
+			private function showCell(e:ListEvent):void{
+				if(e.rowIndex<0){
+					return;
+				}
+				var column:AdvancedDataGridColumn=knowgrid.columns[e.columnIndex];
+				
+				var l:ArrayCollection=knowgrid.dataProvider as ArrayCollection;
+				var item:Object=l.getItemAt(e.rowIndex);
+				
+				showTxt.text = item[column.dataField];
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
+		<s:layout>
+			<s:VerticalLayout>
+				
+			</s:VerticalLayout>
+		</s:layout>
+		
+			<s:BorderContainer id="form" left="0" top="0" height="30" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+				<s:layout>
+					<s:VerticalLayout>
+						
+					</s:VerticalLayout>
+				</s:layout>
+				<s:BorderContainer left="0" top="0" height="30" width="100%" borderVisible="false" backgroundAlpha="0"  >
+					<s:layout>
+						<s:HorizontalLayout gap="3" verticalAlign="middle" paddingLeft="10">
+							
+						</s:HorizontalLayout>
+					</s:layout>
+					<s:Label text="行业："    fontSize="14" height="25" verticalAlign="middle" textAlign="left" >
+						
+					</s:Label>
+					<mx:ComboBox id="hy" dataProvider="{hyList}" labelField="name" width="100">
+						
+					</mx:ComboBox>
+					<s:Label text="模糊关键词(多关键词用空格隔开):">
+						
+					</s:Label>
+					<s:TextInput id="key" width="250" >
+						
+					</s:TextInput>
+					<s:Button label="查询" click="query()">
+					</s:Button>
+					<s:CheckBox label="高级查询" selected="false" id="gaojiCbx" change="gaojiQuery()" >
+						
+					</s:CheckBox>
+				</s:BorderContainer>
+				<s:BorderContainer id="gaojipanel" left="0" top="0" height="30" width="100%" borderVisible="false" visible="false"  backgroundAlpha="0" >
+					<s:layout>
+						<s:HorizontalLayout gap="5" verticalAlign="middle" paddingLeft="10">
+							
+						</s:HorizontalLayout>
+					</s:layout>
+					<s:Label text="分类:" />
+					<s:TextInput id="kind" width="120" />
+					<s:Label text="票据:" />
+					<s:TextInput id="ticket" width="120" />
+					<s:Label text="会计科目:" />
+					<s:TextInput id="kjkm" width="120" />
+				</s:BorderContainer>
+			</s:BorderContainer>
+		<s:BorderContainer width="100%" height="150" borderVisible="false" backgroundAlpha="0">
+			<s:TextArea id="showTxt" width="100%" height="100%" fontSize="17">
+				
+			</s:TextArea>
+			
+		</s:BorderContainer>
+		<s:Scroller width="100%" height="100%">
+			<s:Group width="100%" height="100%">
+				<uicontrol:MarkAdvancedDataGrid id="knowgrid" itemClick="showCell(event)" change="showCell(event)" selectionMode="singleCell" dataProvider="{list}"  isNewAdd="false" enabled="true" editable="false" minWidth="1000" height="100%">
+					<uicontrol:groupedColumns>
+						<mx:AdvancedDataGridColumn headerText="行业" dataField="group" width="60">
+						</mx:AdvancedDataGridColumn>
+						<mx:AdvancedDataGridColumnGroup headerText="分类" id="flgroup">
+							
+						</mx:AdvancedDataGridColumnGroup>
+						<mx:AdvancedDataGridColumn headerText="票据" dataField="ticket" width="200">
+							
+						</mx:AdvancedDataGridColumn>
+						<mx:AdvancedDataGridColumn headerText="科目" dataField="kjkm" width="150">
+							
+						</mx:AdvancedDataGridColumn>
+						
+					</uicontrol:groupedColumns>
+					
+				</uicontrol:MarkAdvancedDataGrid>
+			</s:Group>
+		</s:Scroller>	
+	</s:BorderContainer>
+</control:CBorderContainer>
