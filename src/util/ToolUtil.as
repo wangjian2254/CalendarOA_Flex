@@ -32,6 +32,7 @@ package util
 //			bbRefresh();
 //			userRefresh();
 			sessionUserRefresh();
+			groupRefresh();
 			
 //			ruleRefresh();
 //			ticketRefresh();
@@ -131,6 +132,28 @@ package util
 			if(result.message.success==true){
 				areaList.removeAll();
 				areaList.addAll(new ArrayCollection(result.areapointvolist as Array));
+			}
+		}
+		
+		[Bindable]
+		public static var groupList:ArrayCollection=new ArrayCollection();
+		
+		public static function groupRefresh(fun:Function=null):void{
+			
+			if(fun==null){
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST").send();
+			}else{
+				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST");
+				http.resultFunArr.addItem(fun);
+				http.send();
+				
+			}
+			
+		}
+		public static function resultAllGroup(result:Object,e:ResultEvent):void{
+			if(result.success==true){
+				groupList.removeAll();
+				groupList.addAll(new ArrayCollection(result.result as Array));
 			}
 		}
 		

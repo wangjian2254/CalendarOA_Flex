@@ -89,10 +89,58 @@
 			}
 			
 			private function repeatChange():void{
-				if(repeatType.selectedValue=="daily"||repeatType.selectedValue=="daily"){
+				if(repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
 					dayTile.visible = false;
+					dayPanel.height=0;
 				}else{
 					dayTile.visible = true;
+					if(repeatType.selectedValue=="weekly"){
+						dayPanel.height = 25;
+						dayTile.removeAllElements();
+						for(var i:Number=0;i<7;i++){
+							var cb:CheckBox = new CheckBox();
+							switch(i){
+								case 0:
+									cb.label = "日";
+									break;
+								case 1:
+									cb.label = "一";
+									break;
+								case 2:
+									cb.label = "二";
+									break;
+								case 3:
+									cb.label = "三";
+									break;
+								case 4:
+									cb.label = "四";
+									break;
+								case 5:
+									cb.label = "五";
+									break;
+								case 6:
+									cb.label = "六";
+									break;
+							}
+							
+							cb.selected=false;
+							dayTile.addElement(cb);
+						}
+						
+					}
+					
+					if(repeatType.selectedValue=="monthly"){
+						dayTile.removeAllElements();
+						dayPanel.height = 125;
+						for( i=0;i<32;i++){
+							cb = new CheckBox();
+							
+							cb.label = ""+(i+1);
+							
+							cb.selected=false;
+							dayTile.addElement(cb);
+						}
+					}
 				}
 				this.invalidateDisplayList();
 			}
@@ -108,7 +156,7 @@
 			
 		</s:VerticalLayout>
 	</s:layout>
-	<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" />
+	
 	<s:TextInput id="scheduleTitle" width="500" text="日程标题">
 	</s:TextInput>
 	<s:BorderContainer width="500" height="25" borderVisible="false" >
@@ -121,7 +169,6 @@
 			
 		</mx:ComboBox>
 		<s:Label text="到" height="100%" verticalAlign="middle" />
-		<mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 		<mx:ComboBox id="endTime" dataProvider="{endtimelist}" labelField="text" width="90"   >
 			
 		</mx:ComboBox>
@@ -135,27 +182,12 @@
 		</s:CheckBox>
 		
 	</s:BorderContainer>
-	
-	<s:BorderContainer width="500" height="50" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5"/>
-		</s:layout>
-		<s:Label text="说明:" width="80" textAlign="right" />
-		<s:TextArea width="100%" height="100%" />
-	</s:BorderContainer>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5"/>
-		</s:layout>
-		<s:Label text="颜色:" width="80" textAlign="right" />
-		
-	</s:BorderContainer>
 	<s:BorderContainer width="500" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="重复频率：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:RadioButton group="{repeatType}" label="每天" value="daily">
+		<s:RadioButton group="{repeatType}" label="每天" value="daily" selected="true">
 		</s:RadioButton>
 		<s:RadioButton group="{repeatType}" label="每周" value="weekly">
 		</s:RadioButton>
@@ -164,13 +196,13 @@
 		<s:RadioButton group="{repeatType}" label="每年" value="yearly">
 		</s:RadioButton>
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="50" borderVisible="false" >
+	<s:BorderContainer id="dayPanel" width="500" height="0" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="重复时间：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
-			<s:CheckBox label="一" />
+		<s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="5"   >
+			<s:CheckBox label="一"  />
 			<s:CheckBox label="二" />
 			<s:CheckBox label="三" />
 			<s:CheckBox label="四" />
@@ -179,5 +211,54 @@
 			<s:CheckBox label="日" />
 		</s:TileGroup>
 	</s:BorderContainer>
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="结束时间：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		
+		<mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		
+	</s:BorderContainer>
+	<s:BorderContainer width="500" height="100" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="说明:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:TextArea width="100%" height="100%" />
+	</s:BorderContainer>
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="颜色:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:BorderContainer id="color1" backgroundColor="#00CCFF" borderColor="#000000" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color2" backgroundColor="#00FFFF" borderColor="#ffffff" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color3" backgroundColor="#3300FF" borderColor="#ffffff" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color4" backgroundColor="#3366FF" borderColor="#ffffff" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color5" backgroundColor="#CC9900" borderColor="#ffffff" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color6" backgroundColor="#FF6633" borderColor="#ffffff" width="20" height="20">
+		</s:BorderContainer>
+		<mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ED0E9C"
+						symbolColor="#030002">
+			
+		</mx:ColorPicker>
+	</s:BorderContainer>
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="分组:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:ComboBox id="group" dataProvider="{ToolUtil.groupList}" labelField="name" width="190" >
+			
+		</s:ComboBox>
+		
+	</s:BorderContainer>
+	<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" />
 	
 </s:TitleWindow>

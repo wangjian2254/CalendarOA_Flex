@@ -15,7 +15,6 @@
 			
 			import events.ChangeMenuEvent;
 			
-			
 			import httpcontrol.HttpServiceUtil;
 			import httpcontrol.RemoteUtil;
 			
@@ -45,7 +44,7 @@
 			public function init():void{
 				ToolUtil.currentUserFun = currentUser;
 				LoadingUtil.loading=loading;
-				ToolUtil.init();
+//				ToolUtil.init();
 				ToolUtil.sessionUserRefresh(currentUser);
 				menuXML.send();
 				gongNengStack.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr,changeMenu);
@@ -65,6 +64,11 @@
 					}else{
 						userinfoGroup2.visible=false;
 						userinfoGroup.visible=true;
+						ToolUtil.init();
+						for(var i:Number=0;i<cbar.numElements;i++){
+							var c:CBorderContainer = cbar.getElementAt(i) as CBorderContainer;
+							c.init(null);
+						}
 					}
 					menuXML.send();
 				}
