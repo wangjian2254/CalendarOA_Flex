@@ -16,23 +16,104 @@
 			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
+			import mx.formatters.DateFormatter;
+			import mx.managers.PopUpManager;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
+			import uicontrol.DayItem;
+			
+			import util.DateUtil;
 			import util.ToolUtil;
 			
 			[Bindable]
 			private var list:ArrayCollection=new ArrayCollection();
 			
+			
 			override public   function  init(e:FlexEvent):void{
-//				loadData();
+				dateChooser.selectedDate = new Date();
+				showCalendar();
 			}
 			override public function closeContainer(e:CloseEvent):void{
 				dispatchEvent(e);
 				
 			}
+			
+			
+			private var currentMonth:Number=0;
+			
+			private function showCalendar(date:Date=null):void{
+				if(date==null){
+					date = new Date();
+				}else{
+					date = new Date(date.fullYear,date.month,date.date);
+					
+				}
+				if(currentMonth==date.month){
+					return;
+				}
+				currentMonth=date.month;
+				if(date.date!=1){
+					date.date=1;
+				}
+				if(date.day!=0){
+					date.date -= date.day;
+				}
+				var fr:DateFormatter=new DateFormatter();
+				fr.formatString="YYYYMMDD";
+//				calendarPanel.removeAllElements();
+				var dayItem:DayItem=null;
+				var f:Boolean=true;
+				var count:Number=0;
+				for(var i:Number=0;i<100;i++){
+					if(calendarPanel.numElements-1<i){
+						dayItem = new DayItem();
+						calendarPanel.addElement(dayItem);
+						f = true;
+					}else{
+						dayItem = calendarPanel.getElementAt(i) as DayItem;
+						f = false;
+					}
+					dayItem.date = fr.format(date);
+					if(!f){
+						dayItem.init();
+					}
+					
+					date.date+=1;
+					if(currentMonth<date.month&&date.day==0){
+						count=i+1;
+						break;
+					}
+				}
+				for(i=calendarPanel.numElements-1;i>=count;i--){
+					calendarPanel.removeElementAt(i);
+				}
+				resize();
+				
+			}
+			
+			private function resize():void{
+				var dayItem:DayItem=null;
+				var row:Number = calendarPanel.numElements/7;
+				var dayHeight:Number=(this.height - 26-row+1-2-10)/row;
+				var dayWidth:Number = (this.width - 12-taskPanel.width-190-7+1)/7;
+				for(var  i:Number=0;i<100;i++){
+					if(calendarPanel.numElements-1<i){
+						break;
+					}else{
+						dayItem = calendarPanel.getElementAt(i) as DayItem;
+						dayItem.height = dayHeight;
+						dayItem.width = dayWidth;
+						dayItem.invalidateSize();
+						
+					}
+				}
+				calendarPanel.invalidateSize();
+			}
+			
 			public function save(e:Event):void{
 				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_saveOrUpdateAreaPoint.action",saveDataResult,"POST");
 				var o:Object=getData();
@@ -137,7 +218,28 @@
 				}
 			}
 			
+			public function createSchedule():void{
+				var s:SchedulePanel = PopUpManager.createPopUp(this,SchedulePanel,true) as SchedulePanel;
+				s.x = (FlexGlobals.topLevelApplication.width-s.width)/2
+				s.x = (FlexGlobals.topLevelApplication.width-s.width)/2
+			}
 			
+			private function changeDate():void{
+				showCalendar(dateChooser.selectedDate);
+			}
+			
+			private function showTask():void{
+				if(taskPanel.width>100){
+					taskPanel.width=0;
+					mytask.color = 0xffffff;
+				}else{
+					mytask.color = 0x00CCCC;
+					taskPanel.width=200;
+					
+				}
+				resize();
+				this.invalidateSize();
+			}
 			
 			[Bindable]
 			private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增','ico':addimg},{'label':'修改','ico':saveimg},{'label':'同步数据','ico':refreshimg}]);
@@ -146,26 +248,87 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:DateFormatter id="monthstr" formatString="YYYY年MM月" >
+			
+		</mx:DateFormatter>
 	</fx:Declarations>
 	
 	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
 		<s:layout>
-			<s:HorizontalLayout>
+			<s:HorizontalLayout gap="0">
 				
 			</s:HorizontalLayout>
 		</s:layout>
+		<s:Scroller  width="190" height="100%">
+			<s:Group>
+				<s:BorderContainer width="100%" borderVisible="false" >
+					<s:layout>
+						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
+						</s:VerticalLayout>
+					</s:layout>
+					<s:Button chromeColor="red" label="创建日程" color="#ffffff" fontWeight="bold"  height="25" click="createSchedule()" />
+					<s:Label text="{monthstr.format(dateChooser.selectedDate)}" fontSize="18" fontWeight="bold" paddingTop="10" >
+						
+					</s:Label>
+					<mx:DateChooser id="dateChooser" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+					<s:Label text="我的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
+					</s:Label>
+					<s:Label text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
+					</s:Label>
+					<uicontrol:ScheduleItem id="mytask" color="#ffffff" scheduleName="任务" fun="showTask"/>
+					<s:Label text="参与的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
+					</s:Label>
+				</s:BorderContainer>
+			</s:Group>
+		</s:Scroller>
 		
-		<s:BorderContainer id="rightContainner" width="706" height="100%" backgroundAlpha="0"  borderVisible="false">
+		<s:BorderContainer id="rightContainner" width="100%" height="100%" backgroundAlpha="0"  borderVisible="false">
 			<s:layout>
 				<s:VerticalLayout gap="1">
 					
 				</s:VerticalLayout>
 				
 			</s:layout>
-			<s:TileGroup width="100%" height="666" requestedColumnCount="7" >
-				
-			</s:TileGroup>
+			<s:BorderContainer width="100%" height="25" borderVisible="false" backgroundAlpha="0">
+				<s:layout>
+					<s:HorizontalLayout gap="0" verticalAlign="middle" >
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期日" textAlign="center" verticalAlign="middle" />
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期一" textAlign="center" verticalAlign="middle" />
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期二" textAlign="center" verticalAlign="middle" />
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期三" textAlign="center" verticalAlign="middle" />
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期四" textAlign="center" verticalAlign="middle" />
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期五" textAlign="center" verticalAlign="middle" />
+				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期六" textAlign="center" verticalAlign="middle" />
+					
+			</s:BorderContainer>
+			<s:BorderContainer width="100%" height="100%" borderVisible="true" borderColor="#cccccc" backgroundColor="#cccccc">
+				<s:layout>
+					<s:VerticalLayout gap="0">
+						
+					</s:VerticalLayout>
+					
+				</s:layout>
+				<s:TileGroup id="calendarPanel" width="100%" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
+					
+				</s:TileGroup>
+			</s:BorderContainer>
+			
 				
 		</s:BorderContainer>
+		<s:Scroller id="taskPanel"  width="0" height="100%">
+			<s:Group>
+				<s:BorderContainer width="100%" borderVisible="false" >
+					<s:layout>
+						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
+						</s:VerticalLayout>
+					</s:layout>
+					<s:Label text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
+					</s:Label>
+				</s:BorderContainer>
+			</s:Group>
+		</s:Scroller>
 	</s:BorderContainer>
 </control:CBorderContainer>

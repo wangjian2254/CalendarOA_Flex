@@ -1,19 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="110" creationComplete="init()">
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" borderVisible="false" height="110" creationComplete="init()" xmlns:uicontrol="uicontrol.*">
 	<s:layout>
-		<s:VerticalLayout/>
+		<s:VerticalLayout gap="0"/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import httpcontrol.HttpServiceUtil;
 			
-			private function init():void{
+			import mx.collections.ArrayCollection;
+			import mx.rpc.events.ResultEvent;
+			[Bindable]
+			public var date:String="20140315";
+			
+			private var scheduleArr:ArrayCollection=new ArrayCollection();
+			
+			public function init():void{
+				getScheduleByDate();
+			}
+			
+			private function getScheduleByDate():void{
+				var obj:Object = new Object();
+				obj["date"] = date;
 				
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
+			}
+			
+			private function queryResult(result:Object,e:ResultEvent):void{
+				scheduleArr.removeAll();
+				if(result.success){
+					scheduleArr.addAll(new ArrayCollection(result.result as Array));
+				}
+				showSchedule();
+				
+			}
+			
+			private function showSchedule():void{
+				scheduleList.removeAllElements();
+				var scheduleItem:ScheduleItem=null;
+				for each(var obj:Object in scheduleArr){
+					scheduleItem = new ScheduleItem();
+					scheduleItem.scheduleData = obj;
+					scheduleItem.scheduleName = obj.title;
+					scheduleItem.color = obj.color;
+					scheduleItem.scheduleId = obj.id;
+					
+					scheduleList.addElement(scheduleItem);
+				}
 			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
+	<s:BorderContainer width="100%" height="20" borderVisible="false">
+		<s:layout>
+			<s:HorizontalLayout paddingLeft="10">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:Label id="datestr" fontWeight="bold" fontSize="15" text="{date.substr(6,2)}" textAlign="center" height="100%" verticalAlign="middle">
+			
+		</s:Label>
+		<s:Label fontSize="13" text="{date.substr(4,2)+'月'}" visible="{date.substr(6,2)=='01'?true:false}" textAlign="center" height="100%" verticalAlign="middle">
+			
+		</s:Label>
+		
+	</s:BorderContainer>
+	<s:BorderContainer id="scheduleList" width="100%" height="100%" borderVisible="false">
+		<s:layout>
+			<s:VerticalLayout paddingLeft="3" gap="0">
+				
+			</s:VerticalLayout>
+		</s:layout>
+		<uicontrol:ScheduleItem   />
+		<uicontrol:ScheduleItem   />
+		<uicontrol:ScheduleItem   />
+		<uicontrol:ScheduleItem   />
+		<uicontrol:ScheduleItem   />
+	</s:BorderContainer>
+	
+		
 </s:BorderContainer>

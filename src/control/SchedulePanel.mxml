@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="500" title="{titlestr}" creationComplete="init()" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+			import httpcontrol.HttpServiceUtil;
+			import httpcontrol.RemoteUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.DateUtil;
+			import util.ToolUtil;
+			import util.UserUtil;
+			
+			[Bindable]
+			public var titlestr:String="创建日程";
+			
+			[Bindable]
+			public var startDateValue:Date=new Date();
+			[Bindable]
+			public var endDateValue:Date=new Date();
+			
+			[Bindable]
+			private var timelist:ArrayCollection = new ArrayCollection([{"value":"00:00","text":"凌晨 00:00"}]);
+			[Bindable]
+			private var endtimelist:ArrayCollection = new ArrayCollection();
+			
+			public var userfn:Function;
+			
+			public function closeWin():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			public function init():void{
+				timelist.removeAll();
+				for(var i:Number=0;i<24;i++){
+					var h:String ="0"+i;
+					var s:String = "凌晨 ";
+					if(i>=5&&i<9){
+						s="上午 ";
+					}
+					if(i>=9&&i<15){
+						s="中午 ";
+					}
+					if(i>=15&&i<18){
+						s="下午 ";
+					}
+					if(i>=18){
+						s="晚上 ";
+					}
+					
+					timelist.addItem({"value":h.substring(h.length-2)+":00","text":s+h.substring(h.length-2)+":00"});
+					timelist.addItem({"value":h.substring(h.length-2)+":30","text":s+h.substring(h.length-2)+":30"});
+				}
+			}
+			
+			public function save():void{
+//				if(this.username.text==""||this.truename.text==""||
+//					this.password.text==""||this.rpassword.text==""){
+//					Alert.show("请填写完整信息。","提示");
+//					return;
+//				}
+//				if(this.password.text==""||this.password.text!=this.rpassword.text){
+//					Alert.show("密码和确认密码要一致。","提示");
+//					return;
+//				}
+//				var obj:Object=new Object();
+//				obj.username=username.text;
+//				obj.truename = truename.text;
+//				obj.password = password.text;
+//				obj.isaction = 'true';
+//				obj.ismanager = 'true';
+				
+//				HttpServiceUtil.getCHTTPServiceAndResult("/ft/regUser",refresh,"POST").send(obj);
+					
+				
+			}
+			public function refresh():void{
+				var start:Number=timelist.getItemIndex(startTime.selectedItem);
+				endtimelist.removeAll();
+				for(var i:Number = start+1;i<timelist.length;i++){
+					endtimelist.addItem(timelist.getItemAt(i));
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:VerticalLayout gap="3" paddingLeft="10" paddingTop="10">
+			
+		</s:VerticalLayout>
+	</s:layout>
+	<s:TextInput id="scheduleTitle" width="300" text="日程标题">
+	</s:TextInput>
+	<s:BorderContainer width="300" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<mx:DateField id="startDate" width="80" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		<mx:ComboBox id="startTime" dataProvider="{timelist}" labelField="text" width="80" change="refresh()"  >
+			
+		</mx:ComboBox>
+		<s:Label text="到" height="100%" verticalAlign="middle" />
+		<mx:DateField id="endDate" width="80" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		<mx:ComboBox id="endTime" dataProvider="{endtimelist}" labelField="text" width="80"   >
+			
+		</mx:ComboBox>
+	</s:BorderContainer>
+</s:TitleWindow>

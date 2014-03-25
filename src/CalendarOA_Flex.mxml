@@ -88,6 +88,8 @@
 						menuContainer.addElement(btn);
 					}
 				}
+				
+				welcome(null,null);
 			}
 			
 			public function failMenu(evt:FaultEvent):void{
