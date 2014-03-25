@@ -94,12 +94,13 @@
 				resize();
 				
 			}
-			
+			[Bindable]
+			private var dayWidth:Number=0;
 			private function resize():void{
 				var dayItem:DayItem=null;
 				var row:Number = calendarPanel.numElements/7;
 				var dayHeight:Number=(this.height - 26-row+1-2-10)/row;
-				var dayWidth:Number = (this.width - 12-taskPanel.width-190-7+1)/7;
+				dayWidth = (this.width - 12-taskPanel.width-190-7+1)/7;
 				for(var  i:Number=0;i<100;i++){
 					if(calendarPanel.numElements-1<i){
 						break;
@@ -220,8 +221,8 @@
 			
 			public function createSchedule():void{
 				var s:SchedulePanel = PopUpManager.createPopUp(this,SchedulePanel,true) as SchedulePanel;
-				s.x = (FlexGlobals.topLevelApplication.width-s.width)/2
-				s.x = (FlexGlobals.topLevelApplication.width-s.width)/2
+				s.x = (FlexGlobals.topLevelApplication.width-s.width)/2;
+				s.y = (FlexGlobals.topLevelApplication.height-s.height)/2;
 			}
 			
 			private function changeDate():void{
@@ -291,17 +292,17 @@
 			</s:layout>
 			<s:BorderContainer width="100%" height="25" borderVisible="false" backgroundAlpha="0">
 				<s:layout>
-					<s:HorizontalLayout gap="0" verticalAlign="middle" >
+					<s:HorizontalLayout gap="1" verticalAlign="middle" >
 						
 					</s:HorizontalLayout>
 				</s:layout>
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期日" textAlign="center" verticalAlign="middle" />
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期一" textAlign="center" verticalAlign="middle" />
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期二" textAlign="center" verticalAlign="middle" />
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期三" textAlign="center" verticalAlign="middle" />
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期四" textAlign="center" verticalAlign="middle" />
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期五" textAlign="center" verticalAlign="middle" />
-				<s:Label width="101" height="25" fontSize="18" fontWeight="bold" text="星期六" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期日" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期一" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期二" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期三" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期四" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期五" textAlign="center" verticalAlign="middle" />
+				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期六" textAlign="center" verticalAlign="middle" />
 					
 			</s:BorderContainer>
 			<s:BorderContainer width="100%" height="100%" borderVisible="true" borderColor="#cccccc" backgroundColor="#cccccc">

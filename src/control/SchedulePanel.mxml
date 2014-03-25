@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="500" title="{titlestr}" creationComplete="init()" close="closeWin()">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="550" height="500" title="{titlestr}" creationComplete="init()" close="closeWin()">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
@@ -87,10 +87,20 @@
 					endtimelist.addItem(timelist.getItemAt(i));
 				}
 			}
+			
+			private function repeatChange():void{
+				if(repeatType.selectedValue=="daily"||repeatType.selectedValue=="daily"){
+					dayTile.visible = false;
+				}else{
+					dayTile.visible = true;
+				}
+				this.invalidateDisplayList();
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:RadioButtonGroup id="repeatType" change="repeatChange()"/>
 	</fx:Declarations>
 	
 	<s:layout>
@@ -98,20 +108,76 @@
 			
 		</s:VerticalLayout>
 	</s:layout>
-	<s:TextInput id="scheduleTitle" width="300" text="日程标题">
+	<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" />
+	<s:TextInput id="scheduleTitle" width="500" text="日程标题">
 	</s:TextInput>
-	<s:BorderContainer width="300" height="25" borderVisible="false" >
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
-		<mx:DateField id="startDate" width="80" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-		<mx:ComboBox id="startTime" dataProvider="{timelist}" labelField="text" width="80" change="refresh()"  >
+		<s:Label text="时间段：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		<mx:ComboBox id="startTime" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
 			
 		</mx:ComboBox>
 		<s:Label text="到" height="100%" verticalAlign="middle" />
-		<mx:DateField id="endDate" width="80" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-		<mx:ComboBox id="endTime" dataProvider="{endtimelist}" labelField="text" width="80"   >
+		<mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		<mx:ComboBox id="endTime" dataProvider="{endtimelist}" labelField="text" width="90"   >
 			
 		</mx:ComboBox>
 	</s:BorderContainer>
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="是否全天：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:CheckBox label="全天" id="is_all_day">
+		</s:CheckBox>
+		
+	</s:BorderContainer>
+	
+	<s:BorderContainer width="500" height="50" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="说明:" width="80" textAlign="right" />
+		<s:TextArea width="100%" height="100%" />
+	</s:BorderContainer>
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="颜色:" width="80" textAlign="right" />
+		
+	</s:BorderContainer>
+	<s:BorderContainer width="500" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="重复频率：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:RadioButton group="{repeatType}" label="每天" value="daily">
+		</s:RadioButton>
+		<s:RadioButton group="{repeatType}" label="每周" value="weekly">
+		</s:RadioButton>
+		<s:RadioButton group="{repeatType}" label="每月" value="monthly">
+		</s:RadioButton>
+		<s:RadioButton group="{repeatType}" label="每年" value="yearly">
+		</s:RadioButton>
+	</s:BorderContainer>
+	<s:BorderContainer width="500" height="50" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="重复时间：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
+			<s:CheckBox label="一" />
+			<s:CheckBox label="二" />
+			<s:CheckBox label="三" />
+			<s:CheckBox label="四" />
+			<s:CheckBox label="五" />
+			<s:CheckBox label="六" />
+			<s:CheckBox label="日" />
+		</s:TileGroup>
+	</s:BorderContainer>
+	
 </s:TitleWindow>
