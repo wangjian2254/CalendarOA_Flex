@@ -209,7 +209,7 @@
 					}
 				}else{
 					obj.warning_time1 = (0-(firstNum.value*firstWarning.selectedItem.value));
-					if(needSecond2.selected){
+					if(needSecond1.selected){
 						obj.warning_time2 = (0-(secondNum.value*secondWarning.selectedItem.value));
 					}
 				}
