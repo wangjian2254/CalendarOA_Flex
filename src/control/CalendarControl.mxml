@@ -140,11 +140,13 @@
 				fr.formatString="YYYYMMDD";
 //				calendarPanel.removeAllElements();
 				var dayItem:DayItem=null;
+				var newDayItem:DayItem=null;
 				var f:Boolean=true;
 				var count:Number=0;
 				for(var i:Number=0;i<100;i++){
 					if(calendarPanel.numElements-1<i){
 						dayItem = new DayItem();
+						newDayItem = dayItem;
 						calendarPanel.addElement(dayItem);
 						f = true;
 					}else{
@@ -166,11 +168,12 @@
 					calendarPanel.removeElementAt(i);
 				}
 				resize();
+				newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
 				
 			}
 			[Bindable]
 			private var dayWidth:Number=0;
-			private function resize():void{
+			private function resize(e:FlexEvent=null):void{
 				var dayItem:DayItem=null;
 				var row:Number = calendarPanel.numElements/7;
 				var dayHeight:Number=(this.height - 26-row+1-2-10)/row;

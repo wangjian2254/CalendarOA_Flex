@@ -86,11 +86,7 @@
 				
 			</s:VerticalLayout>
 		</s:layout>
-		<uicontrol:ScheduleItem   />
-		<uicontrol:ScheduleItem   />
-		<uicontrol:ScheduleItem   />
-		<uicontrol:ScheduleItem   />
-		<uicontrol:ScheduleItem   />
+		
 	</s:BorderContainer>
 	
 		
