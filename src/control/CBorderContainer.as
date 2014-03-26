@@ -1,8 +1,10 @@
 package control
 {
 	import events.ChangeTabButtonEvent;
+	import events.ChangeUserEvent;
 	import events.CloseEvent;
 	
+	import mx.core.FlexGlobals;
 	import mx.core.INavigatorContent;
 	import mx.events.FlexEvent;
 	
@@ -40,6 +42,7 @@ package control
 			super();
 			this.setStyle("borderVisible",false);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,init);
+			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);
 		}
 		
 		public function get flag():String
@@ -54,6 +57,9 @@ package control
 		
 		public function init(e:FlexEvent):void{
 			throw new Error("CBorderContainer 的子类必须重写 init(e:FlexEvent) 方法。");
+		}
+		public function changeCurrentUser(e:ChangeUserEvent):void{
+//			throw new Error("CBorderContainer 的子类必须重写 init(e:FlexEvent) 方法。");
 		}
 		
 		public function showThis():void{

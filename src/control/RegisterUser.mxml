@@ -15,7 +15,6 @@
 			import util.ToolUtil;
 			import util.UserUtil;
 			
-			public var userfn:Function;
 			
 			public function closeWin():void{
 				PopUpManager.removePopUp(this);
@@ -38,14 +37,14 @@
 				obj.isaction = 'true';
 				obj.ismanager = 'true';
 				
-				HttpServiceUtil.getCHTTPServiceAndResult("/ft/regUser",refresh,"POST").send(obj);
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/regUser",refresh,"POST").send(obj);
 					
 				
 			}
 			public function refresh(r:Object,e:ResultEvent):void{
 				if(r.success){
 					Alert.show("注册成功","提示");
-					ToolUtil.sessionUserRefresh(userfn);
+					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
 					closeWin();
 				}else{
 //					Alert.show("修改密码失败","提示");

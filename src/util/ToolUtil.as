@@ -3,6 +3,8 @@ package util
 	import control.Loading;
 	import control.LoginUser;
 	
+	import events.ChangeUserEvent;
+	
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
 	
@@ -11,6 +13,7 @@ package util
 	import httpcontrol.RemoteUtil;
 	
 	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
 	import mx.rpc.AbstractOperation;
@@ -24,6 +27,10 @@ package util
 		public function ToolUtil()
 		{
 		}
+		
+		[Bindable]
+		public static var resultMsg:String="";
+		
 		public static var  currentUserFun:Function=null;
 		public static var loginUser:LoginUser= new LoginUser();
 		public static function init():void{
@@ -33,6 +40,7 @@ package util
 //			userRefresh();
 			sessionUserRefresh();
 			groupRefresh();
+			contactsRefresh();
 			
 //			ruleRefresh();
 //			ticketRefresh();
@@ -59,6 +67,9 @@ package util
 		}
 		public static function resultFinduser(result:Object,e:ResultEvent):void{
 			if(result.success==true){
+				if(sessionUser["id"]!=result.result["id"]){
+					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,result.result,true));
+				}
 				sessionUser=result.result;
 			}else{
 				sessionUser=false;
@@ -154,6 +165,29 @@ package util
 			if(result.success==true){
 				groupList.removeAll();
 				groupList.addAll(new ArrayCollection(result.result as Array));
+			}
+		}
+		[Bindable]
+		public static var contactsList:ArrayCollection=new ArrayCollection();
+		
+		public static function contactsRefresh(fun:Function=null):void{
+			
+			if(fun==null){
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllGroup,"POST").send();
+			}else{
+				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllContacts,"POST");
+				http.resultFunArr.addItem(fun);
+				http.send();
+				
+			}
+			
+		}
+		public static function resultAllContacts(result:Object,e:ResultEvent):void{
+			if(result.success==true){
+				contactsList.removeAll();
+				if(result.result){
+					contactsList.addAll(new ArrayCollection(result.result as Array));
+				}
 			}
 		}
 		

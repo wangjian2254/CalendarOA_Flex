@@ -7,32 +7,27 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import control.SchedulePanel;
-			
 			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.managers.PopUpManager;
 			[Bindable]
 			public var color:Number = 0xffffff;
 			[Bindable]
-			public var scheduleName : String = "开会";
+			public var groupName : String = "开会";
 			
 			[Bindable]
-			public var scheduleId:String="21";
+			public var groupId:String="21";
 			
 			[Bindable]
-			public var scheduleData:Object = null;
+			public var groupData:Object = null;
 			
 			public var fun:Function=null;
+			public var isshow:Boolean=true;
 			
 			
 			private function openSchedule():void{
 				if(fun!=null){
-					fun();
+					fun(this,groupData);
 				}else{
-					var s:SchedulePanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
-					s.schedulData = scheduleData;
-					PopUpManager.centerPopUp(s);
+					Alert.show(groupName,"日程");
 				}
 				
 				
@@ -45,7 +40,7 @@
 	<s:BorderContainer  width="10" height="10"  backgroundColor="{color}" borderVisible="true" borderStyle="solid" borderColor="#CCCCCC" >
 		
 	</s:BorderContainer>
-	<mx:LinkButton id="linkScheduleItem" label="{scheduleName}" click="openSchedule()" >
+	<mx:LinkButton id="linkScheduleItem" label="{groupName}" click="openSchedule()" >
 		
 	</mx:LinkButton>
 </s:BorderContainer>

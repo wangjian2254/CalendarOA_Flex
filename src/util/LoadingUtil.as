@@ -8,6 +8,6 @@ package util
 		{
 		}
 		
-		public static var loading:Loading;
+		public static var loading:Loading=new Loading();
 	}
 }

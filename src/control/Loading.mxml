@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" width="400" height="300" borderVisible="false" backgroundAlpha="0.5" backgroundColor="#000000">
+				   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" width="400" height="300" visible="false" borderVisible="false" backgroundAlpha="0.5" backgroundColor="#000000">
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.PopUpAnchor;
 			private var num:int=0;
 			
 			public function showIn():void{
 				num++;
 					this.visible=true;
+					if(this.parent==null){
+						PopUpManager.addPopUp(this,FlexGlobals.topLevelApplication as DisplayObject,true);
+					}
+					PopUpManager.bringToFront(this);
+					PopUpManager.centerPopUp(this);
 //				if(num>0){
 					
 //				}
@@ -20,6 +29,7 @@
 //				Alert.show(""+num,"Loading")
 				if(num==0){
 					this.visible=false;
+					PopUpManager.removePopUp(this);
 				}
 //				if(num>0){
 //					//this.visible=true;
@@ -72,6 +82,9 @@
 			}
 			
 			private function init():void{
+				this.width = FlexGlobals.topLevelApplication.width;
+				this.height = FlexGlobals.topLevelApplication.height;
+				
 				open.addEventListener(TimerEvent.TIMER,openevent);
 				close.addEventListener(TimerEvent.TIMER,closeevent);
 				

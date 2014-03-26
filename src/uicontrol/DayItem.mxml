@@ -11,8 +11,12 @@
 			
 			import mx.collections.ArrayCollection;
 			import mx.rpc.events.ResultEvent;
+			
+			
 			[Bindable]
 			public var date:String="20140315";
+			
+			private var groupShowData:Object=new Object();
 			
 			private var scheduleArr:ArrayCollection=new ArrayCollection();
 			
@@ -24,7 +28,7 @@
 				var obj:Object = new Object();
 				obj["date"] = date;
 				
-				
+				groupShowData=new Object();
 				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
 			}
 			
@@ -37,7 +41,10 @@
 				
 			}
 			
-			private function showSchedule():void{
+			public function showSchedule(gid:Number=0,show:Boolean=true):void{
+				if(gid!=0){
+					groupShowData[gid+""]=show;
+				}
 				scheduleList.removeAllElements();
 				var scheduleItem:ScheduleItem=null;
 				for each(var obj:Object in scheduleArr){
@@ -46,10 +53,14 @@
 					scheduleItem.scheduleName = obj.title;
 					scheduleItem.color = obj.color;
 					scheduleItem.scheduleId = obj.id;
-					
-					scheduleList.addElement(scheduleItem);
+					if(!groupShowData.hasOwnProperty(""+gid)||groupShowData[""+gid]){
+						scheduleList.addElement(scheduleItem);
+					}
 				}
 			}
+			
+			
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>

@@ -10,6 +10,7 @@
 			import control.CBorderContainer;
 			import control.CalendarControl;
 			import control.ChangePassword;
+			import control.Loading;
 			import control.LoginUser;
 			import control.RegisterUser;
 			
@@ -43,7 +44,6 @@
 			import util.UserUtil;
 			public function init():void{
 				ToolUtil.currentUserFun = currentUser;
-				LoadingUtil.loading=loading;
 //				ToolUtil.init();
 				ToolUtil.sessionUserRefresh(currentUser);
 				menuXML.send();
@@ -64,13 +64,14 @@
 					}else{
 						userinfoGroup2.visible=false;
 						userinfoGroup.visible=true;
-						ToolUtil.init();
-						for(var i:Number=0;i<cbar.numElements;i++){
-							var c:CBorderContainer = cbar.getElementAt(i) as CBorderContainer;
-							c.init(null);
-						}
+						
 					}
 					menuXML.send();
+					ToolUtil.init();
+					for(var i:Number=0;i<gongNengStack.numElements;i++){
+						var c:CBorderContainer = gongNengStack.getElementAt(i) as CBorderContainer;
+						c.init(null);
+					}
 				}
 			}
 			
@@ -247,9 +248,7 @@
 			public function reg():void{
 				var changepassword:RegisterUser=RegisterUser(PopUpManager.createPopUp( 
 					this, RegisterUser , true) as spark.components.TitleWindow);
-				changepassword.userfn=currentUser;
-				changepassword.x=(this.width-changepassword.width)/2;
-				changepassword.y=(this.height-changepassword.height)/2;
+				PopUpManager.centerPopUp(changepassword);
 			}
 			
 			public function logout():void{
@@ -262,8 +261,9 @@
 			public function repassword():void{
 				var changepassword:ChangePassword=ChangePassword(PopUpManager.createPopUp( 
 					this, ChangePassword , true) as spark.components.TitleWindow);
-				changepassword.x=(this.width-changepassword.width)/2;
-				changepassword.y=(this.height-changepassword.height)/2;
+				PopUpManager.centerPopUp(changepassword);
+//				changepassword.x=(this.width-changepassword.width)/2;
+//				changepassword.y=(this.height-changepassword.height)/2;
 			}
 			
 		]]>
@@ -328,6 +328,7 @@
 			</s:layout>
 			<s:Label text="当前位置： " left="20" top="8" styleName="textStyle3"/>
 			<s:Label id="website" left="85" top="8" styleName="textStyle3"/>
+			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" top="0" bottom="0" left="0" right="0" textAlign="center" verticalAlign="middle" />
 			<mx:LinkButton label="重置页面" visible="false" top="3" right="12" color="0x353535"/>
 		</s:SkinnableContainer>		
 	</s:Group>
@@ -341,8 +342,6 @@
 	<uicontrol:CTabBar id="cbar" dataProvider="{gongNengStack}" left="2" right="2" width="100%" bottom="1" height="31" borderVisible="false"  creationComplete="trace('tabbar')">
 		
 	</uicontrol:CTabBar>
-	<control:Loading id="loading" width="100%" height="100%" visible="false">
-		
-	</control:Loading>
+	
 </s:Application>
 

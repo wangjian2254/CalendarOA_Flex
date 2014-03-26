@@ -6,6 +6,7 @@
 						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
 	<fx:Script>
 		<![CDATA[
+			import events.ChangeUserEvent;
 			import events.CloseEvent;
 			import events.PageChangeEvent;
 			
@@ -25,6 +26,7 @@
 			import mx.rpc.events.ResultEvent;
 			
 			import uicontrol.DayItem;
+			import uicontrol.GroupItem;
 			
 			import util.DateUtil;
 			import util.ToolUtil;
@@ -36,10 +38,82 @@
 			override public   function  init(e:FlexEvent):void{
 				dateChooser.selectedDate = new Date();
 				showCalendar();
+				if(ToolUtil.groupList.length==0){
+					ToolUtil.groupRefresh(regetGroup);
+				}else{
+					regetGroup();
+				}
+			}
+			override public function changeCurrentUser(e:ChangeUserEvent):void{
+				regetSchedule();
 			}
 			override public function closeContainer(e:CloseEvent):void{
 				dispatchEvent(e);
 				
+			}
+			
+			public function regetSchedule():void{
+				var dayItem:DayItem=null;
+				for(var  i:Number=0;i<100;i++){
+					if(calendarPanel.numElements-1<i){
+						break;
+					}else{
+						dayItem = calendarPanel.getElementAt(i) as DayItem;
+						
+						dayItem.init();
+					}
+				}
+				regetGroup();
+			}
+			
+			public function regetGroup(result:Object=null,e:ResultEvent=null):void{
+				while(datePanel.getElementIndex(mygrouplbl)+1<datePanel.getElementIndex(mytasklbl)){
+					datePanel.removeElementAt(datePanel.getElementIndex(mygrouplbl)+1);
+				}
+				while(datePanel.getElementIndex(myjoingrouplbl)+1<datePanel.numElements){
+					datePanel.removeElementAt(datePanel.getElementIndex(mygrouplbl)+1);
+				}
+				var groupItem:GroupItem=null;
+				var obj:Object = null;
+				for(var i:Number=ToolUtil.groupList.length-1;i>=0;i--){
+					groupItem = new GroupItem();
+					obj = ToolUtil.groupList.getItemAt(i);
+					groupItem.color = obj.color;
+					groupItem.groupId = obj.id;
+					groupItem.groupName = obj.name;
+					groupItem.groupData = obj;
+					groupItem.fun=showGroup;
+					groupItem.isshow=true;
+					
+					if(obj.author == ToolUtil.sessionUser.id){
+						datePanel.addElementAt(groupItem,datePanel.getElementIndex(mygrouplbl)+1);
+					}else{
+						datePanel.addElementAt(groupItem,datePanel.getElementIndex(myjoingrouplbl)+1);
+					}
+					
+				}
+			}
+			
+			public function showGroup(group:GroupItem,g:Object):void{
+				if(group.isshow){
+					group.color = 0xffffff;
+					group.isshow = false;
+				}else{
+					group.color = g.color;
+					group.isshow = true;
+				}
+				
+				var dayItem:DayItem=null;
+				for(var  i:Number=0;i<100;i++){
+					if(calendarPanel.numElements-1<i){
+						break;
+					}else{
+						dayItem = calendarPanel.getElementAt(i) as DayItem;
+						
+						dayItem.showSchedule(g.id,group.isshow);
+						
+					}
+				}
 			}
 			
 			
@@ -220,9 +294,8 @@
 			}
 			
 			public function createSchedule():void{
-				var s:SchedulePanel = PopUpManager.createPopUp(this,SchedulePanel,true) as SchedulePanel;
-				s.x = (FlexGlobals.topLevelApplication.width-s.width)/2;
-				s.y = (FlexGlobals.topLevelApplication.height-s.height)/2;
+				var s:SchedulePanel = PopUpManager.createPopUp(this,SchedulePanel,false) as SchedulePanel;
+				PopUpManager.centerPopUp(s);
 			}
 			
 			private function changeDate():void{
@@ -262,7 +335,7 @@
 		</s:layout>
 		<s:Scroller  width="190" height="100%">
 			<s:Group>
-				<s:BorderContainer width="100%" borderVisible="false" >
+				<s:BorderContainer id="datePanel" width="100%" borderVisible="false" >
 					<s:layout>
 						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
 						</s:VerticalLayout>
@@ -272,12 +345,13 @@
 						
 					</s:Label>
 					<mx:DateChooser id="dateChooser" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-					<s:Label text="我的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
+					<s:Label id="mygrouplbl" text="我的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
-					<s:Label text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
+					
+					<s:Label id="mytasklbl" text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
 					<uicontrol:ScheduleItem id="mytask" color="#ffffff" scheduleName="任务" fun="showTask"/>
-					<s:Label text="参与的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
+					<s:Label id="myjoingrouplbl" text="参与的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
 				</s:BorderContainer>
 			</s:Group>

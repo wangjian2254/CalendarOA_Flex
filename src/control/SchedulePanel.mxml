@@ -1,21 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="550" height="500" title="{titlestr}" creationComplete="init()" close="closeWin()">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="750" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()">
 	<fx:Script>
 		<![CDATA[
+			import events.ChangeJoinUserEvent;
+			import events.ChangeUserEvent;
+			
 			import httpcontrol.HttpServiceUtil;
 			import httpcontrol.RemoteUtil;
 			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
+			import mx.controls.LinkButton;
+			import mx.core.FlexGlobals;
+			import mx.managers.CursorManager;
+			import mx.managers.CursorManagerPriority;
 			import mx.managers.PopUpManager;
 			import mx.rpc.AbstractOperation;
 			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import spark.formatters.DateTimeFormatter;
+			
+			import uicontrol.ContactItem;
+			import uicontrol.ScheduleItem;
 			
 			import util.DateUtil;
 			import util.ToolUtil;
 			import util.UserUtil;
+			
+			[Bindable]
+			private var baseHeight:Number=450;
 			
 			[Bindable]
 			public var titlestr:String="创建日程";
@@ -26,17 +42,78 @@
 			public var endDateValue:Date=new Date();
 			
 			[Bindable]
-			private var timelist:ArrayCollection = new ArrayCollection([{"value":"00:00","text":"凌晨 00:00"}]);
+			public var schedulData:Object=null;
+			
+			[Bindable]
+			private var timelist:ArrayCollection = new ArrayCollection([{"value":"0000","text":"凌晨 00:00"}]);
+			[Bindable]
+			private var warninglist:ArrayCollection = new ArrayCollection([{"value":1,"text":"分钟"},{"value":60,"text":"小时"},{"value":60*24,"text":"天"},{"value":60*24*7,"text":"周"}]);
+//			[Bindable]
+//			private var warninglist2:ArrayCollection = new ArrayCollection([{"value":0,"text":"当天"},{"value":24*60,"text":"提前一天"},{"value":24*60*2,"text":"提前二天"},{"value":24*60*3,"text":"提前三天"},{"value":24*60*4,"text":"提前四天"},{"value":24*60*7,"text":"提前一星期"}]);
 			[Bindable]
 			private var endtimelist:ArrayCollection = new ArrayCollection();
 			
-			public var userfn:Function;
+			[Bindable]
+			private var contactsList:ArrayCollection =null;
+			
+			
+			private var selectColor:Number =0x00CCFF;
 			
 			public function closeWin():void{
 				PopUpManager.removePopUp(this);
 			}
 			
 			public function init():void{
+				contactsList = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+				if(schedulData!=null){
+					if(schedulData.is_all_day){
+						is_all_day.selected = schedulData.is_all_day;
+						startDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
+						endDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
+					}else{
+						startDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_start);
+						endDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_end);
+						
+					}
+					startDate.selectedDate = startDateValue;
+					if(schedulData.enddate){
+						forever.selected = false;
+						endDate.selectedDate = DateField.stringToDate(schedulData.enddate,"YYYYMMDD")
+						
+					}else{
+						forever.selected = true;
+					}
+					
+					scheduleTitle.text = schedulData.title;
+					desc.text = schedulData.desc;
+					repeatType.selectedValue = schedulData.repeat_type;
+					repeatChange();
+					for each(var o:Object in ToolUtil.groupList){
+						if(o.id == schedulData.group){
+							group.selectedItem = o;
+						}
+					}
+					
+					colorClick(schedulData.color);
+					if(schedulData.users.length>0){
+						isMultiUsers.selected=true;
+					}else{
+						isMultiUsers.selected=false;
+					}
+					multiUsers();
+					for each(var u:Object in schedulData.users){
+						for each(var c:Object in joinUserGrid.dataProvider as ArrayCollection){
+							if(u.username == c.username){
+								c.selected=true;
+							}
+						}
+					}
+					joinUserGrid.invalidateList();
+					changeUsers();
+					titlestr = schedulData.title;
+					
+				}
+				
 				timelist.removeAll();
 				for(var i:Number=0;i<24;i++){
 					var h:String ="0"+i;
@@ -54,37 +131,134 @@
 						s="晚上 ";
 					}
 					
-					timelist.addItem({"value":h.substring(h.length-2)+":00","text":s+h.substring(h.length-2)+":00"});
-					timelist.addItem({"value":h.substring(h.length-2)+":30","text":s+h.substring(h.length-2)+":30"});
+					timelist.addItem({"value":h.substring(h.length-2)+"00","text":s+h.substring(h.length-2)+":00"});
+					timelist.addItem({"value":h.substring(h.length-2)+"30","text":s+h.substring(h.length-2)+":30"});
 				}
+				
+				try{
+					var index:Number=startDateValue.hours*2;
+					if(startDateValue.minutes>30){
+						index+=1;
+					}
+					startTime.selectedItem = timelist.getItemAt(index);	
+					endtimelist.removeAll();
+					for(index+=1;index<timelist.length;index++){
+						endtimelist.addItem(timelist.getItemAt(index));
+						if(timeStr.format(endDateValue)>=timelist.getItemAt(index).value){
+							endTime.selectedItem = timelist.getItemAt(index);
+						}
+					}
+				}catch(error:Error){
+					
+				}
+				
+				warningChange();
+				
+			}
+			
+			private function getData():Object{
+				var obj:Object=new Object();
+				if(schedulData!=null&&schedulData.hasOwnProperty("id")){
+					obj.id = schedulData["id"];
+				}
+				obj.title=scheduleTitle.text;
+				obj.desc = desc.text;
+				obj.startdate = datestr.format(startDate.selectedDate);
+				if(!forever.selected){
+					obj.enddate = datestr.format(endDate.selectedDate);
+				}
+				obj.is_all_day = is_all_day.selected;
+				if(!is_all_day.selected){
+					obj.time_start = startTime.selectedItem.value;
+					obj.time_end = endTime.selectedItem.value;
+				}
+				obj.repeat_type = repeatType.selectedValue;
+				
+				obj.repeat_date = new Array();
+				if(repeatType.selectedValue=="weekly"){
+					for(var m:Number=0;m<dayTile.numElements;m++){
+						if((dayTile.getElementAt(m) as CheckBox).selected){
+							obj.repeat_date.push(m);
+						}
+					}
+				}
+				if(repeatType.selectedValue=="monthly"){
+					for(m=0;m<dayTile.numElements;m++){
+						if((dayTile.getElementAt(m) as CheckBox).selected){
+							obj.repeat_date.push(m+1);
+						}
+					}
+				}
+				obj.color = selectColor;
+				obj.groupid = group.selectedItem.id;
+				obj.users = new Array();
+				for each(var c:Object in joinUserGrid.dataProvider as ArrayCollection){
+					if(true== c.selected){
+						obj.users.push(c.username);
+					}
+				}
+				
+				obj.warning_email=cbemail.selected;
+				obj.warning_sms=cbsms.selected;
+				obj.warning_rtx=cbrtx.selected;
+				if(is_all_day.selected){
+					obj.warning_time1 = firstDay.value*24*60+firstHour.value*60+firstMin.value;
+					if(needSecond2.selected){
+						obj.warning_time2 = secondDay.value*24*60+secondHour.value*60+secondMin.value;
+					}
+				}else{
+					obj.warning_time1 = (0-(firstNum.value*firstWarning.selectedItem.value));
+					if(needSecond2.selected){
+						obj.warning_time2 = (0-(secondNum.value*secondWarning.selectedItem.value));
+					}
+				}
+				
+				return obj;
 			}
 			
 			public function save():void{
-//				if(this.username.text==""||this.truename.text==""||
-//					this.password.text==""||this.rpassword.text==""){
-//					Alert.show("请填写完整信息。","提示");
-//					return;
-//				}
-//				if(this.password.text==""||this.password.text!=this.rpassword.text){
-//					Alert.show("密码和确认密码要一致。","提示");
-//					return;
-//				}
-//				var obj:Object=new Object();
-//				obj.username=username.text;
-//				obj.truename = truename.text;
-//				obj.password = password.text;
-//				obj.isaction = 'true';
-//				obj.ismanager = 'true';
+				if(this.scheduleTitle.text==""||this.scheduleTitle.text=="日程标题"){
+					scheduleTitle.selectAll();
+					Alert.show("请填写日程标题。","提示");
+					return;
+				}
+				if(startDate.selectedDate==null){
+					Alert.show("请选择开始时间。","提示");
+					startDate.open();
+					return;
+				}
+				if(!forever.selected&&endDate.selectedDate==null){
+					Alert.show("请选择结束时间，或选择永远重复。","提示");
+					endDate.open();
+					return;
+				}
 				
-//				HttpServiceUtil.getCHTTPServiceAndResult("/ft/regUser",refresh,"POST").send(obj);
+				
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(getData());
 					
 				
 			}
+			
+			private function saveResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					if(schedulData==null){
+						schedulData = getData();
+					}
+					schedulData.id = result.result;
+					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+					
+				}
+			}
+			
 			public function refresh():void{
 				var start:Number=timelist.getItemIndex(startTime.selectedItem);
 				endtimelist.removeAll();
 				for(var i:Number = start+1;i<timelist.length;i++){
 					endtimelist.addItem(timelist.getItemAt(i));
+					if(timeStr.format(endDateValue)>=timelist.getItemAt(i).value){
+						endTime.selectedItem = timelist.getItemAt(i);
+					}
 				}
 			}
 			
@@ -92,10 +266,12 @@
 				if(repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
 					dayTile.visible = false;
 					dayPanel.height=0;
+					resize();
 				}else{
 					dayTile.visible = true;
 					if(repeatType.selectedValue=="weekly"){
 						dayPanel.height = 25;
+						resize();
 						dayTile.removeAllElements();
 						for(var i:Number=0;i<7;i++){
 							var cb:CheckBox = new CheckBox();
@@ -126,12 +302,20 @@
 							cb.selected=false;
 							dayTile.addElement(cb);
 						}
+						for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
+							try{
+								(dayTile.getElementAt(Number( schedulData.repeat_date[index])) as CheckBox).selected = true;
+							}catch(e:Error){
+							}
+						}
 						
 					}
 					
 					if(repeatType.selectedValue=="monthly"){
 						dayTile.removeAllElements();
 						dayPanel.height = 125;
+						this.height=baseHeight+dayPanel.height;
+						this.invalidateSize();
 						for( i=0;i<32;i++){
 							cb = new CheckBox();
 							
@@ -140,49 +324,157 @@
 							cb.selected=false;
 							dayTile.addElement(cb);
 						}
+						for (index= 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
+							try{
+								(dayTile.getElementAt(Number( schedulData.repeat_date[index])-1) as CheckBox).selected = true;
+							}catch(e:Error){
+							}
+						}
 					}
 				}
 				this.invalidateDisplayList();
 			}
+			
+			private function colorChange():void{
+				colorClick(colorPicker.selectedColor);
+			}
+			
+			private function colorClick(c:Number):void{
+				selectColor = c;
+				color0.setStyle("backgroundColor",c);
+				color1.setStyle("borderColor",0xffffff);
+				color2.setStyle("borderColor",0xffffff);
+				color3.setStyle("borderColor",0xffffff);
+				color4.setStyle("borderColor",0xffffff);
+				color5.setStyle("borderColor",0xffffff);
+				color6.setStyle("borderColor",0xffffff);
+				switch(c){
+					case 0x00CCFF:
+						color1.setStyle("borderColor",0x000000);
+						break;
+					case 0x00FFFF:
+						color2.setStyle("borderColor",0x000000);
+						break;
+					case 0x3300FF:
+						color3.setStyle("borderColor",0x000000);
+						break;
+					case 0x3366FF:
+						color4.setStyle("borderColor",0x000000);
+						break;
+					case 0xCC9900:
+						color5.setStyle("borderColor",0x000000);
+						break;
+					case 0xFF6633:
+						color6.setStyle("borderColor",0x000000);
+						break;
+					default:
+						if(colorPicker.selectedColor!=c){
+							colorPicker.selectedColor=c;
+						}
+					
+				}
+			}
+			
+			private function delJoin(e:ChangeJoinUserEvent):void{
+				joinUserGrid.invalidateList();
+			}
+			
+			public function changeUsers():void{
+				users.removeAllElements();
+				var address:ContactItem = null;
+				for each(var obj:Object in contactsList){
+					if(obj.selected){
+						address = new ContactItem();
+						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
+						users.addElement(address);
+					}
+				}
+			}
+			
+			private function multiUsers():void{
+				if(isMultiUsers.selected){
+					contactPanel.width = 350;
+				}else{
+					contactPanel.width = 0;
+				}
+				this.width = 420+contactPanel.width;
+				this.invalidateSize();
+			}
+			
+			private function warningChange():void{
+				if(cbrtx.selected||cbsms.selected||cbemail.selected){
+					alldaywarning.height=0;
+					alldaywarning1.height=0;
+					alldaywarning2.height=0;
+					if(is_all_day.selected){
+						alldaywarning1.height=25;
+						alldaywarning2.height=25;
+					}else{
+						alldaywarning.height=25;
+					}
+				}else{
+					alldaywarning.height=0;
+					alldaywarning1.height=0;
+					alldaywarning2.height=0;
+				}
+				resize();
+			}
+			
+			private function resize():void{
+				this.height = baseHeight+dayPanel.height+alldaywarning.height+alldaywarning1.height+alldaywarning2.height;
+				this.invalidateSize();
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 		<s:RadioButtonGroup id="repeatType" change="repeatChange()"/>
+		<mx:DateFormatter id="datestr" formatString="YYYYMMDD" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="timeStr" formatString="JJNN" >
+			
+		</mx:DateFormatter>
+		
 	</fx:Declarations>
 	
 	<s:layout>
-		<s:VerticalLayout gap="3" paddingLeft="10" paddingTop="10">
+		<s:HorizontalLayout gap="3" paddingLeft="10" paddingTop="5" paddingBottom="5">
 			
-		</s:VerticalLayout>
+		</s:HorizontalLayout>
 	</s:layout>
+	<s:BorderContainer width="400" height="25" borderVisible="false" >
+		<s:layout>
+			<s:VerticalLayout gap="3"/>
+		</s:layout>
 	
-	<s:TextInput id="scheduleTitle" width="500" text="日程标题">
+	<s:TextInput id="scheduleTitle" width="100%" text="日程标题">
 	</s:TextInput>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="时间段：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 		<mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-		<mx:ComboBox id="startTime" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
+		<mx:ComboBox id="startTime" visible="{!is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
 			
 		</mx:ComboBox>
-		<s:Label text="到" height="100%" verticalAlign="middle" />
-		<mx:ComboBox id="endTime" dataProvider="{endtimelist}" labelField="text" width="90"   >
+		<s:Label text="到" height="100%" verticalAlign="middle" visible="{!is_all_day.selected}" />
+		<mx:ComboBox id="endTime"  visible="{!is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90"   >
 			
 		</mx:ComboBox>
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="是否全天：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:CheckBox label="全天" id="is_all_day">
+		<s:CheckBox label="全天" id="is_all_day" change="warningChange()">
 		</s:CheckBox>
 		
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
@@ -196,7 +488,7 @@
 		<s:RadioButton group="{repeatType}" label="每年" value="yearly">
 		</s:RadioButton>
 	</s:BorderContainer>
-	<s:BorderContainer id="dayPanel" width="500" height="0" borderVisible="false" >
+	<s:BorderContainer id="dayPanel" width="100%" height="0" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
@@ -211,54 +503,164 @@
 			<s:CheckBox label="日" />
 		</s:TileGroup>
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="结束时间：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 		
-		<mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-		
+		<s:CheckBox id="forever" label="永远"  />
+		<mx:DateField id="endDate" width="100" enabled="{!forever.selected}" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="100" borderVisible="false" >
+	<s:BorderContainer width="100%" height="100" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="说明:" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:TextArea width="100%" height="100%" />
+		<s:TextArea id="desc" width="100%" height="100%" />
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="颜色:" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:BorderContainer id="color1" backgroundColor="#00CCFF" borderColor="#000000" width="20" height="20">
+		
+		<s:BorderContainer id="color0" backgroundColor="#00CCFF" borderColor="#000000" borderWeight="2" width="20" height="20">
 		</s:BorderContainer>
-		<s:BorderContainer id="color2" backgroundColor="#00FFFF" borderColor="#ffffff" width="20" height="20">
+		<s:Label text="|" fontWeight="bold" fontSize="18" textAlign="center"  width="10" height="25" verticalAlign="middle"/>
+		<s:BorderContainer id="color1" click="colorClick(0x00CCFF)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#00CCFF" borderColor="#000000" borderWeight="2" width="20" height="20">
 		</s:BorderContainer>
-		<s:BorderContainer id="color3" backgroundColor="#3300FF" borderColor="#ffffff" width="20" height="20">
+		<s:BorderContainer id="color2" click="colorClick(0x00FFFF)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#00FFFF" borderColor="#ffffff" borderWeight="2" width="20" height="20">
 		</s:BorderContainer>
-		<s:BorderContainer id="color4" backgroundColor="#3366FF" borderColor="#ffffff" width="20" height="20">
+		<s:BorderContainer id="color3" click="colorClick(0x3300FF)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#3300FF" borderColor="#ffffff" borderWeight="2" width="20" height="20">
 		</s:BorderContainer>
-		<s:BorderContainer id="color5" backgroundColor="#CC9900" borderColor="#ffffff" width="20" height="20">
+		<s:BorderContainer id="color4" click="colorClick(0x3366FF)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#3366FF" borderColor="#ffffff" borderWeight="2" width="20" height="20">
 		</s:BorderContainer>
-		<s:BorderContainer id="color6" backgroundColor="#FF6633" borderColor="#ffffff" width="20" height="20">
+		<s:BorderContainer id="color5" click="colorClick(0xCC9900)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#CC9900" borderColor="#ffffff" borderWeight="2" width="20" height="20">
 		</s:BorderContainer>
-		<mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ED0E9C"
+		<s:BorderContainer id="color6" click="colorClick(0xFF6633)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#FF6633" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange()"
 						symbolColor="#030002">
 			
 		</mx:ColorPicker>
 	</s:BorderContainer>
-	<s:BorderContainer width="500" height="25" borderVisible="false" >
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
 		<s:layout>
 			<s:HorizontalLayout gap="5"/>
 		</s:layout>
 		<s:Label text="分组:" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:ComboBox id="group" dataProvider="{ToolUtil.groupList}" labelField="name" width="190" >
+		<mx:ComboBox id="group" dataProvider="{ToolUtil.groupList}" labelField="name" width="190" >
 			
-		</s:ComboBox>
+		</mx:ComboBox>
 		
 	</s:BorderContainer>
-	<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" />
-	
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="多人参与:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:CheckBox id="isMultiUsers" label="多人" change="multiUsers()" />
+		
+	</s:BorderContainer>
+	<s:BorderContainer width="100%" height="25" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="提醒方式:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:CheckBox id="cbrtx" label="RTX腾讯通" selected="true" change="warningChange()" />
+		<s:CheckBox id="cbsms" label="手机短信"  change="warningChange()" />
+		<s:CheckBox id="cbemail" label="email"  change="warningChange()" />
+	</s:BorderContainer>
+	<s:BorderContainer id="alldaywarning" width="100%" height="25" borderVisible="false"  visible="{!is_all_day.selected}">
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="第一次提醒:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label text="提前"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstNum" value="0" minimum="0" maximum="3000" width="50"/>
+		<mx:ComboBox id="firstWarning" dataProvider="{warninglist}" labelField="text" width="50" />
+		<s:Label text="第二次提醒:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label text="提前"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondNum" value="0" minimum="0" maximum="3000" width="70"/>
+		<mx:ComboBox id="secondWarning" dataProvider="{warninglist}" selectedIndex="1" labelField="text" width="70" enabled="{needSecond1.selected}" />
+		<s:CheckBox  id="needSecond1" selected="true"/>
+	</s:BorderContainer>
+	<s:BorderContainer  id="alldaywarning1" width="100%" height="25" borderVisible="false" visible="{is_all_day.selected}" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="第一次提醒:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label text="提前"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstDay" value="0" minimum="0" maximum="30" width="50"/>
+		<s:Label text="天"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstHour" value="8" minimum="0" maximum="11" width="50"/>
+		<s:Label text="时"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstMin" value="0" minimum="0" maximum="59" width="50"/>
+		<s:Label text="分"  height="25" verticalAlign="middle" />
+		
+	</s:BorderContainer>
+	<s:BorderContainer id="alldaywarning2" width="100%" height="25" borderVisible="false" visible="{is_all_day.selected}" >
+		<s:layout>
+			<s:HorizontalLayout gap="5"/>
+		</s:layout>
+		
+		<s:Label text="第二次提醒:" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label text="提前"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondDay" value="0" minimum="0" maximum="30" width="50" enabled="{needSecond2.selected}"/>
+		<s:Label text="天"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondHour" value="8" minimum="0" maximum="11" width="50" enabled="{needSecond2.selected}"/>
+		<s:Label text="时"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
+		<s:Label text="分"  height="25" verticalAlign="middle" />
+		<s:CheckBox  id="needSecond2" selected="true"/>
+	</s:BorderContainer>
+	<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
+	</s:BorderContainer>
+	<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%"  visible="{isMultiUsers.selected}">
+		
+	</s:BorderContainer>
+	<s:BorderContainer id="contactPanel" width="100%" height="100%" borderVisible="false"  visible="{isMultiUsers.selected}">
+		<s:layout>
+			<s:VerticalLayout gap="5"/>
+		</s:layout>
+		<s:Label text="参与人：" width="100%" height="25" verticalAlign="middle" />
+		<s:Scroller width="100%" height="100" >
+			<s:Group width="100%" height="100%" >
+				<s:TileGroup id="users"  width="100%" requestedColumnCount="-1">
+					
+				</s:TileGroup>
+			</s:Group>
+		</s:Scroller>
+		<mx:DataGrid id="joinUserGrid" width="100%" height="100%" editable="true" dataProvider="{contactsList}" >
+			<mx:columns>
+				<mx:DataGridColumn headerText="选择" width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
+					<mx:itemRenderer>
+						<fx:Component>
+							<mx:HBox horizontalAlign="center">
+								<fx:Script>
+									<![CDATA[
+										public function get selected():Boolean{
+											return cb.selected;
+										}
+										public function set selected(value:Boolean):void{
+											cb.selected=value;
+										}
+									]]>
+								</fx:Script>
+								
+								<mx:CheckBox id="cb" selected="{data.selected}" change="outerDocument.changeUsers()" >
+									
+								</mx:CheckBox>
+							</mx:HBox>
+						</fx:Component>
+					</mx:itemRenderer>
+				</mx:DataGridColumn>
+				<mx:DataGridColumn headerText="账号" dataField="username" width="140" editable="false">
+				</mx:DataGridColumn>
+				<mx:DataGridColumn headerText="姓名" dataField="nickname" width="140" editable="false">
+				</mx:DataGridColumn>
+			</mx:columns>
+		</mx:DataGrid>
+	</s:BorderContainer>
 </s:TitleWindow>

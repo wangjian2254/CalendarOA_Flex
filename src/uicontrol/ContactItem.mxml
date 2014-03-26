@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="{linkScheduleItem.width+10+10+2}" height="18" borderVisible="false">
+	<s:layout>
+		<s:HorizontalLayout gap="2" paddingLeft="10" verticalAlign="middle" horizontalAlign="left"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import events.ChangeJoinUserEvent;
+			
+			import mx.controls.Alert;
+
+			[Bindable]
+			[Embed("assets/img/tabbutton/X_down.png")]
+			public var X_down:Class;
+			[Bindable]
+			[Embed("assets/img/tabbutton/X_hover.png")]
+			public var X_hover:Class;
+			[Bindable]
+			[Embed("assets/img/tabbutton/X_out.png")]
+			public var X_out:Class;
+			
+			
+			[Bindable]
+			public var userData:Object = null;
+			
+			public var fun:Function=null;
+			
+			private function openSchedule():void{
+				userData.selected = false;
+				if(this.parent!=null){
+					this.parent.removeChild(this);
+				}
+				if(fun!=null){
+					fun();
+				}else{
+//					Alert.show(scheduleName,"日程");
+				}
+				
+				dispatchEvent(new ChangeJoinUserEvent(true));
+				
+			}
+			
+			public function closeO():void{
+				
+				this.clo.source=X_hover;
+			}
+			public function closeD():void{
+				
+				this.clo.source=X_down;
+			}
+			public function closeU():void{
+				this.clo.source=X_out;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<mx:LinkButton id="linkScheduleItem" label="{userData.username+':'+userData.nickname}" >
+		
+	</mx:LinkButton>
+	<mx:Image id="clo"  source="{X_out}"  click="openSchedule()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
+
+</s:BorderContainer>
