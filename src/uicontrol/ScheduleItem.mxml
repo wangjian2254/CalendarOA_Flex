@@ -26,7 +26,10 @@
 			public var fun:Function=null;
 			
 			
-			private function openSchedule():void{
+			private function openSchedule(e:MouseEvent):void{
+				if(!(e.target is LinkButton)){
+					return;
+				}
 				if(fun!=null){
 					fun();
 				}else{
@@ -45,7 +48,7 @@
 	<s:BorderContainer  width="10" height="10"  backgroundColor="{color}" borderVisible="true" borderStyle="solid" borderColor="#CCCCCC" >
 		
 	</s:BorderContainer>
-	<mx:LinkButton id="linkScheduleItem" label="{scheduleName}" click="openSchedule()" >
+	<mx:LinkButton id="linkScheduleItem" label="{scheduleName}" click="openSchedule(event)" >
 		
 	</mx:LinkButton>
 </s:BorderContainer>

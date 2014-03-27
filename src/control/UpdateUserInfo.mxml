@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="330" title="注册用户" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+			import httpcontrol.HttpServiceUtil;
+			import httpcontrol.RemoteUtil;
+			
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+			import util.UserUtil;
+			
+			
+			public function closeWin():void{
+				PopUpManager.removePopUp(this);
+			}
+			
+			public function save():void{
+				
+				
+				var obj:Object=new Object();
+				obj.id = ToolUtil.sessionUser.id;
+				obj.username=username.text;
+				obj.truename = truename.text;
+				obj.email = email.text;
+				obj.rtx = rtx.text;
+				obj.sms = sms.text;
+				obj.isaction = 'true';
+				obj.ismanager = 'true';
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/saveUser",refresh,"POST").send(obj);
+					
+				
+			}
+			public function refresh(r:Object,e:ResultEvent):void{
+				if(r.success){
+					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+					closeWin();
+				}else{
+//					Alert.show("修改密码失败","提示");
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:Form width="100%" id="form" >
+		
+		<s:FormItem label="用户名:" textAlign="right">
+			<s:TextInput id="username" width="200"  text="{ToolUtil.sessionUser.username}" enabled="false">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="昵称:" textAlign="right">
+			<s:TextInput id="truename"   width="200" text="{ToolUtil.sessionUser.nickname}">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="电子邮箱:" textAlign="right" >
+			<s:TextInput id="email"   width="200" text="{ToolUtil.sessionUser.email}">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="腾讯通账号:" textAlign="right">
+			<s:TextInput id="rtx"  width="200" text="{ToolUtil.sessionUser.rtx}">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="手机号:" textAlign="right">
+			<s:TextInput id="sms"   width="200" text="{ToolUtil.sessionUser.sms}">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem>
+			<s:Button label="保存" click="save()">
+				
+			</s:Button>
+		</s:FormItem>
+	</s:Form>
+</s:TitleWindow>

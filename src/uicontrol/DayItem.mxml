@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" borderVisible="false" height="110"  creationComplete="init()" xmlns:uicontrol="uicontrol.*">
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" borderVisible="false" height="110" click="createSchedule(event)"  creationComplete="init()" xmlns:uicontrol="uicontrol.*">
 	<s:layout>
 		<s:VerticalLayout gap="0"/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import control.SchedulePanel;
+			
 			import events.ChangeScheduleEvent;
 			
 			import httpcontrol.HttpServiceUtil;
@@ -14,8 +16,12 @@
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
 			
+			import spark.skins.spark.BorderContainerSkin;
+			
+			import util.DateUtil;
 			import util.ToolUtil;
 			
 			
@@ -56,6 +62,17 @@
 				showSchedule();
 			}
 			
+			private function createSchedule(e:MouseEvent):void{
+				if(!(e.target is BorderContainerSkin)){
+					return;
+				}
+				var s:SchedulePanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
+				s.schedulData = null;
+				s.startDateValue = DateUtil.parseDate(date+timestr.format(new Date()));
+				s.endDateValue = DateUtil.parseDate(date+timestr.format(new Date()));
+				PopUpManager.centerPopUp(s);
+			}
+			
 //			private function queryResult(result:Object,e:ResultEvent):void{
 //				scheduleArr.removeAll();
 //				if(result.success){
@@ -90,6 +107,9 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 		<mx:DateFormatter id="monthstr" formatString="YYYYMMDD" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="timestr" formatString="JJNN" >
 			
 		</mx:DateFormatter>
 	</fx:Declarations>

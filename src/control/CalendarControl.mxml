@@ -73,16 +73,16 @@
 			}
 			
 			public function regetGroup(result:Object=null,e:ResultEvent=null):void{
-				while(datePanel.getElementIndex(mygrouplbl)+1<datePanel.getElementIndex(mytasklbl)){
-					datePanel.removeElementAt(datePanel.getElementIndex(mygrouplbl)+1);
-				}
-				while(datePanel.getElementIndex(myjoingrouplbl)+1<datePanel.numElements){
-					datePanel.removeElementAt(datePanel.getElementIndex(mygrouplbl)+1);
-				}
+				
+				mygrouppanel.removeAllElements();
+				joingrouppanel.removeAllElements();
+				
 				var groupItem:GroupItem=null;
 				var obj:Object = null;
+				var h:Number=0;
 				for(var i:Number=ToolUtil.groupList.length-1;i>=0;i--){
 					groupItem = new GroupItem();
+					h = groupItem.height;
 					obj = ToolUtil.groupList.getItemAt(i);
 					groupItem.color = obj.color;
 					groupItem.groupId = obj.id;
@@ -92,12 +92,16 @@
 					groupItem.isshow=true;
 					
 					if(obj.author == ToolUtil.sessionUser.id){
-						datePanel.addElementAt(groupItem,datePanel.getElementIndex(mygrouplbl)+1);
+//						datePanel.addElementAt(groupItem,datePanel.getElementIndex(mygrouplbl)+1);
+						mygrouppanel.addElement(groupItem)
 					}else{
-						datePanel.addElementAt(groupItem,datePanel.getElementIndex(myjoingrouplbl)+1);
+//						datePanel.addElementAt(groupItem,datePanel.getElementIndex(myjoingrouplbl)+1);
+						joingrouppanel.addElement(groupItem);
 					}
-					
 				}
+				mygrouppanel.height=h*mygrouppanel.numElements;
+				joingrouppanel.height=h*joingrouppanel.numElements;
+				datePanel.invalidateSize();
 			}
 			
 			public function showGroup(group:GroupItem,g:Object):void{
@@ -363,12 +367,23 @@
 					<mx:DateChooser id="dateChooser" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 					<s:Label id="mygrouplbl" text="我的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
-					
+					<s:BorderContainer id="mygrouppanel" width="100%" borderVisible="false" >
+						<s:layout>
+							<s:VerticalLayout>
+							</s:VerticalLayout>
+						</s:layout>
+					</s:BorderContainer>
 					<s:Label id="mytasklbl" text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
 					<uicontrol:ScheduleItem id="mytask" color="#ffffff" scheduleName="任务" fun="showTask"/>
 					<s:Label id="myjoingrouplbl" text="参与的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
+					<s:BorderContainer id="joingrouppanel" width="100%" borderVisible="false"  >
+						<s:layout>
+							<s:VerticalLayout>
+							</s:VerticalLayout>
+						</s:layout>
+					</s:BorderContainer>
 				</s:BorderContainer>
 			</s:Group>
 		</s:Scroller>

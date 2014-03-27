@@ -13,6 +13,7 @@
 			import control.Loading;
 			import control.LoginUser;
 			import control.RegisterUser;
+			import control.UpdateUserInfo;
 			
 			import events.ChangeMenuEvent;
 			
@@ -250,6 +251,11 @@
 					this, RegisterUser , true) as spark.components.TitleWindow);
 				PopUpManager.centerPopUp(changepassword);
 			}
+			public function updateinfo():void{
+				var changepassword:UpdateUserInfo=UpdateUserInfo(PopUpManager.createPopUp( 
+					this, UpdateUserInfo , true) as spark.components.TitleWindow);
+				PopUpManager.centerPopUp(changepassword);
+			}
 			
 			public function logout():void{
 				HttpServiceUtil.getCHTTPServiceAndResult("/ca/logout",currentUser,"POST").send();
@@ -293,6 +299,8 @@
 				<mx:LinkButton x="0" y="2" height="25" label="登出"  styleName="textStyle1" click="logout()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
+				<s:Label text="|" styleName="textStyle1"/>
+				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>
 			</s:SkinnableContainer>
 			
 		</s:Group>

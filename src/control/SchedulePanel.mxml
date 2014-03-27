@@ -66,6 +66,22 @@
 			}
 			
 			public function init():void{
+				dopanel.visible = (schedulData==null||schedulData.author==ToolUtil.sessionUser.username)?true:false;
+				if(!ToolUtil.sessionUser.email){
+					cbemail.enabled = false;
+				}else{
+					cbemail.enabled = true;
+				}
+				if(!ToolUtil.sessionUser.sms){
+					cbsms.enabled = false;
+				}else{
+					cbsms.enabled = true;
+				}
+				if(!ToolUtil.sessionUser.rtx){
+					cbrtx.enabled = false;
+				}else{
+					cbrtx.enabled = true;
+				}
 				contactsList = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 				if(schedulData!=null){
 					if(schedulData.is_all_day){
@@ -199,6 +215,8 @@
 					titlestr = schedulData.title;
 					
 				}
+				
+				
 				
 				timelist.removeAll();
 				for(var i:Number=0;i<24;i++){
@@ -748,7 +766,7 @@
 		<s:Label text="分"  height="25" verticalAlign="middle" />
 		<s:CheckBox  id="needSecond2" selected="true"/>
 	</s:BorderContainer>
-	<s:BorderContainer  width="100%" height="30" borderVisible="false" visible="{is_all_day.selected}" >
+	<s:BorderContainer id="dopanel"  width="100%" height="30" borderVisible="false"  >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
