@@ -66,7 +66,9 @@
 						dayItem.init();
 					}
 				}
-				ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
+				if(calendarPanel.numElements>0){
+					ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
+				}
 				regetGroup();
 			}
 			
@@ -158,6 +160,8 @@
 						f = false;
 					}
 					dayItem.date = fr.format(date);
+					dayItem.nowdate = fr.format(dateChooser.selectedDate);
+					
 					if(!f){
 						dayItem.init();
 					}
@@ -171,7 +175,9 @@
 				for(i=calendarPanel.numElements-1;i>=count;i--){
 					calendarPanel.removeElementAt(i);
 				}
-				ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
+				if(calendarPanel.numElements>0){
+					ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
+				}
 				resize();
 				if (newDayItem!=null){
 					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
@@ -389,7 +395,7 @@
 				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期六" textAlign="center" verticalAlign="middle" />
 					
 			</s:BorderContainer>
-			<s:BorderContainer width="100%" height="100%" borderVisible="true" borderColor="#cccccc" backgroundColor="#cccccc">
+			<s:BorderContainer width="100%" height="100%" borderVisible="true" borderColor="#999999" backgroundColor="#999999">
 				<s:layout>
 					<s:VerticalLayout gap="0">
 						
