@@ -14,6 +14,7 @@
 			import mx.controls.Alert;
 			import mx.controls.LinkButton;
 			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
 			import mx.managers.CursorManager;
 			import mx.managers.CursorManagerPriority;
 			import mx.managers.PopUpManager;
@@ -22,6 +23,7 @@
 			import mx.utils.ObjectUtil;
 			
 			import spark.formatters.DateTimeFormatter;
+			import spark.skins.spark.StackedFormHeadingSkin;
 			
 			import uicontrol.ContactItem;
 			import uicontrol.ScheduleItem;
@@ -31,7 +33,7 @@
 			import util.UserUtil;
 			
 			[Bindable]
-			private var baseHeight:Number=430;
+			private var baseHeight:Number=440;
 			
 			[Bindable]
 			public var titlestr:String="创建日程";
@@ -109,6 +111,90 @@
 						}
 					}
 					joinUserGrid.invalidateList();
+					cbemail.selected = false;
+					cbsms.selected = false;
+					cbrtx.selected = false;
+					for each(var warningtype:String in schedulData.warningkind){
+						if(warningtype =="email"){
+							cbemail.selected=true;
+						}
+						if(warningtype =="sms"){
+							cbsms.selected=true;
+						}
+						if(warningtype =="rtx"){
+							cbrtx.selected=true;
+						}
+					}
+					index=0;
+					for each(var warningtime:Number in schedulData.warningtime){
+						if(!is_all_day.selected){
+							warningtime = 0-warningtime;
+						}
+						switch(index){
+							case 0:
+								if(is_all_day.selected){
+//									var w:Number=warningtime-warningtime%(24*60);
+//									warningtime=w+24*60-warningtime%(24*60);
+										
+									firstDay.value =0- Math.floor(warningtime/(24*60));
+									firstHour.value = Math.floor(((warningtime+secondDay.value*24*60)%(24*60))/60);
+									firstMin.value = (warningtime+secondDay.value*24*60)%60;
+								}else{
+									if(warningtime%(7*24*60)==0){
+										firstNum.value=warningtime/(7*24*60);
+										firstWarning.selectedIndex=3;
+									}else
+									if(warningtime%(24*60)==0){
+										firstNum.value=warningtime/(24*60);
+										firstWarning.selectedIndex=2;
+									}else
+									if(warningtime%(60)==0){
+										firstNum.value=warningtime/(60);
+										firstWarning.selectedIndex=1;
+									}else{
+										firstNum.value=warningtime;
+										firstWarning.selectedIndex=0;
+									}
+								}
+								break;
+							case 1:
+								if(is_all_day.selected){
+//									w=warningtime-warningtime%(24*60);
+//									warningtime=w+24*60-warningtime%(24*60);
+									secondDay.value =0- Math.floor(warningtime/(24*60));
+									secondHour.value = Math.floor(((warningtime+secondDay.value*24*60)%(24*60))/60);
+									secondMin.value = (warningtime+secondDay.value*24*60)%60;
+								}else{
+									if(warningtime%(7*24*60)==0){
+										secondNum.value=warningtime/(7*24*60);
+										secondWarning.selectedIndex=3;
+									}else
+										if(warningtime%(24*60)==0){
+											secondNum.value=warningtime/(24*60);
+											secondWarning.selectedIndex=2;
+										}else
+											if(warningtime%(60)==0){
+												secondNum.value=warningtime/(60);
+												secondWarning.selectedIndex=1;
+											}else{
+												secondNum.value=warningtime;
+												secondWarning.selectedIndex=0;
+											}
+								}
+								break;
+						}
+						index+=1;
+					}
+					if(index==1){
+						if(is_all_day.selected){
+							needSecond1.selected = true;
+							needSecond2.selected = false;
+						}else{
+							needSecond2.selected = true;
+							needSecond1.selected = false;
+						}
+					}
+					
 					changeUsers();
 					titlestr = schedulData.title;
 					
@@ -179,7 +265,10 @@
 				if(repeatType.selectedValue=="weekly"){
 					for(var m:Number=0;m<dayTile.numElements;m++){
 						if((dayTile.getElementAt(m) as CheckBox).selected){
-							obj.repeat_date.push(m);
+							if(m==0){
+								obj.repeat_date.push(6);
+							}
+								obj.repeat_date.push(m-1);
 						}
 					}
 				}
@@ -203,9 +292,9 @@
 				obj.warning_sms=cbsms.selected;
 				obj.warning_rtx=cbrtx.selected;
 				if(is_all_day.selected){
-					obj.warning_time1 = firstDay.value*24*60+firstHour.value*60+firstMin.value;
+					obj.warning_time1 = firstHour.value*60+firstMin.value +(0-firstDay.value*24*60);
 					if(needSecond2.selected){
-						obj.warning_time2 = secondDay.value*24*60+secondHour.value*60+secondMin.value;
+						obj.warning_time2 = secondHour.value*60+secondMin.value +(0-secondDay.value*24*60);
 					}
 				}else{
 					obj.warning_time1 = (0-(firstNum.value*firstWarning.selectedItem.value));
@@ -306,7 +395,12 @@
 						}
 						for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
 							try{
-								(dayTile.getElementAt(Number( schedulData.repeat_date[index])) as CheckBox).selected = true;
+								if(schedulData.repeat_date[index]==6){
+									
+									(dayTile.getElementAt(0) as CheckBox).selected = true;
+								}else{
+									(dayTile.getElementAt(Number( schedulData.repeat_date[index])+1) as CheckBox).selected = true;
+								}
 							}catch(e:Error){
 							}
 						}
@@ -429,6 +523,33 @@
 				this.height = baseHeight+dayPanel.height+alldaywarning.height+alldaywarning0.height+alldaywarning1.height+alldaywarning2.height;
 				this.invalidateSize();
 			}
+			
+			
+			private function delAsk():void{
+				
+					Alert.show("确认删除当前日程?", "提示", Alert.YES | Alert.NO, null, del);
+				
+			}
+			//删除日程
+			private function del(e:mx.events.CloseEvent):void
+			{
+				if (e.detail == Alert.YES){
+					var data:Object = new Object();
+					data["id"] = schedulData.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
+					
+					
+				}
+			}
+			
+			private function delResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					
+					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+					closeWin();
+				}
+			}
+			
 			
 		]]>
 	</fx:Script>
@@ -606,7 +727,7 @@
 		<s:Label text="提前"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="firstDay" value="0" minimum="0" maximum="30" width="50"/>
 		<s:Label text="天"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="firstHour" value="8" minimum="0" maximum="11" width="50"/>
+		<s:NumericStepper id="firstHour" value="8" minimum="0" maximum="23" width="50"/>
 		<s:Label text="时"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="firstMin" value="0" minimum="0" maximum="59" width="50"/>
 		<s:Label text="分"  height="25" verticalAlign="middle" />
@@ -621,13 +742,21 @@
 		<s:Label text="提前"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="secondDay" value="1" minimum="0" maximum="30" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="天"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondHour" value="8" minimum="0" maximum="11" width="50" enabled="{needSecond2.selected}"/>
+		<s:NumericStepper id="secondHour" value="8" minimum="0" maximum="23" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="时"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="分"  height="25" verticalAlign="middle" />
 		<s:CheckBox  id="needSecond2" selected="true"/>
 	</s:BorderContainer>
-	<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
+	<s:BorderContainer  width="100%" height="30" borderVisible="false" visible="{is_all_day.selected}" >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		
+		<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
+		<s:Button chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
+		</s:BorderContainer>
+		
 	</s:BorderContainer>
 	<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%"  visible="{isMultiUsers.selected}">
 		

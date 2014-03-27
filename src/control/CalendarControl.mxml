@@ -37,6 +37,7 @@
 			
 			override public   function  init(e:FlexEvent):void{
 				dateChooser.selectedDate = new Date();
+			
 				showCalendar();
 				if(ToolUtil.groupList.length==0){
 					ToolUtil.groupRefresh(regetGroup);
@@ -52,6 +53,8 @@
 				
 			}
 			
+			
+			
 			public function regetSchedule():void{
 				var dayItem:DayItem=null;
 				for(var  i:Number=0;i<100;i++){
@@ -63,6 +66,7 @@
 						dayItem.init();
 					}
 				}
+				ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
 				regetGroup();
 			}
 			
@@ -167,8 +171,11 @@
 				for(i=calendarPanel.numElements-1;i>=count;i--){
 					calendarPanel.removeElementAt(i);
 				}
+				ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
 				resize();
-				newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
+				if (newDayItem!=null){
+					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
+				}
 				
 			}
 			[Bindable]

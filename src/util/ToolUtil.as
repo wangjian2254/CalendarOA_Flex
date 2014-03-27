@@ -3,6 +3,7 @@ package util
 	import control.Loading;
 	import control.LoginUser;
 	
+	import events.ChangeScheduleEvent;
 	import events.ChangeUserEvent;
 	
 	import flash.net.URLRequest;
@@ -191,7 +192,33 @@ package util
 			}
 		}
 		
+		public static var scheduleMap:Object = new Object();
 		
+		public static function getScheduleByDate(start:String,end:String,fun:Function=null):void{
+			var obj:Object = new Object();
+			obj["startdate"] = start;
+			obj["enddate"] = end;
+			
+			if(fun==null){
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
+			}else{
+				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST");
+				http.resultFunArr.addItem(fun);
+				http.send(obj);
+				
+			}
+			
+		}
+		
+		public static function queryResult(result:Object,e:ResultEvent):void{
+			if(result.success){
+				if(result.result){
+					scheduleMap=result.result;
+				}
+				FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
+			}
+			
+		}
 		
 
 		

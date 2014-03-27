@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="300" title="注册用户" close="closeWin()">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="450" title="注册用户" close="closeWin()">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
@@ -34,6 +34,9 @@
 				obj.username=username.text;
 				obj.truename = truename.text;
 				obj.password = password.text;
+				obj.email = email.text;
+				obj.rtx = rtx.text;
+				obj.sms = sms.text;
 				obj.isaction = 'true';
 				obj.ismanager = 'true';
 				
@@ -75,6 +78,21 @@
 		</s:FormItem>
 		<s:FormItem label="确认密码:" textAlign="right">
 			<s:TextInput id="rpassword" displayAsPassword="true"  width="200">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="电子邮箱:" textAlign="right">
+			<s:TextInput id="email"   width="200">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="腾讯通账号:" textAlign="right">
+			<s:TextInput id="rtx"  width="200">
+				
+			</s:TextInput>
+		</s:FormItem>
+		<s:FormItem label="手机号:" textAlign="right">
+			<s:TextInput id="sms"   width="200">
 				
 			</s:TextInput>
 		</s:FormItem>

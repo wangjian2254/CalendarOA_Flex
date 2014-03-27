@@ -7,10 +7,16 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import events.ChangeScheduleEvent;
+			
 			import httpcontrol.HttpServiceUtil;
 			
 			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
 			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
 			
 			
 			[Bindable]
@@ -22,24 +28,30 @@
 			
 			public function init():void{
 				getScheduleByDate();
+				FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr,getScheduleByDate);
 			}
 			
-			private function getScheduleByDate():void{
-				var obj:Object = new Object();
-				obj["date"] = date;
+			private function getScheduleByDate(e:Event=null):void{
 				
-				groupShowData=new Object();
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
-			}
-			
-			private function queryResult(result:Object,e:ResultEvent):void{
 				scheduleArr.removeAll();
-				if(result.success){
-					scheduleArr.addAll(new ArrayCollection(result.result as Array));
+				groupShowData=new Object();
+				if(ToolUtil.scheduleMap.hasOwnProperty("schedulelist")&&ToolUtil.scheduleMap.schedulelist.hasOwnProperty(date)){
+					for each(var i:String in ToolUtil.scheduleMap.schedulelist[date]){
+						
+						scheduleArr.addItem(ToolUtil.scheduleMap.schedulemap[i]);
+					}
 				}
 				showSchedule();
-				
 			}
+			
+//			private function queryResult(result:Object,e:ResultEvent):void{
+//				scheduleArr.removeAll();
+//				if(result.success){
+//					
+//				}
+//				
+//				
+//			}
 			
 			public function showSchedule(gid:Number=0,show:Boolean=true):void{
 				if(gid!=0){
