@@ -569,8 +569,12 @@
 			
 			
 			private function delAsk():void{
+				if(schedulData!=null &&schedulData.id){
 				
 					Alert.show("确认删除当前日程?", "提示", Alert.YES | Alert.NO, null, del);
+				}else{
+					closeWin();
+				}
 				
 			}
 			//删除日程
@@ -781,7 +785,7 @@
 		
 		<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 		<s:Label text="提前"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondNum" value="30" minimum="0" maximum="3000" width="50"/>
+		<s:NumericStepper id="secondNum" value="30" minimum="0" maximum="3000" width="50"  enabled="{needSecond1.selected}"/>
 		<mx:ComboBox id="secondWarning" dataProvider="{warninglist}" selectedIndex="0" labelField="text" width="60" enabled="{needSecond1.selected}" />
 		<s:CheckBox  id="needSecond1" selected="true"/>
 	</s:BorderContainer>
