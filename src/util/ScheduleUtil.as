@@ -60,8 +60,8 @@ package util
 				if(showSchedule[scheduleId].isinit){
 					showSchedule[scheduleId].init();
 				}
-				PopUpManager.bringToFront(showSchedule[scheduleId]);
-				PopUpManager.centerPopUp(showSchedule[scheduleId]);
+//				PopUpManager.bringToFront(showSchedule[scheduleId]);
+//				PopUpManager.centerPopUp(showSchedule[scheduleId]);
 			}
 		}
 		
