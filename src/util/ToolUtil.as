@@ -171,10 +171,10 @@ package util
 		[Bindable]
 		public static var contactsList:ArrayCollection=new ArrayCollection();
 		
-		public static function contactsRefresh(fun:Function=null):void{
+		public static function contactsRefresh(fun:*=null,e:*=null):void{
 			
-			if(fun==null){
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllGroup,"POST").send();
+			if(!(fun is Function)){
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllContacts,"POST").send();
 			}else{
 				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllContacts,"POST");
 				http.resultFunArr.addItem(fun);
@@ -193,6 +193,14 @@ package util
 		}
 		
 		public static var scheduleMap:Object = new Object();
+		
+		public static function getSchedule(id:String):Object{
+			if(ToolUtil.scheduleMap.hasOwnProperty("schedulemap")&&ToolUtil.scheduleMap.schedulemap.hasOwnProperty(id)){
+				return ToolUtil.scheduleMap.schedulemap[id];
+			}
+			return null;
+		}
+		
 		
 		public static function getScheduleByDate(start:String,end:String,fun:Function=null):void{
 			var obj:Object = new Object();
@@ -214,6 +222,12 @@ package util
 			if(result.success){
 				if(result.result){
 					scheduleMap=result.result;
+					
+					if(ToolUtil.scheduleMap.hasOwnProperty("schedulemap")){
+						for(var sid:String in scheduleMap.schedulemap){
+							ScheduleUtil.updateSchedulePanel(sid);
+						}
+					}
 				}
 				FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
 			}

@@ -7,9 +7,13 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
+			import control.SchedulePanel;
+			
 			import events.ChangeJoinUserEvent;
 			
 			import mx.controls.Alert;
+			
+			import spark.components.TileGroup;
 
 			[Bindable]
 			[Embed("assets/img/tabbutton/X_down.png")]
@@ -25,12 +29,17 @@
 			[Bindable]
 			public var userData:Object = null;
 			
+			[Bindable]
+			public var modifyEnable:Boolean = false;
+			
+			public var tileGroup:TileGroup =null;
+			
 			public var fun:Function=null;
 			
 			private function openSchedule():void{
 				userData.selected = false;
-				if(this.parent!=null){
-					this.parent.removeChild(this);
+				if(tileGroup!=null){
+					tileGroup.removeElement(this);
 				}
 				if(fun!=null){
 					fun();
@@ -62,6 +71,6 @@
 	<mx:LinkButton id="linkScheduleItem" label="{userData.username+':'+userData.nickname}" >
 		
 	</mx:LinkButton>
-	<mx:Image id="clo"  source="{X_out}"  click="openSchedule()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
+	<mx:Image id="clo" visible="{modifyEnable}"  source="{X_out}"  click="openSchedule()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
 
 </s:BorderContainer>

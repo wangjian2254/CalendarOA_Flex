@@ -21,7 +21,11 @@
 			}
 			
 			public function save():void{
-				
+				if(this.username.text==""||this.truename.text==""||
+					this.rtx.text==""){
+					Alert.show("请填写完整信息。 用户名、密码、姓名、腾讯通账号 必须填写","提示");
+					return;
+				}
 				
 				var obj:Object=new Object();
 				obj.id = ToolUtil.sessionUser.id;
@@ -58,20 +62,32 @@
 				
 			</s:TextInput>
 		</s:FormItem>
-		<s:FormItem label="昵称:" textAlign="right">
+		<s:FormItem label="姓名:" textAlign="right">
+			<s:layout>
+				<s:HorizontalLayout gap="5"/>
+			</s:layout>
 			<s:TextInput id="truename"   width="200" text="{ToolUtil.sessionUser.nickname}">
 				
 			</s:TextInput>
+			<s:Label text="*" color="red" />
 		</s:FormItem>
 		<s:FormItem label="电子邮箱:" textAlign="right" >
+			<s:layout>
+				<s:HorizontalLayout gap="5"/>
+			</s:layout>
 			<s:TextInput id="email"   width="200" text="{ToolUtil.sessionUser.email}">
 				
 			</s:TextInput>
+			<s:Label text="*" color="red" />
 		</s:FormItem>
 		<s:FormItem label="腾讯通账号:" textAlign="right">
+			<s:layout>
+				<s:HorizontalLayout gap="5"/>
+			</s:layout>
 			<s:TextInput id="rtx"  width="200" text="{ToolUtil.sessionUser.rtx}">
 				
 			</s:TextInput>
+			<s:Label text="*" color="red" />
 		</s:FormItem>
 		<s:FormItem label="手机号:" textAlign="right">
 			<s:TextInput id="sms"   width="200" text="{ToolUtil.sessionUser.sms}">
@@ -79,9 +95,15 @@
 			</s:TextInput>
 		</s:FormItem>
 		<s:FormItem>
-			<s:Button label="保存" click="save()">
-				
-			</s:Button>
+				<s:layout>
+					<s:HorizontalLayout gap="10"/>
+				</s:layout>
+				<s:Button label="保存" click="save()" chromeColor="red" color="#ffffff" height="25">
+					
+				</s:Button>
+				<s:Button label="放弃" click="closeWin()" chromeColor="#ffffff" color="#000000" height="25">
+					
+				</s:Button>
 		</s:FormItem>
 	</s:Form>
 </s:TitleWindow>

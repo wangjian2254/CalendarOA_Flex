@@ -14,6 +14,7 @@
 			import control.LoginUser;
 			import control.RegisterUser;
 			import control.UpdateUserInfo;
+			import control.UserControl;
 			
 			import events.ChangeMenuEvent;
 			
@@ -48,7 +49,7 @@
 //				ToolUtil.init();
 				ToolUtil.sessionUserRefresh(currentUser);
 				menuXML.send();
-				gongNengStack.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr,changeMenu);
+				FlexGlobals.topLevelApplication.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr,changeMenu);
 				
 			}
 			private function welcome(result:Object,e:ResultEvent):void{
@@ -220,7 +221,7 @@
 				menuflag=null;
 				var xml:XML=event.item as XML;
 				var mod:String=xml.attribute('mod').toString();
-				website.text=xml.attribute('label').toString();
+				
 				if(cbar.setView(mod)){
 					return;
 				}
@@ -230,6 +231,9 @@
 					case 'calendar':
 						c=new CalendarControl();
 						break;
+					case 'contact':
+						c=new UserControl();
+						break;
 					
 					
 				}
@@ -238,6 +242,7 @@
 					c.flag=mod;
 					c.param=obj;
 					cbar.addView(c);
+					website.text=c.label;
 				}
 				
 			}
@@ -290,7 +295,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
-			<s:Label text="用户名:{ToolUtil.sessionUser.username} | 用户:{ToolUtil.sessionUser.truename}" styleName="textStyle2"/>	
+			<s:Label text="用户名:{ToolUtil.sessionUser.username} | 用户:{ToolUtil.sessionUser.nickname}" styleName="textStyle2"/>	
 			<s:SkinnableContainer  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>

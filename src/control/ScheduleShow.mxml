@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="750" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+			import events.ChangeJoinUserEvent;
+			import events.ChangeUserEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			import httpcontrol.RemoteUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.LinkButton;
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.events.CollectionEvent;
+			import mx.managers.CursorManager;
+			import mx.managers.CursorManagerPriority;
+			import mx.managers.PopUpManager;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import spark.formatters.DateTimeFormatter;
+			import spark.skins.spark.StackedFormHeadingSkin;
+			
+			import uicontrol.ContactItem;
+			import uicontrol.ScheduleItem;
+			
+			import util.DateUtil;
+			import util.ScheduleUtil;
+			import util.ToolUtil;
+			import util.UserUtil;
+			
+			private var _isinit:Boolean=false;
+			
+			[Bindable]
+			private var baseHeight:Number=350;
+			
+			[Bindable]
+			public var titlestr:String="创建日程";
+			
+			[Bindable]
+			public var startDateValue:Date=new Date();
+			[Bindable]
+			public var endDateValue:Date=new Date();
+			
+			[Bindable]
+			public var schedulData:Object=null;
+			
+			[Bindable]
+			private var timelist:ArrayCollection = new ArrayCollection([{"value":"0000","text":"凌晨 00:00"}]);
+			[Bindable]
+			private var warninglist:ArrayCollection = new ArrayCollection([{"value":1,"text":"分钟"},{"value":60,"text":"小时"},{"value":60*24,"text":"天"},{"value":60*24*7,"text":"周"}]);
+//			[Bindable]
+//			private var warninglist2:ArrayCollection = new ArrayCollection([{"value":0,"text":"当天"},{"value":24*60,"text":"提前一天"},{"value":24*60*2,"text":"提前二天"},{"value":24*60*3,"text":"提前三天"},{"value":24*60*4,"text":"提前四天"},{"value":24*60*7,"text":"提前一星期"}]);
+			[Bindable]
+			private var endtimelist:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			private var contactsList:ArrayCollection =null;
+			
+			
+			private var selectColor:Number =0x00CCFF;
+			
+			public function get isinit():Boolean
+			{
+				return _isinit;
+			}
+
+			public function closeWin():void{
+				if(schedulData!=null){
+					ScheduleUtil.closeSchedulePanel(schedulData.id+"");
+				}
+				PopUpManager.removePopUp(this);
+			}
+			
+			public function init():void{
+				_isinit = true;
+				
+				contactsList = new ArrayCollection(schedulData.users as Array);
+					
+				
+				
+				
+				if(schedulData!=null){
+					if(schedulData.is_all_day){
+						is_all_day.text = "全天";
+						startDateValue = DateUtil.parseDate(schedulData.startdate);
+						endDateValue = DateUtil.parseDate(schedulData.startdate);
+					}else{
+						startDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_start);
+						endDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_end);
+						
+						is_all_day.text = timeStr.format(startDateValue)+" 到 "+timeStr.format(endDateValue);
+						
+					}
+					startdate.text = datestr2.format(startDateValue);
+					if(!schedulData.enddate){
+						forever.text = "永远";
+						
+					}else{
+						forever.text = datestr2.format(endDateValue);
+					}
+					
+					scheduleTitle.text = schedulData.title;
+					desc.text = schedulData.desc;
+					repeatChange();
+					groupPanel.height = 0;
+					groupPanel.visible = false;
+					for each(var o:Object in ToolUtil.groupList){
+						if(o.id == schedulData.group){
+							group.text = o.name;
+							groupPanel.height = 25;
+							groupPanel.visible = true;
+						}
+					}
+					
+					
+					multiUsers();
+					
+					cbemail.visible = false;
+					cbsms.visible = false;
+					cbrtx.visible = false;
+					for each(var warningtype:String in schedulData.warningkind){
+						if(warningtype =="email"){
+							cbemail.visible=true;
+						}
+						if(warningtype =="sms"){
+							cbsms.visible=true;
+						}
+						if(warningtype =="rtx"){
+							cbrtx.visible=true;
+						}
+					}
+					var index:Number=0;
+					for each(var warningtime:Number in schedulData.warningtime){
+						if(!schedulData.is_all_day){
+							warningtime = 0-warningtime;
+						}
+						switch(index){
+							case 0:
+								if(schedulData.is_all_day){
+//									var w:Number=warningtime-warningtime%(24*60);
+//									warningtime=w+24*60-warningtime%(24*60);
+									var d:Number =0- Math.floor(warningtime/(24*60));
+									if(d==0){
+										firstWarning.text ="当天 ";
+									}else{
+										firstWarning.text ="提前 "+"天 ";
+									}
+									
+									firstWarning.text+= Math.floor(((warningtime+d*24*60)%(24*60))/60)+":";
+									firstWarning.text += (warningtime+d*24*60)%60;
+								}else{
+									if(warningtime%(7*24*60)==0){
+										
+										firstWarning.text="提前 "+warningtime/(7*24*60)+ "周";
+									}else
+									if(warningtime%(24*60)==0){
+										
+										firstWarning.text="提前 "+warningtime/(24*60)+ "天";
+									}else
+									if(warningtime%(60)==0){
+										
+										firstWarning.text="提前 "+warningtime/(60)+ "小时";
+									}else{
+										
+										firstWarning.text="提前 "+warningtime+ "分钟";
+									}
+								}
+								break;
+							case 1:
+								if(schedulData.is_all_day){
+									d =0- Math.floor(warningtime/(24*60));
+									if(d==0){
+										secondWarning.text ="当天 ";
+									}else{
+										secondWarning.text ="提前 "+"天 ";
+									}
+									
+									secondWarning.text+= Math.floor(((warningtime+d*24*60)%(24*60))/60)+":";
+									secondWarning.text += (warningtime+d*24*60)%60;
+									
+								}else{
+									if(warningtime%(7*24*60)==0){
+										
+										secondWarning.text="提前 "+warningtime/(7*24*60)+ "周";
+									}else
+										if(warningtime%(24*60)==0){
+											
+											secondWarning.text="提前 "+warningtime/(24*60)+ "天";
+										}else
+											if(warningtime%(60)==0){
+												
+												secondWarning.text="提前 "+warningtime/60+ "小时";
+											}else{
+												
+												secondWarning.text="提前 "+warningtime+ "分钟";
+											}
+								}
+								break;
+						}
+						index+=1;
+					}
+					if(index==1){
+						if(schedulData.is_all_day){
+							alldaywarning.visible = true;
+							alldaywarning.height = 25;
+							alldaywarning0.visible = false;
+							alldaywarning0.height = 0;
+						}else{
+							alldaywarning0.visible = true;
+							alldaywarning0.height = 25;
+							alldaywarning.visible = false;
+							alldaywarning.height = 0;
+						}
+					}
+					
+					changeUsers();
+					titlestr = schedulData.title;
+					
+				}
+				
+				multiUsers();
+				resize();
+			}
+			
+			
+			
+			
+			
+			private function repeatChange():void{
+				
+				if(schedulData.repeat_type=="daily"||schedulData.repeat_type=="yearly"){
+					if(schedulData.repeat_type=="daily"){
+						repeatType.text = "每天";
+					}else{
+						repeatType.text = "每年";
+					}
+					dayTile.visible = false;
+					dayPanel.height=0;
+					resize();
+				}else{
+					dayTile.visible = true;
+					if(schedulData.repeat_type=="weekly"){
+						repeatType.text = "每周";
+						dayPanel.height = 20;
+						resize();
+						dayTile.removeAllElements();
+						for(var i:Number=0;i<7;i++){
+							var cb:Label = new Label();
+							cb.height = 20;
+							cb.setStyle("verticalAlign","middle");
+							switch(i){
+								case 0:
+									cb.text = "日";
+									break;
+								case 1:
+									cb.text = "一";
+									break;
+								case 2:
+									cb.text = "二";
+									break;
+								case 3:
+									cb.text = "三";
+									break;
+								case 4:
+									cb.text = "四";
+									break;
+								case 5:
+									cb.text = "五";
+									break;
+								case 6:
+									cb.text = "六";
+									break;
+							}
+							
+							dayTile.addElement(cb);
+						}
+						for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
+							try{
+								if(schedulData.repeat_date[index]==6){
+									
+									(dayTile.getElementAt(0) as Label).setStyle("backgroundColor",0xcccccc);
+								}else{
+									(dayTile.getElementAt(Number( schedulData.repeat_date[index])+1) as Label).setStyle("backgroundColor",0xcccccc);
+								}
+							}catch(e:Error){
+							}
+						}
+						
+					}
+					
+					if(schedulData.repeat_type=="monthly"){
+						repeatType.text = "每月";
+						dayTile.removeAllElements();
+						dayPanel.height = 100;
+						resize();
+						for( i=0;i<31;i++){
+							cb = new Label();
+							cb.height = 20;
+							cb.setStyle("verticalAlign","middle");
+							cb.text = ""+(i+1);
+							dayTile.addElement(cb);
+						}
+						for (index= 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
+							try{
+								(dayTile.getElementAt(Number( schedulData.repeat_date[index])-1) as Label).setStyle("backgroundColor",0xcccccc);
+							}catch(e:Error){
+							}
+						}
+					}
+				}
+				this.invalidateDisplayList();
+			}
+			
+		
+			
+			
+			
+			public function changeUsers():void{
+				users.removeAllElements();
+				var address:ContactItem = null;
+				for each(var obj:Object in contactsList){
+					address = new ContactItem();
+					address.tileGroup = users;
+					address.modifyEnable = false;
+					address.userData = obj;
+					users.addElement(address);
+				}
+			}
+			
+			private function multiUsers():void{
+				if(contactsList.length>0){
+					contactPanel.width = 350;
+					contactPanel.visible = true;
+				}else{
+					contactPanel.width = 0;
+					contactPanel.visible = false;
+				}
+				this.width = 420+contactPanel.width;
+				this.invalidateSize();
+			}
+			
+			
+			private function resize():void{
+//				this.height = schedulePanel.height;
+				this.height = baseHeight+dayPanel.height+alldaywarning.height+alldaywarning0.height+groupPanel.height;
+				this.invalidateSize();
+			}
+			
+			
+			
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:DateFormatter id="datestr" formatString="YYYYMMDD" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="datestr2" formatString="YYYY-MM-DD" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="timeStr" formatString="JJ:NN" >
+			
+		</mx:DateFormatter>
+		
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:HorizontalLayout gap="3" paddingLeft="10" paddingTop="5" paddingBottom="5">
+			
+		</s:HorizontalLayout>
+	</s:layout>
+	<s:BorderContainer width="400" id="schedulePanel" borderVisible="false" >
+		<s:layout>
+			<s:VerticalLayout gap="0"/>
+		</s:layout>
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="日程标题：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			
+			<s:Label id="scheduleTitle" width="100%" text="日程标题">
+			</s:Label>
+		</s:BorderContainer>
+		
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="开始日期：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			
+			<s:Label id="startdate" text="" height="100%" verticalAlign="middle" />
+			
+		</s:BorderContainer>
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="是否全天：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:Label text="全天" id="is_all_day" >
+			</s:Label>
+			
+		</s:BorderContainer>
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="重复频率：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:Label id="repeatType" width="80"  height="25"  />
+			
+		</s:BorderContainer>
+		<s:BorderContainer id="dayPanel" width="100%" height="0" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" />
+			</s:layout>
+			<s:Label text="重复时间：" width="80" textAlign="right" height="30" verticalAlign="middle" />
+			<s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
+				<s:Label text="一"  />
+				<s:Label text="二" />
+				<s:Label text="三" />
+				<s:Label text="四" />
+				<s:Label text="五" />
+				<s:Label text="六" />
+				<s:Label text="日" />
+			</s:TileGroup>
+		</s:BorderContainer>
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="结束时间：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			
+			<s:Label id="forever" text="永远"  />
+		</s:BorderContainer>
+		<s:BorderContainer width="100%" height="100" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" />
+			</s:layout>
+			<s:Label text="说明：" width="80" textAlign="right" height="30" verticalAlign="middle" />
+			<s:TextArea id="desc" width="100%" height="100%" editable="false" />
+		</s:BorderContainer>
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="颜色：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			
+			<s:BorderContainer id="color0" backgroundColor="#00CCFF" borderColor="#000000" borderWeight="2" width="20" height="20">
+			</s:BorderContainer>
+			
+		</s:BorderContainer>
+		<s:BorderContainer id="groupPanel" width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="分组：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:Label id="group" width="200"  height="25" verticalAlign="middle" />
+			
+			
+		</s:BorderContainer>
+	
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="提醒方式：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:Label id="cbrtx" text="RTX腾讯通"   />
+			<s:Label id="cbsms" text="手机短信"   />
+			<s:Label id="cbemail" text="email"   />
+		</s:BorderContainer>
+		<s:BorderContainer id="alldaywarning" width="100%" height="30" borderVisible="false"  visible="{!schedulData.is_all_day}">
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="第一次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:Label id="firstWarning" text="提前"  height="25" verticalAlign="middle" />
+			
+		</s:BorderContainer>
+		<s:BorderContainer id="alldaywarning0" width="100%" height="30" borderVisible="false"  visible="{!schedulData.is_all_day}">
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			
+			<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:Label id="secondWarning" text="提前"  height="25" verticalAlign="middle" />
+		</s:BorderContainer>
+	</s:BorderContainer>
+		
+		<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%"  visible="{contactPanel.visible}">
+			
+		</s:BorderContainer>
+	<s:BorderContainer id="contactPanel" width="100%" height="100%" borderVisible="false"  >
+		<s:layout>
+			<s:VerticalLayout gap="5"/>
+		</s:layout>
+			<s:BorderContainer  width="100%" height="30" borderVisible="false"  >
+				<s:layout>
+					<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+				</s:layout>
+				
+				<s:Label text="发起人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+				<s:Label id="author" text="{schedulData.author+':'+schedulData.authornickname}" width="100%"  height="25" verticalAlign="middle" />
+				
+			</s:BorderContainer>
+			<s:BorderContainer  width="100%" height="30" borderVisible="false"  >
+				<s:layout>
+					<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+				</s:layout>
+				
+				<s:Label text="参与人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+				
+			</s:BorderContainer>
+		<s:Scroller width="100%" height="100%" >
+			<s:Group width="100%" height="100%" >
+				<s:TileGroup id="users"  width="100%" requestedColumnCount="-1">
+					
+				</s:TileGroup>
+			</s:Group>
+		</s:Scroller>
+		
+	</s:BorderContainer>
+</s:TitleWindow>

@@ -5,6 +5,7 @@
 	<fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
+			import events.ChangeMenuEvent;
 			import events.ChangeUserEvent;
 			
 			import httpcontrol.HttpServiceUtil;
@@ -15,6 +16,7 @@
 			import mx.controls.LinkButton;
 			import mx.core.FlexGlobals;
 			import mx.events.CloseEvent;
+			import mx.events.CollectionEvent;
 			import mx.managers.CursorManager;
 			import mx.managers.CursorManagerPriority;
 			import mx.managers.PopUpManager;
@@ -29,8 +31,11 @@
 			import uicontrol.ScheduleItem;
 			
 			import util.DateUtil;
+			import util.ScheduleUtil;
 			import util.ToolUtil;
 			import util.UserUtil;
+			
+			private var _isinit:Boolean=false;
 			
 			[Bindable]
 			private var baseHeight:Number=440;
@@ -60,13 +65,29 @@
 			
 			
 			private var selectColor:Number =0x00CCFF;
-			
+			public function get isinit():Boolean
+			{
+				return _isinit;
+			}
 			public function closeWin():void{
+				if(schedulData!=null){
+					ScheduleUtil.closeSchedulePanel(schedulData.id+"");
+				}else{
+					ScheduleUtil.clearNewSchedule();
+				}
 				PopUpManager.removePopUp(this);
 			}
 			
 			public function init():void{
+				_isinit = true;
 				dopanel.visible = (schedulData==null||schedulData.author==ToolUtil.sessionUser.username)?true:false;
+				if(dopanel.visible){
+					contactsList = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+				}else{
+					contactsList = new ArrayCollection(schedulData.users as Array);
+					joinUserGrid.height =0;
+					joinUserGrid.visible = false;
+				}
 				if(!ToolUtil.sessionUser.email){
 					cbemail.enabled = false;
 				}else{
@@ -82,7 +103,7 @@
 				}else{
 					cbrtx.enabled = true;
 				}
-				contactsList = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+				
 				if(schedulData!=null){
 					if(schedulData.is_all_day){
 						is_all_day.selected = schedulData.is_all_day;
@@ -153,8 +174,8 @@
 //									warningtime=w+24*60-warningtime%(24*60);
 										
 									firstDay.value =0- Math.floor(warningtime/(24*60));
-									firstHour.value = Math.floor(((warningtime+secondDay.value*24*60)%(24*60))/60);
-									firstMin.value = (warningtime+secondDay.value*24*60)%60;
+									firstHour.value = Math.floor(((warningtime+firstDay.value*24*60)%(24*60))/60);
+									firstMin.value = (warningtime+firstDay.value*24*60)%60;
 								}else{
 									if(warningtime%(7*24*60)==0){
 										firstNum.value=warningtime/(7*24*60);
@@ -354,8 +375,9 @@
 						schedulData = getData();
 					}
 					schedulData.id = result.result;
+					titlestr = schedulData.title;
 					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-					
+					ScheduleUtil.clearNewSchedule();
 				}
 			}
 			
@@ -498,6 +520,9 @@
 				for each(var obj:Object in contactsList){
 					if(obj.selected){
 						address = new ContactItem();
+						address.tileGroup = users;
+						address.modifyEnable = dopanel.visible;
+						address.userData = obj;
 						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
 						users.addElement(address);
 					}
@@ -568,6 +593,29 @@
 				}
 			}
 			
+			
+			private function openAddress():void{
+				var obj:Object=new Object();
+//				obj['test']="测试";
+				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
+				FlexGlobals.topLevelApplication.dispatchEvent(evt);
+			}
+			
+			private function refreshAddress(result:Object,e:ResultEvent):void{
+				var contacts:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+				for each(var u:Object in contacts){
+					for each(var c:Object in joinUserGrid.dataProvider as ArrayCollection){
+						if(u.username == c.username){
+							if(c.selected){
+								u.selected=true;
+							}
+						}
+					}
+				}
+				contactsList = contacts;
+				
+				changeUsers();
+			}
 			
 		]]>
 	</fx:Script>
@@ -783,32 +831,55 @@
 		<s:layout>
 			<s:VerticalLayout gap="5"/>
 		</s:layout>
-		<s:Label text="参与人：" width="100%" height="25" verticalAlign="middle" />
-		<s:Scroller width="100%" height="100" >
+		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+			<s:layout>
+				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+			</s:layout>
+			<s:Label text="参与人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+			<s:BorderContainer  width="100%" height="30" borderVisible="false" >
+				<s:layout>
+					<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right"/>
+				</s:layout>
+				<s:Button label="管理通信录" height="25" chromeColor="#cccccc" color="#000000" click="openAddress()">
+					
+				</s:Button>
+				<s:Button label="刷新" height="25" chromeColor="#009933" color="#ffffff" click="ToolUtil.contactsRefresh(refreshAddress)">
+					
+				</s:Button>
+			</s:BorderContainer>
+		</s:BorderContainer>
+		<s:Scroller width="100%" height="100%" >
 			<s:Group width="100%" height="100%" >
 				<s:TileGroup id="users"  width="100%" requestedColumnCount="-1">
 					
 				</s:TileGroup>
 			</s:Group>
 		</s:Scroller>
-		<mx:DataGrid id="joinUserGrid" width="100%" height="100%" editable="true" dataProvider="{contactsList}" >
+		<mx:DataGrid id="joinUserGrid" width="100%" minHeight="350" editable="true" dataProvider="{contactsList}" >
 			<mx:columns>
-				<mx:DataGridColumn headerText="选择" width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
+				<mx:DataGridColumn headerText="选择"  width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
 					<mx:itemRenderer>
 						<fx:Component>
 							<mx:HBox horizontalAlign="center">
 								<fx:Script>
 									<![CDATA[
 										public function get selected():Boolean{
+											
 											return cb.selected;
 										}
 										public function set selected(value:Boolean):void{
 											cb.selected=value;
 										}
+										private function changeValue():void{
+											if(data.selected!=cb.selected){
+												data.selected = cb.selected;
+												outerDocument.changeUsers();
+											}
+										}
 									]]>
 								</fx:Script>
 								
-								<mx:CheckBox id="cb" selected="{data.selected}" change="outerDocument.changeUsers()" >
+								<mx:CheckBox id="cb" selected="{data.selected}" change="changeValue()" >
 									
 								</mx:CheckBox>
 							</mx:HBox>

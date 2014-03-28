@@ -22,6 +22,7 @@
 			import spark.skins.spark.BorderContainerSkin;
 			
 			import util.DateUtil;
+			import util.ScheduleUtil;
 			import util.ToolUtil;
 			
 			
@@ -66,11 +67,7 @@
 				if(!(e.target is BorderContainerSkin)){
 					return;
 				}
-				var s:SchedulePanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
-				s.schedulData = null;
-				s.startDateValue = DateUtil.parseDate(date+timestr.format(new Date()));
-				s.endDateValue = DateUtil.parseDate(date+timestr.format(new Date()));
-				PopUpManager.centerPopUp(s);
+				ScheduleUtil.createSchedule(DateUtil.parseDate(date+timestr.format(new Date())),DateUtil.parseDate(date+timestr.format(new Date())));
 			}
 			
 //			private function queryResult(result:Object,e:ResultEvent):void{
@@ -94,7 +91,7 @@
 					scheduleItem.scheduleName = obj.title;
 					scheduleItem.color = obj.color;
 					scheduleItem.scheduleId = obj.id;
-					if(!groupShowData.hasOwnProperty(""+gid)||groupShowData[""+gid]){
+					if(!groupShowData.hasOwnProperty(""+obj.group)||groupShowData[""+obj.group]){
 						scheduleList.addElement(scheduleItem);
 					}
 				}

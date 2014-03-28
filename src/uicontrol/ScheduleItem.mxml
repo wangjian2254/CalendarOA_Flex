@@ -8,10 +8,14 @@
 	<fx:Script>
 		<![CDATA[
 			import control.SchedulePanel;
+			import control.ScheduleShow;
 			
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
 			import mx.managers.PopUpManager;
+			
+			import util.ScheduleUtil;
+			import util.ToolUtil;
 			[Bindable]
 			public var color:Number = 0xffffff;
 			[Bindable]
@@ -33,9 +37,7 @@
 				if(fun!=null){
 					fun();
 				}else{
-					var s:SchedulePanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
-					s.schedulData = scheduleData;
-					PopUpManager.centerPopUp(s);
+					ScheduleUtil.showSchedulePanel(scheduleId);
 				}
 				
 				

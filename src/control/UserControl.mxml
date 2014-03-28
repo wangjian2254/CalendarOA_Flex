@@ -27,12 +27,7 @@
 			
 			override public   function  init(e:FlexEvent):void{
 
-				var data:Object=new Object();
 				
-				
-				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ft/allmanager",getDataResult,"POST");
-				http.send(data);
-				return;
 				
 
 			}
@@ -61,41 +56,63 @@
 				}
 			}
 			
-			public function save(e:Event):void{
-				var data:Object=getData();
-				if(data==null){
-					return;
-				}
-				HttpServiceUtil.getCHTTPServiceAndResult("/ft/saveUser",saveDataResult,"POST").send(data);
-			}
+			
 			public function getData():Object{
 				var o:Object={};
-				o["username"]=username.text;
-				o["truename"]=truename.text;
 				
-				if(sfqy.selected){
-					o["isaction"]=true;
-				}else{
-					o["isaction"]=false;
-					
-				}
-				if(uTypeRadio.selectedValue=="1"){
-					o['ismanager']=true;
-				}else{
-					o['ismanager']=false;
-				}
-				
-				o["id"]=idField.text;
 				
 				return o;
 			}
-			private function saveDataResult(result:Object,e:ResultEvent):void{
-				if(result.success){
-					idField.text=result.result.id;
-					init(null);
+			
+			private function delContactAsk():void{
+				
+				Alert.show("确认移除选中的联系人?", "提示", Alert.YES | Alert.NO, null, delContact);
+				
+			}
+			//删除日程
+			private function delContact(e:mx.events.CloseEvent):void
+			{
+				if (e.detail == Alert.YES){
+					var data:Object=new Object();
+					var username:Array = new Array();
+					for each(var item:Object in ToolUtil.contactsList){
+						if(item.selected){
+							username.push(item.username);
+						}
+					}
+					data["usernames"] = username;
+					data["do"] = "out";
+					HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
+					
+					
 				}
 			}
-			
+			private function addContact():void{
+				var data:Object=new Object();
+				var username:Array = new Array();
+				for each(var item:Object in list){
+					if(item.selected){
+						username.push(item.username);
+					}
+				}
+				data["usernames"] = username;
+				data["do"] = "join";
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
+				
+			}
+			private function search():void{
+				var data:Object=new Object();
+				data["key"] = key.text;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/findUser",searchResult,"POST").send(data);
+				
+			}
+			private function searchResult(result:Object,e:ResultEvent):void{
+				if(result.result){
+					list.removeAll();
+					list.addAll(new ArrayCollection(result.result as Array));
+				}
+				
+			}
 			
 			private function loadDataFault(e:FaultEvent):void{
 				Alert.show('操作失败',"提示");
@@ -131,12 +148,6 @@
 			}
 			
 			public function add():void{
-				username.enabled=true;
-				username.text="";
-				truename.text="";
-				
-				sfqy.selected=false;
-				idField.text="";
 			}
 			public function del():void{
 				var userArr:ArrayCollection=new ArrayCollection();
@@ -164,23 +175,6 @@
 			}
 			
 			public function show(obj:Object):void{
-				username.enabled=false;
-				username.text=obj.username;
-				truename.text=obj.truename;
-				if(obj.ismanager){
-					uTypeRadio.selectedValue="1";
-				}else{
-					uTypeRadio.selectedValue="0";
-					
-				}
-
-				if(obj.isaction){
-					sfqy.selected=true;
-				}else{
-					sfqy.selected=false;
-					
-				}
-				idField.text=obj.id;
 			}
 			
 			
@@ -245,84 +239,18 @@
 			</s:layout>
 			<s:BorderContainer  width="100%" height="25"  backgroundAlpha="0"  borderVisible="false">	
 				<s:layout>
-					<s:VerticalLayout verticalAlign="top" paddingLeft="25">
+					<s:HorizontalLayout verticalAlign="middle" paddingLeft="25" gap="5">
 						
-					</s:VerticalLayout>
+					</s:HorizontalLayout>
 				</s:layout>
-				<s:Label text="用户信息"  width="100%" fontFamily="黑体" fontSize="14" height="25" verticalAlign="middle" textAlign="left" fontWeight="bold">
-					
-				</s:Label>
-				</s:BorderContainer>
-				<s:Form width="100%" id="form" >
-					<s:FormItem label="用户名:" textAlign="right">
-						<s:TextInput id="username" width="200" >
-							
-						</s:TextInput>
-					</s:FormItem>
-					
-					<s:FormItem label="昵称:" textAlign="right">
-						<s:TextInput id="truename"  width="200">
-							
-						</s:TextInput>
-					</s:FormItem>
-					<s:FormItem label="密码:" textAlign="right">
-						<s:Label text="初始密码为：111111"/>
-					</s:FormItem>
-					
-					
-					<s:FormItem label="身份:" textAlign="right">
-						<s:RadioButton group="{uTypeRadio}"  label="游客"  value="0">
-							
-						</s:RadioButton>
-						<s:RadioButton group="{uTypeRadio}" label="编辑者"  value="1">
-							
-						</s:RadioButton>
-					</s:FormItem>
-					
-					
-					<s:FormItem label="启用:" textAlign="right">
-						<s:CheckBox id="sfqy" label="可用"/>
-					</s:FormItem>
-					<s:FormItem>
-						<s:BorderContainer borderVisible="false" width="100%">
-							<s:layout>
-								<s:HorizontalLayout gap="10">
-									
-								</s:HorizontalLayout>
-							</s:layout>
-							<s:Button label="保存" chromeColor="#faf0cc" height="30" click="save(event)">
-							</s:Button>
-							<s:Button label="初始化密码" chromeColor="#faf0cc" height="30" click="initpassword(event)">
-							</s:Button>
-						</s:BorderContainer>
-						
-					</s:FormItem>
-					<s:TextInput id="idField" visible="false">
-						
-					</s:TextInput>
-				</s:Form>
-		</s:BorderContainer>
-		<s:BorderContainer id="rightContainner" width="70%" height="100%" backgroundAlpha="0"  borderVisible="false">
-			<s:layout>
-				<s:VerticalLayout gap="5">
-					
-				</s:VerticalLayout>
-				
-			</s:layout>
-			<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
-				<s:layout>
-					<s:BasicLayout>
-						
-					</s:BasicLayout>
-				</s:layout>
-				<mx:ButtonBar dataProvider="{buttonArr}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30" top="7" bottom="7" left="10" itemClick="clickHander(event);">
-					
-				</mx:ButtonBar>
-				
+				<s:Label text="查找：" />
+				<s:TextInput width="100" id="key" />
+				<s:Button chromeColor="red" color="#ffffff" label="查找" height="25" click="search()" />
+				<s:Button chromeColor="#cccccc" color="#000000" label="加入通信录" height="25" click="addContact()" />
 			</s:BorderContainer>
-			<uicontrol:MarkAdvancedDataGrid id="peopgrid" dataProvider="{list}"  isNewAdd="false" enabled="true" editable="false" width="100%" height="100%">
+			<uicontrol:MarkAdvancedDataGrid dataProvider="{list}"  isNewAdd="false" enabled="true" editable="true" width="100%" height="100%">
 				<uicontrol:columns>
-					<mx:AdvancedDataGridColumn headerText="选择" dataField="selected"  sortable="false" width="60"  editorDataField="selected" rendererIsEditor="true" >
+					<mx:AdvancedDataGridColumn headerText="选择" dataField="selected" editable="true"  sortable="false" width="60"  editorDataField="selected" rendererIsEditor="true" >
 						<mx:itemRenderer>
 							<fx:Component>
 								<mx:HBox horizontalAlign="center">
@@ -344,17 +272,63 @@
 							</fx:Component>
 						</mx:itemRenderer>
 					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="用户名" dataField="username">
+					<mx:AdvancedDataGridColumn headerText="用户名" editable="false"  dataField="username">
 						
 					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="姓名" dataField="truename">
+					<mx:AdvancedDataGridColumn headerText="姓名" editable="false"  dataField="nickname">
 						
 					</mx:AdvancedDataGridColumn>
 					
-					<mx:AdvancedDataGridColumn headerText="用户类型" dataField="usertype"  labelFunction="userType">
+				</uicontrol:columns>
+				
+			</uicontrol:MarkAdvancedDataGrid>
+		</s:BorderContainer>
+		<s:BorderContainer id="rightContainner" width="70%" height="100%" backgroundAlpha="0"  borderVisible="false">
+			<s:layout>
+				<s:VerticalLayout gap="5">
+					
+				</s:VerticalLayout>
+				
+			</s:layout>
+			<s:Button chromeColor="red" color="#ffffff" label="移除通信录" height="25" click="delContactAsk()" />
+			<uicontrol:MarkAdvancedDataGrid id="peopgrid" dataProvider="{ToolUtil.contactsList}"  isNewAdd="false" enabled="true" editable="true" width="100%" height="100%">
+				<uicontrol:columns>
+					<mx:AdvancedDataGridColumn headerText="选择" dataField="selected" editable="true"  sortable="false" width="60"  editorDataField="selected" rendererIsEditor="true" >
+						<mx:itemRenderer>
+							<fx:Component>
+								<mx:HBox horizontalAlign="center">
+									<fx:Script>
+										<![CDATA[
+											public function get selected():Boolean{
+												return cb.selected;
+											}
+											public function set selected(value:Boolean):void{
+												cb.selected=value;
+											}
+										]]>
+									</fx:Script>
+									
+									<mx:CheckBox id="cb" selected="{data.selected}" >
+										
+									</mx:CheckBox>
+								</mx:HBox>
+							</fx:Component>
+						</mx:itemRenderer>
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn headerText="用户名" editable="false" dataField="username">
 						
 					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="是否启用" dataField="sfqy" labelFunction="isUsered">
+					<mx:AdvancedDataGridColumn headerText="姓名" editable="false"  dataField="nickname">
+						
+					</mx:AdvancedDataGridColumn>
+					
+					<mx:AdvancedDataGridColumn headerText="RTX账号" editable="false"  dataField="rtx"  >
+						
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn headerText="email" editable="false"  dataField="email" >
+						
+					</mx:AdvancedDataGridColumn>
+					<mx:AdvancedDataGridColumn headerText="手机号" editable="false"  dataField="sms" >
 						
 					</mx:AdvancedDataGridColumn>
 				</uicontrol:columns>

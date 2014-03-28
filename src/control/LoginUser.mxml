@@ -25,6 +25,13 @@
 				PopUpManager.removePopUp(this);
 			}
 			
+			public function reg():void{
+				var changepassword:RegisterUser=RegisterUser(PopUpManager.createPopUp( 
+					FlexGlobals.topLevelApplication as DisplayObject, RegisterUser , true) as spark.components.TitleWindow);
+				PopUpManager.centerPopUp(changepassword);
+				closeWin();
+			}
+			
 			public function save():void{
 				if(this.username.text==""||
 					this.password.text==""){
@@ -69,9 +76,16 @@
 		</s:FormItem>
 		
 		<s:FormItem>
-			<s:Button label="登录" click="save()">
-				
-			</s:Button>
+				<s:layout>
+					<s:HorizontalLayout gap="10"/>
+				</s:layout>
+				<s:Button label="登录" click="save()" chromeColor="red" color="#ffffff" height="25">
+					
+				</s:Button>
+				<s:Button label="注册" click="reg()" chromeColor="#ffffff" color="#000000" height="25">
+					
+				</s:Button>
+			
 		</s:FormItem>
 	</s:Form>
 </s:TitleWindow>

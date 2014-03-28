@@ -29,6 +29,7 @@
 			import uicontrol.GroupItem;
 			
 			import util.DateUtil;
+			import util.ScheduleUtil;
 			import util.ToolUtil;
 			
 			[Bindable]
@@ -314,8 +315,7 @@
 			}
 			
 			public function createSchedule():void{
-				var s:SchedulePanel = PopUpManager.createPopUp(this,SchedulePanel,false) as SchedulePanel;
-				PopUpManager.centerPopUp(s);
+				ScheduleUtil.createSchedule();
 			}
 			
 			private function changeDate():void{
