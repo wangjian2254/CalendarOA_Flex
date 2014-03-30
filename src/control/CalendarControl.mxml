@@ -56,6 +56,10 @@
 				
 			}
 			
+			private function changeShowModel():void{
+				currentMonth=-1;
+				showCalendar(dateChooser.selectedDate);
+			}
 			
 			
 			public function regetSchedule():void{
@@ -130,7 +134,7 @@
 			}
 			
 			
-			private var currentMonth:Number=0;
+			private var currentMonth:Number=-1;
 			
 			private function showCalendar(date:Date=null):void{
 				if(date==null){
@@ -143,12 +147,21 @@
 					return;
 				}
 				currentMonth=date.month;
-				if(date.date!=1){
-					date.date=1;
+				if(showModel.selectedItem.value=="monthly"){
+					if(date.date!=1){
+						date.date=1;
+					}
+					if(date.day!=0){
+						date.date -= date.day;
+					}
 				}
-				if(date.day!=0){
-					date.date -= date.day;
+				if(showModel.selectedItem.value=="weekly"){
+					if(date.day!=0){
+						date.date -= date.day;
+					}
 				}
+				
+				
 				var fr:DateFormatter=new DateFormatter();
 				fr.formatString="YYYYMMDD";
 //				calendarPanel.removeAllElements();
@@ -174,10 +187,23 @@
 					}
 					
 					date.date+=1;
-					if(currentMonth<date.month&&date.day==0){
-						count=i+1;
-						break;
+					if(showModel.selectedItem.value=="monthly"){
+						if(currentMonth<date.month&&date.day==0){
+							count=i+1;
+							break;
+						}
 					}
+					if(showModel.selectedItem.value=="weekly"){
+						if(date.day==0){
+							count=i+1;
+							break;
+						}
+					}
+					if(showModel.selectedItem.value=="daily"){
+							count=i+1;
+							break;
+					}
+					
 				}
 				for(i=calendarPanel.numElements-1;i>=count;i--){
 					calendarPanel.removeElementAt(i);
@@ -196,8 +222,16 @@
 			private function resize(e:FlexEvent=null):void{
 				var dayItem:DayItem=null;
 				var row:Number = calendarPanel.numElements/7;
+				if(row<1){
+					row=1;
+				}
 				var dayHeight:Number=(this.height - 26-row+1-2-10)/row;
-				dayWidth = (this.width - 12-taskPanel.width-190-7+1)/7;
+				if(calendarPanel.numElements>1){
+					dayWidth = (this.width - 12-taskPanel.width-190-7+1)/7;
+				}else{
+					dayWidth = this.width - 12-taskPanel.width-190;
+				}
+				
 				for(var  i:Number=0;i<100;i++){
 					if(calendarPanel.numElements-1<i){
 						break;
@@ -206,6 +240,8 @@
 						dayItem.height = dayHeight;
 						dayItem.width = dayWidth;
 						dayItem.invalidateSize();
+						dayItem.showTimeLine(dayWidth,row==1?true:false);
+						dayItem.invalidateDisplayList();
 						
 					}
 				}
@@ -375,7 +411,7 @@
 									
 								</s:HorizontalLayout>
 							</s:layout>
-							<s:ButtonBar dataProvider="{btnlist}" width="100" selectedIndex="2" chromeColor="#faf0cc"   labelField="label" />
+							<s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="2" chromeColor="#faf0cc"   labelField="label" />
 						</s:BorderContainer>
 					</s:BorderContainer>
 					
