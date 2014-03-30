@@ -34,11 +34,13 @@
 			
 			[Bindable]
 			private var list:ArrayCollection=new ArrayCollection();
+			[Bindable]
+			private var btnlist:ArrayCollection=new ArrayCollection([{"label":"日","value":"daily"},{"label":"周","value":"weekly"},{"label":"月","value":"monthly"}]);
 			
 			
 			override public   function  init(e:FlexEvent):void{
 				dateChooser.selectedDate = new Date();
-			
+				
 				showCalendar();
 				if(ToolUtil.groupList.length==0){
 					ToolUtil.groupRefresh(regetGroup);
@@ -360,7 +362,23 @@
 						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
 						</s:VerticalLayout>
 					</s:layout>
-					<s:Button chromeColor="red" label="创建日程" color="#ffffff" fontWeight="bold"  height="25" click="createSchedule()" />
+					<s:BorderContainer width="100%" height="30" borderVisible="false">
+						<s:layout>
+							<s:HorizontalLayout gap="5" verticalAlign="middle">
+								
+							</s:HorizontalLayout>
+						</s:layout>
+						<s:Button chromeColor="red" label="创建日程" color="#ffffff" fontWeight="bold"  height="25" click="createSchedule()" />
+						<s:BorderContainer width="100%" height="30" borderVisible="false">
+							<s:layout>
+								<s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="3">
+									
+								</s:HorizontalLayout>
+							</s:layout>
+							<s:ButtonBar dataProvider="{btnlist}" width="100" selectedIndex="2" chromeColor="#faf0cc"   labelField="label" />
+						</s:BorderContainer>
+					</s:BorderContainer>
+					
 					<s:Label text="{monthstr.format(dateChooser.selectedDate)}" fontSize="18" fontWeight="bold" paddingTop="10" >
 						
 					</s:Label>
