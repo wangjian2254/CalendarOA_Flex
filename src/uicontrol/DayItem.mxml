@@ -202,8 +202,8 @@
 				}
 				var d:Date=new Date();
 				this.contentGroup.graphics.lineStyle(2,0xFF0000);
-				this.contentGroup.graphics.moveTo(0,this.height/24*(d.hours)+(d.minutes/60*this.height/48));
-				this.contentGroup.graphics.lineTo(w,this.height/24*(d.hours)+(d.minutes/60*this.height/48));
+				this.contentGroup.graphics.moveTo(0,this.height/24*(d.hours)+(d.minutes/60*this.height/24));
+				this.contentGroup.graphics.lineTo(w,this.height/24*(d.hours)+(d.minutes/60*this.height/24));
 			}
 			
 			private function drawline(w:Number,i:Number):void{
