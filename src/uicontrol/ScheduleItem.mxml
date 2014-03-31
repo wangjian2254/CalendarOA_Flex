@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="18" borderVisible="false" backgroundAlpha="0">
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="18" borderVisible="false" backgroundAlpha="0" creationComplete="init()" >
 	<s:layout>
-		<s:HorizontalLayout gap="2" paddingLeft="10" verticalAlign="middle" horizontalAlign="left"/>
+		<s:VerticalLayout gap="2" paddingLeft="10" verticalAlign="top" paddingTop="0" horizontalAlign="left"/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
@@ -26,9 +26,18 @@
 			
 			[Bindable]
 			public var scheduleData:Object = null;
+			[Bindable]
+			public var descShow:Boolean = false;
+
 			
 			public var fun:Function=null;
 			
+			private function init():void{
+				if(!descShow){
+					lbldesc.height=0;
+					lbldesc.visible=false;
+				}
+			}
 			
 			private function openSchedule(e:MouseEvent):void{
 				if(!(e.target is LinkButton)){
@@ -47,10 +56,21 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:BorderContainer  width="10" height="10"  backgroundColor="{color}" borderVisible="true" borderStyle="solid" borderColor="#CCCCCC" >
-		
+	
+	
+	<s:BorderContainer  width="100%" height="18" borderVisible="false"  backgroundAlpha="0">
+		<s:layout>
+			<s:HorizontalLayout  gap="3" verticalAlign="middle" >
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:BorderContainer id="colorBorder"  width="10" height="10"   backgroundColor="{color}" borderVisible="true" borderStyle="solid" borderColor="#CCCCCC" >
+			
+		</s:BorderContainer>
+		<mx:LinkButton id="linkScheduleItem" label="{scheduleName}" click="openSchedule(event)" >
+			
+		</mx:LinkButton>
 	</s:BorderContainer>
-	<mx:LinkButton id="linkScheduleItem" label="{scheduleName}" click="openSchedule(event)" >
-		
-	</mx:LinkButton>
+		<s:Label id="lbldesc" width="100%" height="100%" text="{scheduleData.desc}" visible="{descShow}" />
+	
 </s:BorderContainer>

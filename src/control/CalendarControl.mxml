@@ -48,6 +48,7 @@
 					regetGroup();
 				}
 			}
+			
 			override public function changeCurrentUser(e:ChangeUserEvent):void{
 				regetSchedule();
 			}
@@ -136,35 +137,10 @@
 			
 			private var currentMonth:Number=-1;
 			
-			private function showCalendar(date:Date=null):void{
-				if(date==null){
-					date = new Date();
-				}else{
-					date = new Date(date.fullYear,date.month,date.date);
-					
-				}
-				if(currentMonth==date.month){
-					return;
-				}
-				currentMonth=date.month;
-				if(showModel.selectedItem.value=="monthly"){
-					if(date.date!=1){
-						date.date=1;
-					}
-					if(date.day!=0){
-						date.date -= date.day;
-					}
-				}
-				if(showModel.selectedItem.value=="weekly"){
-					if(date.day!=0){
-						date.date -= date.day;
-					}
-				}
-				
-				
+			private function showCalendar_Monthly(date:Date=null):void{
 				var fr:DateFormatter=new DateFormatter();
 				fr.formatString="YYYYMMDD";
-//				calendarPanel.removeAllElements();
+				//				calendarPanel.removeAllElements();
 				var dayItem:DayItem=null;
 				var newDayItem:DayItem=null;
 				var f:Boolean=true;
@@ -172,20 +148,20 @@
 				for(var i:Number=0;i<100;i++){
 					if(calendarPanel.numElements-1<i){
 						dayItem = new DayItem();
+						dayItem.is_all_day = 1;
 						newDayItem = dayItem;
 						calendarPanel.addElement(dayItem);
 						f = true;
 					}else{
 						dayItem = calendarPanel.getElementAt(i) as DayItem;
+						dayItem.is_all_day = 1;
 						f = false;
 					}
 					dayItem.date = fr.format(date);
 					dayItem.nowdate = fr.format(dateChooser.selectedDate);
-					
 					if(!f){
 						dayItem.init();
 					}
-					
 					date.date+=1;
 					if(showModel.selectedItem.value=="monthly"){
 						if(currentMonth<date.month&&date.day==0){
@@ -193,18 +169,8 @@
 							break;
 						}
 					}
-					if(showModel.selectedItem.value=="weekly"){
-						if(date.day==0){
-							count=i+1;
-							break;
-						}
-					}
-					if(showModel.selectedItem.value=="daily"){
-							count=i+1;
-							break;
-					}
-					
 				}
+				
 				for(i=calendarPanel.numElements-1;i>=count;i--){
 					calendarPanel.removeElementAt(i);
 				}
@@ -215,37 +181,303 @@
 				if (newDayItem!=null){
 					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
 				}
+			}
+			private function showCalendar_Weekly(date:Date=null):void{
+				
+				var fr:DateFormatter=new DateFormatter();
+				fr.formatString="YYYYMMDD";
+				//				calendarPanel.removeAllElements();
+				var dayItem:DayItem=null;
+				var newDayItem:DayItem=null;
+				var f:Boolean=true;
+				var count:Number=0;
+				var weekDate:Array=new Array();
+				for(var i:Number=1;i<100;i++){
+					if(calendarBorder.numElements-1<i){
+						dayItem = new DayItem();
+						newDayItem = dayItem;
+						dayItem.is_all_day = 2;
+						calendarBorder.addElement(dayItem);
+						f = true;
+					}else{
+						dayItem = calendarBorder.getElementAt(i) as DayItem;
+						dayItem.is_all_day = 2;
+						f = false;
+					}
+					dayItem.date = fr.format(date);
+					dayItem.nowdate = fr.format(dateChooser.selectedDate);
+					
+					if(!f){
+						dayItem.init();
+					}
+					dayItem = new DayItem();
+					dayItem.is_all_day = 3;
+					dayItem.date = fr.format(date);
+					dayItem.nowdate = fr.format(dateChooser.selectedDate);
+					daySchedule.addElement(dayItem);
+					weekDate.push(date.date);
+					date.date+=1;
+					
+					if(date.day==0){
+						count=i+1;
+						break;
+					}
+				
+					
+				}
+				
+				
+				for(i=calendarBorder.numElements-1;i>=count;i--){
+					calendarBorder.removeElementAt(i);
+				}
+				if(calendarBorder.numElements>0){
+					ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date,(calendarBorder.getElementAt(calendarBorder.numElements-1) as DayItem).date);
+				}
+				resize();
+				if (newDayItem!=null){
+					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
+				}
+			}
+			private function showCalendar_Daily(date:Date=null):void{
+				var fr:DateFormatter=new DateFormatter();
+				fr.formatString="YYYYMMDD";
+				//				calendarPanel.removeAllElements();
+				var dayItem:DayItem=null;
+				var newDayItem:DayItem=null;
+				var f:Boolean=true;
+				var count:Number=0;
+				for(var i:Number=1;i<100;i++){
+					if(calendarBorder.numElements-1<i){
+						dayItem = new DayItem();
+						newDayItem = dayItem;
+						dayItem.is_all_day = 2;
+						calendarBorder.addElement(dayItem);
+						f = true;
+					}else{
+						dayItem = calendarBorder.getElementAt(i) as DayItem;
+						dayItem.is_all_day = 2;
+						f = false;
+					}
+					dayItem.date = fr.format(date);
+					dayItem.nowdate = fr.format(dateChooser.selectedDate);
+					
+					if(!f){
+						dayItem.init();
+					}
+					dayItem = new DayItem();
+					dayItem.is_all_day = 3;
+					dayItem.date = fr.format(date);
+					dayItem.nowdate = fr.format(dateChooser.selectedDate);
+					daySchedule.addElement(dayItem);
+					date.date+=1;
+					
+					if(showModel.selectedItem.value=="daily"){
+						count=i+1;
+						break;
+					}
+					
+				}
+				switch(date.day){
+					case 2:
+						lbldayHead.text = "星期一";
+						break;
+					case 3:
+						lbldayHead.text = "星期二";
+						break;
+					case 4:
+						lbldayHead.text = "星期三";
+						break;
+					case 5:
+						lbldayHead.text = "星期四";
+						break;
+					case 6:
+						lbldayHead.text = "星期五";
+						break;
+					case 0:
+						lbldayHead.text = "星期六";
+						break;
+					case 1:
+						lbldayHead.text = "星期日";
+						break;
+				}
+				
+				for(i=calendarBorder.numElements-1;i>=count;i--){
+					calendarBorder.removeElementAt(i);
+				}
+				if(calendarBorder.numElements>0){
+					ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date,(calendarBorder.getElementAt(calendarBorder.numElements-1) as DayItem).date);
+				}
+				resize();
+				if (newDayItem!=null){
+					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
+				}
+			}
+			
+			private function showCalendar(date:Date=null):void{
+				if(date==null){
+					date = new Date();
+				}else{
+					date = new Date(date.fullYear,date.month,date.date);
+					
+				}
+				if(currentMonth==date.month){
+					return;
+				}
+				daySchedule.removeAllElements();
+				currentMonth=date.month;
+				if(showModel.selectedItem.value=="monthly"){
+					daySchedule.height = 0;
+					daySchedule.visible = false;
+					calendarBorder.visible = false;
+					calendarBorder.removeAllElements();
+					calendarPanel.visible = true;
+					if(date.date!=1){
+						date.date=1;
+					}
+					if(date.day!=0){
+						date.date -= date.day;
+					}
+					showCalendar_Monthly(date);
+				}else{
+					if(calendarBorder.numElements==0){
+						var timeline:DayItem=new DayItem();
+						timeline.width = 50;
+						timeline.is_all_day=2;
+						timeline.height =80*24;
+						calendarBorder.addElement(timeline);
+					}
+					if(daySchedule.numElements==0){
+						var timeline2:DayItem=new DayItem();
+						timeline2.width = 50;
+						timeline2.height = 100;
+						timeline2.blank=true;
+						daySchedule.addElement(timeline2);
+					}
+				}
+				if(showModel.selectedItem.value=="weekly"){
+					daySchedule.height = 100;
+					daySchedule.visible = true;
+					calendarBorder.visible = true;
+					calendarPanel.visible = false;
+					if(date.day!=0){
+						date.date -= date.day;
+					}
+					showCalendar_Weekly(date);
+				}
+				if(showModel.selectedItem.value=="daily"){
+					daySchedule.height = 100;
+					daySchedule.visible = true;
+					calendarBorder.visible = true;
+					calendarPanel.visible = false;
+					showCalendar_Daily(date);
+				}
+				
+				
+				
 				
 			}
 			[Bindable]
 			private var dayWidth:Number=0;
-			private function resize(e:FlexEvent=null):void{
+			private function resize(e:FlexEvent=null,flag:Boolean=true):void{
 				var dayItem:DayItem=null;
-				var row:Number = calendarPanel.numElements/7;
-				if(row<1){
-					row=1;
+				var row:Number = 0;
+				var dayHeight:Number;
+				dayHeight=80*24;
+				dayWidth = (this.width - 12-taskPanel.width-190-7+1)/7;
+				weekHead.height=0;
+				dayHead.height=25;
+				if(showModel.selectedItem.value=="monthly"){
+					row=calendarPanel.numElements/7;
+					dayHeight =(this.height - 27-row+1-2-11)/row;
+					
+					calendarPanel.requestedColumnCount = 7;
+					
+					weekHead.height=25;
+					dayHead.height=0;
+					
 				}
-				var dayHeight:Number=(this.height - 26-row+1-2-10)/row;
-				if(calendarPanel.numElements>1){
-					dayWidth = (this.width - 12-taskPanel.width-190-7+1)/7;
-				}else{
-					dayWidth = this.width - 12-taskPanel.width-190;
+				if(showModel.selectedItem.value=="weekly"){
+					dayWidth = (this.width - 12-taskPanel.width-190-7+1-15-51)/7;
+					weekHead.height=25;
+					dayHead.height=0;
+					calendarBorder.width = dayWidth*7+6;
+					
+				}
+				if(showModel.selectedItem.value=="daily"){
+					dayWidth = this.width - 12-taskPanel.width-190-15-51;
+					calendarBorder.width = dayWidth;
+					
 				}
 				
-				for(var  i:Number=0;i<100;i++){
-					if(calendarPanel.numElements-1<i){
-						break;
-					}else{
-						dayItem = calendarPanel.getElementAt(i) as DayItem;
-						dayItem.height = dayHeight;
-						dayItem.width = dayWidth;
-						dayItem.invalidateSize();
-						dayItem.showTimeLine(dayWidth,row==1?true:false);
-						dayItem.invalidateDisplayList();
-						
+				
+				
+				
+				
+				if(showModel.selectedItem.value=="monthly"){
+					for(var  i:Number=0;i<100;i++){
+						if(calendarPanel.numElements-1<i){
+							break;
+						}else{
+							dayItem = calendarPanel.getElementAt(i) as DayItem;
+							dayItem.height = dayHeight;
+							dayItem.width = dayWidth;
+							dayItem.invalidateSize();
+							dayItem.invalidateDisplayList();
+							
+						}
+					}
+					
+				}else{
+					for(i=0;i<100;i++){
+						if(calendarPanel.numElements-1<i){
+							break;
+						}else{
+							dayItem = calendarPanel.getElementAt(i) as DayItem;
+							dayItem.height = 10;
+							dayItem.width = 10;
+							dayItem.invalidateSize();
+							
+						}
+					}
+					for( i=1;i<100;i++){
+						if(calendarBorder.numElements-1<i){
+							break;
+						}else{
+							dayItem = calendarBorder.getElementAt(i) as DayItem;
+							dayItem.height = dayHeight;
+							dayItem.width = dayWidth;
+							dayItem.invalidateSize();
+							dayItem.showTimeLine(dayWidth,row==0?true:false);
+							dayItem.invalidateDisplayList();
+							
+						}
+					}
+					for( i=1;i<9;i++){
+						if(daySchedule.numElements-1<i){
+							break;
+						}else{
+							dayItem = daySchedule.getElementAt(i) as DayItem;
+							dayItem.height = 100;
+							dayItem.width = dayWidth;
+							dayItem.invalidateSize();
+							dayItem.invalidateDisplayList();
+							
+						}
+					}
+					if(flag){
+						var now:Date=new Date();
+						var y:Number=(now.hours-3)*80;
+						calendarScroller.viewport.verticalScrollPosition=y;
 					}
 				}
 				calendarPanel.invalidateSize();
+				calendarPanel.invalidateDisplayList();
+				calendayGroup.invalidateSize();
+				calendayGroup.invalidateDisplayList();
+				calendarScroller.invalidateSize();
+				calendarScroller.invalidateDisplayList();
+				
+				
 			}
 			
 			public function save(e:Event):void{
@@ -365,11 +597,11 @@
 					taskPanel.width=0;
 					mytask.color = 0xffffff;
 				}else{
-					mytask.color = 0x00CCCC;
+					mytask.color = 0xfad165;
 					taskPanel.width=200;
 					
 				}
-				resize();
+				resize(null,false);
 				this.invalidateSize();
 			}
 			
@@ -449,31 +681,59 @@
 				</s:VerticalLayout>
 				
 			</s:layout>
-			<s:BorderContainer width="100%" height="25" borderVisible="false" backgroundAlpha="0">
+			<s:BorderContainer id="weekHead" width="100%" height="25" visible="{weekHead.height==0?false:true}" borderVisible="false" backgroundAlpha="0">
 				<s:layout>
 					<s:HorizontalLayout gap="1" verticalAlign="middle" >
 						
 					</s:HorizontalLayout>
 				</s:layout>
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期日" textAlign="center" verticalAlign="middle" />
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期一" textAlign="center" verticalAlign="middle" />
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期二" textAlign="center" verticalAlign="middle" />
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期三" textAlign="center" verticalAlign="middle" />
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期四" textAlign="center" verticalAlign="middle" />
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期五" textAlign="center" verticalAlign="middle" />
-				<s:Label width="{dayWidth}" height="25" fontSize="18" fontWeight="bold" text="星期六" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期日" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期一" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期二" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期三" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期四" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期五" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期六" textAlign="center" verticalAlign="middle" />
 					
 			</s:BorderContainer>
-			<s:BorderContainer width="100%" height="100%" borderVisible="true" borderColor="#999999" backgroundColor="#999999">
+			<s:BorderContainer id="dayHead" width="100%" height="0" borderVisible="false" backgroundAlpha="0">
 				<s:layout>
-					<s:VerticalLayout gap="0">
+					<s:HorizontalLayout gap="1" verticalAlign="middle" >
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				<s:Label id="lbldayHead" width="{dayWidth}" height="25" fontSize="18"  textAlign="center" verticalAlign="middle" />
+				
+			</s:BorderContainer>
+			<s:BorderContainer id="daySchedule" minWidth="100" height="0" borderVisible="false"   backgroundColor="#999999">
+				<s:layout>
+					<s:HorizontalLayout gap="1" verticalAlign="middle" paddingBottom="1" paddingRight="1" paddingLeft="1" paddingTop="1">
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				
+			</s:BorderContainer>
+			<s:BorderContainer width="100%" height="100%" borderVisible="false"  backgroundColor="#999999">
+				<s:layout>
+					<s:VerticalLayout gap="0"  paddingBottom="1" paddingRight="1" paddingLeft="1" paddingTop="1">
 						
 					</s:VerticalLayout>
 					
 				</s:layout>
-				<s:TileGroup id="calendarPanel" width="100%" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
-					
-				</s:TileGroup>
+				<s:Scroller id="calendarScroller" width="100%" height="100%">
+					<s:Group id="calendayGroup"  width="100%" height="100%">
+						<s:TileGroup id="calendarPanel" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
+							
+						</s:TileGroup>
+						<s:BorderContainer id="calendarBorder"  borderVisible="false" backgroundAlpha="0">
+							<s:layout>
+								<s:HorizontalLayout gap="1">
+									
+								</s:HorizontalLayout>
+							</s:layout>
+						</s:BorderContainer>
+					</s:Group>
+				</s:Scroller>
 			</s:BorderContainer>
 			
 				
