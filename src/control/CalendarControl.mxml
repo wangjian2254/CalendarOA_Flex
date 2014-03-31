@@ -59,6 +59,8 @@
 			
 			private function changeShowModel():void{
 				currentMonth=-1;
+				currentWeek=-1;
+				currentDaily=-1;
 				showCalendar(dateChooser.selectedDate);
 			}
 			
@@ -110,6 +112,7 @@
 				mygrouppanel.height=h*mygrouppanel.numElements;
 				joingrouppanel.height=h*joingrouppanel.numElements;
 				datePanel.invalidateSize();
+				changeShowModel();
 			}
 			
 			public function showGroup(group:GroupItem,g:Object):void{
@@ -551,7 +554,7 @@
 									
 								</s:HorizontalLayout>
 							</s:layout>
-							<s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="2" chromeColor="#faf0cc"   labelField="label" />
+							<s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
 						</s:BorderContainer>
 					</s:BorderContainer>
 					

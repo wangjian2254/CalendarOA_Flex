@@ -162,7 +162,14 @@
 							while(schedulePos.hasOwnProperty(y.toString())){
 								y+=20;
 								if(this.width<300){
-									x+=10;
+									x+=25;
+								}else{
+									x+=100;
+								}
+							}
+							if(yisused(y)){
+								if(this.width<300){
+									x+=25;
 								}else{
 									x+=100;
 								}
@@ -190,6 +197,15 @@
 						}
 					}
 				}
+			}
+			
+			private function yisused(y:Number):Boolean{
+				for(var i:Number=0;i<60;i++){
+					if(schedulePos.hasOwnProperty((y-i).toString())){
+						return true;
+					}
+				}
+				return false;
 			}
 			
 			public function showTimeLine(w:Number,flag:Boolean):void{
