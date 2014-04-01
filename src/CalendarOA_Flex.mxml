@@ -48,6 +48,7 @@
 				ToolUtil.currentUserFun = currentUser;
 //				ToolUtil.init();
 				ToolUtil.sessionUserRefresh(currentUser);
+				
 				menuXML.send();
 				FlexGlobals.topLevelApplication.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr,changeMenu);
 				

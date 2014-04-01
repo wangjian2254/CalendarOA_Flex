@@ -164,15 +164,13 @@
 								if(this.width<300){
 									x+=25;
 								}else{
-									x+=100;
+									x+=40;
 								}
 							}
-							if(yisused(y)){
-								if(this.width<300){
-									x+=25;
-								}else{
-									x+=100;
-								}
+							if(this.width<300){
+								x+=25*yisused(y);
+							}else{
+								x+=40*yisused(y);
 							}
 							schedulePos[y.toString()]=true;
 							scheduleItem.x=x;
@@ -199,13 +197,14 @@
 				}
 			}
 			
-			private function yisused(y:Number):Boolean{
+			private function yisused(y:Number):Number{
+				var n:Number=0;
 				for(var i:Number=0;i<60;i++){
 					if(schedulePos.hasOwnProperty((y-i).toString())){
-						return true;
+						n++;
 					}
 				}
-				return false;
+				return n;
 			}
 			
 			public function showTimeLine(w:Number,flag:Boolean):void{

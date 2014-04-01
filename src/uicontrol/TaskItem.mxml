@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="18" borderVisible="false" backgroundAlpha="0" creationComplete="init()" xmlns:uicontrol="uicontrol.*" >
+	<s:layout>
+		<s:HorizontalLayout  gap="3" verticalAlign="middle" >
+			
+		</s:HorizontalLayout>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import control.SchedulePanel;
+			import control.ScheduleShow;
+			
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ScheduleUtil;
+			import util.TaskUtil;
+			import util.ToolUtil;
+			[Bindable]
+			public var color:Number = 0xffffff;
+			[Bindable]
+			public var taskName : String = "开会";
+			
+			[Bindable]
+			public var taskId:String="21";
+			
+			[Bindable]
+			public var taskData:Object = null;
+			
+			
+			public var fun:Function=null;
+			
+			private function init():void{
+				okbtn.visible=true;
+				if(taskData.status){
+					this.linkScheduleItem.graphics.lineStyle(2,0xFF0000);
+					this.linkScheduleItem.graphics.moveTo(0,linkScheduleItem.height/2);
+					this.linkScheduleItem.graphics.lineTo(linkScheduleItem.width,linkScheduleItem.height/2);
+					okbtn.visible=false;
+				}
+				
+			}
+			
+			private function openSchedule(e:MouseEvent):void{
+				if(!(e.target is LinkButton)){
+					return;
+				}
+				if(fun!=null){
+					fun();
+				}else{
+					TaskUtil.showTaskPanel(taskId);
+				}
+			}
+			
+			private function delTask():void{
+				var obj:Object = new Object();
+				obj["id"]=taskData.id;
+				obj["do"]=true;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/doTask",doResult,"POST").send(obj);
+			}
+			
+			private function doResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					taskData.status=true;
+					init();
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	
+		
+		<s:BorderContainer id="colorBorder"  width="10" height="10"   backgroundColor="{color}" borderVisible="true" borderStyle="solid" borderColor="#CCCCCC" >
+			
+		</s:BorderContainer>
+		<mx:LinkButton id="linkScheduleItem"  label="{taskName}" click="openSchedule(event)" width="100%" >
+			
+		</mx:LinkButton>
+		<uicontrol:BtnOk id="okbtn" clickFun="delTask" />
+</s:BorderContainer>

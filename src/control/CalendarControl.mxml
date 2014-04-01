@@ -13,11 +13,10 @@
 			import httpcontrol.CHTTPService;
 			import httpcontrol.HttpServiceUtil;
 			
-			import model.DeptModel;
-			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			import mx.events.CollectionEvent;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
 			import mx.formatters.DateFormatter;
@@ -27,9 +26,11 @@
 			
 			import uicontrol.DayItem;
 			import uicontrol.GroupItem;
+			import uicontrol.TaskItem;
 			
 			import util.DateUtil;
 			import util.ScheduleUtil;
+			import util.TaskUtil;
 			import util.ToolUtil;
 			
 			[Bindable]
@@ -47,6 +48,8 @@
 				}else{
 					regetGroup();
 				}
+				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
+				taskChange(null);
 			}
 			
 			override public function changeCurrentUser(e:ChangeUserEvent):void{
@@ -76,9 +79,18 @@
 						dayItem.init();
 					}
 				}
-				if(calendarPanel.numElements>0){
-					ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
+				if(showModel.selectedItem.value=="monthly"){
+					
+					if(calendarPanel.numElements>0){
+						ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
+					}
+				}else{
+					if(calendarBorder.numElements>1){
+						ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date,(calendarBorder.getElementAt(calendarBorder.numElements-1) as DayItem).date);
+					}
+					
 				}
+				ToolUtil.taskUnRefresh(showTaskList);
 				regetGroup();
 			}
 			
@@ -516,8 +528,29 @@
 				this.invalidateSize();
 			}
 			
-			[Bindable]
-			private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增','ico':addimg},{'label':'修改','ico':saveimg},{'label':'同步数据','ico':refreshimg}]);
+			private function showTaskList(result:Object,e:ResultEvent):void{
+				
+			}
+			private function taskChange(e:CollectionEvent):void{
+				
+				taskunpanel.removeAllElements();
+				var taskItem:TaskItem=null;
+				for each(var obj:Object in ToolUtil.taskUnList){
+					taskItem=new TaskItem();
+					taskItem.taskData = obj;
+					taskItem.taskName = obj.title;
+					taskItem.color = obj.color;
+					taskItem.taskId = obj.id;
+					taskunpanel.addElement(taskItem);
+					
+				}
+				
+			}
+			
+			private function createTask():void{
+				TaskUtil.createTask();
+				
+			}
 			
 		]]>
 	</fx:Script>
@@ -570,9 +603,9 @@
 							</s:VerticalLayout>
 						</s:layout>
 					</s:BorderContainer>
-					<s:Label id="mytasklbl" text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
+					<s:Label id="mytasklbl" text="我的备忘" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
-					<uicontrol:ScheduleItem id="mytask" color="#ffffff" scheduleName="任务" fun="showTask"/>
+					<uicontrol:ScheduleItem id="mytask" color="#fad165" scheduleName="备忘" fun="showTask"/>
 					<s:Label id="myjoingrouplbl" text="参与的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
 					</s:Label>
 					<s:BorderContainer id="joingrouppanel" width="100%" borderVisible="false"  >
@@ -653,15 +686,38 @@
 			
 				
 		</s:BorderContainer>
-		<s:Scroller id="taskPanel"  width="0" height="100%">
+		<s:Scroller id="taskPanel"  width="200" height="100%">
 			<s:Group>
 				<s:BorderContainer width="100%" borderVisible="false" >
 					<s:layout>
 						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
 						</s:VerticalLayout>
 					</s:layout>
-					<s:Label text="我的任务" fontSize="18" fontWeight="bold" paddingTop="10" >
-					</s:Label>
+					<s:BorderContainer width="100%" height="25"  borderVisible="false" backgroundAlpha="0">
+						<s:layout>
+							<s:HorizontalLayout gap="1" verticalAlign="middle">
+								
+							</s:HorizontalLayout>
+						</s:layout>
+						<s:Label text="我的备忘" fontSize="18" fontWeight="bold" paddingTop="10" >
+						</s:Label>
+						<s:BorderContainer   width="100%" height="25" borderVisible="false" backgroundAlpha="0">
+							<s:layout>
+								<s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="15">
+									
+								</s:HorizontalLayout>
+							</s:layout>
+							<uicontrol:BtnAdd clickFun="createTask" />
+							<uicontrol:BtnDel clickFun="showTask" />
+						</s:BorderContainer>
+					</s:BorderContainer>
+					
+					<s:BorderContainer id="taskunpanel" width="100%" borderVisible="false"  >
+						<s:layout>
+							<s:VerticalLayout>
+							</s:VerticalLayout>
+						</s:layout>
+					</s:BorderContainer>
 				</s:BorderContainer>
 			</s:Group>
 		</s:Scroller>

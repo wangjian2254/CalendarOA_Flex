@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="750" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="750" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
@@ -813,7 +813,7 @@
 		
 		<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 		<s:Label text="提前"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondNum" value="30" minimum="0" maximum="3000" width="50"  enabled="{needSecond1.selected}"/>
+		<s:NumericStepper id="secondNum" value="20" minimum="0" maximum="3000" width="50"  enabled="{needSecond1.selected}"/>
 		<mx:ComboBox id="secondWarning" dataProvider="{warninglist}" selectedIndex="0" labelField="text" width="60" enabled="{needSecond1.selected}" />
 		<s:CheckBox  id="needSecond1" selected="true"/>
 	</s:BorderContainer>
@@ -825,7 +825,7 @@
 		<s:Label text="提前"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="firstDay" value="0" minimum="0" maximum="30" width="50"/>
 		<s:Label text="天"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="firstHour" value="8" minimum="0" maximum="23" width="50"/>
+		<s:NumericStepper id="firstHour" value="9" minimum="0" maximum="23" width="50"/>
 		<s:Label text="时"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="firstMin" value="0" minimum="0" maximum="59" width="50"/>
 		<s:Label text="分"  height="25" verticalAlign="middle" />
@@ -840,7 +840,7 @@
 		<s:Label text="提前"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="secondDay" value="1" minimum="0" maximum="30" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="天"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondHour" value="8" minimum="0" maximum="23" width="50" enabled="{needSecond2.selected}"/>
+		<s:NumericStepper id="secondHour" value="17" minimum="0" maximum="23" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="时"  height="25" verticalAlign="middle" />
 		<s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="分"  height="25" verticalAlign="middle" />
@@ -870,14 +870,12 @@
 			<s:Label text="参与人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 			<s:BorderContainer  width="100%" height="30" borderVisible="false" >
 				<s:layout>
-					<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right"/>
+					<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
 				</s:layout>
-				<s:Button label="管理通信录" height="25" chromeColor="#cccccc" color="#000000" click="openAddress()">
-					
-				</s:Button>
-				<s:Button label="刷新" height="25" chromeColor="#009933" color="#ffffff" click="ToolUtil.contactsRefresh(refreshAddress)">
-					
-				</s:Button>
+				
+				<uicontrol:BtnSetting clickFun="openAddress" />
+				<uicontrol:BtnRefresh clickFun="ToolUtil.contactsRefresh" parm="refreshAddress" />
+				
 			</s:BorderContainer>
 		</s:BorderContainer>
 		<s:Scroller width="100%" height="100%" >
