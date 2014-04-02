@@ -10,6 +10,7 @@
 			import control.CBorderContainer;
 			import control.CalendarControl;
 			import control.ChangePassword;
+			import control.GroupControl;
 			import control.Loading;
 			import control.LoginUser;
 			import control.RegisterUser;
@@ -234,6 +235,9 @@
 						break;
 					case 'contact':
 						c=new UserControl();
+						break;
+					case 'group':
+						c=new GroupControl();
 						break;
 					
 					

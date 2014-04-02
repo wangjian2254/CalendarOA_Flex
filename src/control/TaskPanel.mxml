@@ -29,6 +29,7 @@
 			
 			import uicontrol.ContactItem;
 			import uicontrol.ScheduleItem;
+			import uicontrol.TaskItem;
 			
 			import util.DateUtil;
 			import util.ScheduleUtil;
@@ -54,6 +55,7 @@
 			[Bindable]
 			private var endtimelist:ArrayCollection = new ArrayCollection();
 			
+			public var taskItem:TaskItem=null;
 			
 			
 			private var selectColor:Number =0x00CCFF;
@@ -71,6 +73,9 @@
 			}
 			
 			public function init():void{
+				if(taskItem!=null){
+					taskItem.init();
+				}
 				_isinit = true;
 				donook.visible=false;
 				dook.visible=false;
@@ -224,6 +229,7 @@
 					titlestr = taskData.title;
 					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
 					ScheduleUtil.clearNewSchedule();
+					init();
 				}
 			}
 			

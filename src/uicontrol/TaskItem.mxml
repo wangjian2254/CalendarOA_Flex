@@ -36,7 +36,7 @@
 			
 			public var fun:Function=null;
 			
-			private function init():void{
+			public function init():void{
 				okbtn.visible=true;
 				if(taskData.status){
 					this.linkScheduleItem.graphics.lineStyle(2,0xFF0000);
@@ -54,7 +54,7 @@
 				if(fun!=null){
 					fun();
 				}else{
-					TaskUtil.showTaskPanel(taskId);
+					TaskUtil.showTaskPanel(taskId,this);
 				}
 			}
 			

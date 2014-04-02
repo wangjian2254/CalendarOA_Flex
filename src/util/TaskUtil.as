@@ -8,6 +8,8 @@ package util
 	
 	import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
+	
+	import uicontrol.TaskItem;
 
 	public class TaskUtil
 	{
@@ -66,7 +68,7 @@ package util
 			}
 		}
 		
-		public static function showTaskPanel(scheduleId:String):void{
+		public static function showTaskPanel(scheduleId:String,taskItem:TaskItem=null):void{
 			var taskData:Object = ToolUtil.getTask(scheduleId);
 				
 			if(showTask.hasOwnProperty(scheduleId)){
@@ -85,6 +87,7 @@ package util
 					PopUpManager.centerPopUp(showTask[scheduleId]);
 					
 			}
+			showTask[scheduleId].taskItem=taskItem;
 		}
 	}
 }

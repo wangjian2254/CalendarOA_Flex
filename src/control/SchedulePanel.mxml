@@ -59,6 +59,8 @@
 //			private var warninglist2:ArrayCollection = new ArrayCollection([{"value":0,"text":"当天"},{"value":24*60,"text":"提前一天"},{"value":24*60*2,"text":"提前二天"},{"value":24*60*3,"text":"提前三天"},{"value":24*60*4,"text":"提前四天"},{"value":24*60*7,"text":"提前一星期"}]);
 			[Bindable]
 			private var endtimelist:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var grouplist:ArrayCollection = new ArrayCollection();
 			
 			[Bindable]
 			private var contactsList:ArrayCollection =null;
@@ -80,7 +82,20 @@
 			
 			public function init():void{
 				_isinit = true;
+				grouplist.removeAll();
+				for each(var g:Object in ToolUtil.groupList){
+					if(g.pem!="look"){
+						grouplist.addItem(g);
+					}
+				}
 				dopanel.visible = (schedulData==null||schedulData.author==ToolUtil.sessionUser.username)?true:false;
+				if(dopanel.visible==false&&schedulData!=null){
+					for each(g in grouplist){
+						if(g.id==schedulData.group){
+							dopanel.visible=true;
+						}
+					}
+				}
 				if(dopanel.visible){
 					contactsList = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 				}else{
@@ -620,7 +635,6 @@
 			
 			private function openAddress():void{
 				var obj:Object=new Object();
-//				obj['test']="测试";
 				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
 				FlexGlobals.topLevelApplication.dispatchEvent(evt);
 			}
@@ -774,7 +788,7 @@
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
 		<s:Label text="分组：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<mx:ComboBox id="group" dataProvider="{ToolUtil.groupList}" labelField="name" width="190" >
+		<mx:ComboBox id="group" dataProvider="{grouplist}" labelField="name" width="190" >
 			
 		</mx:ComboBox>
 		
