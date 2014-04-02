@@ -95,6 +95,10 @@
 						username.push(item.username);
 					}
 				}
+				if(username.length==0){
+					Alert.show("请选择用户","警告");
+					return;
+				}
 				data["usernames"] = username;
 				data["do"] = "join";
 				HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);

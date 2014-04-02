@@ -48,8 +48,10 @@
 					showCalendar();
 				}else{
 					regetGroup();
+					changeShowModel();
 				}
 				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
+				ToolUtil.groupList.addEventListener(CollectionEvent.COLLECTION_CHANGE,regetGroup);
 				taskChange(null);
 			}
 			
@@ -99,6 +101,7 @@
 				
 				mygrouppanel.removeAllElements();
 				joingrouppanel.removeAllElements();
+				lookgrouppanel.removeAllElements();
 				
 				var groupItem:GroupItem=null;
 				var obj:Object = null;
@@ -126,7 +129,7 @@
 			joingrouppanel.invalidateSize()
 			lookgrouppanel.invalidateSize()
 			datePanel.invalidateSize();
-			changeShowModel();
+			
 			}
 			
 			public function showGroup(group:GroupItem,g:Object):void{
@@ -139,15 +142,27 @@
 				}
 				
 				var dayItem:DayItem=null;
-				for(var  i:Number=0;i<100;i++){
-					if(calendarPanel.numElements-1<i){
-						break;
-					}else{
-						dayItem = calendarPanel.getElementAt(i) as DayItem;
+				for(var  i:Number=1;i<50;i++){
+					if(calendarPanel.numElements-1>=i){
+						
+						dayItem = calendarPanel.getElementAt(i-1) as DayItem;
 						
 						dayItem.showSchedule(g.id,group.isshow);
 						
 					}
+					if(calendarBorder.numElements-1>=i){
+						dayItem = calendarBorder.getElementAt(i) as DayItem;
+						
+						dayItem.showSchedule(g.id,group.isshow);
+						
+					}
+					if(daySchedule.numElements-1>=i){
+						dayItem = daySchedule.getElementAt(i) as DayItem;
+						
+						dayItem.showSchedule(g.id,group.isshow);
+						
+					}
+
 				}
 			}
 			
@@ -588,7 +603,7 @@
 								
 							</s:HorizontalLayout>
 						</s:layout>
-						<s:Button chromeColor="red" label="创建日程" color="#ffffff" fontWeight="bold"  height="25" click="createSchedule()" />
+						<s:Button chromeColor="red" label="创建日程" color="#ffffff"   height="25" click="createSchedule()" />
 						<s:BorderContainer width="100%" height="30" borderVisible="false">
 							<s:layout>
 								<s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="3">
@@ -604,14 +619,14 @@
 					</s:Label>
 					<mx:DateChooser id="dateChooser" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 					
-					<s:Label id="mytasklbl" text="我的备忘" fontSize="18" fontWeight="bold" paddingTop="10" >
+					<s:Label id="mytasklbl" text="我的备忘" fontSize="18"  paddingTop="10" >
 					</s:Label>
 					<uicontrol:ScheduleItem id="mytask" color="#fad165" scheduleName="备忘" fun="showTask"/>
 					<s:BorderContainer width="100%" height="30" borderVisible="false" >
 						<s:layout>
 							<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 						</s:layout>
-						<s:Label text="我的分组：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+						<s:Label text="我的分组：" fontSize="18"  paddingTop="10"/>
 						<s:BorderContainer  width="100%" height="30" borderVisible="false" >
 							<s:layout>
 								<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
@@ -627,7 +642,7 @@
 							</s:VerticalLayout>
 						</s:layout>
 					</s:BorderContainer>
-					<s:Label id="myjoingrouplbl" text="参与的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
+					<s:Label id="myjoingrouplbl" text="参与的分组" fontSize="18"  paddingTop="10" >
 					</s:Label>
 					<s:BorderContainer id="joingrouppanel" width="100%" borderVisible="false"  >
 						<s:layout>
@@ -635,7 +650,7 @@
 							</s:VerticalLayout>
 						</s:layout>
 					</s:BorderContainer>
-					<s:Label text="分享的分组" fontSize="18" fontWeight="bold" paddingTop="10" >
+					<s:Label text="分享的分组" fontSize="18"  paddingTop="10" >
 					</s:Label>
 					<s:BorderContainer id="lookgrouppanel" width="100%" borderVisible="false"  >
 						<s:layout>
@@ -728,7 +743,7 @@
 								
 							</s:HorizontalLayout>
 						</s:layout>
-						<s:Label text="我的备忘" fontSize="18" fontWeight="bold" paddingTop="10" >
+						<s:Label text="我的备忘" fontSize="18"  paddingTop="10" >
 						</s:Label>
 						<s:BorderContainer   width="100%" height="25" borderVisible="false" backgroundAlpha="0">
 							<s:layout>

@@ -28,8 +28,6 @@
 			
 			
 			[Bindable]
-			private var list:ArrayCollection=new ArrayCollection();
-			[Bindable]
 			private var joinlist:ArrayCollection=new ArrayCollection();
 			[Bindable]
 			private var observerlist:ArrayCollection=new ArrayCollection();
@@ -38,7 +36,7 @@
 			
 			override public   function  init(e:FlexEvent):void{
 				
-				
+				add();
 				
 				
 			}
@@ -47,87 +45,7 @@
 				
 			}
 			
-			private function getDataResult(o:Object,e:ResultEvent):void{
-				if(o&&o.success){
-					list = new ArrayCollection(o.result as Array);
-				}
-				
-			}
-			public function initpassword(e:Event):void{
-				var data:Object=getData();
-				if(data==null){
-					return;
-				}
-				HttpServiceUtil.getCHTTPServiceAndResult("/ft/initUser",initUserResult,"POST").send(data);
-			}
 			
-			private function initUserResult(result:Object,e:ResultEvent):void{
-				if(result.success){
-					Alert.show(result.message,"提示");
-				}
-			}
-			
-			
-			public function getData():Object{
-				var o:Object={};
-				
-				
-				return o;
-			}
-			
-			private function delContactAsk():void{
-				
-				Alert.show("确认移除选中的联系人?", "提示", Alert.YES | Alert.NO, null, delContact);
-				
-			}
-			//删除日程
-			private function delContact(e:mx.events.CloseEvent):void
-			{
-				if (e.detail == Alert.YES){
-					var data:Object=new Object();
-					var username:Array = new Array();
-					for each(var item:Object in ToolUtil.contactsList){
-						if(item.selected){
-							username.push(item.username);
-						}
-					}
-					data["usernames"] = username;
-					data["do"] = "out";
-					HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
-					
-					
-				}
-			}
-			private function addContact():void{
-				var data:Object=new Object();
-				var username:Array = new Array();
-				for each(var item:Object in list){
-					if(item.selected){
-						username.push(item.username);
-					}
-				}
-				data["usernames"] = username;
-				data["do"] = "join";
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
-				
-			}
-			private function search():void{
-				var data:Object=new Object();
-				data["key"] = key.text;
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/findUser",searchResult,"POST").send(data);
-				
-			}
-			private function searchResult(result:Object,e:ResultEvent):void{
-				if(result.result){
-					list.removeAll();
-					list.addAll(new ArrayCollection(result.result as Array));
-				}
-				
-			}
-			
-			private function loadDataFault(e:FaultEvent):void{
-				Alert.show('操作失败',"提示");
-			}
 			
 			
 			
@@ -175,7 +93,6 @@
 				if(result.success){
 					add();
 					init(null);
-					//					InfoUtil.userRefresh(refreshScx);
 				}
 			}
 			
@@ -286,9 +203,13 @@
 				}
 			}
 			private function save():void{
+				if(groupTitle.text==""){
+					Alert.show("分组名称不能为空","警告");
+					return;
+				}
 				var obj:Object=null;
 				var data:Object=new Object();
-				if(groupData==null){
+				if(groupData!=null){
 					data["id"]=groupData.id;
 				}
 				data["name"]=groupTitle.text;
@@ -301,7 +222,7 @@
 				for each(obj in observerlist){
 					data["observers"].push(obj.username);
 				}
-				HttpServiceUtil.getCHTTPServiceAndResult("/ft/updateGroup",saveResult,"POST").send(data);
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateGroup",saveResult,"POST").send(data);
 			}
 			private function saveResult(result:Object,e:ResultEvent):void{
 				if(result.success){
@@ -343,8 +264,7 @@
 						
 					</s:HorizontalLayout>
 				</s:layout>
-				<s:Label text="查找：" />
-				<s:TextInput width="100" id="key" />
+				
 				<s:Button chromeColor="red" color="#ffffff" label="新建分组" height="25" click="add()" />
 			</s:BorderContainer>
 			<uicontrol:MarkAdvancedDataGrid id="groupGrid" dataProvider="{ToolUtil.groupList}" itemClick="show()"  isNewAdd="false" enabled="true" editable="true" width="100%" height="100%">
@@ -361,21 +281,21 @@
 				
 			</uicontrol:MarkAdvancedDataGrid>
 		</s:BorderContainer>
-		<s:Form width="70%" height="100%">
-			<s:FormItem label="分组名称" >
+		<s:Form width="70%" height="100%"  >
+			<s:FormItem label="分组名称："  >
 				<s:TextInput id="groupTitle" width="200"/>
 			</s:FormItem>
-			<s:FormItem label="颜色标示" >
+			<s:FormItem label="颜色标示：" >
 				<mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" 
 								symbolColor="#030002">
 					
 				</mx:ColorPicker>
 			</s:FormItem>
-			<s:FormItem label="参与者" >
+			<s:FormItem label="参与者：" >
 				<s:layout>
 					<s:HorizontalLayout gap="5"/>
 				</s:layout>
-				<s:BorderContainer width="40%" height="250" borderVisible="false">
+				<s:BorderContainer width="40%" height="220" borderVisible="false">
 					<s:layout>
 						<s:VerticalLayout gap="3">
 							
@@ -407,13 +327,13 @@
 						</mx:columns>
 					</mx:DataGrid>
 				</s:BorderContainer>
-				<s:BorderContainer width="40%" height="250" borderVisible="false">
+				<s:BorderContainer width="40%" height="220" borderVisible="false">
 					<s:layout>
 						<s:VerticalLayout gap="3">
 							
 						</s:VerticalLayout>
 					</s:layout>
-					<s:Label text="参与者（可创建、修改日程）" width="80"  textAlign="right" height="30" verticalAlign="middle" />
+					<s:Label text="参与者（可创建、修改日程）" height="30" verticalAlign="middle" />
 					
 					<mx:DataGrid width="100%" height="100%" id="joingrid" dataProvider="{joinlist}" doubleClickEnabled="true" itemDoubleClick="joinuser(false)">
 						<mx:columns>
@@ -427,25 +347,30 @@
 					</mx:DataGrid>
 				</s:BorderContainer>
 			</s:FormItem>
-			<s:FormItem label="共享者" >
+			<s:FormItem label="共享者：" >
 				<s:layout>
-					<s:VerticalLayout gap="3">
+					<s:HorizontalLayout gap="3">
 						
-					</s:VerticalLayout>
+					</s:HorizontalLayout>
 				</s:layout>
-				<s:BorderContainer width="100%" height="30" borderVisible="false" >
+				<s:BorderContainer width="40%" height="220" borderVisible="false" >
 					<s:layout>
-						<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+						<s:VerticalLayout gap="5" verticalAlign="middle"/>
 					</s:layout>
-					<s:Label text="常用联系人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-					<s:BorderContainer  width="100%" height="30" borderVisible="false" >
+					<s:BorderContainer width="100%" height="30" borderVisible="false" >
 						<s:layout>
-							<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
+							<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 						</s:layout>
-						
-						<uicontrol:BtnSetting clickFun="openAddress" />
-						<uicontrol:BtnRefresh clickFun="ToolUtil.contactsRefresh"  />
-						
+						<s:Label text="常用联系人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+						<s:BorderContainer  width="100%" height="30" borderVisible="false" >
+							<s:layout>
+								<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
+							</s:layout>
+							
+							<uicontrol:BtnSetting clickFun="openAddress" />
+							<uicontrol:BtnRefresh clickFun="ToolUtil.contactsRefresh"  />
+							
+						</s:BorderContainer>
 					</s:BorderContainer>
 					
 					<mx:DataGrid width="100%" height="100%" id="allContactGrid2" dataProvider="{ToolUtil.contactsList}" doubleClickEnabled="true" itemDoubleClick="joinuser2(true)">
@@ -459,13 +384,13 @@
 						</mx:columns>
 					</mx:DataGrid>
 				</s:BorderContainer>
-				<s:BorderContainer width="40%" height="250" borderVisible="false">
+				<s:BorderContainer width="40%" height="220" borderVisible="false">
 					<s:layout>
 						<s:VerticalLayout gap="3">
 							
 						</s:VerticalLayout>
 					</s:layout>
-					<s:Label text="共享者（只能看见日程）" width="80"  textAlign="right" height="30" verticalAlign="middle" />
+					<s:Label text="共享者（只能看见日程）"  height="30" verticalAlign="middle" />
 					
 					<mx:DataGrid width="100%" height="100%" id="observergrid" dataProvider="{observerlist}" doubleClickEnabled="true" itemDoubleClick="joinuser2(false)">
 						<mx:columns>
@@ -480,6 +405,11 @@
 				</s:BorderContainer>
 			</s:FormItem>
 			<s:FormItem  >
+				<s:layout>
+					<s:HorizontalLayout gap="3">
+						
+					</s:HorizontalLayout>
+				</s:layout>
 				<s:Button label="保存" chromeColor="#ff0000" color="#ffffff" height="25" id="btnSave" click="save()" />
 				<s:Button label="删除" chromeColor="#cccccc" color="#000000" height="25" id="btnDel" click="askdel()" />
 				<s:Button label="退出" chromeColor="#ff0000" color="#ffffff" height="25" id="btnQuit" click="askquit()" />

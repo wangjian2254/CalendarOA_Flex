@@ -55,6 +55,9 @@
 //					Alert.show("修改密码失败","提示");
 				}
 			}
+			private function foucePass():void{
+				password.setFocus();
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -64,13 +67,13 @@
 	<s:Form width="100%" id="form" >
 		
 		<s:FormItem label="用户名:" textAlign="right">
-			<s:TextInput id="username" width="200"  text="">
+			<s:TextInput id="username" width="200"  text="" tabIndex="1" enter="foucePass()">
 				
 			</s:TextInput>
 		</s:FormItem>
 		
 		<s:FormItem label="密码:" textAlign="right">
-			<s:TextInput id="password" displayAsPassword="true"  width="200">
+			<s:TextInput id="password" displayAsPassword="true"  width="200" tabIndex="2" enter="save()">
 				
 			</s:TextInput>
 		</s:FormItem>
@@ -79,10 +82,10 @@
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
-				<s:Button label="登录" click="save()" chromeColor="red" color="#ffffff" height="25">
+				<s:Button label="登录" click="save()" chromeColor="red" color="#ffffff" height="25" tabIndex="3">
 					
 				</s:Button>
-				<s:Button label="注册" click="reg()" chromeColor="#ffffff" color="#000000" height="25">
+				<s:Button label="注册" click="reg()" chromeColor="#ffffff" color="#000000" height="25" tabIndex="4">
 					
 				</s:Button>
 			

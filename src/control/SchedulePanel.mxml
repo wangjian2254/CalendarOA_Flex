@@ -120,6 +120,14 @@
 				}
 				
 				if(schedulData!=null){
+					if(schedulData.author==ToolUtil.sessionUser.username){
+						authorpanel.height=0;
+						authorpanel.visible=false;
+					}else{
+						authorpanel.height=30;
+						authorpanel.visible=true;
+						authorlbl.text = schedulData.author+':'+schedulData.authornickname;
+					}
 					if(schedulData.is_all_day){
 						is_all_day.selected = schedulData.is_all_day;
 						startDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
@@ -598,7 +606,7 @@
 			
 			private function resize():void{
 //				this.height = schedulePanel.height;
-				this.height = baseHeight+dayPanel.height+alldaywarning.height+alldaywarning0.height+alldaywarning1.height+alldaywarning2.height;
+				this.height = baseHeight+dayPanel.height+alldaywarning.height+alldaywarning0.height+alldaywarning1.height+alldaywarning2.height+authorpanel.height;
 				this.invalidateSize();
 			}
 			
@@ -859,6 +867,15 @@
 		<s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
 		<s:Label text="分"  height="25" verticalAlign="middle" />
 		<s:CheckBox  id="needSecond2" selected="true"/>
+	</s:BorderContainer>
+	<s:BorderContainer id="authorpanel" width="100%" height="30" borderVisible="false"  >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		
+		<s:Label text="创建者：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label id="authorlbl" text=""  height="25" verticalAlign="middle" />
+		
 	</s:BorderContainer>
 	<s:BorderContainer id="dopanel"  width="100%" height="30" borderVisible="false"  >
 		<s:layout>

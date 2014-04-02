@@ -76,8 +76,16 @@ package util
 				PopUpManager.bringToFront(showSchedule[scheduleId]);
 				PopUpManager.centerPopUp(showSchedule[scheduleId]);
 			}else{
-				
-				if(scheduleData.author==ToolUtil.sessionUser.username){
+				var b:Boolean=false;
+				for each(var obj:Object in ToolUtil.groupList){
+					if(obj.id==scheduleData.group){
+						if(obj.pem!="look"){
+							b=true;
+						}
+						break;
+					}
+				}
+				if(b){
 					var s:SchedulePanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
 					showSchedule[scheduleId]=s;
 					s.schedulData = scheduleData;
