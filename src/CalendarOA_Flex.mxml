@@ -295,7 +295,7 @@
 		<s:layout>
 			<s:BasicLayout/>
 		</s:layout>
-		<s:Image source="assets/saaslogo.png" x="25" y="5"/>
+		<s:Image source="/static/image/logo.png" x="25" y="5" height="43"/>
 		
 		
 		<s:Group top="12" right="15" visible="false" id="userinfoGroup">
