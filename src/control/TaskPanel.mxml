@@ -176,6 +176,8 @@
 					}
 					if(index==1){
 						needSecond2.selected = false;
+					}else{
+						needSecond2.selected = true;
 					}
 					
 					titlestr = taskData.title;
@@ -417,7 +419,7 @@
 		<s:Label text="时间段：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 		<mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 		
-		<s:Label text="到" height="100%" verticalAlign="middle"  />
+		<s:Label text="到" height="100%" verticalAlign="middle" visible="{endDate.visible}"  />
 		<mx:DateField id="endDate" width="100"  selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 		
 	</s:BorderContainer>
