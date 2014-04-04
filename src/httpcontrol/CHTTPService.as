@@ -15,6 +15,9 @@ package httpcontrol
 	
 	public class CHTTPService extends HTTPService
 	{
+		
+		public static var baseUrl:String="";
+		
 		public function CHTTPService(rootURL:String=null, destination:String=null)
 		{
 			super(rootURL, destination);
@@ -37,6 +40,7 @@ package httpcontrol
 		{
 			try{
 				this.loading.showIn();
+				this.url=baseUrl+this.url;
 				if(this.url.indexOf("?")!=-1){
 					this.url+="&requesttimestr="+(new Date()).toString();
 				}else{

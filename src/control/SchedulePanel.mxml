@@ -119,7 +119,16 @@
 					cbrtx.enabled = true;
 				}
 				
+				btnDel.visible=false;
 				if(schedulData!=null){
+					if(schedulData.zentaourl){
+						btnGo.visible=true;
+						btnDel.visible=false;
+					}else{
+						btnGo.visible=false;
+						btnDel.visible=true;
+						
+					}
 					if(schedulData.author==ToolUtil.sessionUser.username){
 						authorpanel.height=0;
 						authorpanel.visible=false;
@@ -405,6 +414,7 @@
 					titlestr = schedulData.title;
 					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
 					ScheduleUtil.clearNewSchedule();
+					init();
 				}
 			}
 			
@@ -663,6 +673,14 @@
 				changeUsers();
 			}
 			
+			private function gotoZentao():void{
+				if(schedulData.zentaourl){
+					var request:URLRequest=new URLRequest(schedulData.zentaourl);  
+					navigateToURL(request,"_blank");
+					return;
+				}
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -883,7 +901,8 @@
 		</s:layout>
 		
 		<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
-		<s:Button chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
+		<s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
+		<s:Button id="btnGo" chromeColor="#ff0000" label="去禅道查看详情" height="25" color="#ffffff" click="gotoZentao()" />
 		</s:BorderContainer>
 		
 	</s:BorderContainer>

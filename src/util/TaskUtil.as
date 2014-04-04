@@ -72,7 +72,7 @@ package util
 			var taskData:Object = ToolUtil.getTask(scheduleId);
 				
 			if(showTask.hasOwnProperty(scheduleId)){
-				showTask[scheduleId].schedulData = taskData;
+				showTask[scheduleId].taskData = taskData;
 				if(showTask[scheduleId].isinit){
 					showTask[scheduleId].init();
 				}

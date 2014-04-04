@@ -8,6 +8,8 @@
 			import events.ChangeMenuEvent;
 			import events.ChangeUserEvent;
 			
+			import flash.net.navigateToURL;
+			
 			import httpcontrol.HttpServiceUtil;
 			import httpcontrol.RemoteUtil;
 			
@@ -100,9 +102,15 @@
 				
 				if(taskData!=null){
 					startDateValue = DateField.stringToDate(taskData.startdate,"YYYYMMDD");
-					endDateValue = DateField.stringToDate(taskData.startdate,"YYYYMMDD");
+//					endDateValue = DateField.stringToDate(taskData.startdate,"YYYYMMDD");
 					startDate.selectedDate = startDateValue;
-					endDate.selectedDate = DateField.stringToDate(taskData.enddate,"YYYYMMDD")
+					if (taskData.enddate){
+						endDate.selectedDate = DateField.stringToDate(taskData.enddate,"YYYYMMDD");
+						endDateValue=endDate.selectedDate;
+					}else{
+						endDate.selectedDate =null;
+						endDateValue=null;
+					}
 					
 					if(taskData.id){
 						delbtn.visible=true;
@@ -110,14 +118,25 @@
 					if(!taskData.status){
 						donook.visible=false;
 						dook.visible=true;
+						if(taskData.zentaourl){
+							
+							dook.label="去禅道查看详情";
+							delbtn.visible=false;
+						}
 					}else{
-						donook.visible=true;
+						if(taskData.zentaourl){
+							delbtn.visible=false;
+							
+							donook.visible=false;
+						}else{
+							donook.visible=true;
+						}
 						dook.visible=false;
 						
 					}
 					
 					
-					taskData.text = taskData.title;
+					taskTitle.text = taskData.title;
 					desc.text = taskData.desc;
 					
 					
@@ -345,6 +364,11 @@
 			
 			
 			private function dotask(f:Boolean):void{
+				if(taskData.zentaourl){
+					var request:URLRequest=new URLRequest(taskData.zentaourl);  
+					navigateToURL(request,"_blank");
+					return;
+				}
 				var obj:Object = new Object();
 				obj["id"]=taskData.id;
 				obj["do"]=f;
@@ -353,7 +377,11 @@
 			
 			private function doResult(result:Object,e:ResultEvent):void{
 				if(result.success){
-					taskData.status=true;
+					if(taskData.status){
+						taskData.status=false;
+					}else{
+						taskData.status=true;
+					}
 					init();
 				}
 			}

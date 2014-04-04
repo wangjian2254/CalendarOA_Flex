@@ -20,6 +20,7 @@
 			import control.UserControl;
 			
 			import events.ChangeMenuEvent;
+			import events.ChangeUserEvent;
 			
 			import httpcontrol.HttpServiceUtil;
 			import httpcontrol.RemoteUtil;
@@ -48,6 +49,17 @@
 			import util.ToolUtil;
 			import util.UserUtil;
 			public function init():void{
+				if(this is Application){
+					loginBtnPanel2.removeElement(closeAppBtn2);
+					loginBtnPanel.removeElement(closeAppBtn1);
+					loginBtnPanel2.removeElement(closeAppLine2);
+					loginBtnPanel.removeElement(closeAppLine1);
+					loginBtnPanel.invalidateSize();
+					loginBtnPanel.invalidateDisplayList();
+					loginBtnPanel2.invalidateSize();
+					loginBtnPanel2.invalidateDisplayList();
+				}
+				
 				ToolUtil.currentUserFun = currentUser;
 //				ToolUtil.init();
 				ToolUtil.sessionUserRefresh(currentUser);
@@ -283,6 +295,13 @@
 //				changepassword.x=(this.width-changepassword.width)/2;
 //				changepassword.y=(this.height-changepassword.height)/2;
 			}
+			public function quite():void{
+				
+			}
+			
+			public function reLogin():void{
+				FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+			}
 			
 		]]>
 	</fx:Script>
@@ -302,8 +321,8 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
-			<s:Label text="用户名:{ToolUtil.sessionUser.username} | 用户:{ToolUtil.sessionUser.nickname}" styleName="textStyle2"/>	
-			<s:SkinnableContainer  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
+			<s:Label text="用户:{ToolUtil.sessionUser.nickname} | 用户名:{ToolUtil.sessionUser.username}" styleName="textStyle2"/>	
+			<s:SkinnableContainer  id="loginBtnPanel"  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
@@ -313,6 +332,9 @@
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>
+				<s:Label text="|" styleName="textStyle1" id="closeAppLine1"/>
+				<mx:LinkButton x="0" y="2" height="25" label="关闭程序" id="closeAppBtn1" styleName="textStyle1" visible="true" click="quite()"/>
+				
 			</s:SkinnableContainer>
 			
 		</s:Group>
@@ -320,7 +342,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
-			<s:SkinnableContainer  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
+			<s:SkinnableContainer  id="loginBtnPanel2" height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
@@ -328,6 +350,8 @@
 				<mx:LinkButton x="0" y="2" height="25" label="登录"  styleName="textStyle1" click="login()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="注册" styleName="textStyle1" click="reg()"/>
+				<s:Label text="|" styleName="textStyle1"  id="closeAppLine2"/>
+				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  id="closeAppBtn2" styleName="textStyle1" visible="true" click="quite()"/>
 			</s:SkinnableContainer>
 			
 		</s:Group>
@@ -349,7 +373,7 @@
 			<s:Label text="当前位置： " left="20" top="8" styleName="textStyle3"/>
 			<s:Label id="website" left="85" top="8" styleName="textStyle3"/>
 			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" top="0" bottom="0" left="0" right="0" textAlign="center" verticalAlign="middle" />
-			<mx:LinkButton label="重置页面" visible="false" top="3" right="12" color="0x353535"/>
+			<mx:LinkButton label="刷新页面数据" visible="true" click="reLogin()" top="3" right="12" color="0x353535"/>
 		</s:SkinnableContainer>		
 	</s:Group>
 	

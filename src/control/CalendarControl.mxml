@@ -538,7 +538,7 @@
 					mytask.color = 0xffffff;
 				}else{
 					mytask.color = 0xfad165;
-					taskPanel.width=200;
+					taskPanel.width=250;
 					
 				}
 				resize(null,false);
@@ -730,7 +730,7 @@
 			
 				
 		</s:BorderContainer>
-		<s:Scroller id="taskPanel"  width="200" height="100%">
+		<s:Scroller id="taskPanel"  width="250" height="100%">
 			<s:Group>
 				<s:BorderContainer width="100%" borderVisible="false" >
 					<s:layout>
