@@ -471,7 +471,7 @@
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
 		<s:Label text="未完成提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:CheckBox id="cbrtx" label="RTX腾讯通" selected="true" change="warningChange()" />
+		<s:CheckBox id="cbrtx" label="RTX腾讯通" change="warningChange()" />
 		<s:CheckBox id="cbsms" label="手机短信"  change="warningChange()" />
 		<s:CheckBox id="cbemail" label="email"  change="warningChange()" />
 	</s:BorderContainer>

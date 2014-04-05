@@ -151,6 +151,8 @@ package util
 		
 		[Bindable]
 		public static var groupList:ArrayCollection=new ArrayCollection();
+		[Bindable]
+		public static var groupColor:Object=new Object();
 		
 		public static function groupRefresh(fun:Function=null):void{
 			
@@ -168,6 +170,9 @@ package util
 			if(result.success==true){
 				groupList.removeAll();
 				groupList.addAll(new ArrayCollection(result.result as Array));
+				for each(var item:Object in groupList){
+					groupColor[""+item.id]=item.color;
+				}
 			}
 		}
 		[Bindable]

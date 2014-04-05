@@ -283,7 +283,6 @@
 			
 			public function logout():void{
 				HttpServiceUtil.getCHTTPServiceAndResult("/ca/logout",currentUser,"POST").send();
-				Alert.show("您已经退出","提示");
 			}
 			
 			

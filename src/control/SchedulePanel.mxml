@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="750" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()" xmlns:uicontrol="uicontrol.*">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="750" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()"  xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
@@ -135,7 +135,9 @@
 					}else{
 						authorpanel.height=30;
 						authorpanel.visible=true;
-						authorlbl.text = schedulData.author+':'+schedulData.authornickname;
+						if(schedulData.author){
+							authorlbl.text = schedulData.author+':'+schedulData.authornickname;
+						}
 					}
 					if(schedulData.is_all_day){
 						is_all_day.selected = schedulData.is_all_day;
@@ -832,7 +834,7 @@
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
 		<s:Label text="提醒方式：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:CheckBox id="cbrtx" label="RTX腾讯通" selected="true" change="warningChange()" />
+		<s:CheckBox id="cbrtx" label="RTX腾讯通" change="warningChange()" />
 		<s:CheckBox id="cbsms" label="手机短信"  change="warningChange()" />
 		<s:CheckBox id="cbemail" label="email"  change="warningChange()" />
 	</s:BorderContainer>
@@ -892,7 +894,7 @@
 		</s:layout>
 		
 		<s:Label text="创建者：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:Label id="authorlbl" text=""  height="25" verticalAlign="middle" />
+		<s:Label id="authorlbl" text="{ToolUtil.sessionUser.username}:{ToolUtil.sessionUser.nickname}"  height="25" verticalAlign="middle" />
 		
 	</s:BorderContainer>
 	<s:BorderContainer id="dopanel"  width="100%" height="30" borderVisible="false"  >
@@ -902,7 +904,7 @@
 		
 		<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
 		<s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
-		<s:Button id="btnGo" chromeColor="#ff0000" label="去禅道查看详情" height="25" color="#ffffff" click="gotoZentao()" />
+		<s:Button id="btnGo" chromeColor="#ff0000" label="去禅道查看详情" visible="false" height="25" color="#ffffff" click="gotoZentao()" />
 		</s:BorderContainer>
 		
 	</s:BorderContainer>

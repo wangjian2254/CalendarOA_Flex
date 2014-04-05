@@ -48,7 +48,6 @@
 			}
 			public function refresh(r:Object,e:ResultEvent):void{
 				if(r.success){
-					Alert.show("注册成功","提示");
 					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
 					closeWin();
 				}else{
@@ -67,7 +66,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="username" width="200"  text="">
+			<s:TextInput id="username" width="200"  text="" tabIndex="1">
 				
 			</s:TextInput>
 			<s:Label text="*" color="red" />
@@ -76,7 +75,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="truename"   width="200">
+			<s:TextInput id="truename"   width="200"  tabIndex="2">
 				
 			</s:TextInput>
 			<s:Label text="*" color="red" />
@@ -85,7 +84,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="password" displayAsPassword="true"  width="200">
+			<s:TextInput id="password" displayAsPassword="true"  width="200"  tabIndex="3">
 				
 			</s:TextInput>
 			<s:Label text="*" color="red" />
@@ -94,7 +93,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="rpassword" displayAsPassword="true"  width="200">
+			<s:TextInput id="rpassword" displayAsPassword="true"  width="200"  tabIndex="4">
 				
 			</s:TextInput>
 			<s:Label text="*" color="red" />
@@ -103,19 +102,19 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="rtx"  width="200">
+			<s:TextInput id="rtx"  width="200"  tabIndex="5">
 				
 			</s:TextInput>
 			<s:Label text="日程提醒需要使用" color="red" />
 		</s:FormItem>
 		<s:FormItem label="电子邮箱:" textAlign="right">
-			<s:TextInput id="email"   width="200">
+			<s:TextInput id="email"   width="200"  tabIndex="6">
 				
 			</s:TextInput>
 		</s:FormItem>
 		
 		<s:FormItem label="手机号:" textAlign="right">
-			<s:TextInput id="sms"   width="200">
+			<s:TextInput id="sms"   width="200"  tabIndex="7">
 				
 			</s:TextInput>
 		</s:FormItem>
@@ -123,13 +122,13 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="zentaoaccount"   width="200">
+			<s:TextInput id="zentaoaccount"   width="200"  tabIndex="8">
 				
 			</s:TextInput>
 			<s:Label text="配合项目开发使用" color="red" />
 		</s:FormItem>
 		<s:FormItem label="禅道密码:" textAlign="right">
-			<s:TextInput id="zentaopassword"   width="200">
+			<s:TextInput id="zentaopassword"   width="200"  tabIndex="9">
 				
 			</s:TextInput>
 		</s:FormItem>
@@ -137,7 +136,7 @@
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
-				<s:Button label="提交" click="save()" chromeColor="red" color="#ffffff" height="25">
+				<s:Button label="提交" click="save()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
 					
 				</s:Button>
 				<s:Button label="放弃" click="closeWin()" chromeColor="#ffffff" color="#000000" height="25">
