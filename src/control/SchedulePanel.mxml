@@ -409,10 +409,10 @@
 			
 			private function saveResult(result:Object,e:ResultEvent):void{
 				if(result.success){
-					if(schedulData==null){
-						schedulData = getData();
-					}
-					schedulData.id = result.result;
+//					if(schedulData==null){
+//						schedulData = getData();
+//					}
+					schedulData = result.result;
 					titlestr = schedulData.title;
 					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
 					ScheduleUtil.clearNewSchedule();

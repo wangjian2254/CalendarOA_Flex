@@ -77,7 +77,6 @@ package httpcontrol
 					}
 				}catch(error:Error){
 					
-					Alert.show(e.result.toString,"警告");
 					Alert.show("系统错误","警告");
 				}
 					
