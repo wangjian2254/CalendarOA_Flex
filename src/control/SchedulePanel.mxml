@@ -671,6 +671,7 @@
 					}
 				}
 				contactsList = contacts;
+				joinUserGrid.invalidateList();
 				
 				changeUsers();
 			}
