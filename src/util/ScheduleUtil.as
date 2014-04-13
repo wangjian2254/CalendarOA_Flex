@@ -36,7 +36,7 @@ package util
 			}
 				
 			PopUpManager.bringToFront(newSchedule);
-			PopUpManager.centerPopUp(newSchedule);
+//			PopUpManager.centerPopUp(newSchedule);
 		}
 		
 		public static function clearNewSchedule():void{
@@ -58,7 +58,7 @@ package util
 			if(showSchedule.hasOwnProperty(scheduleId)){
 				showSchedule[scheduleId].schedulData = scheduleData;
 				if(showSchedule[scheduleId].isinit){
-					showSchedule[scheduleId].init();
+					showSchedule[scheduleId].init(false);
 				}
 //				PopUpManager.bringToFront(showSchedule[scheduleId]);
 //				PopUpManager.centerPopUp(showSchedule[scheduleId]);
@@ -74,7 +74,7 @@ package util
 					showSchedule[scheduleId].init();
 				}
 				PopUpManager.bringToFront(showSchedule[scheduleId]);
-				PopUpManager.centerPopUp(showSchedule[scheduleId]);
+//				PopUpManager.centerPopUp(showSchedule[scheduleId]);
 			}else{
 				var b:Boolean=false;
 				for each(var obj:Object in ToolUtil.groupList){
@@ -90,14 +90,14 @@ package util
 					showSchedule[scheduleId]=s;
 					s.schedulData = scheduleData;
 					PopUpManager.bringToFront(showSchedule[scheduleId]);
-					PopUpManager.centerPopUp(showSchedule[scheduleId]);
+//					PopUpManager.centerPopUp(showSchedule[scheduleId]);
 					
 				}else{
 					var show:ScheduleShow = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,ScheduleShow,false) as ScheduleShow;
 					showSchedule[scheduleId]=show;
 					show.schedulData = scheduleData;
 					PopUpManager.bringToFront(showSchedule[scheduleId]);
-					PopUpManager.centerPopUp(showSchedule[scheduleId]);
+//					PopUpManager.centerPopUp(showSchedule[scheduleId]);
 					
 				}
 			}

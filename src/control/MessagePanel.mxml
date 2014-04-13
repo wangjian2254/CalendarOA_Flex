@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0">
+	<fx:Script>
+		<![CDATA[
+			import events.ChangeUserEvent;
+			import events.CloseEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			[Bindable]
+			private var buttonArr0:ArrayCollection=new ArrayCollection([{'label':'全部','mode':'all'},{'label':'未读信息','mode':'unread'},{'label':'已读信息','mode':'read'}]);
+			[Bindable]
+			private var buttonArr1:ArrayCollection=new ArrayCollection([{'label':'刷新','ico':refreshimg,'mode':'refresh'},{'label':'写信息','ico':wximg,'mode':'add'}]);
+			[Bindable]
+			private var buttonArr2:ArrayCollection=new ArrayCollection([{'label':'回复','ico':saveimg,'mode':'huifu'},{'label':'转发','ico':saveimg,'mode':'add'}]);
+			[Bindable]
+			private var buttonArr3:ArrayCollection=new ArrayCollection([{'label':'标记已读','ico':saveimg,'mode':'read'},{'label':'标记未读','ico':saveimg,'mode':'unread'}]);
+			
+			//新增，保存，删除的处理函数
+			private function clickHander(e:ItemClickEvent):void{
+				if(e.item.mode==''){
+				}
+				
+				
+			}
+			
+			private function showType():void{
+				
+			}
+			
+			override public   function  init(e:FlexEvent):void{
+				
+			}
+			
+			override public function changeCurrentUser(e:ChangeUserEvent):void{
+				
+			}
+			override public function closeContainer(e:CloseEvent):void{
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<control:layout>
+		<s:VerticalLayout gap="1" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5">
+			
+		</s:VerticalLayout>
+	</control:layout>
+	<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+		<s:layout>
+			<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:ButtonBar dataProvider="{buttonArr0}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showType()" >
+		</s:ButtonBar>
+		<mx:ButtonBar dataProvider="{buttonArr1}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
+		</mx:ButtonBar>
+		<mx:ButtonBar dataProvider="{buttonArr2}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
+		</mx:ButtonBar>
+		<mx:ButtonBar dataProvider="{buttonArr3}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
+		</mx:ButtonBar>
+	</s:BorderContainer>
+	<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
+		<s:layout>
+			<s:HorizontalLayout gap="2" verticalAlign="top">
+				
+			</s:HorizontalLayout>
+		</s:layout>
+		<s:DataGrid width="200" height="100%" rowHeight="100"  >
+			<s:columns>
+				<s:ArrayList>
+					<s:GridColumn dataField="title" headerText="按时间排序" >
+						<s:itemRenderer>
+							<fx:Component>
+								<s:GridItemRenderer>
+									<s:HGroup width="100%" height="100%" verticalAlign="middle">
+										
+										<s:BorderContainer visible="{data.is_read}" width="25" height="25" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
+											
+										</s:BorderContainer>
+										<s:VGroup width="100%" height="100%">
+											<s:Label width="100%" height="25" text="{data.authorname}" fontSize="15" color="#000000">
+												
+											</s:Label>
+											<s:Label width="100%" height="20" text="{data.title}" fontSize="13" color="#CCCCCC">
+												
+											</s:Label>
+											<s:TextArea editable="false" width="100%" text="{data.desc.substr(0,200)}" height="100%" fontSize="12" color="#ADADAD" >
+												
+											</s:TextArea>
+										</s:VGroup>
+									</s:HGroup>
+								</s:GridItemRenderer>
+								
+							</fx:Component>
+						</s:itemRenderer>
+					</s:GridColumn>
+				</s:ArrayList>
+			</s:columns>
+		</s:DataGrid>
+		<s:Scroller width="100%" height="100%">
+			<s:Group width="100%" height="100%">
+				<s:BorderContainer width="100%" height="100%">
+					
+				</s:BorderContainer>
+			</s:Group>
+		</s:Scroller>
+	</s:BorderContainer>
+</control:CBorderContainer>

@@ -171,9 +171,9 @@
 					
 				}
 				if(userArr.length>0){
-					ToolUtil.deptRefresh(refresh);
-					ToolUtil.areaRefresh(refresh);
-					ToolUtil.userRefresh(refresh);
+//					ToolUtil.deptRefresh(refresh);
+//					ToolUtil.areaRefresh(refresh);
+//					ToolUtil.userRefresh(refresh);
 					//					HttpServiceUtil.getCHTTPServiceAndResultAndFault("/htcsgl/_100_BaseInfosAction_deletedept.action",loadDataResult,loadDataFault,"POST").send(userArr);
 				}
 			}

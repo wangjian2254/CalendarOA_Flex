@@ -15,6 +15,7 @@
 			import control.GroupControl;
 			import control.Loading;
 			import control.LoginUser;
+			import control.MessagePanel;
 			import control.RegisterUser;
 			import control.UpdateUserInfo;
 			import control.UserControl;
@@ -253,6 +254,9 @@
 					case 'group':
 						c=new GroupControl();
 						break;
+					case 'message':
+						c=new MessagePanel();
+						break;
 					
 					
 				}
@@ -320,6 +324,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
+			<mx:LinkButton icon="{CBorderContainer.refreshimg}" label="{ToolUtil.unreadMessageNum} 未读消息" styleName="textStyle2" textDecoration="underline" />
 			<s:Label text="用户:{ToolUtil.sessionUser.nickname} | 用户名:{ToolUtil.sessionUser.username}" styleName="textStyle2"/>	
 			<s:SkinnableContainer  id="loginBtnPanel"  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
 				<s:layout>

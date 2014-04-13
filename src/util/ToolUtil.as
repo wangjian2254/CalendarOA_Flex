@@ -6,8 +6,10 @@ package util
 	import events.ChangeScheduleEvent;
 	import events.ChangeUserEvent;
 	
+	import flash.events.TimerEvent;
 	import flash.net.URLRequest;
 	import flash.net.navigateToURL;
+	import flash.utils.Timer;
 	
 	import httpcontrol.CHTTPService;
 	import httpcontrol.HttpServiceUtil;
@@ -34,6 +36,9 @@ package util
 		
 		public static var  currentUserFun:Function=null;
 		public static var loginUser:LoginUser= new LoginUser();
+		
+		private static var time:Timer = new Timer(1000*60*5,0);
+		
 		public static function init():void{
 //			hyRefresh();
 //			kjkmRefresh();
@@ -44,7 +49,11 @@ package util
 			contactsRefresh();
 //			taskRefresh();
 			taskUnRefresh();
-			
+			unreadMessageRefresh();
+			time.addEventListener(TimerEvent.TIMER,unreadMessageRefresh);
+			if(!time.running){
+				time.start();
+			}
 //			ruleRefresh();
 //			ticketRefresh();
 //			businessRefresh();
@@ -83,69 +92,25 @@ package util
 			 
 		}
 		
-		[Bindable]
-		public static var userList:ArrayCollection=new ArrayCollection();
 		
-		public static function userRefresh(fun:Function=null):void{
+		
+		[Bindable]
+		public static var unreadMessageNum:Number=new Number(0);
+		
+		public static function unreadMessageRefresh(fun:*=null):void{
 //			RemoteUtil.getOperationAndResult("getAllUser",resultAllUser).send();
-			if(fun==null){
-				HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_findall.action",resultAllUser,"POST").send()
+			if(fun==null||!(fun is Function)){
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getUnReadCount",resultUnReadMessageRefresh,"POST").send()
 //				RemoteUtil.getOperationAndResult("",resultAllUser,false).send();
 			}else{
-				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_findall.action",resultAllUser,"POST");
+				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getUnReadCount",resultUnReadMessageRefresh,"POST");
 				http.resultFunArr.addItem(fun);
 				http.send();
-				
 			}
 		}
-		public static function resultAllUser(result:Object,e:ResultEvent):void{
-			if(result.message.success==true){
-				userList.removeAll();
-				userList.addAll(new ArrayCollection(result.userslist as Array));
-			}
-		}
-		[Bindable]
-		public static var deptList:ArrayCollection=new ArrayCollection();
-		
-		public static function deptRefresh(fun:Function=null):void{
-			
-			if(fun==null){
-				HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_finddeptall.action",resultAllDept,"POST").send();
-//				RemoteUtil.getOperationAndResult("getAllDept",resultAllDept,false).send();
-			}else{
-				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_finddeptall.action",resultAllDept,"POST");
-				http.resultFunArr.addItem(fun);
-				http.send();
-				
-			}
-			
-		}
-		public static function resultAllDept(result:Object,e:ResultEvent):void{
-			if(result.message.success==true){
-				deptList.removeAll();
-				deptList.addAll(new ArrayCollection(result.deptvolist as Array));
-			}
-		}
-		[Bindable]
-		public static var areaList:ArrayCollection=new ArrayCollection();
-		
-		public static function areaRefresh(fun:Function=null):void{
-			
-			if(fun==null){
-				HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_findareaall.action",resultAllArea,"POST").send();
-//				RemoteUtil.getOperationAndResult("getAllDept",resultAllDept,false).send();
-			}else{
-				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("_100_BaseInfosAction_findareaall.action",resultAllArea,"POST");
-				http.resultFunArr.addItem(fun);
-				http.send();
-				
-			}
-			
-		}
-		public static function resultAllArea(result:Object,e:ResultEvent):void{
-			if(result.message.success==true){
-				areaList.removeAll();
-				areaList.addAll(new ArrayCollection(result.areapointvolist as Array));
+		public static function resultUnReadMessageRefresh(result:Object,e:ResultEvent):void{
+			if(result.success==true){
+				unreadMessageNum = new Number( result.result);
 			}
 		}
 		

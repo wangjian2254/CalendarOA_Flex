@@ -39,7 +39,7 @@ package util
 			}
 				
 			PopUpManager.bringToFront(newTask);
-			PopUpManager.centerPopUp(newTask);
+//			PopUpManager.centerPopUp(newTask);
 		}
 		
 		public static function clearNewTask():void{
@@ -61,7 +61,7 @@ package util
 			if(showTask.hasOwnProperty(scheduleId)){
 				showTask[scheduleId].scheduleData = scheduleData;
 				if(showTask[scheduleId].isinit){
-					showTask[scheduleId].init();
+					showTask[scheduleId].init(false);
 				}
 //				PopUpManager.bringToFront(showTask[scheduleId]);
 //				PopUpManager.centerPopUp(showTask[scheduleId]);
@@ -77,14 +77,14 @@ package util
 					showTask[scheduleId].init();
 				}
 				PopUpManager.bringToFront(showTask[scheduleId]);
-				PopUpManager.centerPopUp(showTask[scheduleId]);
+//				PopUpManager.centerPopUp(showTask[scheduleId]);
 			}else{
 				
 					var s:TaskPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,TaskPanel,false) as TaskPanel;
 					showTask[scheduleId]=s;
 					s.taskData = taskData;
 					PopUpManager.bringToFront(showTask[scheduleId]);
-					PopUpManager.centerPopUp(showTask[scheduleId]);
+//					PopUpManager.centerPopUp(showTask[scheduleId]);
 					
 			}
 			showTask[scheduleId].taskItem=taskItem;

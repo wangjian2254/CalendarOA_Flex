@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="420" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()" xmlns:uicontrol="uicontrol.*">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" x="-500" y="200" width="420" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
@@ -19,6 +19,7 @@
 			import mx.core.FlexGlobals;
 			import mx.events.CloseEvent;
 			import mx.events.CollectionEvent;
+			import mx.events.EffectEvent;
 			import mx.managers.CursorManager;
 			import mx.managers.CursorManagerPriority;
 			import mx.managers.PopUpManager;
@@ -71,10 +72,42 @@
 				}else{
 					ScheduleUtil.clearNewSchedule();
 				}
+				
+				mve.xFrom = this.x;
+				mve.yFrom = this.y;
+				
+				mve.xTo =(FlexGlobals.topLevelApplication.width+this.width);
+				mve.yTo = (FlexGlobals.topLevelApplication.height+this.height);
+				var pa:Point=new Point(mve.xFrom,mve.yFrom);
+				var pb:Point=new Point(mve.xTo,mve.yTo);
+				mve.duration = int(Point.distance(pa,pb))/100*70;
+				mve.play();
+				
+				mve.addEventListener(EffectEvent.EFFECT_END,removeWindow);
+			}
+			
+			private function removeWindow(e:EffectEvent):void{
+				mve.removeEventListener(EffectEvent.EFFECT_END,removeWindow);
 				PopUpManager.removePopUp(this);
 			}
 			
-			public function init():void{
+			public function init(flag:Boolean=true):void{
+				if(flag){
+					if(!isinit){
+						mve.xFrom= 0-this.width;
+						mve.yFrom = (FlexGlobals.topLevelApplication.height-this.height)/2;
+					}else{
+						mve.xFrom = this.x;
+						mve.yFrom = this.y;
+					}
+					
+					mve.xTo =(FlexGlobals.topLevelApplication.width-this.width)/2;
+					mve.yTo = (FlexGlobals.topLevelApplication.height-this.height)/2;
+					var pa:Point=new Point(mve.xFrom,mve.yFrom);
+					var pb:Point=new Point(mve.xTo,mve.yTo);
+					mve.duration = int(Point.distance(pa,pb))/100*70;
+					mve.play();
+				}
 				if(taskItem!=null){
 					taskItem.init();
 				}
@@ -250,7 +283,7 @@
 					titlestr = taskData.title;
 					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
 					ScheduleUtil.clearNewSchedule();
-					init();
+					init(false);
 				}
 			}
 			
@@ -384,7 +417,7 @@
 					}else{
 						taskData.status=true;
 					}
-					init();
+					init(false);
 				}
 			}
 		]]>
@@ -397,7 +430,7 @@
 		<mx:DateFormatter id="timeStr" formatString="JJNN" >
 			
 		</mx:DateFormatter>
-		
+		<s:Move id="mve" target="{this}" />
 	</fx:Declarations>
 	
 	<s:layout>
