@@ -100,10 +100,10 @@ package util
 		public static function unreadMessageRefresh(fun:*=null):void{
 //			RemoteUtil.getOperationAndResult("getAllUser",resultAllUser).send();
 			if(fun==null||!(fun is Function)){
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getUnReadCount",resultUnReadMessageRefresh,"POST").send()
+				HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getUnReadCount",resultUnReadMessageRefresh,"POST").send()
 //				RemoteUtil.getOperationAndResult("",resultAllUser,false).send();
 			}else{
-				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getUnReadCount",resultUnReadMessageRefresh,"POST");
+				var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getUnReadCount",resultUnReadMessageRefresh,"POST");
 				http.resultFunArr.addItem(fun);
 				http.send();
 			}
