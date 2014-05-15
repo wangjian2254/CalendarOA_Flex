@@ -28,7 +28,7 @@
 			
 			//新增，保存，删除的处理函数
 			private function clickHander(e:ItemClickEvent):void{
-				if(e.item.mode==''){
+				if(e.item.mode=='add'){
 				}
 				
 				
