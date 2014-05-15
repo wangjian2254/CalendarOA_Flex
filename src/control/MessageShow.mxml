@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" x="-500" y="200" width="420" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()" xmlns:uicontrol="uicontrol.*">
+	<fx:Script>
+		<![CDATA[
+			import events.ChangeJoinUserEvent;
+			import events.ChangeMenuEvent;
+			import events.ChangeUserEvent;
+			
+			import flash.net.navigateToURL;
+			
+			import httpcontrol.HttpServiceUtil;
+			import httpcontrol.RemoteUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.LinkButton;
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.events.CollectionEvent;
+			import mx.events.EffectEvent;
+			import mx.managers.CursorManager;
+			import mx.managers.CursorManagerPriority;
+			import mx.managers.PopUpManager;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import spark.formatters.DateTimeFormatter;
+			import spark.skins.spark.StackedFormHeadingSkin;
+			
+			import uicontrol.ContactItem;
+			import uicontrol.ScheduleItem;
+			import uicontrol.TaskItem;
+			
+			import util.DateUtil;
+			import util.ScheduleUtil;
+			import util.ToolUtil;
+			import util.UserUtil;
+			
+			private var _isinit:Boolean=false;
+			
+			[Bindable]
+			private var baseHeight:Number=290;
+			
+			[Bindable]
+			public var titlestr:String="创建备忘";
+			
+			[Bindable]
+			public var startDateValue:Date=new Date();
+			[Bindable]
+			public var endDateValue:Date=new Date();
+			
+			[Bindable]
+			public var taskData:Object=null;
+			
+			[Bindable]
+			private var endtimelist:ArrayCollection = new ArrayCollection();
+			
+			public var taskItem:TaskItem=null;
+			
+			
+			private var selectColor:Number =0x00CCFF;
+			public function get isinit():Boolean
+			{
+				return _isinit;
+			}
+			public function closeWin():void{
+				if(taskData!=null){
+					ScheduleUtil.closeSchedulePanel(taskData.id+"");
+				}else{
+					ScheduleUtil.clearNewSchedule();
+				}
+				
+				mve.xFrom = this.x;
+				mve.yFrom = this.y;
+				
+				mve.xTo =(FlexGlobals.topLevelApplication.width+this.width);
+				mve.yTo = (FlexGlobals.topLevelApplication.height+this.height);
+				var pa:Point=new Point(mve.xFrom,mve.yFrom);
+				var pb:Point=new Point(mve.xTo,mve.yTo);
+				mve.duration = int(Point.distance(pa,pb))/100*70;
+				mve.play();
+				
+				mve.addEventListener(EffectEvent.EFFECT_END,removeWindow);
+			}
+			
+			private function removeWindow(e:EffectEvent):void{
+				mve.removeEventListener(EffectEvent.EFFECT_END,removeWindow);
+				PopUpManager.removePopUp(this);
+			}
+			
+			public function init(flag:Boolean=true):void{
+				if(flag){
+					if(!isinit){
+						mve.xFrom= 0-this.width;
+						mve.yFrom = (FlexGlobals.topLevelApplication.height-this.height)/2;
+					}else{
+						mve.xFrom = this.x;
+						mve.yFrom = this.y;
+					}
+					
+					mve.xTo =(FlexGlobals.topLevelApplication.width-this.width)/2;
+					mve.yTo = (FlexGlobals.topLevelApplication.height-this.height)/2;
+					var pa:Point=new Point(mve.xFrom,mve.yFrom);
+					var pb:Point=new Point(mve.xTo,mve.yTo);
+					mve.duration = int(Point.distance(pa,pb))/100*70;
+					mve.play();
+				}
+				if(taskItem!=null){
+					taskItem.init();
+				}
+				_isinit = true;
+				donook.visible=false;
+				dook.visible=false;
+				delbtn.visible=false;
+				dopanel.visible = (taskData==null||taskData.author==ToolUtil.sessionUser.username)?true:false;
+				
+				if(!ToolUtil.sessionUser.email){
+					cbemail.enabled = false;
+				}else{
+					cbemail.enabled = true;
+				}
+				if(!ToolUtil.sessionUser.sms){
+					cbsms.enabled = false;
+				}else{
+					cbsms.enabled = true;
+				}
+				if(!ToolUtil.sessionUser.rtx){
+					cbrtx.enabled = false;
+				}else{
+					cbrtx.enabled = true;
+				}
+				
+				if(taskData!=null){
+					startDateValue = DateField.stringToDate(taskData.startdate,"YYYYMMDD");
+//					endDateValue = DateField.stringToDate(taskData.startdate,"YYYYMMDD");
+					startDate.selectedDate = startDateValue;
+					if (taskData.enddate){
+						endDate.selectedDate = DateField.stringToDate(taskData.enddate,"YYYYMMDD");
+						endDateValue=endDate.selectedDate;
+					}else{
+						endDate.selectedDate =null;
+						endDateValue=null;
+					}
+					
+					if(taskData.id){
+						delbtn.visible=true;
+					}
+					if(!taskData.status){
+						donook.visible=false;
+						dook.visible=true;
+						if(taskData.zentaourl){
+							
+							dook.label="去禅道查看详情";
+							delbtn.visible=false;
+						}
+					}else{
+						if(taskData.zentaourl){
+							delbtn.visible=false;
+							
+							donook.visible=false;
+						}else{
+							donook.visible=true;
+						}
+						dook.visible=false;
+						
+					}
+					
+					
+					taskTitle.text = taskData.title;
+					desc.text = taskData.desc;
+					
+					
+					
+					colorClick(taskData.color);
+					
+					cbemail.selected = false;
+					cbsms.selected = false;
+					cbrtx.selected = false;
+					for each(var warningtype:String in taskData.warningkind){
+						if(warningtype =="email"){
+							cbemail.selected=true;
+						}
+						if(warningtype =="sms"){
+							cbsms.selected=true;
+						}
+						if(warningtype =="rtx"){
+							cbrtx.selected=true;
+						}
+					}
+					var index:Number=0;
+					for each(var warningtime:Number in taskData.warningtime){
+						
+						switch(index){
+							case 0:
+								firstDay.value =0- Math.floor(warningtime/(24*60));
+								firstHour.value = Math.floor(((warningtime+firstDay.value*24*60)%(24*60))/60);
+								firstMin.value = (warningtime+firstDay.value*24*60)%60;
+								break;
+							case 1:
+								secondDay.value =0- Math.floor(warningtime/(24*60));
+								secondHour.value = Math.floor(((warningtime+secondDay.value*24*60)%(24*60))/60);
+								secondMin.value = (warningtime+secondDay.value*24*60)%60;
+								break;
+						}
+						index+=1;
+					}
+					if(index==1){
+						needSecond2.selected = false;
+					}else{
+						needSecond2.selected = true;
+					}
+					
+					titlestr = taskData.title;
+					
+				}
+				
+				
+				
+				
+				
+				warningChange();
+				
+			}
+			
+			private function getData():Object{
+				var obj:Object=new Object();
+				if(taskData!=null&&taskData.hasOwnProperty("id")){
+					obj.id = taskData["id"];
+				}
+				obj.title=taskTitle.text;
+				obj.desc = desc.text;
+				obj.startdate = datestr.format(startDate.selectedDate);
+				obj.enddate = datestr.format(endDate.selectedDate);
+				
+				
+				obj.color = selectColor;
+				
+				
+				obj.warning_email=cbemail.selected;
+				obj.warning_sms=cbsms.selected;
+				obj.warning_rtx=cbrtx.selected;
+				obj.warning_time1 = firstHour.value*60+firstMin.value +(0-firstDay.value*24*60);
+				if(needSecond2.selected){
+					obj.warning_time2 = secondHour.value*60+secondMin.value +(0-secondDay.value*24*60);
+				}
+				
+				return obj;
+			}
+			
+			public function save():void{
+				if(this.taskTitle.text==""||this.taskTitle.text=="备忘标题"){
+					taskTitle.selectAll();
+					Alert.show("请填写备忘标题。","提示");
+					return;
+				}
+				if(startDate.selectedDate==null){
+					Alert.show("请选择开始时间。","提示");
+					startDate.open();
+					return;
+				}
+				if(endDate.selectedDate==null){
+					Alert.show("请选择结束时间，或选择永远重复。","提示");
+					endDate.open();
+					return;
+				}
+				
+				
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateTask",saveResult,"POST").send(getData());
+					
+				
+			}
+			
+			private function saveResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					if(taskData==null){
+						taskData = getData();
+					}
+					taskData.id = result.result;
+					titlestr = taskData.title;
+					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+					ScheduleUtil.clearNewSchedule();
+					init(false);
+				}
+			}
+			
+			
+			
+			private function colorChange():void{
+				colorClick(colorPicker.selectedColor);
+			}
+			
+			private function colorClick(c:Number):void{
+				selectColor = c;
+				color0.setStyle("backgroundColor",c);
+				color1.setStyle("borderColor",0xffffff);
+				color2.setStyle("borderColor",0xffffff);
+				color3.setStyle("borderColor",0xffffff);
+				color4.setStyle("borderColor",0xffffff);
+				color5.setStyle("borderColor",0xffffff);
+				color6.setStyle("borderColor",0xffffff);
+				color7.setStyle("borderColor",0xffffff);
+				color8.setStyle("borderColor",0xffffff);
+				color9.setStyle("borderColor",0xffffff);
+				color10.setStyle("borderColor",0xffffff);
+				switch(c){
+					case 0xaecfea:
+						color1.setStyle("borderColor",0x000000);
+						break;
+					case 0x5484ed:
+						color2.setStyle("borderColor",0x000000);
+						break;
+					case 0xa4bdfc:
+						color3.setStyle("borderColor",0x000000);
+						break;
+					case 0x46d6db:
+						color4.setStyle("borderColor",0x000000);
+						break;
+					case 0x7ae7bf:
+						color5.setStyle("borderColor",0x000000);
+						break;
+					case 0x51b749:
+						color6.setStyle("borderColor",0x000000);
+						break;
+					case 0xfbd75b:
+						color6.setStyle("borderColor",0x000000);
+						break;
+					case 0xffb878:
+						color6.setStyle("borderColor",0x000000);
+						break;
+					case 0xff887c:
+						color6.setStyle("borderColor",0x000000);
+						break;
+					case 0xdbadff:
+						color6.setStyle("borderColor",0x000000);
+						break;
+					default:
+						if(colorPicker.selectedColor!=c){
+							colorPicker.selectedColor=c;
+						}
+					
+				}
+			}
+			
+			
+			
+			private function warningChange():void{
+				if(cbrtx.selected||cbsms.selected||cbemail.selected){
+					alldaywarning1.height=0;
+					alldaywarning2.height=0;
+						alldaywarning1.height=30;
+						alldaywarning2.height=30;
+				}else{
+					alldaywarning1.height=0;
+					alldaywarning2.height=0;
+				}
+				resize();
+			}
+			
+			private function resize():void{
+//				this.height = schedulePanel.height;
+				this.height = baseHeight+alldaywarning1.height+alldaywarning2.height;
+				this.invalidateSize();
+			}
+			
+			
+			private function delAsk():void{
+				if(taskData!=null &&taskData.id){
+				
+					Alert.show("确认删除当前日程?", "提示", Alert.YES | Alert.NO, null, del);
+				}else{
+					closeWin();
+				}
+				
+			}
+			//删除日程
+			private function del(e:mx.events.CloseEvent):void
+			{
+				if (e.detail == Alert.YES){
+					var data:Object = new Object();
+					data["id"] = taskData.id;
+					HttpServiceUtil.getCHTTPServiceAndResult("/ca/delTask",delResult,"POST").send(data);
+					
+					
+				}
+			}
+			
+			private function delResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					
+					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+					closeWin();
+				}
+			}
+			
+			
+			
+			private function dotask(f:Boolean):void{
+				if(taskData.zentaourl){
+					var request:URLRequest=new URLRequest(taskData.zentaourl);  
+					navigateToURL(request,"_blank");
+					return;
+				}
+				var obj:Object = new Object();
+				obj["id"]=taskData.id;
+				obj["do"]=f;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/doTask",doResult,"POST").send(obj);
+			}
+			
+			private function doResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					if(taskData.status){
+						taskData.status=false;
+					}else{
+						taskData.status=true;
+					}
+					init(false);
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:DateFormatter id="datestr" formatString="YYYYMMDD" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="timeStr" formatString="JJNN" >
+			
+		</mx:DateFormatter>
+		<s:Move id="mve" target="{this}" />
+	</fx:Declarations>
+	
+	<s:layout>
+		<s:HorizontalLayout gap="3" paddingLeft="10" paddingTop="5" paddingBottom="5">
+			
+		</s:HorizontalLayout>
+	</s:layout>
+	<s:BorderContainer width="400" id="schedulePanel" borderVisible="false" >
+		<s:layout>
+			<s:VerticalLayout gap="0"/>
+		</s:layout>
+	
+	<s:TextInput id="taskTitle" width="100%" text="备忘标题">
+	</s:TextInput>
+	<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		<s:Label text="时间段：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		
+		<s:Label text="到" height="100%" verticalAlign="middle" visible="{endDate.visible}"  />
+		<mx:DateField id="endDate" width="100"  selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+		
+	</s:BorderContainer>
+	<s:BorderContainer width="100%" height="100" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5" />
+		</s:layout>
+		<s:Label text="说明：" width="80" textAlign="right" height="30" verticalAlign="middle" />
+		<s:TextArea id="desc" width="100%" height="100%" />
+	</s:BorderContainer>
+	<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		<s:Label text="颜色：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		
+		<s:BorderContainer id="color0" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:Label text="|" fontWeight="bold" fontSize="18" textAlign="center"  width="10" height="25" verticalAlign="middle"/>
+		<s:BorderContainer id="color1" click="colorClick(0xaecfea)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color2" click="colorClick(0x5484ed)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#5484ed" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color3" click="colorClick(0xa4bdfc)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#a4bdfc" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color4" click="colorClick(0x46d6db)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#46d6db" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color5" click="colorClick(0x7ae7bf)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#7ae7bf" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color6" click="colorClick(0x51b749)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#51b749" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color7" click="colorClick(0xfbd75b)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#fbd75b" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color8" click="colorClick(0xffb878)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ffb878" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color9" click="colorClick(0xff887c)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ff887c" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+		</s:BorderContainer>
+		<mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange()"
+						symbolColor="#030002">
+			
+		</mx:ColorPicker>
+	</s:BorderContainer>
+	
+	
+	<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		<s:Label text="未完成提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:CheckBox id="cbrtx" label="RTX腾讯通" change="warningChange()" />
+		<s:CheckBox id="cbsms" label="手机短信"  change="warningChange()" />
+		<s:CheckBox id="cbemail" label="email"  change="warningChange()" />
+	</s:BorderContainer>
+	
+	<s:BorderContainer  id="alldaywarning1" width="100%" height="30" borderVisible="false"  >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		<s:Label text="第一次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label text="提前"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstDay" value="0" minimum="0" maximum="30" width="50"/>
+		<s:Label text="天"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstHour" value="8" minimum="0" maximum="23" width="50"/>
+		<s:Label text="时"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="firstMin" value="0" minimum="0" maximum="59" width="50"/>
+		<s:Label text="分"  height="25" verticalAlign="middle" />
+		
+	</s:BorderContainer>
+	<s:BorderContainer id="alldaywarning2" width="100%" height="30" borderVisible="false"  >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		
+		<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+		<s:Label text="提前"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondDay" value="1" minimum="0" maximum="30" width="50" enabled="{needSecond2.selected}"/>
+		<s:Label text="天"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondHour" value="17" minimum="0" maximum="23" width="50" enabled="{needSecond2.selected}"/>
+		<s:Label text="时"  height="25" verticalAlign="middle" />
+		<s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
+		<s:Label text="分"  height="25" verticalAlign="middle" />
+		<s:CheckBox  id="needSecond2" selected="false"/>
+	</s:BorderContainer>
+	<s:BorderContainer id="dopanel"  width="100%" height="30" borderVisible="false"  >
+		<s:layout>
+			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+		</s:layout>
+		
+		<s:Button chromeColor="#ff0000" label="保存" height="25" color="#ffffff" click="save()" />
+		<s:Button chromeColor="#cccccc" id="delbtn" label="舍弃" height="25" color="#000000" click="delAsk()" />
+		<s:Button chromeColor="#ff0000" id="dook" label="标记完成" height="25" color="#ffffff" click="dotask(true)" />
+		<s:Button chromeColor="#cccccc" id="donook" label="标记未完成" height="25" color="#000000" click="dotask(false)" />
+	</s:BorderContainer>
+		
+	</s:BorderContainer>
+</s:TitleWindow>
