@@ -27,6 +27,7 @@
 			private var messagelist:ArrayCollection=new ArrayCollection();
 			
 			//新增，保存，删除,回复，转发的处理函数
+			//多个按钮点击事件的处理函数
 			private function clickHander(e:ItemClickEvent):void{
 				if(e.item.mode=='add'){
 				}
