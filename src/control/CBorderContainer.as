@@ -42,6 +42,7 @@ package control
 			super();
 			this.setStyle("borderVisible",false);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,init);
+			this.addEventListener(FlexEvent.CREATION_COMPLETE,reloadParamData);
 			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);
 		}
 		
@@ -112,6 +113,10 @@ package control
 		public function set param(value:Object):void
 		{
 			_param = value;
+		}
+		
+		public function reloadParamData(e:FlexEvent):void{
+			param=null;
 		}
 		
 		

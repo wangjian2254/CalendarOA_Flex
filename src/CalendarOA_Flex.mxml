@@ -80,7 +80,9 @@
 				var event1:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
 				var xml1:XML=new XML("<menuitem label='站内消息' mod='message'></menuitem>");
 				event1.item=xml1; 
-				onMenuChange(event1);
+				var obj:Object = new Object();
+				obj["messageType"]="unread";
+				onMenuChange(event1,obj);
 			}
 			
 			private function currentUser(result:Object,e:ResultEvent):void{
@@ -246,33 +248,34 @@
 				menuflag=null;
 				var xml:XML=event.item as XML;
 				var mod:String=xml.attribute('mod').toString();
-				
-				if(cbar.setView(mod)){
-					return;
-				}
 				var c:CBorderContainer;
-				switch(mod){
-					
-					case 'calendar':
-						c=new CalendarControl();
-						break;
-					case 'contact':
-						c=new UserControl();
-						break;
-					case 'group':
-						c=new GroupControl();
-						break;
-					case 'message':
-						c=new MessagePanel();
-						break;
-					
-					
+				c = cbar.getView(mod);
+				if(c==null){
+					switch(mod){
+						
+						case 'calendar':
+							c=new CalendarControl();
+							break;
+						case 'contact':
+							c=new UserControl();
+							break;
+						case 'group':
+							c=new GroupControl();
+							break;
+						case 'message':
+							c=new MessagePanel();
+							break;
+						
+						
+					}
 				}
 				if(c!=null){
 					c.label=xml.attribute('label').toString();
 					c.flag=mod;
 					c.param=obj;
-					cbar.addView(c);
+					if(!cbar.setView(mod)){
+						cbar.addView(c);
+					}
 					website.text=c.label;
 				}
 				

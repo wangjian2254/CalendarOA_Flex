@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0">
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
 			import events.ChangeUserEvent;
 			import events.CloseEvent;
 			
+			import httpcontrol.HttpServiceUtil;
+			
 			import mx.collections.ArrayCollection;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
+			import mx.rpc.events.ResultEvent;
 			[Bindable]
 			private var buttonArr0:ArrayCollection=new ArrayCollection([{'label':'全部','mode':'all'},{'label':'未读信息','mode':'unread'},{'label':'已读信息','mode':'read'}]);
 			[Bindable]
@@ -18,6 +21,9 @@
 			private var buttonArr2:ArrayCollection=new ArrayCollection([{'label':'回复','ico':saveimg,'mode':'huifu'},{'label':'转发','ico':saveimg,'mode':'add'}]);
 			[Bindable]
 			private var buttonArr3:ArrayCollection=new ArrayCollection([{'label':'标记已读','ico':saveimg,'mode':'read'},{'label':'标记未读','ico':saveimg,'mode':'unread'}]);
+			
+			[Bindable]
+			private var messagelist:ArrayCollection=new ArrayCollection();
 			
 			//新增，保存，删除的处理函数
 			private function clickHander(e:ItemClickEvent):void{
@@ -28,18 +34,61 @@
 			}
 			
 			private function showType():void{
+				pagebar1.initPage();
+				messagelist.removeAll();
+				getMessages();
 				
 			}
 			
-			override public   function  init(e:FlexEvent):void{
+			private function getMessages():void{
+				var data:Object = new Object();
+				data["type"] = messageType.selectedItem.mode;
+				data["start"] = pagebar1.PageIndex*pagebar1.mPageSize;
+				HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageByUser",getMessagesResult,"POST").send(data);
 				
+			}
+			
+			private function getMessagesResult(result:Object,e:ResultEvent):void{
+				if(result.success){
+					
+					if(messagelist.length==0){
+						pagebar1.mPageSize=result.result.limit;
+						pagebar1.RecordCount=result.result.total;
+						pagebar1.initPage();
+					}
+					
+					messagelist.removeAll();
+					messagelist.addAll(new ArrayCollection(result.result.list as Array));
+					pagebar1.RecordCount=result.result.total;
+				}
+			}
+			
+			
+			override public   function  init(e:FlexEvent):void{
+				getMessages();
 			}
 			
 			override public function changeCurrentUser(e:ChangeUserEvent):void{
+				getMessages();
 				
 			}
 			override public function closeContainer(e:CloseEvent):void{
 				
+			}
+			
+			override public function reloadParamData(e:FlexEvent):void{
+				if(param){
+					if(param.hasOwnProperty("messageType")){
+						for each(var obj:Object in buttonArr0){
+							if(obj.mode==param["messageType"]){
+								messageType.selectedItem=obj;
+							}
+						}
+						showType();
+					}
+					
+				}
+				super.reloadParamData(e);
 			}
 			
 			
@@ -59,7 +108,7 @@
 				
 			</s:HorizontalLayout>
 		</s:layout>
-		<s:ButtonBar dataProvider="{buttonArr0}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showType()" >
+		<s:ButtonBar id="messageType" dataProvider="{buttonArr0}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showType()" >
 		</s:ButtonBar>
 		<mx:ButtonBar dataProvider="{buttonArr1}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
 		</mx:ButtonBar>
@@ -74,38 +123,41 @@
 				
 			</s:HorizontalLayout>
 		</s:layout>
-		<s:DataGrid width="200" height="100%" rowHeight="100"  >
-			<s:columns>
-				<s:ArrayList>
-					<s:GridColumn dataField="title" headerText="按时间排序" >
-						<s:itemRenderer>
-							<fx:Component>
-								<s:GridItemRenderer>
-									<s:HGroup width="100%" height="100%" verticalAlign="middle">
-										
-										<s:BorderContainer visible="{data.is_read}" width="25" height="25" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
+		<s:VGroup width="250" height="100%">
+			<s:DataGrid id="messageGrid" dataProvider="{messagelist}"  width="100%" height="100%" rowHeight="50"  >
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" >
+							<s:itemRenderer>
+								<fx:Component>
+									<s:GridItemRenderer>
+										<s:HGroup width="100%" height="100%" verticalAlign="middle" gap="5" paddingLeft="5" paddingTop="3" paddingRight="3">
 											
-										</s:BorderContainer>
-										<s:VGroup width="100%" height="100%">
-											<s:Label width="100%" height="25" text="{data.authorname}" fontSize="15" color="#000000">
+											<s:BorderContainer visible="{!data.is_read}" width="10" height="10" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
 												
-											</s:Label>
-											<s:Label width="100%" height="20" text="{data.title}" fontSize="13" color="#CCCCCC">
+											</s:BorderContainer>
+											<s:VGroup width="100%" height="100%">
+												<s:Label width="100%" height="12" paddingLeft="10" text="{data.authorname}" textDecoration="underline" fontSize="12" color="#434343">
+													
+												</s:Label>
+												<s:Label width="100%" height="100%" text="{data.title}" maxDisplayedLines="-1" fontSize="15" color="#000000">
+													
+												</s:Label>
 												
-											</s:Label>
-											<s:TextArea editable="false" width="100%" text="{data.desc.substr(0,200)}" height="100%" fontSize="12" color="#ADADAD" >
-												
-											</s:TextArea>
-										</s:VGroup>
-									</s:HGroup>
-								</s:GridItemRenderer>
-								
-							</fx:Component>
-						</s:itemRenderer>
-					</s:GridColumn>
-				</s:ArrayList>
-			</s:columns>
-		</s:DataGrid>
+											</s:VGroup>
+										</s:HGroup>
+									</s:GridItemRenderer>
+									
+								</fx:Component>
+							</s:itemRenderer>
+						</s:GridColumn>
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
+			<uicontrol:Pageing id="pagebar1" infolbl="false">
+			</uicontrol:Pageing>
+		</s:VGroup>
+		
 		<s:Scroller width="100%" height="100%">
 			<s:Group width="100%" height="100%">
 				<s:BorderContainer width="100%" height="100%">

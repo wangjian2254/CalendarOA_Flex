@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="370" height="30" backgroundAlpha="0"  borderVisible="false" >
+	<s:layout>
+		<s:HorizontalLayout verticalAlign="middle" paddingLeft="5"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import events.PageChangeEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			
+			[Bindable]
+			[Embed("assets/pageing/l.png")]
+			public var l:Class;
+			[Bindable]
+			[Embed("assets/pageing/ll.png")]
+			public var ll:Class;
+			[Bindable]
+			[Embed("assets/pageing/r.png")]
+			public var r:Class;
+			[Bindable]
+			[Embed("assets/pageing/rr.png")]
+			public var rr:Class;
+			
+			[Bindable]
+			public var infolbl:Boolean=true;
+			
+			import mx.controls.Alert;
+			
+			private var mRecordCount:int=0;
+			
+			public var mPageSize:int =20;
+			
+			private var mPageIndex:int =0;
+			
+			private var mPageCount:int = 0;
+			
+			
+			
+			public function method_l():void
+				
+			{
+				
+				mPageIndex=mPageIndex-1;
+				
+				SetState();
+				
+				OnPageChange();
+				
+			}
+			
+			public function method_le():void
+				
+			{
+				
+				mPageIndex =0;
+				
+				SetState();
+				
+				OnPageChange();
+				
+			}
+			
+			public function method_r():void
+				
+			{
+				
+				mPageIndex=mPageIndex+1;
+				
+				SetState();
+				
+				OnPageChange();
+				
+			}
+			
+			public function method_re():void
+				
+			{
+				
+				mPageIndex=mPageCount-1;
+				
+				SetState();
+				
+				OnPageChange();
+				
+			}
+			
+			public function method_select():void
+				
+			{
+				if(c_select.selectedItem!=null){
+					mPageIndex = c_select.selectedItem.data;
+					SetState();
+					OnPageChange();
+				}
+				
+				
+				
+			}
+			
+			public function get PageIndex():int
+				
+			{
+				
+				return mPageIndex;
+				
+			}
+			public function initPage():void
+				
+			{
+				
+				mPageIndex=0;
+				
+			}
+			
+			
+			
+			
+			
+			//设置记录总数
+			
+			public function set RecordCount(count:int):void
+				
+			{
+				
+				mRecordCount= count;
+				
+				SetState();
+				
+				
+			}
+			
+			private function SetState():void
+				
+			{
+				
+				if(mRecordCount%mPageSize > 0)
+					
+				{
+					
+					mPageCount = mRecordCount/mPageSize+1;
+					
+				}
+					
+				else
+					
+				{
+					
+					mPageCount = mRecordCount/mPageSize;
+					
+				}
+				
+				var pages:ArrayCollection = new ArrayCollection();
+				
+				for(var i:int =1;i<=mPageCount;i++)
+					
+				{
+					
+					pages.addItem( {label:i.toString(), data:i-1});
+					
+				}
+				
+				
+				
+				c_select.dataProvider= pages;
+				
+				c_select.selectedIndex= mPageIndex;
+				
+				if(mPageCount>1)
+					
+				{
+					
+					c_select.enabled=true;
+					
+					c_l.enabled=true;
+					
+					c_le.enabled=true;
+					
+					c_r.enabled=true;
+					
+					c_re.enabled=true;
+					
+					if(mPageIndex==0)
+						
+					{
+						
+						c_l.enabled=false;
+						
+						c_le.enabled=false;
+						
+					}
+					
+					if(mPageIndex == mPageCount-1)
+						
+					{
+						
+						c_r.enabled=false;
+						
+						c_re.enabled=false;
+						
+					}
+					
+				}
+					
+				else
+					
+				{
+					
+					c_select.enabled=false;
+					
+					c_l.enabled=false;
+					
+					c_le.enabled=false;
+					
+					c_r.enabled=false;
+					
+					c_re.enabled=false;
+					
+				}
+				
+				pageinfo.text="总记录数:" + mRecordCount+"/" + mPageCount+"页数";
+				
+				
+				
+			}
+			
+			//获取记录总数
+			
+			public function get RecordCount():int
+				
+			{
+				
+				return mRecordCount;
+				
+			}
+			
+			//打开分页控件
+			
+			public function Open():void{
+				
+				mPageIndex =0;
+				
+				OnPageChange();
+				
+			}
+			
+			//刷新当前页面
+			
+			public function Refresh():void
+				
+			{
+				
+				OnPageChange();
+				
+			}
+			
+			private function OnPageChange():void
+				
+			{
+				
+				var e:PageChangeEvent = new  PageChangeEvent(PageChangeEvent.PageChange_EventStr,mPageIndex,mPageSize,true);
+				
+				dispatchEvent(e);
+				
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Metadata>
+		
+		
+	
+	</fx:Metadata>
+	
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:Button icon="{ll}" click="method_le()"  id="c_le" enabled="false"  fontFamily="Georgia" width="24" height="24" minWidth="24" minHeight="24">
+	</s:Button>
+	
+	<s:Button icon="{l}" click="method_l()" id="c_l" enabled="false"  fontFamily="Georgia" width="24" height="24" minWidth="24" minHeight="24">
+	</s:Button>
+	
+	<s:ComboBox  change="method_select()" id="c_select" enabled="false"  width="54"></s:ComboBox>
+	
+	<s:Button icon="{r}" click="method_r()" id="c_r" enabled="false"  fontFamily="Georgia" width="24" height="24" minWidth="24" minHeight="24">
+	</s:Button>
+	
+	<s:Button icon="{rr}" click="method_re()" id="c_re" enabled="false"  fontFamily="Georgia" width="24" height="24" minWidth="24" minHeight="24">
+	</s:Button>
+	
+	<s:Label  width="175" fontSize="12" id="pageinfo" visible="{infolbl}"/>
+</s:BorderContainer>
