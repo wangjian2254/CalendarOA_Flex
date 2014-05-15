@@ -34,6 +34,7 @@
 				
 			}
 			
+			// 全部、未读、已读 筛选
 			private function showType():void{
 				pagebar1.initPage();
 				messagelist.removeAll();
