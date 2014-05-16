@@ -20,21 +20,102 @@
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			
+			import util.DateUtil;
 			import util.ToolUtil;
+			
+			[Bindable]
+			private var timelist:ArrayCollection=new ArrayCollection([{'label':'今天','mode':'today'},
+				{'label':'昨天','mode':'yesterday'},
+				{'label':'前天','mode':'beforeyesterday'},
+				{'label':'本周','mode':'week'},
+				{'label':'上周','mode':'beforeweek'},
+				{'label':'本月','mode':'monthly'},
+				{'label':'上月','mode':'beforemonthly'}]);
 			
 			[Bindable]
 			private var list:ArrayCollection=new ArrayCollection();
 			
 			override public   function  init(e:FlexEvent):void{
-
-				
-				
-
 			}
 			override public function closeContainer(e:CloseEvent):void{
 				dispatchEvent(e);
+			}
+			
+			private function showLog():void{
+				
+				if(logQZ.selectedItem==null){
+					return;
+				}
+				var end:Date=new Date();
+				var start:Date=new Date();
+				
+				switch(logQZ.selectedItem.mode){
+					case "today":
+						break;
+					case "yesterday":
+						start.date-=1;
+						end.date-=1;
+						break;
+					case "beforeyesterday":
+						start.date-=2;
+						end.date-=2;
+						break;
+					case "week":
+						if (end.day>0){
+							end.date-=(end.day-1);
+						}else{
+							end.date-=6;
+						}
+							
+						break;
+					case "beforeweek":
+						if (start.day>0){
+							start.date-=(end.day-1);
+						}else{
+							start.date-=6;
+						}
+						if (end.day>0){
+							end.date-=(end.day-1);
+						}else{
+							end.date-=6;
+						}
+						end.date-=7;
+						break;
+					case "monthly":
+						end.date=1;
+						break;
+					case "beforemonthly":
+						start.date-=start.date;
+						end.date-=end.date;
+						end.date-=end.date;
+						break;
+					
+				}
+				startdate.selectedDate=start;
+				enddate.selectedDate=end;
+				queryLog();
 				
 			}
+			
+			private function queryparamchange():void{
+				logQZ.selectedIndex=-1;
+			}
+			
+			private function queryLog():void{
+				var data:Object=new Object();
+				data["start"] = DateUtil.dateLbl(startdate.selectedDate);
+				data["end"] = DateUtil.dateLbl(enddate.selectedDate);
+				HttpServiceUtil.getCHTTPServiceAndResult("/log/getMyHistory",queryLogResult,"POST").send(data);
+			}
+			
+			private function queryLogResult(result:Object,e:ResultEvent):void{
+				if(result.result){
+					list.removeAll();
+					list.addAll(new ArrayCollection(result.result as Array));
+				}
+				
+			}
+			
 			
 			private function getDataResult(o:Object,e:ResultEvent):void{
 				if(o&&o.success){
@@ -104,19 +185,8 @@
 				HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
 				
 			}
-			private function search():void{
-				var data:Object=new Object();
-				data["key"] = key.text;
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/findUser",searchResult,"POST").send(data);
-				
-			}
-			private function searchResult(result:Object,e:ResultEvent):void{
-				if(result.result){
-					list.removeAll();
-					list.addAll(new ArrayCollection(result.result as Array));
-				}
-				
-			}
+			
+			
 			
 			private function loadDataFault(e:FaultEvent):void{
 				Alert.show('操作失败',"提示");
@@ -129,11 +199,7 @@
 					add();
 				}
 				if(e.label=="修改"){
-					if(peopgrid.selectedItem==null){
-						Alert.show("提示","请选择一条记录。");
-					}else{
-						show(peopgrid.selectedItem);
-					}
+					
 				}
 				if(e.label=="删除"){
 					del();
@@ -191,25 +257,7 @@
 				}
 			}
 			
-			private function isUsered(item:Object, column:AdvancedDataGridColumn):String{
-				var str:String="";
-					if(item.isaction){
-						str="启用";
-					}else{
-						str="停止使用";
-					}
-				return str;
-			}
 			
-			
-			private function userType(item:Object, column:AdvancedDataGridColumn):String{
-				var str:String="";
-					if(item.ismanager){
-						str="编辑者";
-					}
-					
-				return str;
-			}
 				[Bindable]
 				private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增','ico':addimg},{'label':'修改','ico':saveimg},{'label':'同步数据','ico':refreshimg}]);
 				
@@ -231,114 +279,93 @@
 	</fx:Declarations>
 	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
 		<s:layout>
-			<s:HorizontalLayout paddingTop="3">
+			<s:VerticalLayout verticalAlign="top" >
 				
-			</s:HorizontalLayout>
+			</s:VerticalLayout>
 		</s:layout>
-		<s:BorderContainer width="30%" height="100%" id="panel" backgroundAlpha="0"   borderVisible="false">
+		<s:BorderContainer  width="100%" height="45"   borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">	
 			<s:layout>
-				<s:VerticalLayout verticalAlign="top">
+				<s:HorizontalLayout verticalAlign="middle" paddingLeft="25" gap="8">
 					
-				</s:VerticalLayout>
+				</s:HorizontalLayout>
 			</s:layout>
-			<s:BorderContainer  width="100%" height="25"  backgroundAlpha="0"  borderVisible="false">	
-				<s:layout>
-					<s:HorizontalLayout verticalAlign="middle" paddingLeft="25" gap="5">
-						
-					</s:HorizontalLayout>
-				</s:layout>
-				<s:Label text="查找：" />
-				<s:TextInput width="100" id="key" />
-				<s:Button chromeColor="red" color="#ffffff" label="查找" height="25" click="search()" />
-				<s:Button chromeColor="#cccccc" color="#000000" label="加入通信录" height="25" click="addContact()" />
-			</s:BorderContainer>
-			<uicontrol:MarkAdvancedDataGrid dataProvider="{list}"  isNewAdd="false" enabled="true" editable="true" width="100%" height="100%">
-				<uicontrol:columns>
-					<mx:AdvancedDataGridColumn headerText="选择" dataField="selected" editable="true"  sortable="false" width="60"  editorDataField="selected" rendererIsEditor="true" >
-						<mx:itemRenderer>
-							<fx:Component>
-								<mx:HBox horizontalAlign="center">
-									<fx:Script>
-										<![CDATA[
-											public function get selected():Boolean{
-												return cb.selected;
-											}
-											public function set selected(value:Boolean):void{
-												cb.selected=value;
-											}
-										]]>
-									</fx:Script>
-									
-									<mx:CheckBox id="cb" selected="{data.selected}" >
-										
-									</mx:CheckBox>
-								</mx:HBox>
-							</fx:Component>
-						</mx:itemRenderer>
-					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="用户名" editable="false"  dataField="username">
-						
-					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="姓名" editable="false"  dataField="nickname">
-						
-					</mx:AdvancedDataGridColumn>
-					
-				</uicontrol:columns>
+			<s:ButtonBar id="logQZ" dataProvider="{timelist}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showLog()" >
+			</s:ButtonBar>
+			<s:Label text="时间范围：" />
+			<mx:DateField id="startdate" formatString="YYYY/MM/DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="queryparamchange()" />
+			<s:Label text="~"/>
+			<mx:DateField id="enddate"  formatString="YYYY/MM/DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="queryparamchange()"/>
+			<s:Button label="查询" />
+			<s:CheckBox id="showUsername" label="显示用户名">
 				
-			</uicontrol:MarkAdvancedDataGrid>
+			</s:CheckBox>
 		</s:BorderContainer>
-		<s:BorderContainer id="rightContainner" width="70%" height="100%" backgroundAlpha="0"  borderVisible="false">
+		<s:BorderContainer  width="100%" height="100%"  backgroundAlpha="0"  borderVisible="false">	
+			<s:layout>
+				<s:HorizontalLayout  gap="8">
+					
+				</s:HorizontalLayout>
+			</s:layout>
+			
+			<s:DataGrid id="logGrid" dataProvider="{list}"  width="500" height="100%"   >
+				<s:columns>
+					<s:ArrayList>
+						<s:GridColumn dataField="date" headerText="日期" width="70">
+							
+						</s:GridColumn>
+						<s:GridColumn dataField="date" headerText="操作者" width="70">
+							
+						</s:GridColumn>
+						<s:GridColumn dataField="date" headerText="操作者账号" visible="{showUsername.selected}" width="70">
+							
+						</s:GridColumn>
+						<s:GridColumn dataField="date" headerText="动作" width="60">
+							
+						</s:GridColumn>
+						<s:GridColumn dataField="date" headerText="对象类型" width="70">
+							
+						</s:GridColumn>
+						<s:GridColumn dataField="date" headerText="对象名称">
+							
+						</s:GridColumn>
+						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" visible="false" >
+							<s:itemRenderer>
+								<fx:Component>
+									<s:GridItemRenderer>
+										<s:HGroup width="100%" height="100%" verticalAlign="middle" gap="5" paddingLeft="5" paddingTop="3" paddingRight="3">
+											
+											<s:BorderContainer visible="{!data.is_read}" width="10" height="10" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
+												
+											</s:BorderContainer>
+											<s:VGroup width="100%" height="100%">
+												<s:Label width="100%" height="12" paddingLeft="10" text="{data.authorname}" textDecoration="underline" fontSize="12" color="#434343">
+													
+												</s:Label>
+												<s:Label width="100%" height="100%" text="{data.title}" maxDisplayedLines="-1" fontSize="15" color="#000000">
+													
+												</s:Label>
+												
+											</s:VGroup>
+										</s:HGroup>
+									</s:GridItemRenderer>
+									
+								</fx:Component>
+							</s:itemRenderer>
+						</s:GridColumn>
+					</s:ArrayList>
+				</s:columns>
+			</s:DataGrid>
+		
+		<s:BorderContainer id="rightContainner" width="100%" height="100%" backgroundAlpha="0"  borderVisible="false">
 			<s:layout>
 				<s:VerticalLayout gap="5">
 					
 				</s:VerticalLayout>
 				
 			</s:layout>
-			<s:Button chromeColor="red" color="#ffffff" label="移除通信录" height="25" click="delContactAsk()" />
-			<uicontrol:MarkAdvancedDataGrid id="peopgrid" dataProvider="{ToolUtil.contactsList}"  isNewAdd="false" enabled="true" editable="true" width="100%" height="100%">
-				<uicontrol:columns>
-					<mx:AdvancedDataGridColumn headerText="选择" dataField="selected" editable="true"  sortable="false" width="60"  editorDataField="selected" rendererIsEditor="true" >
-						<mx:itemRenderer>
-							<fx:Component>
-								<mx:HBox horizontalAlign="center">
-									<fx:Script>
-										<![CDATA[
-											public function get selected():Boolean{
-												return cb.selected;
-											}
-											public function set selected(value:Boolean):void{
-												cb.selected=value;
-											}
-										]]>
-									</fx:Script>
-									
-									<mx:CheckBox id="cb" selected="{data.selected}" >
-										
-									</mx:CheckBox>
-								</mx:HBox>
-							</fx:Component>
-						</mx:itemRenderer>
-					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="用户名" editable="false" dataField="username">
-						
-					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="姓名" editable="false"  dataField="nickname">
-						
-					</mx:AdvancedDataGridColumn>
-					
-					<mx:AdvancedDataGridColumn headerText="RTX账号" editable="false"  dataField="rtx"  >
-						
-					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="email" editable="false"  dataField="email" >
-						
-					</mx:AdvancedDataGridColumn>
-					<mx:AdvancedDataGridColumn headerText="手机号" editable="false"  dataField="sms" >
-						
-					</mx:AdvancedDataGridColumn>
-				</uicontrol:columns>
-				
-			</uicontrol:MarkAdvancedDataGrid>
+			
 
+		</s:BorderContainer>
 		</s:BorderContainer>
 	</s:BorderContainer>
 </control:CBorderContainer>
