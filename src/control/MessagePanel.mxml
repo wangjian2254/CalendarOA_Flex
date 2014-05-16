@@ -78,8 +78,8 @@
 			override public function closeContainer(e:CloseEvent):void{
 				
 			}
-			//
-			
+
+            // 重新进入时执行
 			override public function reloadParamData(e:FlexEvent):void{
 				if(param){
 					if(param.hasOwnProperty("messageType")){
