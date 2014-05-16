@@ -78,7 +78,7 @@
 			override public function closeContainer(e:CloseEvent):void{
 				
 			}
-			
+			//
 			override public function reloadParamData(e:FlexEvent):void{
 				if(param){
 					if(param.hasOwnProperty("messageType")){
