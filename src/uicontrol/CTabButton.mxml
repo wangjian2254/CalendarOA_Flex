@@ -32,13 +32,13 @@
 			//////
 		
 			[Bindable]
-			[Embed("assets/img/tabbutton/X_down.png")]
+			[Embed("/assets/img/tabbutton/X_down.png")]
 			public var X_down:Class;
 			[Bindable]
-			[Embed("assets/img/tabbutton/X_hover.png")]
+			[Embed("/assets/img/tabbutton/X_hover.png")]
 			public var X_hover:Class;
 			[Bindable]
-			[Embed("assets/img/tabbutton/X_out.png")]
+			[Embed("/assets/img/tabbutton/X_out.png")]
 			public var X_out:Class;
 			
 			private var _flag:String=STATUS_U;

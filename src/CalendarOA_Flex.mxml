@@ -4,7 +4,7 @@
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   preloader="uicontrol.LoadingExampleProgressBar"
 			   creationComplete="init()"  minWidth="955" minHeight="600" skinClass="skins.ApplicationSkinBlue" xmlns:httpcontrol="httpcontrol.*" xmlns:control="control.*" xmlns:uicontrol="uicontrol.*">
-	<fx:Style source="assets/customrControls.css">
+	<fx:Style source="/assets/customrControls.css">
 		
 	</fx:Style>
 	<fx:Script>
@@ -310,7 +310,7 @@
 		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 		
 	</fx:Declarations>
-	<fx:Style source="assets/style.css"/>
+	<fx:Style source="/assets/style.css"/>
 	<s:Group id="header" width="100%" height="109">
 		<s:layout>
 			<s:BasicLayout/>

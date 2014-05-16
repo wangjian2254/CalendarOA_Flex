@@ -19,22 +19,22 @@ package control
 		private var _param:Object;//附带的参数
 		
 		[Bindable]
-		[Embed("assets/img/toolbg.png")]
+		[Embed("/assets/img/toolbg.png")]
 		public static var toolbgimg:Class;
 		[Bindable]
-		[Embed("assets/img/save.png")]
+		[Embed("/assets/img/save.png")]
 		public static var saveimg:Class;
 		[Bindable]
-		[Embed("assets/img/add.png")]
+		[Embed("/assets/img/add.png")]
 		public static var addimg:Class;
 		[Bindable]
-		[Embed("assets/img/del.png")]
+		[Embed("/assets/img/del.png")]
 		public static var delimg:Class;
 		[Bindable]
-		[Embed("assets/img/refresh.png")]
+		[Embed("/assets/img/refresh.png")]
 		public  static var refreshimg:Class;
 		[Bindable]
-		[Embed("assets/img/wx.png")]
+		[Embed("/assets/img/wx.png")]
 		public  static var wximg:Class;
 		
 		public function CBorderContainer()

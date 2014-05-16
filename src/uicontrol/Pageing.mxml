@@ -13,16 +13,16 @@
 			import mx.collections.ArrayList;
 			
 			[Bindable]
-			[Embed("assets/pageing/l.png")]
+			[Embed("/assets/pageing/l.png")]
 			public var l:Class;
 			[Bindable]
-			[Embed("assets/pageing/ll.png")]
+			[Embed("/assets/pageing/ll.png")]
 			public var ll:Class;
 			[Bindable]
-			[Embed("assets/pageing/r.png")]
+			[Embed("/assets/pageing/r.png")]
 			public var r:Class;
 			[Bindable]
-			[Embed("assets/pageing/rr.png")]
+			[Embed("/assets/pageing/rr.png")]
 			public var rr:Class;
 			
 			[Bindable]

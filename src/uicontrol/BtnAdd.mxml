@@ -9,13 +9,13 @@
 		<![CDATA[
 			
 			[Bindable]
-			[Embed("assets/btnimg/add_down.png")]
+			[Embed("/assets/btnimg/add_down.png")]
 			public var X_down:Class;
 			[Bindable]
-			[Embed("assets/btnimg/add_over.png")]
+			[Embed("/assets/btnimg/add_over.png")]
 			public var X_hover:Class;
 			[Bindable]
-			[Embed("assets/btnimg/add.png")]
+			[Embed("/assets/btnimg/add.png")]
 			public var X_out:Class;
 			
 			public function closeO():void{
