@@ -4,7 +4,7 @@
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   preloader="uicontrol.LoadingExampleProgressBar"
 			   creationComplete="init()"  minWidth="955" minHeight="600" skinClass="skins.ApplicationSkinBlue" xmlns:httpcontrol="httpcontrol.*" xmlns:control="control.*" xmlns:uicontrol="uicontrol.*">
-	<fx:Style source="assets/customrControls.css">
+	<fx:Style source="/assets/customrControls.css">
 		
 	</fx:Style>
 	<fx:Script>
@@ -14,6 +14,7 @@
 			import control.ChangePassword;
 			import control.GroupControl;
 			import control.Loading;
+			import control.LogPanel;
 			import control.LoginUser;
 			import control.MessagePanel;
 			import control.RegisterUser;
@@ -148,24 +149,7 @@
 				onMenuChange(event,evt.getObj());
 			}
 			
-			private function resulthaschange(evt:ResultEvent, token:Object=null):void{
-				if(evt.result.success==true){
-					if(evt.result.result){
-						var event:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
-						var xml:XML=new XML("<menuitem label='用户管理' mod='people'></menuitem>");
-						//						xml.label="欢迎";
-						//						xml.mod="welcome";
-						event.item=xml; 
-						onMenuChange(event);
-					}else{
-						var event1:MenuEvent=new MenuEvent(MenuEvent.CHANGE);
-						var xml1:XML=new XML("<menuitem label='用户管理' mod='people'></menuitem>");
-						event1.item=xml1; 
-						onMenuChange(event1);
-					}
-					
-				}
-			}
+			
 			private function resultUser(evt:ResultEvent, token:Object=null):void{
 				if(evt.result.success==true){
 					var user:User=new User();
@@ -265,6 +249,9 @@
 						case 'message':
 							c=new MessagePanel();
 							break;
+						case 'log':
+							c=new LogPanel();
+							break;
 						
 						
 					}
@@ -323,7 +310,7 @@
 		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 		
 	</fx:Declarations>
-	<fx:Style source="assets/style.css"/>
+	<fx:Style source="/assets/style.css"/>
 	<s:Group id="header" width="100%" height="109">
 		<s:layout>
 			<s:BasicLayout/>

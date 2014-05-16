@@ -3,8 +3,9 @@
 #################
 
 *.pydevproject
-.project
 .metadata
+.project
+.actionScriptProperties
 bin/
 tmp/
 *.tmp

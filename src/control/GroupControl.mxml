@@ -246,9 +246,9 @@
 			
 		</s:RadioButtonGroup>
 	</fx:Declarations>
-	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false">
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
 		<s:layout>
-			<s:HorizontalLayout>
+			<s:HorizontalLayout paddingTop="3">
 				
 			</s:HorizontalLayout>
 		</s:layout>
