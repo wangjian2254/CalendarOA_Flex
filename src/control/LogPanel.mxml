@@ -36,6 +36,8 @@
 			private var list:ArrayCollection=new ArrayCollection();
 			
 			override public   function  init(e:FlexEvent):void{
+                showLog();
+                queryLog();
 			}
 			override public function closeContainer(e:CloseEvent):void{
 				dispatchEvent(e);
@@ -295,7 +297,7 @@
 			<mx:DateField id="startdate" formatString="YYYY/MM/DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="queryparamchange()" />
 			<s:Label text="~"/>
 			<mx:DateField id="enddate"  formatString="YYYY/MM/DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="queryparamchange()"/>
-			<s:Button label="查询" />
+			<s:Button label="查询" click="queryLog()" />
 			<s:CheckBox id="showUsername" label="显示用户名">
 				
 			</s:CheckBox>
@@ -310,24 +312,22 @@
 			<s:DataGrid id="logGrid" dataProvider="{list}"  width="500" height="100%"   >
 				<s:columns>
 					<s:ArrayList>
-						<s:GridColumn dataField="date" headerText="日期" width="70">
+						<s:GridColumn dataField="action_time" headerText="日期" width="140">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="date" headerText="操作者" width="70">
+						<s:GridColumn dataField="nickname" headerText="操作者" width="70">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="date" headerText="操作者账号" visible="{showUsername.selected}" width="70">
+						<s:GridColumn dataField="username" headerText="操作者账号" visible="{showUsername.selected}" width="70">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="date" headerText="动作" width="60">
+						<s:GridColumn dataField="action_flag" headerText="动作" width="60">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="date" headerText="对象类型" width="70">
+						<s:GridColumn dataField="object_repr" headerText="对象" >
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="date" headerText="对象名称">
-							
-						</s:GridColumn>
+
 						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" visible="false" >
 							<s:itemRenderer>
 								<fx:Component>
