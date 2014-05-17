@@ -4,16 +4,19 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
+			import control.MessageShow;
+			
 			import events.ChangeUserEvent;
 			import events.CloseEvent;
 			
 			import httpcontrol.HttpServiceUtil;
 			
 			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
+			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
-			import control.MessageShow;
 			[Bindable]
 			private var buttonArr0:ArrayCollection=new ArrayCollection([{'label':'全部','mode':'all'},{'label':'未读信息','mode':'unread'},{'label':'已读信息','mode':'read'}]);
 			[Bindable]
@@ -25,11 +28,17 @@
 			
 			[Bindable]
 			private var messagelist:ArrayCollection=new ArrayCollection();
-			
+			private var messageWin:MessageShow;
 			//新增，保存，删除,回复，转发的处理函数
 			//多个按钮点击事件的处理函数
 			private function clickHander(e:ItemClickEvent):void{
 				if(e.item.mode=='add'){
+					if(messageWin==null){
+						messageWin=new MessageShow();
+						messageWin.title="发送信息";
+					}
+					PopUpManager.addPopUp(messageWin,FlexGlobals.topLevelApplication as DisplayObject,true);
+					PopUpManager.centerPopUp(messageWin);
 				}
 				
 				
