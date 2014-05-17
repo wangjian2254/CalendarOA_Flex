@@ -6,6 +6,7 @@
 .metadata
 .project
 .actionScriptProperties
+.flexProperties
 bin/
 tmp/
 *.tmp
