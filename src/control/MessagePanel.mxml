@@ -37,7 +37,8 @@
 						messageWin=new MessageShow();
 						messageWin.title="发送信息";
 					}
-					PopUpManager.addPopUp(messageWin,FlexGlobals.topLevelApplication as DisplayObject,true);
+					PopUpManager.addPopUp(messageWin,FlexGlobals.topLevelApplication as DisplayObject);
+					PopUpManager.bringToFront(messageWin);
 					PopUpManager.centerPopUp(messageWin);
 				}
 				

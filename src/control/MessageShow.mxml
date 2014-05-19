@@ -1,83 +1,210 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="450" height="300"  creationComplete="init(event)" close="closeWin(event)">
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="770" height="470"  creationComplete="init(event)" close="closeWin(event)" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
+			import events.ChangeJoinUserEvent;
+			import events.ChangeMenuEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			
 			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
 			import mx.events.CloseEvent;
+			import mx.events.EffectEvent;
 			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.utils.ObjectUtil;
+			
+			import uicontrol.ContactItem;
+			
+			import util.ToolUtil;
 			[Bindable]
 			private var sjrArr:ArrayCollection;
+			private var isFirstForAni:Boolean=true;
 			private function init(e:mx.events.FlexEvent):void{
+				if(isFirstForAni){
+					showAnimation();
+				}
 			}
 			private function closeWin(e:mx.events.CloseEvent):void{
+				closeAnimation();
+			}
+			private function openAddress():void{
+				var obj:Object=new Object();
+				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
+				FlexGlobals.topLevelApplication.dispatchEvent(evt);
+			}
+			private function refreshAddress(result:Object,e:ResultEvent):void{
+				var contacts:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+				for each(var u:Object in contacts){
+					for each(var c:Object in sjrGrid.dataProvider as ArrayCollection){
+						if(u.username == c.username){
+							if(c.selected){
+								u.selected=true;
+							}
+						}
+					}
+				}
+				sjrArr = contacts;
+				sjrGrid.invalidateList();
+				
+//				changeUsers();
+			}
+//			public function changeUsers():void{
+//				users.removeAllElements();
+//				var address:ContactItem = null;
+//				for each(var obj:Object in sjrArr){
+//					if(obj.selected){
+//						address = new ContactItem();
+//						address.tileGroup = users;
+//						address.modifyEnable = true;
+//						address.userData = obj;
+//						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
+//						users.addElement(address);
+//					}
+//				}
+//			}
+			private function delJoin(e:ChangeJoinUserEvent):void{
+				sjrGrid.invalidateList();
+			}
+			public  function showAnimation():void{
+				mve.xFrom=0-this.width;
+				mve.yFrom=(FlexGlobals.topLevelApplication.height-this.height)/2;
+				mve.xTo=(FlexGlobals.topLevelApplication.width-this.width)/2;
+				mve.yTo=(FlexGlobals.topLevelApplication.height-this.height)/2;
+				var pa:Point=new Point(mve.xFrom,mve.yFrom);
+				var pb:Point=new Point(mve.xTo,mve.yTo);
+				mve.duration = int(Point.distance(pa,pb))/100*70;
+				mve.addEventListener(EffectEvent.EFFECT_END,showAnimationEnd);
+				mve.play();
+			}
+			private function showAnimationEnd(e:EffectEvent):void{
+				isFirstForAni=false;
+			}
+			public  function closeAnimation():void{
+				mve.xFrom=this.width;
+				mve.yFrom=this.height;
+				mve.xTo=FlexGlobals.topLevelApplication.width;
+				mve.yTo =FlexGlobals.topLevelApplication.height;
+				var pa:Point=new Point(mve.xFrom,mve.yFrom);
+				var pb:Point=new Point(mve.xTo,mve.yTo);
+				mve.duration = int(Point.distance(pa,pb))/100*70;
+				mve.addEventListener(EffectEvent.EFFECT_END,closeAnimationEnd);
+				mve.play();
+			}
+			private function closeAnimationEnd(e:EffectEvent):void{
 				PopUpManager.removePopUp(this);
 			}
-			private function showSjrGrid(e:flash.events.Event):void{
-				sjrContainer.visible=sjrCheck.selected;
+			public  function sendAnimation():void{
+				mve.xFrom=this.width;
+				mve.yFrom=this.height;
+				mve.xTo=FlexGlobals.topLevelApplication.width;
+				mve.yTo =0;
+				var pa:Point=new Point(mve.xFrom,mve.yFrom);
+				var pb:Point=new Point(mve.xTo,mve.yTo);
+				mve.duration = int(Point.distance(pa,pb))/100*70;
+				mve.addEventListener(EffectEvent.EFFECT_END,sendAnimationEnd);
+				mve.play();
+			}
+			private function sendAnimationEnd(e:EffectEvent):void{
+				PopUpManager.removePopUp(this);
+			}
+			private function sendMessage():void{
+				if(!isValid()){
+					return;
+				}
+				var url:String="";//保存url
+				var obj:Object=getData();//获取数据方法
+				HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
+			}
+			private function sendMessageResult(result:Object,e:ResultEvent):void{
+				//补齐后续方法
+			}
+			public function getData():Object{
+				var o:Object={};
+				return o;
+			}
+			private function isValid():Boolean{
+				//补齐后续方法
+				return true;
 			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:Move id="mve" target="{this}"/>
 	</fx:Declarations>
 	<s:BorderContainer top="10" right="10" bottom="10" left="10" borderVisible="false">
 		<s:layout>
 			<s:VerticalLayout>
 			</s:VerticalLayout>
 		</s:layout>
-		<s:BorderContainer width="420" height="100%" borderVisible="false">
+		<s:BorderContainer width="100%" height="100%" borderVisible="false">
 			<s:layout>
-				<s:HorizontalLayout>
+				<s:HorizontalLayout gap="5">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:BorderContainer width="420" height="200" borderVisible="false">
+			<s:BorderContainer width="80%" height="100%" borderVisible="false">
 				<s:layout>
 					<s:VerticalLayout>
 					</s:VerticalLayout>
 				</s:layout>
-				<s:BorderContainer borderVisible="false">
-					<s:layout>
-						<s:HorizontalLayout>
-						</s:HorizontalLayout>
-					</s:layout>
-					<s:Label text="标题">
-					</s:Label>
-					<s:TextInput id="mesTitle" maxChars="200" width="400">
-						
-					</s:TextInput>
-				</s:BorderContainer>
 				<s:BorderContainer borderVisible="false" width="100%">
 					<s:layout>
 						<s:HorizontalLayout>
 						</s:HorizontalLayout>
 					</s:layout>
-					<s:Label text="内容">
+					<s:Label text="标题：" verticalAlign="middle" height="25">
 					</s:Label>
-					<s:BorderContainer>
-						<s:RichEditableText id="mesContent" height="150" width="400">
-							
-						</s:RichEditableText>
-					</s:BorderContainer>
+					<s:TextInput id="mesTitle" maxChars="200" width="100%" prompt="新增消息">
+						
+					</s:TextInput>
 				</s:BorderContainer>
-				<s:BorderContainer borderVisible="false">
+				<s:BorderContainer borderVisible="false" width="100%" height="100%">
 					<s:layout>
 						<s:HorizontalLayout>
 						</s:HorizontalLayout>
 					</s:layout>
-					<s:Label text="收件人">
+					<s:Label text="内容：">
 					</s:Label>
-					<s:CheckBox id="sjrCheck" change="showSjrGrid(event)">
-					</s:CheckBox>
+					<s:BorderContainer width="100%" height="100%">
+						<s:RichEditableText id="mesContent" height="100%" width="100%">
+						</s:RichEditableText>
+					</s:BorderContainer>
 				</s:BorderContainer>
 			</s:BorderContainer>
-			<s:BorderContainer id="sjrContainer" visible="false" height="250">
+			<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%">
+			</s:BorderContainer>
+			<s:BorderContainer id="sjrContainer" height="100%" borderVisible="false">
 				<s:layout>
-					<s:VerticalLayout>
+					<s:VerticalLayout gap="5">
 					</s:VerticalLayout>
 				</s:layout>
+				<s:BorderContainer width="100%" height="30" borderVisible="false" >
+					<s:layout>
+						<s:HorizontalLayout gap="5" verticalAlign="middle"/>
+					</s:layout>
+					<s:Label text="参与人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+					<s:BorderContainer  width="100%" height="30" borderVisible="false" >
+						<s:layout>
+							<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
+						</s:layout>
+						
+						<uicontrol:BtnSetting clickFun="{openAddress}" />
+						<uicontrol:BtnRefresh clickFun="{ToolUtil.contactsRefresh}" parm="refreshAddress" />
+						
+					</s:BorderContainer>
+				</s:BorderContainer>
+				<!--<s:Scroller width="100%" height="100%" >
+					<s:Group width="100%" height="100%" >
+						<s:TileGroup id="users" height="100%"  width="100%" requestedColumnCount="-1">
+							
+						</s:TileGroup>
+					</s:Group>
+				</s:Scroller>-->
 				<mx:DataGrid id="sjrGrid" width="100%" minHeight="350" editable="true" dataProvider="{sjrArr}" height="{sjrContainer.height}">
 					<mx:columns>
 						<mx:DataGridColumn headerText="选择"  width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
@@ -116,14 +243,14 @@
 				</mx:DataGrid>
 			</s:BorderContainer>
 		</s:BorderContainer>
-		<s:BorderContainer width="420" borderVisible="false">
+		<s:BorderContainer width="100%" borderVisible="false">
 			<s:layout>
 				<s:HorizontalLayout horizontalAlign="center">
 				</s:HorizontalLayout>
 			</s:layout>
-			<s:Button label="发送">
+			<s:Button id="savBtn" label="发送" color="white" chromeColor="red" height="25" click="sendMessage()">
 			</s:Button>
-			<s:Button label="存为草稿">
+			<s:Button label="存为草稿" height="25">
 			</s:Button>
 		</s:BorderContainer>
 	</s:BorderContainer>
