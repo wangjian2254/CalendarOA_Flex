@@ -19,8 +19,9 @@
 			import mx.events.ItemClickEvent;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
-			
-			import util.DateUtil;
+            import mx.utils.StringUtil;
+
+            import util.DateUtil;
 			import util.ToolUtil;
 			
 			[Bindable]
@@ -118,6 +119,27 @@
 				
 			}
 
+            private function click_logItem():void{
+                if(cBoxModelHistory.selected){
+                    if(logGrid.selectedItem){
+                        if(object_id==logGrid.selectedItem.object_id&&object_type==logGrid.selectedItem.object_type_id){
+                            Alert.show("对象历史记录显示的就是选中对象，是否改为显示所选记录?", "提示", Alert.YES | Alert.NO, null, showLogItem);
+                        }else{
+                            showModelHistory();
+                        }
+                    }
+                }else{
+                    showChangeMessage();
+                }
+            }
+
+            private function showLogItem(e:mx.events.CloseEvent):void{
+                if (e.detail == Alert.YES){
+                    cBoxModelHistory.selected=false;
+                    showChangeMessage();
+                }
+            }
+
             private function showChangeMessage():void{
                 if(logGrid.selectedItem==null){
                      logArea.text="";
@@ -125,159 +147,43 @@
                     logArea.text=logGrid.selectedItem.change_message;
                 }
             }
-			
-			
-			private function getDataResult(o:Object,e:ResultEvent):void{
-				if(o&&o.success){
-					list = new ArrayCollection(o.result as Array);
-				}
-				
-			}
-			public function initpassword(e:Event):void{
-				var data:Object=getData();
-				if(data==null){
-					return;
-				}
-				HttpServiceUtil.getCHTTPServiceAndResult("/ft/initUser",initUserResult,"POST").send(data);
-			}
-			
-			private function initUserResult(result:Object,e:ResultEvent):void{
-				if(result.success){
-					Alert.show(result.message,"提示");
-				}
-			}
-			
-			
-			public function getData():Object{
-				var o:Object={};
-				
-				
-				return o;
-			}
-			
-			private function delContactAsk():void{
-				
-				Alert.show("确认移除选中的联系人?", "提示", Alert.YES | Alert.NO, null, delContact);
-				
-			}
-			//删除日程
-			private function delContact(e:mx.events.CloseEvent):void
-			{
-				if (e.detail == Alert.YES){
-					var data:Object=new Object();
-					var username:Array = new Array();
-					for each(var item:Object in ToolUtil.contactsList){
-						if(item.selected){
-							username.push(item.username);
-						}
-					}
-					data["usernames"] = username;
-					data["do"] = "out";
-					HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
-					
-					
-				}
-			}
-			private function addContact():void{
-				var data:Object=new Object();
-				var username:Array = new Array();
-				for each(var item:Object in list){
-					if(item.selected){
-						username.push(item.username);
-					}
-				}
-				if(username.length==0){
-					Alert.show("请选择用户","警告");
-					return;
-				}
-				data["usernames"] = username;
-				data["do"] = "join";
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts",ToolUtil.contactsRefresh,"POST").send(data);
-				
-			}
-			
-			
-			
-			private function loadDataFault(e:FaultEvent):void{
-				Alert.show('操作失败',"提示");
-			}
-			
-			
-			//新增，保存，删除的处理函数
-			private function clickHander(e:ItemClickEvent):void{
-				if(e.label=="新增"){
-					add();
-				}
-				if(e.label=="修改"){
-					
-				}
-				if(e.label=="删除"){
-					del();
-				}
-				if(e.label=='同步数据'){
-					//					InfoUtil.userRefresh(refreshScx);
-					init(null);
-				}
-				//				if(e.label=='测试打开部门管理'){
-				//					var obj:Object=new Object();
-				//					obj['test']="测试";
-				//					var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"dept",obj,true)
-				//					dispatchEvent(evt);
-				//				}
-				
-			}
-			
-			public function add():void{
-			}
-			public function del():void{
-				var userArr:ArrayCollection=new ArrayCollection();
-				var obj:Object;
-				var item:Object;
-				for(var i:int=list.length-1;i>=0;i--){
-					item=list.getItemAt(i);
-					if(!item.selected){
-						continue;
-					}
-					obj=new Object();
-					if(item.hasOwnProperty("id")){
-						obj.id=item.id;
-						userArr.addItem(obj);
-					}
-					//					obj.name=item.name;
-					
-				}
-				if(userArr.length>0){
-//					ToolUtil.deptRefresh(refresh);
-//					ToolUtil.areaRefresh(refresh);
-//					ToolUtil.userRefresh(refresh);
-					//					HttpServiceUtil.getCHTTPServiceAndResultAndFault("/htcsgl/_100_BaseInfosAction_deletedept.action",loadDataResult,loadDataFault,"POST").send(userArr);
-				}
-			}
-			
-			public function show(obj:Object):void{
-			}
-			
-			
-			
-			public function refresh(result:Object,e:ResultEvent):void{
-				if(result.success){
-					add();
-					init(null);
-					//					InfoUtil.userRefresh(refreshScx);
-				}
-			}
-			
-			
-				[Bindable]
-				private var buttonArr:ArrayCollection=new ArrayCollection([{'label':'新增','ico':addimg},{'label':'修改','ico':saveimg},{'label':'同步数据','ico':refreshimg}]);
-				
-			private function pagechange(e:PageChangeEvent):void
-				
-			{
-				
-				//				datalist.dataProvider = e.Filter(datas)
-				
-			}
+
+            private var object_type:int=0;
+            private var object_id:int=0;
+
+            private function showModelHistory():void{
+                 if(cBoxModelHistory.selected){
+                     if(logGrid.selectedItem==null){
+                        logArea.text = "";
+                     }else{
+                         var data:Object=new Object();
+                         data["object_type"] = logGrid.selectedItem.object_type_id;
+                         data["object_id"] = logGrid.selectedItem.object_id;
+                         object_id=logGrid.selectedItem.object_id;
+                         object_type=logGrid.selectedItem.object_type_id;
+                         HttpServiceUtil.getCHTTPServiceAndResultAndFault("/log/getMyHistory",queryLogHistoryResult,queryLogHistoryFault,"POST").send(data);
+                     }
+                 }else{
+                     showChangeMessage();
+                 }
+            }
+
+            private function queryLogHistoryFault(e:FaultEvent):void{
+                object_id=0;
+                object_type=0;
+            }
+
+            private function queryLogHistoryResult(result:Object,e:ResultEvent):void{
+                var list:ArrayCollection = new ArrayCollection(result.result as Array);
+                logArea.text = "";
+                for each(var obj:Object in list){
+                    logArea.text+="时间："+obj.action_time+'  \n操作人："'+obj.nickname+' : '+obj.username+'" \n动作：'+obj.action_flag;
+                    logArea.text+="\n\n";
+                    logArea.text+=obj.change_message;
+                    logArea.text+="\n\n\n";
+                }
+            }
+
 				
 		]]>
 	</fx:Script>
@@ -317,22 +223,25 @@
 				</s:HorizontalLayout>
 			</s:layout>
 			
-			<s:DataGrid id="logGrid" dataProvider="{list}"  width="500" height="100%" click="showChangeMessage()"   >
+			<s:DataGrid id="logGrid" dataProvider="{list}"  width="{showUsername.selected?690:600}" height="100%" click="click_logItem()"   >
 				<s:columns>
 					<s:ArrayList>
-						<s:GridColumn dataField="action_time" headerText="日期" width="120">
+						<s:GridColumn dataField="action_time" headerText="日期" width="125">
 							
 						</s:GridColumn>
 						<s:GridColumn dataField="nickname" headerText="操作者" width="70">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="username" headerText="操作者账号" visible="{showUsername.selected}" width="70">
+						<s:GridColumn dataField="username" headerText="操作者账号" visible="{showUsername.selected}" width="90">
 							
 						</s:GridColumn>
 						<s:GridColumn dataField="action_flag" headerText="动作" width="40">
 							
 						</s:GridColumn>
                         <s:GridColumn dataField="object_type" headerText="对象类型" width="90">
+
+						</s:GridColumn>
+                        <s:GridColumn dataField="object_id" headerText="对象id" width="55">
 
 						</s:GridColumn>
 						<s:GridColumn dataField="object_repr" headerText="对象名称" >
@@ -352,7 +261,8 @@
 				</s:VerticalLayout>
 				
 			</s:layout>
-			<s:TextArea id="logArea" width="100%" height="100%" editable="false">
+            <s:CheckBox id="cBoxModelHistory" selected="false" change="showModelHistory()" label="显示对象的历史修改记录"/>
+			<s:TextArea id="logArea" width="100%" height="100%" editable="false" listAutoPadding="5">
 
 			</s:TextArea>
 

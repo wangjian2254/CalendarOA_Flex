@@ -28,6 +28,7 @@
 				if(isFirstForAni){
 					showAnimation();
 				}
+                sjrArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 			}
 			private function closeWin(e:mx.events.CloseEvent):void{
 				closeAnimation();
