@@ -10,6 +10,7 @@
 			import httpcontrol.HttpServiceUtil;
 			
 			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
 			import mx.events.CloseEvent;
 			import mx.events.EffectEvent;
@@ -113,16 +114,27 @@
 			private function sendAnimationEnd(e:EffectEvent):void{
 				PopUpManager.removePopUp(this);
 			}
+			//保存草稿
+			private function savSketch():void{
+				if(!isValid()){
+					return;
+				}
+				var url:String="/oamessage/updateMessage";
+				var obj:Object=getData();
+				obj.flag=true;
+				HttpServiceUtil.getCHTTPServiceAndResult(url,null,"POST").send(obj);
+			}
 			private function sendMessage():void{
 				if(!isValid()){
 					return;
 				}
 				var url:String="/oamessage/updateMessage";//保存url
 				var obj:Object=getData();//获取数据方法
+				obj.flag=false;
 				HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
 			}
 			private function sendMessageResult(result:Object,e:ResultEvent):void{
-				//补齐后续方法
+				sendAnimation();
 			}
 			public function getData():Object{
 				var o:Object={};
@@ -140,7 +152,23 @@
 				return o;
 			}
 			private function isValid():Boolean{
-				//补齐后续方法
+				var obj:Object=getData();
+				if(obj.title==""){
+					Alert.show("标题不能为空","提示");
+					return false;
+				}
+				if(obj.title.length>200){
+					Alert.show("标题长度不能超过200个字","提示");
+					return false;
+				}
+				if(obj.desc==""){
+					Alert.show("内容不能为空","提示");
+					return false;
+				}
+				if(obj["t"].length<=0){
+					Alert.show("请选择接收人","提示");
+					return false;
+				}
 				return true;
 			}
 		]]>
@@ -199,7 +227,7 @@
 					<s:layout>
 						<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 					</s:layout>
-					<s:Label text="参与人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+					<s:Label text="接收人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 					<s:BorderContainer  width="100%" height="30" borderVisible="false" >
 						<s:layout>
 							<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
@@ -263,7 +291,7 @@
 			</s:layout>
 			<s:Button id="savBtn" label="发送" color="white" chromeColor="red" height="25" click="sendMessage()">
 			</s:Button>
-			<s:Button label="存为草稿" height="25">
+			<s:Button label="存为草稿" height="25" click="savSketch()">
 			</s:Button>
 		</s:BorderContainer>
 	</s:BorderContainer>
