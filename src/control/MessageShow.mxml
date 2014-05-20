@@ -117,7 +117,7 @@
 				if(!isValid()){
 					return;
 				}
-				var url:String="";//保存url
+				var url:String="/oamessage/updateMessage";//保存url
 				var obj:Object=getData();//获取数据方法
 				HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
 			}
@@ -126,6 +126,17 @@
 			}
 			public function getData():Object{
 				var o:Object={};
+                o["title"] = mesTitle.text;
+                o["desc"] = mesContent.text;
+                o["flag"] = true; //true 为草稿，false 为发送
+                o["id"] = 2;
+                o["t"] = new Array();
+                for each(var obj:Object in sjrArr){
+                    if(obj.selected){
+                        o["t"].push(obj.id);
+                    }
+
+                }
 				return o;
 			}
 			private function isValid():Boolean{
