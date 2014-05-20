@@ -1,7 +1,7 @@
 package util
 {
 	import control.Loading;
-	import control.LoginUser;
+	import control.LoginUserPanel;
 	
 	import events.ChangeScheduleEvent;
 	import events.ChangeUserEvent;
@@ -35,7 +35,7 @@ package util
 		public static var resultMsg:String="";
 		
 		public static var  currentUserFun:Function=null;
-		public static var loginUser:LoginUser= new LoginUser();
+		public static var loginUser:LoginUserPanel= new LoginUserPanel();
 		
 		private static var time:Timer = new Timer(1000*60*5,0);
 		

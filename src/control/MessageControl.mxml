@@ -4,7 +4,7 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-        import control.MessageShow;
+        import control.MessagePanel;
 
         import events.ChangeUserEvent;
         import events.CloseEvent;
@@ -42,13 +42,13 @@
 
         [Bindable]
         private var messagelist:ArrayCollection = new ArrayCollection();
-        private var messageWin:MessageShow;
+        private var messageWin:MessagePanel;
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:ItemClickEvent):void {
             if (e.item.mode == 'add') {
                 if (messageWin == null) {
-                    messageWin = new MessageShow();
+                    messageWin = new MessagePanel();
                     messageWin.title = "发送信息";
                 }
                 PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
