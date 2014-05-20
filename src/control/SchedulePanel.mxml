@@ -743,7 +743,7 @@
 			<s:VerticalLayout gap="0"/>
 		</s:layout>
 	
-	<s:TextInput id="scheduleTitle" width="100%" text="日程标题">
+	<s:TextInput id="scheduleTitle" width="100%" prompt="日程标题">
 	</s:TextInput>
 	<s:BorderContainer width="100%" height="30" borderVisible="false" >
 		<s:layout>
