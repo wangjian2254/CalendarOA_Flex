@@ -13,7 +13,6 @@
 			import mx.core.FlexGlobals;
 			import mx.events.CloseEvent;
 			import mx.events.EffectEvent;
-			import mx.events.FlexEvent;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
 			import mx.utils.ObjectUtil;
@@ -24,11 +23,27 @@
 			[Bindable]
 			private var sjrArr:ArrayCollection;
 			private var isFirstForAni:Boolean=true;
+			
 			private function init(e:mx.events.FlexEvent):void{
 				if(isFirstForAni){
 					showAnimation();
 				}
                 sjrArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+				changeUsers();
+			}
+			public function changeUsers():void{
+				users.removeAllElements();
+				var address:ContactItem = null;
+				for each(var obj:Object in sjrArr){
+					if(obj.selected){
+						address = new ContactItem();
+						address.tileGroup = users;
+						address.modifyEnable = true;
+						address.userData = obj;
+						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
+						users.addElement(address);
+					}
+				}
 			}
 			private function closeWin(e:mx.events.CloseEvent):void{
 				closeAnimation();
@@ -51,23 +66,8 @@
 				}
 				sjrArr = contacts;
 				sjrGrid.invalidateList();
-				
-//				changeUsers();
+				changeUsers();
 			}
-//			public function changeUsers():void{
-//				users.removeAllElements();
-//				var address:ContactItem = null;
-//				for each(var obj:Object in sjrArr){
-//					if(obj.selected){
-//						address = new ContactItem();
-//						address.tileGroup = users;
-//						address.modifyEnable = true;
-//						address.userData = obj;
-//						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
-//						users.addElement(address);
-//					}
-//				}
-//			}
 			private function delJoin(e:ChangeJoinUserEvent):void{
 				sjrGrid.invalidateList();
 			}
@@ -171,7 +171,7 @@
 					</s:layout>
 					<s:Label text="内容：">
 					</s:Label>
-					<s:BorderContainer width="100%" height="100%">
+					<s:BorderContainer id="richTextContainer" width="100%" height="100%">
 						<s:RichEditableText id="mesContent" height="100%" width="100%">
 						</s:RichEditableText>
 					</s:BorderContainer>
@@ -179,7 +179,7 @@
 			</s:BorderContainer>
 			<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%">
 			</s:BorderContainer>
-			<s:BorderContainer id="sjrContainer" height="100%" borderVisible="false">
+			<s:BorderContainer id="sjrContainer" height="100%" width="100%" borderVisible="false">
 				<s:layout>
 					<s:VerticalLayout gap="5">
 					</s:VerticalLayout>
@@ -199,14 +199,14 @@
 						
 					</s:BorderContainer>
 				</s:BorderContainer>
-				<!--<s:Scroller width="100%" height="100%" >
+				<s:Scroller width="100%" height="100%" >
 					<s:Group width="100%" height="100%" >
 						<s:TileGroup id="users" height="100%"  width="100%" requestedColumnCount="-1">
 							
 						</s:TileGroup>
 					</s:Group>
-				</s:Scroller>-->
-				<mx:DataGrid id="sjrGrid" width="100%" minHeight="350" editable="true" dataProvider="{sjrArr}" height="{sjrContainer.height}">
+				</s:Scroller>
+				<mx:DataGrid id="sjrGrid" width="100%" minHeight="300" editable="true" dataProvider="{sjrArr}">
 					<mx:columns>
 						<mx:DataGridColumn headerText="选择"  width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
 							<mx:itemRenderer>
@@ -224,6 +224,7 @@
 												private function changeValue():void{
 													if(data.selected!=cb.selected){
 														data.selected = cb.selected;
+														outerDocument.changeUsers();
 													}
 												}
 											]]>
