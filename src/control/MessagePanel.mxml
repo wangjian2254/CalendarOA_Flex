@@ -141,7 +141,6 @@
                 o["title"] = mesTitle.text;
                 o["desc"] = mesContent.text;
                 o["flag"] = true; //true 为草稿，false 为发送
-                o["id"] = 2;
                 o["t"] = new Array();
                 for each(var obj:Object in sjrArr){
                     if(obj.selected){
@@ -153,18 +152,15 @@
 			}
 			private function isValid():Boolean{
 				var obj:Object=getData();
-				if(obj.title==""){
-					Alert.show("标题不能为空","提示");
+				if(obj.title==""&&obj.desc==""){
+					Alert.show("标题 和 内容 不能同时为空","提示");
 					return false;
 				}
 				if(obj.title.length>200){
 					Alert.show("标题长度不能超过200个字","提示");
 					return false;
 				}
-				if(obj.desc==""){
-					Alert.show("内容不能为空","提示");
-					return false;
-				}
+
 				if(obj["t"].length<=0){
 					Alert.show("请选择接收人","提示");
 					return false;
