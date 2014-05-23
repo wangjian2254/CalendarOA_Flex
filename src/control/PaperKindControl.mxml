@@ -4,195 +4,265 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-        import control.MessagePanel;
-
-        import events.ChangeUserEvent;
-        import events.CloseEvent;
-
-        import httpcontrol.HttpServiceUtil;
-
-        import mx.collections.ArrayCollection;
-        import mx.core.FlexGlobals;
-        import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
-        import mx.managers.PopUpManager;
-        import mx.rpc.events.ResultEvent;
-
-        [Bindable]
-        private var buttonArr0:ArrayCollection = new ArrayCollection([
-            {'label': '全部', 'mode': 'all'},
-            {'label': '未读信息', 'mode': 'unread'},
-            {'label': '已读信息', 'mode': 'read'}
-        ]);
-        [Bindable]
-        private var buttonArr1:ArrayCollection = new ArrayCollection([
-            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
-            {'label': '写信息', 'ico': wximg, 'mode': 'add'}
-        ]);
-        [Bindable]
-        private var buttonArr2:ArrayCollection = new ArrayCollection([
-            {'label': '回复', 'ico': saveimg, 'mode': 'huifu'},
-            {'label': '转发', 'ico': saveimg, 'mode': 'add'}
-        ]);
-        [Bindable]
-        private var buttonArr3:ArrayCollection = new ArrayCollection([
-            {'label': '标记已读', 'ico': saveimg, 'mode': 'read'},
-            {'label': '标记未读', 'ico': saveimg, 'mode': 'unread'}
-        ]);
-
-        [Bindable]
-        private var messagelist:ArrayCollection = new ArrayCollection();
-        private var messageWin:MessagePanel;
-        //新增，保存，删除,回复，转发的处理函数
-        //多个按钮点击事件的处理函数
-        private function clickHander(e:ItemClickEvent):void {
-            if (e.item.mode == 'add') {
-                if (messageWin == null) {
-                    messageWin = new MessagePanel();
-                    messageWin.title = "发送信息";
-                }
-                PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                PopUpManager.bringToFront(messageWin);
-                PopUpManager.centerPopUp(messageWin);
-            }
-
-
-        }
-
-        // 全部、未读、已读 筛选
-        private function showType():void {
-            pagebar1.initPage();
-            messagelist.removeAll();
-            getMessages();
-
-        }
-
-        private function getMessages():void {
-            var data:Object = new Object();
-            data["type"] = messageType.selectedItem.mode;
-            data["start"] = pagebar1.PageIndex * pagebar1.mPageSize;
-            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageByUser", getMessagesResult, "POST").send(data);
-
-        }
-
-        private function getMessagesResult(result:Object, e:ResultEvent):void {
-            if (result.success) {
-
-                if (messagelist.length == 0) {
-                    pagebar1.mPageSize = result.result.limit;
-                    pagebar1.RecordCount = result.result.total;
-                    pagebar1.initPage();
-                }
-
-                messagelist.removeAll();
-                messagelist.addAll(new ArrayCollection(result.result.list as Array));
-                pagebar1.RecordCount = result.result.total;
-            }
-        }
-
-
-        override public function init(e:FlexEvent):void {
-            getMessages();
-        }
-
-        override public function changeCurrentUser(e:ChangeUserEvent):void {
-            getMessages();
-
-        }
-
-        override public function closeContainer(e:CloseEvent):void {
-
-        }
-
-        // 重新进入时执行
-        override public function reloadParamData(e:FlexEvent):void {
-            if (param) {
-                if (param.hasOwnProperty("messageType")) {
-                    for each(var obj:Object in buttonArr0) {
-                        if (obj.mode == param["messageType"]) {
-                            messageType.selectedItem = obj;
-                        }
-                    }
-                    showType();
-                }
-
-            }
-            super.reloadParamData(e);
-        }
-        ]]>
+			import control.MessagePanel;
+			
+			import events.ChangeUserEvent;
+			import events.CloseEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Bindable]
+			private var buttonArr1:ArrayCollection = new ArrayCollection([
+				{'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
+				{'label': '新增同级', 'ico': addimg, 'mode': 'addSam'},
+				{'label': '新增下级', 'ico': addimg, 'mode': 'addNex'}
+			]);
+			[Bindable]
+			private var papKindArr:ArrayCollection = new ArrayCollection([
+				{id:"root",name:"试卷类型",children:[
+					{id:"node1", name:"java",children:[
+						{id:"n11", name:"简单类型"},{id:"n12", name:"复合类型"},{id:"n13", name:"继承"}
+					]},  
+					{id:"node2", name:"C语言",children:[
+						{id:"n21", name:"指针"},{id:"n22", name:"结构体",children:[
+							{id:"n231", name:"简单类型"},{id:"n232", name:"复合类型"}]}
+					]},  
+					{id:"node3", name:"python"}
+				]}
+			]);
+			private var state:String="fresh";//fresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态)
+			private function changingHander(e:IndexChangeEvent):void{
+				var item:Object=ba1.dataProvider.getItemAt(e.newIndex);
+				if(item.mode=="addSam"||item.mode=="addNex"){
+					if(!paperKindTree.selectedItem){
+						Alert.show("请先选择一个试卷类型","提示");
+						e.preventDefault();
+						return;
+					}
+				}
+				if(item.mode=="addSam"){
+					if(paperKindTree.selectedItem==paperKindTree.firstVisibleItem){
+						Alert.show("试卷类型不能新增同级","提示");
+						e.preventDefault();
+						return;
+					}
+				}
+			}
+			//新增，保存，删除,回复，转发的处理函数
+			//多个按钮点击事件的处理函数
+			private function clickHander():void {
+				ba1.requireSelection=true;
+				var item:Object=ba1.selectedItem;
+				typeName.text="";
+				delBtn.enabled=false;
+				if(item.mode=="refresh"){
+					state="refresh";
+					loadSubKindData();
+					return;
+				}
+				if (item.mode == 'addSam') {
+					state="addSam";
+					return;
+				}
+				if (item.mode == 'addNex') {
+					state="addNex";
+					return;
+				}
+			}
+			private function isValid():Boolean{
+				var o:Object=getData();
+				if(!paperKindTree.selectedItem){
+					Alert.show("请选择一个试卷类型","提示");
+					return false;
+				}
+				if (state == 'addSam') {
+					if(paperKindTree.selectedItem==paperKindTree.firstVisibleItem){
+						Alert.show("试卷类型不能新增同级","提示");
+						return false;
+					}
+				}
+				if (state == 'mod') {
+					if(paperKindTree.selectedItem==paperKindTree.firstVisibleItem){
+						Alert.show("试卷类型不能修改","提示");
+						return false;
+					}
+				}
+				if (state == 'del') {
+					if(paperKindTree.selectedItem==paperKindTree.firstVisibleItem){
+						Alert.show("试卷类型不能删除","提示");
+						return false;
+					}
+				}
+				if(o["name"]==""){
+					Alert.show("类型名称不能为空","提示");
+					return false;
+				}
+				if(o["name"].length>200){
+					Alert.show("类型名称不能超过200个字","提示");
+					return false;
+				}
+				return true;
+			}
+			//查询方法
+			private function loadSubKindData():void{
+				var o:Object={};//如果需要补齐查询参数
+				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllPaperKind", loadSubKindDataResult, "POST").send(o);
+			};
+			private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					paperKindTree.dataProvider=new ArrayCollection(result as Array);
+				}
+			}
+			//保存方法
+			private function savSubKindData():void{
+				if(!isValid()){
+					return;
+				}
+				var o:Object=getData();
+				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/updatePaperKind", savSubKindDataResult, "POST").send(o);
+			};
+			private function savSubKindDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					loadSubKindData();
+				}
+			}
+			//删除方法
+			private function delSubKindData():void{
+				state="del";
+				if(!isValid()){
+					return;
+				}
+				var o:Object=getData();
+				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delPaperKind", delSubKindDataResult, "POST").send(o);
+			};
+			private function delSubKindDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					loadSubKindData();
+				}
+			}
+			private function selectNode():void{
+				ba1.requireSelection=false;
+				ba1.selectedIndex=-1;
+				state="mod";
+				delBtn.enabled=true;
+				setFormData();
+			}
+			private function setFormData():void{
+				var o:Object=paperKindTree.selectedItem;
+				typeName.text=o.name;
+			}
+			public function getData():Object{
+				var o:Object={};
+				var n:Object=paperKindTree.selectedItem;
+				o["name"] = typeName.text;
+				var parent:Object;
+				if(state=="addSam"){
+					parent=paperKindTree.getParentItem(paperKindTree.selectedItem);
+					if(parent){
+						o["fatherId"]=parent.id;
+					}
+					o["id"]="";
+				}
+				if(state=="addNex"){
+					o["fatherId"]=n.id;
+					o["id"]="";
+				}
+				if(state=="mod"||state=="del"){
+					o["fatherId"]=n.fatherId;
+					o["id"]=n.id;
+				}
+				return o;
+			}
+			
+			override public function init(e:FlexEvent):void {
+				//			loadSubKindData();
+			}
+			
+			override public function changeCurrentUser(e:ChangeUserEvent):void {
+				//			loadSubKindData();
+			}
+			
+			override public function closeContainer(e:CloseEvent):void {
+				
+			}
+			
+			// 重新进入时执行
+			override public function reloadParamData(e:FlexEvent):void {
+			}
+		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
-	<s:layout>
-		<s:VerticalLayout  >
-			
-		</s:VerticalLayout>
-	</s:layout>
-	<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
 		<s:layout>
-			<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
+			<s:VerticalLayout  >
 				
-			</s:HorizontalLayout>
+			</s:VerticalLayout>
 		</s:layout>
-		<s:ButtonBar id="messageType" dataProvider="{buttonArr0}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showType()" >
-		</s:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr1}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr2}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr3}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-	</s:BorderContainer>
-	<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
-		<s:layout>
-			<s:HorizontalLayout gap="2" verticalAlign="top">
-				
-			</s:HorizontalLayout>
-		</s:layout>
-		<s:VGroup width="250" height="100%">
-			<s:DataGrid id="messageGrid" dataProvider="{messagelist}"  width="100%" height="100%" rowHeight="50"  >
-				<s:columns>
-					<s:ArrayList>
-						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" >
-							<s:itemRenderer>
-								<fx:Component>
-									<s:GridItemRenderer>
-										<s:HGroup width="100%" height="100%" verticalAlign="middle" gap="5" paddingLeft="5" paddingTop="3" paddingRight="3">
-											
-											<s:BorderContainer visible="{!data.is_read}" width="10" height="10" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
-												
-											</s:BorderContainer>
-											<s:VGroup width="100%" height="100%">
-												<s:Label width="100%" height="12" paddingLeft="10" text="{data.authorname}" textDecoration="underline" fontSize="12" color="#434343">
-													
-												</s:Label>
-												<s:Label width="100%" height="100%" text="{data.title}" maxDisplayedLines="-1" fontSize="15" color="#000000">
-													
-												</s:Label>
-												
-											</s:VGroup>
-										</s:HGroup>
-									</s:GridItemRenderer>
-									
-								</fx:Component>
-							</s:itemRenderer>
-						</s:GridColumn>
-					</s:ArrayList>
-				</s:columns>
-			</s:DataGrid>
-			<uicontrol:Pageing id="pagebar1" infolbl="false">
-			</uicontrol:Pageing>
-		</s:VGroup>
-		
-		<s:Scroller width="100%" height="100%">
-			<s:Group width="100%" height="100%">
-				<s:BorderContainer width="100%" height="100%">
+		<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+			<s:layout>
+				<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
 					
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  click="clickHander()" changing="changingHander(event)" requireSelection="true">
+			</s:ButtonBar>
+		</s:BorderContainer>
+		<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
+			<s:layout>
+				<s:HorizontalLayout gap="2">
+					
+				</s:HorizontalLayout>
+			</s:layout>
+			<mx:Tree id="paperKindTree" itemClick="selectNode()" dataProvider="{papKindArr}" height="100%" width="30%" labelField="name">
+			</mx:Tree>
+			<s:BorderContainer width="70%" height="100%" borderVisible="false">
+				<s:BorderContainer  width="100%" height="100%" borderVisible="false" top="15" right="15" bottom="15" left="15">
+					<s:layout>
+						<s:VerticalLayout>
+						</s:VerticalLayout>
+					</s:layout>
+					<s:BorderContainer width="100%" height="100%" borderVisible="false">
+						<s:layout>
+							<s:VerticalLayout>
+							</s:VerticalLayout>
+						</s:layout>
+						<s:BorderContainer borderVisible="false" width="100%">
+							<s:layout>
+								<s:HorizontalLayout>
+								</s:HorizontalLayout>
+							</s:layout>
+							<s:Label text="类型名称：" verticalAlign="middle" height="25">
+							</s:Label>
+							<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
+								
+							</s:TextInput>
+						</s:BorderContainer>
+					</s:BorderContainer>
+					<s:BorderContainer width="100%" borderVisible="false">
+						<s:layout>
+							<s:HorizontalLayout horizontalAlign="center">
+							</s:HorizontalLayout>
+						</s:layout>
+						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savSubKindData()">
+						</s:Button>
+						<s:Button id="delBtn" label="删除" height="25" click="delSubKindData()" enabled="false">
+						</s:Button>
+					</s:BorderContainer>
 				</s:BorderContainer>
-			</s:Group>
-		</s:Scroller>
-	</s:BorderContainer>
+			</s:BorderContainer>
+			
+		</s:BorderContainer>
 	</s:BorderContainer>
 </control:CBorderContainer>
