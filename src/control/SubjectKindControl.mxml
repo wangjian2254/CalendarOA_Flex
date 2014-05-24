@@ -16,8 +16,10 @@
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
+			import mx.graphics.SolidColor;
 			import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
+			import mx.validators.StringValidator;
 			
 			import spark.events.IndexChangeEvent;
 
@@ -41,26 +43,9 @@
 				]}
 			]);
 		private var state:String="fresh";//fresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态)
-		private function changingHander(e:IndexChangeEvent):void{
-			var item:Object=ba1.dataProvider.getItemAt(e.newIndex);
-			if(item.mode=="addSam"||item.mode=="addNex"){
-				if(!subjectKindTree.selectedItem){
-					Alert.show("请先选择一个试题类型","提示");
-					e.preventDefault();
-					return;
-				}
-			}
-			if(item.mode=="addSam"){
-				if(subjectKindTree.selectedItem==subjectKindTree.firstVisibleItem){
-					Alert.show("试题类型不能新增同级","提示");
-					e.preventDefault();
-					return;
-				}
-			}
-		}
 		//新增，保存，删除,回复，转发的处理函数
 		//多个按钮点击事件的处理函数
-        private function clickHander():void {
+        private function clickHander(e:MouseEvent):void {
 			ba1.requireSelection=true;
 			var item:Object=ba1.selectedItem;
 			typeName.text="";
@@ -81,28 +66,6 @@
         }
 		private function isValid():Boolean{
 			var o:Object=getData();
-			if(!subjectKindTree.selectedItem){
-				Alert.show("请选择一个试题类型","提示");
-				return false;
-			}
-			if (state == 'addSam') {
-				if(subjectKindTree.selectedItem==subjectKindTree.firstVisibleItem){
-					Alert.show("试题类型不能新增同级","提示");
-					return false;
-				}
-			}
-			if (state == 'mod') {
-				if(subjectKindTree.selectedItem==subjectKindTree.firstVisibleItem){
-					Alert.show("试题类型不能修改","提示");
-					return false;
-				}
-			}
-			if (state == 'del') {
-				if(subjectKindTree.selectedItem==subjectKindTree.firstVisibleItem){
-					Alert.show("试题类型不能删除","提示");
-					return false;
-				}
-			}
 			if(o["name"]==""){
 				Alert.show("类型名称不能为空","提示");
 				return false;
@@ -166,15 +129,19 @@
 			var n:Object=subjectKindTree.selectedItem;
 			o["name"] = typeName.text;
 			var parent:Object;
-			if(state=="addSam"){
+			if(state=="addSam"&&n){
 				parent=subjectKindTree.getParentItem(subjectKindTree.selectedItem);
 				if(parent){
 					o["fatherId"]=parent.id;
 				}
 				o["id"]="";
 			}
-			if(state=="addNex"){
+			if(state=="addNex"&&n){
 				o["fatherId"]=n.id;
+				o["id"]="";
+			}
+			if((state=="addSam"||state=="addNex"||state=="refresh")&&!n){
+				o["fatherId"]="root";
 				o["id"]="";
 			}
 			if(state=="mod"||state=="del"){
@@ -216,7 +183,7 @@
 				
 			</s:HorizontalLayout>
 		</s:layout>
-		<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  click="clickHander()" changing="changingHander(event)" requireSelection="true">
+		<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  click="clickHander(event)" requireSelection="true">
 		</s:ButtonBar>
 	</s:BorderContainer>
 	<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
@@ -225,42 +192,30 @@
 				
 			</s:HorizontalLayout>
 		</s:layout>
-		<mx:Tree id="subjectKindTree" itemClick="selectNode()" dataProvider="{subKindArr}" height="100%" width="30%" labelField="name">
+		<mx:Tree id="subjectKindTree" itemClick="selectNode()" dataProvider="{subKindArr}" height="100%" width="430" labelField="name">
 		</mx:Tree>
-		<s:BorderContainer width="70%" height="100%" borderVisible="false">
-			<s:BorderContainer  width="100%" height="100%" borderVisible="false" top="15" right="15" bottom="15" left="15">
-				<s:layout>
-					<s:VerticalLayout>
-					</s:VerticalLayout>
-				</s:layout>
-				<s:BorderContainer width="100%" height="100%" borderVisible="false">
+		<s:BorderContainer width="100%" height="100%" borderVisible="true">
+			<s:layout>
+				<s:HorizontalLayout>
+					
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:Form width="100%" height="100%">
+				<s:FormItem label="类型名称">
+					<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
+					</s:TextInput>
+				</s:FormItem>
+				<s:FormItem>
 					<s:layout>
-						<s:VerticalLayout>
-						</s:VerticalLayout>
-					</s:layout>
-					<s:BorderContainer borderVisible="false" width="100%">
-						<s:layout>
-							<s:HorizontalLayout>
-							</s:HorizontalLayout>
-						</s:layout>
-						<s:Label text="类型名称：" verticalAlign="middle" height="25">
-						</s:Label>
-						<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
-							
-						</s:TextInput>
-					</s:BorderContainer>
-				</s:BorderContainer>
-				<s:BorderContainer width="100%" borderVisible="false">
-					<s:layout>
-						<s:HorizontalLayout horizontalAlign="center">
+						<s:HorizontalLayout>
 						</s:HorizontalLayout>
 					</s:layout>
 					<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savSubKindData()">
 					</s:Button>
 					<s:Button id="delBtn" label="删除" height="25" click="delSubKindData()" enabled="false">
 					</s:Button>
-				</s:BorderContainer>
-			</s:BorderContainer>
+				</s:FormItem>
+			</s:Form>
 		</s:BorderContainer>
 		
 	</s:BorderContainer>
