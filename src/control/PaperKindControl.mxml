@@ -39,7 +39,7 @@
 				delBtn.enabled=false;
 				if(item.mode=="refresh"){
 					state="refresh";
-					loadSubKindData();
+					loadPagKindData();
 					return;
 				}
 				if (item.mode == 'addSam') {
@@ -64,12 +64,14 @@
 				return true;
 			}
 			//查询方法
-			private function loadSubKindData():void{
+			private function loadPagKindData():void{
 				var o:Object={};//如果需要补齐查询参数
-				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllPaperKind", loadSubKindDataResult, "POST").send(o);
+				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllPaperKind", loadPagKindDataResult, "POST").send(o);
 			};
-			private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
+			private function loadPagKindDataResult(result:Object, e:ResultEvent):void {
 				if (result.success) {
+					typeName.text="";
+					delBtn.enabled=false;
 					var arr:Array=createNodeDataByJson("id","fatherid",result.result as Array);
 					papKindArr=new ArrayCollection(arr);
 				}
@@ -134,21 +136,22 @@
 			};
 			private function savSubKindDataResult(result:Object, e:ResultEvent):void {
 				if (result.success) {
-					loadSubKindData();
+					loadPagKindData();
 				}
 			}
 			//删除方法
 			private function delSubKindData():void{
 				state="del";
-				if(!isValid()){
-					return;
-				}
-				var o:Object=getData();
-				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delPaperKind", delSubKindDataResult, "POST").send(o);
+				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
+					if(e.detail==Alert.YES){
+						var o:Object=getData();
+						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delPaperKind", delSubKindDataResult, "POST").send(o);
+					}
+				});
 			};
 			private function delSubKindDataResult(result:Object, e:ResultEvent):void {
 				if (result.success) {
-					loadSubKindData();
+					loadPagKindData();
 				}
 			}
 			private function selectNode():void{
@@ -182,7 +185,7 @@
 					o["fatherId"]="root";
 					o["id"]="";
 				}
-				if(state=="mod"||state=="del"){
+				if((state=="mod"||state=="del")&&n){
 					o["fatherId"]=n.fatherId;
 					o["id"]=n.id;
 				}
@@ -190,11 +193,11 @@
 			}
 			
 			override public function init(e:FlexEvent):void {
-				//			loadSubKindData();
+				loadPagKindData();
 			}
 			
 			override public function changeCurrentUser(e:ChangeUserEvent):void {
-				//			loadSubKindData();
+				loadPagKindData();
 			}
 			
 			override public function closeContainer(e:CloseEvent):void {
