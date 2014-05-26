@@ -24,13 +24,41 @@
 			[Bindable]
 			private var sjrArr:ArrayCollection;
 			private var isFirstForAni:Boolean=true;
+
+            public var message:Object=null;
+            public var type:String=null;
 			
 			private function init(e:mx.events.FlexEvent):void{
 				if(isFirstForAni){
 					showAnimation();
 				}
                 sjrArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
-				changeUsers();
+
+
+                if(type==null&&message!=null){
+                    mesTitle.text = message.title;
+                    mesContent.text = message.desc;
+                    for each(var u:Object in message.to){
+                        for each(var t:Object in sjrArr){
+                            if(u.id == t.id){
+                                t.selected=true;
+                            }
+                        }
+                    }
+                }
+                if(type=="huifu"&&message!=null){
+                    mesTitle.text = "回复："+message.title;
+                    for each(var t:Object in sjrArr){
+                        if(message.author == t.username){
+                            t.selected=true;
+                        }
+                    }
+                }
+                if(type=="zhuanfa"&&message!=null){
+                    mesTitle.text = "转发："+message.title;
+                    mesContent.text = message.desc;
+                }
+                changeUsers();
 			}
 			public function changeUsers():void{
 				users.removeAllElements();
@@ -140,7 +168,17 @@
 				var o:Object={};
                 o["title"] = mesTitle.text;
                 o["desc"] = mesContent.text;
-                o["flag"] = true; //true 为草稿，false 为发送
+                if(type=="huifu"&&message!=null){
+                    if(message.fatherMessage_id){
+                        o["fatherMessage"]=message.fatherMessage_id;
+                    }else{
+                        o["fatherMessage"]=message.id;
+                    }
+
+                }
+                if(type==null&&message!=null){
+                    o["id"]=message.id;
+                }
                 o["t"] = new Array();
                 for each(var obj:Object in sjrArr){
                     if(obj.selected){
