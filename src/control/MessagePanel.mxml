@@ -40,7 +40,7 @@
                     mesContent.text = message.desc;
                     for each(var u:Object in message.to){
                         for each(var t:Object in sjrArr){
-                            if(u.id == t.id){
+                            if(u.username == t.username){
                                 t.selected=true;
                             }
                         }
@@ -320,7 +320,7 @@
 		</s:BorderContainer>
 		<s:BorderContainer width="100%" borderVisible="false">
 			<s:layout>
-				<s:HorizontalLayout horizontalAlign="center">
+				<s:HorizontalLayout horizontalAlign="left" gap="5">
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:Button id="savBtn" label="发送" color="white" chromeColor="red" height="25" click="sendMessage()">
