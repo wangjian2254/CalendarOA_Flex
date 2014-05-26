@@ -223,7 +223,8 @@
     <s:layout>
         <s:HorizontalLayout gap="5" verticalAlign="top"/>
     </s:layout>
-	<s:Form id="form" width="100%" height="100%" >
+	<s:Form id="form" width="100%" height="100%"  >
+
         <s:FormItem label="标题：" >
             <s:TextInput id="mesTitle" maxChars="200" width="100%" prompt="消息标题"></s:TextInput>
         </s:FormItem>

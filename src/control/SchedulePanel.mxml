@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" x="-1000" y="100" width="420" height="{baseHeight}" title="{titlestr}" creationComplete="init()" close="closeWin()"  xmlns:uicontrol="uicontrol.*">
+			   xmlns:mx="library://ns.adobe.com/flex/mx" x="-1000" y="100" width="470" height="400" title="{titlestr}" creationComplete="init()" close="closeWin()"  xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
@@ -38,8 +38,7 @@
 			
 			private var _isinit:Boolean=false;
 			
-			[Bindable]
-			private var baseHeight:Number=440;
+
 			
 			[Bindable]
 			public var titlestr:String="创建日程";
@@ -302,6 +301,7 @@
 					
 					changeUsers();
 					titlestr = schedulData.title;
+
 					
 				}
 				
@@ -348,9 +348,12 @@
 				}catch(error:Error){
 					
 				}
-				
+
+                repeatChange();
 				warningChange();
 				multiUsers();
+
+                resize();
 				
 			}
 			
@@ -468,12 +471,14 @@
 			private function repeatChange():void{
 				if(repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
 					dayTile.visible = false;
-					dayPanel.height=0;
+                    dayPanel.visible=false;
+                    dayPanel.height=0;
 					resize();
 				}else{
 					dayTile.visible = true;
 					if(repeatType.selectedValue=="weekly"){
-						dayPanel.height = 30;
+                        dayPanel.visible=true;
+                        dayPanel.height=25;
 						resize();
 						dayTile.removeAllElements();
 						for(var i:Number=0;i<7;i++){
@@ -503,7 +508,7 @@
 							}
 							
 							cb.selected=false;
-							cb.height = 30;
+							cb.height = 25;
 							dayTile.addElement(cb);
 						}
 						for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
@@ -522,13 +527,14 @@
 					
 					if(repeatType.selectedValue=="monthly"){
 						dayTile.removeAllElements();
-						dayPanel.height = 150;
+                        dayPanel.visible=true;
+						dayPanel.height = 130;
 						resize();
 						for( i=0;i<32;i++){
 							cb = new CheckBox();
 							
 							cb.label = ""+(i+1);
-							cb.height = 30;
+							cb.height = 25;
 							cb.selected=false;
 							dayTile.addElement(cb);
 						}
@@ -624,36 +630,56 @@
 				}else{
 					contactPanel.width = 0;
 				}
-				this.width = 420+contactPanel.width;
+				this.width = 470+contactPanel.width;
 				this.invalidateSize();
 			}
 			
 			private function warningChange():void{
 				if(cbrtx.selected||cbsms.selected||cbemail.selected){
-					alldaywarning.height=0;
-					alldaywarning0.height=0;
-					alldaywarning1.height=0;
-					alldaywarning2.height=0;
+
+
 					if(is_all_day.selected){
-						alldaywarning1.height=30;
-						alldaywarning2.height=30;
+                        alldaywarning.height=0;
+                        alldaywarning0.height=0;
+                        alldaywarning.visible=false;
+                        alldaywarning0.visible=false;
+						alldaywarning1.height=25;
+						alldaywarning2.height=25;
+                        alldaywarning1.visible=true;
+                        alldaywarning2.visible=true;
 					}else{
-						alldaywarning.height=30;
-						alldaywarning0.height=30;
+                        alldaywarning1.height=0;
+                        alldaywarning2.height=0;
+                        alldaywarning1.visible=false;
+                        alldaywarning2.visible=false;
+						alldaywarning.height=25;
+						alldaywarning0.height=25;
+                        alldaywarning.visible=true;
+                        alldaywarning0.visible=true;
 					}
 				}else{
 					alldaywarning.height=0;
 					alldaywarning0.height=0;
 					alldaywarning1.height=0;
 					alldaywarning2.height=0;
+                    alldaywarning.visible=false;
+                    alldaywarning0.visible=false;
+                    alldaywarning1.visible=false;
+                    alldaywarning2.visible=false;
 				}
 				resize();
 			}
 			
 			private function resize():void{
 //				this.height = schedulePanel.height;
-				this.height = baseHeight+dayPanel.height+alldaywarning.height+alldaywarning0.height+alldaywarning1.height+alldaywarning2.height+authorpanel.height;
-				this.invalidateSize();
+                var h:Number=0;
+                for(var i:int=0 ;i<schedulePanel.numElements;i++){
+                    h+=schedulePanel.getElementAt(i).height;
+                }
+				this.height = h+50;
+//                dayPanel.height+alldaywarning.height+alldaywarning0.height+alldaywarning1.height+alldaywarning2.height+authorpanel.height;
+                schedulePanel.invalidateSize();
+                this.invalidateSize();
 			}
 			
 			
@@ -738,212 +764,188 @@
 			
 		</s:HorizontalLayout>
 	</s:layout>
-	<s:BorderContainer width="400" id="schedulePanel" borderVisible="false" >
-		<s:layout>
-			<s:VerticalLayout gap="0"/>
-		</s:layout>
-	
-	<s:TextInput id="scheduleTitle" width="100%" prompt="日程标题">
-	</s:TextInput>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="时间段：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-		<mx:ComboBox id="startTime" visible="{!is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
-			
-		</mx:ComboBox>
-		<s:Label text="到" height="100%" verticalAlign="middle" visible="{!is_all_day.selected}" />
-		<mx:ComboBox id="endTime"  visible="{!is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90"   >
-			
-		</mx:ComboBox>
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="是否全天：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:CheckBox label="全天" id="is_all_day" change="warningChange()">
-		</s:CheckBox>
-		
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="重复频率：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:RadioButton group="{repeatType}" label="每天" value="daily" selected="true">
-		</s:RadioButton>
-		<s:RadioButton group="{repeatType}" label="每周" value="weekly">
-		</s:RadioButton>
-		<s:RadioButton group="{repeatType}" label="每月" value="monthly">
-		</s:RadioButton>
-		<s:RadioButton group="{repeatType}" label="每年" value="yearly">
-		</s:RadioButton>
-	</s:BorderContainer>
-	<s:BorderContainer id="dayPanel" width="100%" height="0" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" />
-		</s:layout>
-		<s:Label text="重复时间：" width="80" textAlign="right" height="30" verticalAlign="middle" />
-		<s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
-			<s:CheckBox label="一"  />
-			<s:CheckBox label="二" />
-			<s:CheckBox label="三" />
-			<s:CheckBox label="四" />
-			<s:CheckBox label="五" />
-			<s:CheckBox label="六" />
-			<s:CheckBox label="日" />
-		</s:TileGroup>
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="结束时间：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		
-		<s:CheckBox id="forever" label="永远"  />
-		<mx:DateField id="endDate" width="100" enabled="{!forever.selected}" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="100" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" />
-		</s:layout>
-		<s:Label text="说明：" width="80" textAlign="right" height="30" verticalAlign="middle" />
-		<s:TextArea id="desc" width="100%" height="100%" />
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="颜色：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		
-		<s:BorderContainer id="color0" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:Label text="|" fontWeight="bold" fontSize="18" textAlign="center"  width="10" height="25" verticalAlign="middle"/>
-		<s:BorderContainer id="color1" click="colorClick(0xaecfea)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color2" click="colorClick(0x5484ed)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#5484ed" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color3" click="colorClick(0xa4bdfc)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#a4bdfc" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color4" click="colorClick(0x46d6db)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#46d6db" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color5" click="colorClick(0x7ae7bf)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#7ae7bf" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color6" click="colorClick(0x51b749)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#51b749" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color7" click="colorClick(0xfbd75b)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#fbd75b" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color8" click="colorClick(0xffb878)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ffb878" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color9" click="colorClick(0xff887c)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ff887c" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
-		</s:BorderContainer>
-		<mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange()"
-						symbolColor="#030002">
-			
-		</mx:ColorPicker>
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="分组：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<mx:ComboBox id="group" dataProvider="{grouplist}" labelField="name" width="190" >
-			
-		</mx:ComboBox>
-		
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="多人参与：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:CheckBox id="isMultiUsers" label="多人" change="multiUsers()" />
-		
-	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="提醒方式：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:CheckBox id="cbrtx" label="RTX腾讯通" change="warningChange()" />
-		<s:CheckBox id="cbsms" label="手机短信"  change="warningChange()" />
-		<s:CheckBox id="cbemail" label="email"  change="warningChange()" />
-	</s:BorderContainer>
-	<s:BorderContainer id="alldaywarning" width="100%" height="30" borderVisible="false"  visible="{!is_all_day.selected}">
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="第一次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:Label text="提前"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="firstNum" value="10" minimum="0" maximum="3000" width="50"/>
-		<mx:ComboBox id="firstWarning" dataProvider="{warninglist}" labelField="text" width="60" />
-		
-	</s:BorderContainer>
-	<s:BorderContainer id="alldaywarning0" width="100%" height="30" borderVisible="false"  visible="{!is_all_day.selected}">
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		
-		<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:Label text="提前"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondNum" value="20" minimum="0" maximum="3000" width="50"  enabled="{needSecond1.selected}"/>
-		<mx:ComboBox id="secondWarning" dataProvider="{warninglist}" selectedIndex="0" labelField="text" width="60" enabled="{needSecond1.selected}" />
-		<s:CheckBox  id="needSecond1" selected="true"/>
-	</s:BorderContainer>
-	<s:BorderContainer  id="alldaywarning1" width="100%" height="30" borderVisible="false" visible="{is_all_day.selected}" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		<s:Label text="第一次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:Label text="提前"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="firstDay" value="0" minimum="0" maximum="30" width="50"/>
-		<s:Label text="天"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="firstHour" value="9" minimum="0" maximum="23" width="50"/>
-		<s:Label text="时"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="firstMin" value="0" minimum="0" maximum="59" width="50"/>
-		<s:Label text="分"  height="25" verticalAlign="middle" />
-		
-	</s:BorderContainer>
-	<s:BorderContainer id="alldaywarning2" width="100%" height="30" borderVisible="false" visible="{is_all_day.selected}" >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		
-		<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:Label text="提前"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondDay" value="1" minimum="0" maximum="30" width="50" enabled="{needSecond2.selected}"/>
-		<s:Label text="天"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondHour" value="17" minimum="0" maximum="23" width="50" enabled="{needSecond2.selected}"/>
-		<s:Label text="时"  height="25" verticalAlign="middle" />
-		<s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
-		<s:Label text="分"  height="25" verticalAlign="middle" />
-		<s:CheckBox  id="needSecond2" selected="true"/>
-	</s:BorderContainer>
-	<s:BorderContainer id="authorpanel" width="100%" height="30" borderVisible="false"  >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		
-		<s:Label text="创建者：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-		<s:Label id="authorlbl" text="{ToolUtil.sessionUser.username}:{ToolUtil.sessionUser.nickname}"  height="25" verticalAlign="middle" />
-		
-	</s:BorderContainer>
-	<s:BorderContainer id="dopanel"  width="100%" height="30" borderVisible="false"  >
-		<s:layout>
-			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-		</s:layout>
-		
-		<s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
-		<s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
-		<s:Button id="btnGo" chromeColor="#ff0000" label="去禅道查看详情" visible="false" height="25" color="#ffffff" click="gotoZentao()" />
-		</s:BorderContainer>
-		
-	</s:BorderContainer>
+    <s:Form width="450" height="100%" id="schedulePanel">
+        <s:layout>
+            <s:FormLayout gap="0"  ></s:FormLayout>
+        </s:layout>
+        <s:FormItem label="标题：" id="titleItem" height="25">
+            <s:TextInput id="scheduleTitle" width="100%" prompt="日程标题">
+            </s:TextInput>
+        </s:FormItem>
+        <s:FormItem label="时间段："  height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+            <mx:ComboBox id="startTime" visible="{!is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
+
+            </mx:ComboBox>
+            <s:Label text="到" height="100%" verticalAlign="middle" visible="{!is_all_day.selected}" />
+            <mx:ComboBox id="endTime"  visible="{!is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90"   >
+
+            </mx:ComboBox>
+        </s:FormItem>
+        <s:FormItem label="是否全天" height="25">
+            <s:CheckBox label="全天" id="is_all_day" change="warningChange()">
+            </s:CheckBox>
+        </s:FormItem>
+        <s:FormItem label="重复频率" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:RadioButton group="{repeatType}" label="每天" value="daily" selected="true">
+            </s:RadioButton>
+            <s:RadioButton group="{repeatType}" label="每周" value="weekly">
+            </s:RadioButton>
+            <s:RadioButton group="{repeatType}" label="每月" value="monthly">
+            </s:RadioButton>
+            <s:RadioButton group="{repeatType}" label="每年" value="yearly">
+            </s:RadioButton>
+        </s:FormItem>
+        <s:FormItem id="dayPanel"  label="重复时间：" height="25">
+            <s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
+                <s:CheckBox label="一"  />
+                <s:CheckBox label="二" />
+                <s:CheckBox label="三" />
+                <s:CheckBox label="四" />
+                <s:CheckBox label="五" />
+                <s:CheckBox label="六" />
+                <s:CheckBox label="日" />
+            </s:TileGroup>
+        </s:FormItem>
+        <s:FormItem label="结束时间：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:CheckBox id="forever" label="永远"  />
+            <mx:DateField id="endDate" width="100" enabled="{!forever.selected}" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+
+        </s:FormItem>
+        <s:FormItem label="说明：" height="115">
+            <s:TextArea id="desc" width="100%" height="100" />
+        </s:FormItem>
+        <s:FormItem label="颜色：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="3">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:BorderContainer id="color0" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:Label text="|" fontWeight="bold" fontSize="18" textAlign="center"  width="10" height="25" verticalAlign="middle"/>
+            <s:BorderContainer id="color1" click="colorClick(0xaecfea)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color2" click="colorClick(0x5484ed)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#5484ed" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color3" click="colorClick(0xa4bdfc)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#a4bdfc" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color4" click="colorClick(0x46d6db)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#46d6db" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color5" click="colorClick(0x7ae7bf)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#7ae7bf" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color6" click="colorClick(0x51b749)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#51b749" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color7" click="colorClick(0xfbd75b)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#fbd75b" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color8" click="colorClick(0xffb878)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ffb878" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color9" click="colorClick(0xff887c)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ff887c" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange()"
+                            symbolColor="#030002">
+
+            </mx:ColorPicker>
+        </s:FormItem>
+        <s:FormItem label="分组：" height="25">
+            <mx:ComboBox id="group" dataProvider="{grouplist}" labelField="name" width="190" >
+
+            </mx:ComboBox>
+        </s:FormItem>
+        <s:FormItem label="多人参与：" height="25">
+            <s:CheckBox id="isMultiUsers" label="多人" change="multiUsers()" />
+
+        </s:FormItem>
+        <s:FormItem label="提醒方式：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:CheckBox id="cbrtx" label="RTX腾讯通" change="warningChange()" />
+            <s:CheckBox id="cbsms" label="手机短信"  change="warningChange()" />
+            <s:CheckBox id="cbemail" label="email"  change="warningChange()" />
+        </s:FormItem>
+        <s:FormItem id="alldaywarning"  label="第一次提醒：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:Label text="提前"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="firstNum" value="10" minimum="0" maximum="3000" width="50"/>
+            <mx:ComboBox id="firstWarning" dataProvider="{warninglist}" labelField="text" width="60" />
+
+        </s:FormItem>
+        <s:FormItem id="alldaywarning0"  label="第二次提醒：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:Label text="提前"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="secondNum" value="20" minimum="0" maximum="3000" width="50"  enabled="{needSecond1.selected}"/>
+            <mx:ComboBox id="secondWarning" dataProvider="{warninglist}" selectedIndex="0" labelField="text" width="60" enabled="{needSecond1.selected}" />
+            <s:CheckBox  id="needSecond1" selected="true"/>
+        </s:FormItem>
+        <s:FormItem id="alldaywarning1"  label="第一次提醒：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:Label text="提前"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="firstDay" value="0" minimum="0" maximum="30" width="50"/>
+            <s:Label text="天"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="firstHour" value="9" minimum="0" maximum="23" width="50"/>
+            <s:Label text="时"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="firstMin" value="0" minimum="0" maximum="59" width="50"/>
+            <s:Label text="分"  height="25" verticalAlign="middle" />
+        </s:FormItem>
+        <s:FormItem id="alldaywarning2"  label="第二次提醒：" height="25">
+            <s:layout>
+                <s:HorizontalLayout gap="5">
+
+                </s:HorizontalLayout>
+            </s:layout>
+            <s:Label text="提前"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="secondDay" value="1" minimum="0" maximum="30" width="50" enabled="{needSecond2.selected}"/>
+            <s:Label text="天"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="secondHour" value="17" minimum="0" maximum="23" width="50" enabled="{needSecond2.selected}"/>
+            <s:Label text="时"  height="25" verticalAlign="middle" />
+            <s:NumericStepper id="secondMin" value="0" minimum="0" maximum="59" width="50" enabled="{needSecond2.selected}"/>
+            <s:Label text="分"  height="25" verticalAlign="middle" />
+            <s:CheckBox  id="needSecond2" selected="true"/>
+        </s:FormItem>
+        <s:FormItem id="authorpanel" label="创建者：" height="25">
+            <s:Label id="authorlbl" text="{ToolUtil.sessionUser.username}:{ToolUtil.sessionUser.nickname}"  height="25" verticalAlign="middle" />
+
+        </s:FormItem>
+        <mx:ControlBar  id="dopanel">
+            <s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
+            <s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
+            <s:Button id="btnGo" chromeColor="#ff0000" label="去禅道查看详情" visible="false" height="25" color="#ffffff" click="gotoZentao()" />
+
+        </mx:ControlBar>
+    </s:Form>
+
 	<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%"  visible="{isMultiUsers.selected}">
 		
 	</s:BorderContainer>

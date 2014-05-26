@@ -404,16 +404,11 @@
 					</mx:DataGrid>
 				</s:BorderContainer>
 			</s:FormItem>
-			<s:FormItem  >
-				<s:layout>
-					<s:HorizontalLayout gap="3">
-						
-					</s:HorizontalLayout>
-				</s:layout>
+			<mx:ControlBar>
 				<s:Button label="保存" chromeColor="#ff0000" color="#ffffff" height="25" id="btnSave" click="save()" />
 				<s:Button label="删除" chromeColor="#cccccc" color="#000000" height="25" id="btnDel" click="askdel()" />
 				<s:Button label="退出" chromeColor="#ff0000" color="#ffffff" height="25" id="btnQuit" click="askquit()" />
-			</s:FormItem>
+            </mx:ControlBar>
 		</s:Form>
 	</s:BorderContainer>
 </control:CBorderContainer>
