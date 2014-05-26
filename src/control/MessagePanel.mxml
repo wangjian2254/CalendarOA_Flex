@@ -2,7 +2,12 @@
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="770" height="470"  creationComplete="init(event)" close="closeWin(event)" xmlns:uicontrol="uicontrol.*">
-	<fx:Script>
+	<s:layout>
+        <s:HorizontalLayout gap="2">
+
+        </s:HorizontalLayout>
+	</s:layout>
+    <fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
 			import events.ChangeMenuEvent;
@@ -40,19 +45,22 @@
                     mesContent.text = message.desc;
                     for each(var u:Object in message.to){
                         for each(var t:Object in sjrArr){
-                            if(u.id == t.id){
+                            if(u.username == t.username){
                                 t.selected=true;
                             }
                         }
                     }
                 }
                 if(type=="huifu"&&message!=null){
+                    sjrContainer.visible=false;
+                    form.width = this.width;
                     mesTitle.text = "回复："+message.title;
                     for each(var t:Object in sjrArr){
                         if(message.author == t.username){
                             t.selected=true;
                         }
                     }
+
                 }
                 if(type=="zhuanfa"&&message!=null){
                     mesTitle.text = "转发："+message.title;
@@ -211,122 +219,88 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 		<s:Move id="mve" target="{this}"/>
 	</fx:Declarations>
-	<s:BorderContainer top="10" right="10" bottom="10" left="10" borderVisible="false">
-		<s:layout>
-			<s:VerticalLayout>
-			</s:VerticalLayout>
-		</s:layout>
-		<s:BorderContainer width="100%" height="100%" borderVisible="false">
-			<s:layout>
-				<s:HorizontalLayout gap="5">
-				</s:HorizontalLayout>
-			</s:layout>
-			<s:BorderContainer width="80%" height="100%" borderVisible="false">
-				<s:layout>
-					<s:VerticalLayout>
-					</s:VerticalLayout>
-				</s:layout>
-				<s:BorderContainer borderVisible="false" width="100%">
-					<s:layout>
-						<s:HorizontalLayout>
-						</s:HorizontalLayout>
-					</s:layout>
-					<s:Label text="标题：" verticalAlign="middle" height="25">
-					</s:Label>
-					<s:TextInput id="mesTitle" maxChars="200" width="100%" prompt="新增消息">
-						
-					</s:TextInput>
-				</s:BorderContainer>
-				<s:BorderContainer borderVisible="false" width="100%" height="100%">
-					<s:layout>
-						<s:HorizontalLayout>
-						</s:HorizontalLayout>
-					</s:layout>
-					<s:Label text="内容：">
-					</s:Label>
-					<s:BorderContainer id="richTextContainer" width="100%" height="100%">
-						<s:RichEditableText id="mesContent" height="100%" width="100%">
-						</s:RichEditableText>
-					</s:BorderContainer>
-				</s:BorderContainer>
-			</s:BorderContainer>
-			<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%">
-			</s:BorderContainer>
-			<s:BorderContainer id="sjrContainer" height="100%" width="100%" borderVisible="false">
-				<s:layout>
-					<s:VerticalLayout gap="5">
-					</s:VerticalLayout>
-				</s:layout>
-				<s:BorderContainer width="100%" height="30" borderVisible="false" >
-					<s:layout>
-						<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-					</s:layout>
-					<s:Label text="接收人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
-					<s:BorderContainer  width="100%" height="30" borderVisible="false" >
-						<s:layout>
-							<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
-						</s:layout>
-						
-						<uicontrol:BtnSetting clickFun="{openAddress}" />
-						<uicontrol:BtnRefresh clickFun="{ToolUtil.contactsRefresh}" parm="refreshAddress" />
-						
-					</s:BorderContainer>
-				</s:BorderContainer>
-				<s:Scroller width="100%" height="100%" >
-					<s:Group width="100%" height="100%" >
-						<s:TileGroup id="users" height="100%"  width="100%" requestedColumnCount="-1">
-							
-						</s:TileGroup>
-					</s:Group>
-				</s:Scroller>
-				<mx:DataGrid id="sjrGrid" width="100%" minHeight="300" editable="true" dataProvider="{sjrArr}">
-					<mx:columns>
-						<mx:DataGridColumn headerText="选择"  width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
-							<mx:itemRenderer>
-								<fx:Component>
-									<mx:HBox horizontalAlign="center">
-										<fx:Script>
-											<![CDATA[
-												public function get selected():Boolean{
-													
-													return cb.selected;
-												}
-												public function set selected(value:Boolean):void{
-													cb.selected=value;
-												}
-												private function changeValue():void{
-													if(data.selected!=cb.selected){
-														data.selected = cb.selected;
-														outerDocument.changeUsers();
-													}
-												}
-											]]>
-										</fx:Script>
-										
-										<mx:CheckBox id="cb" selected="{data.selected}" change="changeValue()" >
-											
-										</mx:CheckBox>
-									</mx:HBox>
-								</fx:Component>
-							</mx:itemRenderer>
-						</mx:DataGridColumn>
-						<mx:DataGridColumn headerText="账号" dataField="username" width="140" editable="false">
-						</mx:DataGridColumn>
-						<mx:DataGridColumn headerText="姓名" dataField="nickname" width="140" editable="false">
-						</mx:DataGridColumn>
-					</mx:columns>
-				</mx:DataGrid>
-			</s:BorderContainer>
-		</s:BorderContainer>
-		<s:BorderContainer width="100%" borderVisible="false">
-			<s:layout>
-				<s:HorizontalLayout horizontalAlign="center">
-				</s:HorizontalLayout>
-			</s:layout>
-			<s:Button id="savBtn" label="发送" color="white" chromeColor="red" height="25" click="sendMessage()">
-			</s:Button>
-			<s:Button label="存为草稿" height="25" click="savSketch()">
-			</s:Button>
-		</s:BorderContainer>
-	</s:BorderContainer>
+    <s:BorderContainer width="100%" height="100%" borderVisible="false" >
+    <s:layout>
+        <s:HorizontalLayout gap="5" verticalAlign="top"/>
+    </s:layout>
+	<s:Form id="form" width="100%" height="100%" >
+        <s:FormItem label="标题：" >
+            <s:TextInput id="mesTitle" maxChars="200" width="100%" prompt="消息标题"></s:TextInput>
+        </s:FormItem>
+        <s:FormItem label="内容：" height="100%" >
+            <s:TextArea id="mesContent" width="100%" height="310" prompt="消息内容"></s:TextArea>
+        </s:FormItem>
+        <mx:ControlBar>
+            <s:Button id="savBtn" label="发送" color="white" chromeColor="red" height="25" click="sendMessage()">
+            </s:Button>
+            <s:Button label="存为草稿" height="25" click="savSketch()">
+            </s:Button>
+        </mx:ControlBar>
+
+	</s:Form>
+    <s:BorderContainer id="sjrContainer" width="280" height="100%" borderVisible="false" >
+        <s:layout>
+            <s:VerticalLayout gap="5" paddingBottom="20"></s:VerticalLayout>
+        </s:layout>
+        <s:BorderContainer width="100%" height="30" borderVisible="false" >
+            <s:layout>
+                <s:HorizontalLayout gap="5" verticalAlign="middle"/>
+            </s:layout>
+            <s:Label text="接收人：" width="80" textAlign="right" height="25" verticalAlign="middle" />
+                <s:BorderContainer  width="100%" height="30" borderVisible="false" >
+                <s:layout>
+                    <s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
+                </s:layout>
+
+                <uicontrol:BtnSetting clickFun="{openAddress}" />
+                <uicontrol:BtnRefresh clickFun="{ToolUtil.contactsRefresh}" parm="refreshAddress" />
+
+                </s:BorderContainer>
+        </s:BorderContainer>
+        <s:Scroller width="100%" height="120" >
+            <s:Group width="100%" height="100%" >
+                <s:TileGroup id="users" height="100%"  width="100%" requestedColumnCount="-1">
+
+                </s:TileGroup>
+            </s:Group>
+        </s:Scroller>
+        <mx:DataGrid id="sjrGrid" width="100%" height="100%" editable="true" dataProvider="{sjrArr}">
+            <mx:columns>
+                <mx:DataGridColumn headerText="选择"  width="60" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
+                    <mx:itemRenderer>
+                        <fx:Component>
+                            <mx:HBox horizontalAlign="center">
+                                <fx:Script>
+                                                <![CDATA[
+                                    public function get selected():Boolean{
+
+                                        return cb.selected;
+                                    }
+                                    public function set selected(value:Boolean):void{
+                                        cb.selected=value;
+                                    }
+                                    private function changeValue():void{
+                                        if(data.selected!=cb.selected){
+                                            data.selected = cb.selected;
+                                            outerDocument.changeUsers();
+                                        }
+                                    }
+                                    ]]>
+                                            </fx:Script>
+
+                                <mx:CheckBox id="cb" selected="{data.selected}" change="changeValue()" >
+
+                                </mx:CheckBox>
+                            </mx:HBox>
+                        </fx:Component>
+                    </mx:itemRenderer>
+                </mx:DataGridColumn>
+                <mx:DataGridColumn headerText="账号" dataField="username" width="140" editable="false">
+                </mx:DataGridColumn>
+                <mx:DataGridColumn headerText="姓名" dataField="nickname" width="140" editable="false">
+                </mx:DataGridColumn>
+            </mx:columns>
+        </mx:DataGrid>
+    </s:BorderContainer>
+    </s:BorderContainer>
 </s:TitleWindow>

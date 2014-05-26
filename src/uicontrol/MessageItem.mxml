@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" borderVisible="false" minHeight="100"  creationComplete="init()" xmlns:uicontrol="uicontrol.*">
+				   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" borderVisible="false" borderWeight="5" cornerRadius="7" minHeight="100" borderColor="#CCCCCC" backgroundColor="#ffffff"  creationComplete="init()" xmlns:uicontrol="uicontrol.*">
 	<s:layout>
 		<s:VerticalLayout gap="2"  paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5"/>
 	</s:layout>
@@ -15,13 +15,23 @@
         [Bindable]
         public  var message:Object;
 
+        public function setBackColor():void{
+            this.setStyle("borderVisible",true);
+        }
+
         private function init():void{
             for each(var toU:Object in message.to){
-                lblToUsers.text+=toU.nickname+":"+toU.username;
+                lblToUsers.text+=toU.nickname+":"+toU.username+" ;";
             }
 
-            richText.height = richText.contentHeight;
-            this.height=richText.height+messageInfo.height;
+
+            if(this.height<richText.contentHeight+messageInfo.height){
+                richText.height=300;
+
+
+                this.height=richText.height+messageInfo.height+20;
+            }
+
         }
 
         private function  replayMessage():void{
@@ -85,10 +95,9 @@
         </s:Button>
 	</s:HGroup>
 
-
-	    <s:RichEditableText  id="richText" width="100%" text="{message.desc}" backgroundColor="#ffffff" paddingLeft="25" minHeight="100"  >
-
+    <s:HGroup width="100%" height="100%">
+	    <s:RichEditableText  id="richText" editable="false" width="100%"  height="100%" text="{message.desc}" backgroundColor="#ffffff" paddingLeft="25"  >
 	    </s:RichEditableText >
-	
-		
+        <s:VScrollBar  id="VS_Chat"  height="100%" viewport="{richText}" visible="{VS_Chat.enabled}" />
+    </s:HGroup>
 </s:BorderContainer>
