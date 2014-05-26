@@ -14,6 +14,7 @@
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
 			import mx.graphics.SolidColor;
@@ -73,6 +74,7 @@
 		private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
 			if (result.success) {
 				typeName.text="";
+				delBtn.enabled=false;
 				var arr1:Array=[
 				{'id':'111',"fatherid":'11','name':'111',children:[{'id':'1111',"fatherid":'111','name':'1111'}]},
 				{'id':'1',"fatherid":'root','name':'1',children:[{'id':'11',"fatherid":'1','name':'11'}]},
@@ -156,11 +158,12 @@
 		//删除方法
 		private function delSubKindData():void{
 			state="del";
-			if(!isValid()){
-				return;
-			}
-			var o:Object=getData();
-			HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delKind", delSubKindDataResult, "POST").send(o);
+			Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
+					if(e.detail==Alert.YES){
+						var o:Object=getData();
+						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delKind", delSubKindDataResult, "POST").send(o);
+					}
+			});
 		};
 		private function delSubKindDataResult(result:Object, e:ResultEvent):void {
 			if (result.success) {
@@ -206,14 +209,14 @@
 		}
 
         override public function init(e:FlexEvent):void {
-//			loadSubKindData();
+			loadSubKindData();
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-//			loadSubKindData();
+			loadSubKindData();
         }
 
-        override public function closeContainer(e:CloseEvent):void {
+        override public function closeContainer(e:events.CloseEvent):void {
 
         }
 
