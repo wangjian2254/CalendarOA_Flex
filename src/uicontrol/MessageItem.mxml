@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%" borderVisible="false" minHeight="100"  creationComplete="init()" xmlns:uicontrol="uicontrol.*">
+	<s:layout>
+		<s:VerticalLayout gap="2"  paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+        import control.MessagePanel;
+
+        import mx.core.FlexGlobals;
+        import mx.managers.PopUpManager;
+
+        [Bindable]
+        public  var message:Object;
+
+        private function init():void{
+            for each(var toU:Object in message.to){
+                lblToUsers.text+=toU.nickname+":"+toU.username;
+            }
+
+            richText.height = richText.contentHeight;
+            this.height=richText.height+messageInfo.height;
+        }
+
+        private function  replayMessage():void{
+            var  messageWin:MessagePanel = new MessagePanel();
+            messageWin.title = "回复："+message.title;
+            messageWin.message = message;
+            messageWin.type = "huifu";
+            messageWin.x=0-messageWin.width;
+            messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+
+            PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+            PopUpManager.bringToFront(messageWin);
+        }
+        private function  changeSendMessage():void{
+            var  messageWin:MessagePanel = new MessagePanel();
+            messageWin = new MessagePanel();
+            messageWin.title = "转发："+message.title;
+            messageWin.message = message;
+            messageWin.type = "zhuanfa";
+            messageWin.x=0-messageWin.width;
+            messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+
+            PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+            PopUpManager.bringToFront(messageWin);
+        }
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:DateFormatter id="monthstr" formatString="YYYYMMDD" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="timestr" formatString="JJNN" >
+			
+		</mx:DateFormatter>
+		<mx:DateFormatter id="timestr2" formatString="JJ:NN" >
+			
+		</mx:DateFormatter>
+	</fx:Declarations>
+	<s:HGroup width="100%" height="80" verticalAlign="middle">
+        <s:Form id="messageInfo" width="100%" height="80" backgroundColor="#ffffff" >
+            <s:layout>
+                <s:FormLayout gap="-14">
+
+                </s:FormLayout>
+            </s:layout>
+            <s:FormItem label="发件人:">
+                <s:Label text="{message.authorname}:{message.author}"></s:Label>
+            </s:FormItem>
+            <s:FormItem label="主题:">
+                <s:Label text="{message.title}"></s:Label>
+            </s:FormItem>
+            <s:FormItem label="接收者:" id="toUsers">
+                <s:Label id="lblToUsers" text=""></s:Label>
+            </s:FormItem>
+        </s:Form>
+        <s:Button id="savBtn" label="回复" color="white" chromeColor="red" height="25" click="replayMessage()">
+        </s:Button>
+        <s:Button label="转发" height="25" click="changeSendMessage()">
+        </s:Button>
+	</s:HGroup>
+
+
+	    <s:RichEditableText  id="richText" width="100%" text="{message.desc}" backgroundColor="#ffffff" paddingLeft="25" minHeight="100"  >
+
+	    </s:RichEditableText >
+	
+		
+</s:BorderContainer>

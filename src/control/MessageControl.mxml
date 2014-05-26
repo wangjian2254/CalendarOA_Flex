@@ -18,6 +18,10 @@
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
 
+        import spark.events.GridSelectionEvent;
+
+        import uicontrol.MessageItem;
+
         [Bindable]
         private var buttonArr0:ArrayCollection = new ArrayCollection([
             {'label': '全部', 'mode': 'all'},
@@ -32,7 +36,7 @@
         [Bindable]
         private var buttonArr2:ArrayCollection = new ArrayCollection([
             {'label': '回复', 'ico': saveimg, 'mode': 'huifu'},
-            {'label': '转发', 'ico': saveimg, 'mode': 'add'}
+            {'label': '转发', 'ico': saveimg, 'mode': 'zhuanfa'}
         ]);
         [Bindable]
         private var buttonArr3:ArrayCollection = new ArrayCollection([
@@ -43,20 +47,74 @@
         [Bindable]
         private var messagelist:ArrayCollection = new ArrayCollection();
         private var messageWin:MessagePanel;
+        [Bindable]
+        private var  message:Object=null;
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:ItemClickEvent):void {
-            if (e.item.mode == 'add') {
-                if (messageWin == null) {
-                    messageWin = new MessagePanel();
-                    messageWin.title = "发送信息";
-                }
-                PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                PopUpManager.bringToFront(messageWin);
-                PopUpManager.centerPopUp(messageWin);
+            switch (e.item.mode){
+                case 'add':
+                        messageWin = new MessagePanel();
+                        messageWin.title = "发送信息";
+                        messageWin.x=0-messageWin.width;
+                        messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+
+                        PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+                        PopUpManager.bringToFront(messageWin);
+                        break;
+                case 'refresh':
+                        showType();
+                        break;
+
+                case 'huifu':
+                        messageWin = new MessagePanel();
+                        messageWin.title = "回复："+message.title;
+                        messageWin.message = message;
+                        messageWin.type = "huifu";
+                        messageWin.x=0-messageWin.width;
+                        messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+
+                        PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+                        PopUpManager.bringToFront(messageWin);
+                        break;
+                case 'zhuanfa':
+                        messageWin = new MessagePanel();
+                        messageWin.title = "转发："+message.title;
+                        messageWin.message = message;
+                        messageWin.type = "zhuanfa";
+                        messageWin.x=0-messageWin.width;
+                        messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+
+                        PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+                        PopUpManager.bringToFront(messageWin);
+                        break;
             }
 
 
+
+        }
+
+        private function messageSelectionHandler(event:GridSelectionEvent):void{
+            const eventGrid:DataGrid = event.currentTarget as DataGrid;
+            var currentDataItem:Object = eventGrid.selectedItem;
+            var data:Object=new Object();
+            data["id"]=currentDataItem.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageById",selectionMessageResult).send(data);
+        }
+
+        private function selectionMessageResult(result:Object,e:ResultEvent):void{
+            var messagelist:ArrayCollection = new ArrayCollection(result.result as Array);
+
+            var messageItem:MessageItem=null;
+            messageGroup.removeAllElements();
+            for each(var message:Object in messagelist){
+                if(messageGrid.selectedItem.id == message.id){
+                    this.message = message;
+                }
+                messageItem = new MessageItem();
+                messageItem.message = message;
+                messageGroup.addElement(messageItem);
+            }
         }
 
         // 全部、未读、已读 筛选
@@ -152,7 +210,7 @@
 			</s:HorizontalLayout>
 		</s:layout>
 		<s:VGroup width="250" height="100%">
-			<s:DataGrid id="messageGrid" dataProvider="{messagelist}"  width="100%" height="100%" rowHeight="50"  >
+			<s:DataGrid id="messageGrid" dataProvider="{messagelist}" selectionChange="messageSelectionHandler(event)"  width="100%" height="100%" rowHeight="50"  >
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" >
@@ -187,11 +245,9 @@
 		</s:VGroup>
 		
 		<s:Scroller width="100%" height="100%">
-			<s:Group width="100%" height="100%">
-				<s:BorderContainer width="100%" height="100%">
-					
-				</s:BorderContainer>
-			</s:Group>
+			<s:VGroup id="messageGroup" width="100%" height="100%" gap="10" >
+
+			</s:VGroup>
 		</s:Scroller>
 	</s:BorderContainer>
 	</s:BorderContainer>
