@@ -28,8 +28,8 @@
 				{'label': '新增下级', 'ico': addimg, 'mode': 'addNex'}
 			]);
 			[Bindable]
-			private var papKindArr:ArrayCollection;
-			private var state:String="fresh";//fresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态)
+			private var papKindArr:ArrayCollection=new ArrayCollection();;
+			private var state:String="refresh";//refresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态)
 			//新增，保存，删除,回复，转发的处理函数
 			//多个按钮点击事件的处理函数
 			private function clickHander():void {
@@ -72,8 +72,11 @@
 				if (result.success) {
 					typeName.text="";
 					delBtn.enabled=false;
-					var arr:Array=createNodeDataByJson("id","fatherid",result.result as Array);
-					papKindArr=new ArrayCollection(arr);
+					var arr:Array= result.result is Array ?  result.result : [];
+					papKindArr.removeAll();
+					papKindArr.addAll(new ArrayCollection(arr));
+//					var arr:Array=createNodeDataByJson("id","fatherid",result.result as Array);
+//					papKindArr=new ArrayCollection(arr);
 				}
 			}
 			//工具方法把所有带有子父级关系的json数组拼成树节点结构数据(如果json数据层级嵌套太多并且数据量较大可能会影响性能)
@@ -173,20 +176,20 @@
 				if(state=="addSam"&&n){
 					parent=paperKindTree.getParentItem(paperKindTree.selectedItem);
 					if(parent){
-						o["fatherId"]=parent.id;
+						o["father_kind"]=parent.id;
 					}
-					o["id"]="";
+					o["id"]=null;
 				}
 				if(state=="addNex"&&n){
-					o["fatherId"]=n.id;
-					o["id"]="";
+					o["father_kind"]=n.id;
+					o["id"]=null;
 				}
 				if((state=="addSam"||state=="addNex"||state=="refresh")&&!n){
-					o["fatherId"]="root";
-					o["id"]="";
+					o["father_kind"]=null;
+					o["id"]=null;
 				}
 				if((state=="mod"||state=="del")&&n){
-					o["fatherId"]=n.fatherId;
+					o["father_kind"]=n.fatherid;
 					o["id"]=n.id;
 				}
 				return o;
