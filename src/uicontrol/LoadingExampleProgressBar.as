@@ -30,7 +30,7 @@ package uicontrol
 		{    
 			
 			logo = new Loader();    
-			logo.load(new URLRequest("/static/image/waitlogo.png"));    
+			logo.load(new URLRequest("assets/waitlogo.png"));    
 			logo.x = 40;    
 			logo.y = 20; 
 			

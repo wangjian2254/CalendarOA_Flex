@@ -15,7 +15,7 @@ package httpcontrol
 	
 	public class CHTTPService extends HTTPService
 	{
-		
+		[Bindable]
 		public static var baseUrl:String="";
 		
 		public function CHTTPService(rootURL:String=null, destination:String=null)

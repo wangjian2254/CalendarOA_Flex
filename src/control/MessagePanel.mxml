@@ -55,9 +55,9 @@
                     sjrContainer.visible=false;
                     form.width = this.width;
                     mesTitle.text = "回复："+message.title;
-                    for each(var t:Object in sjrArr){
-                        if(message.author == t.username){
-                            t.selected=true;
+                    for each(var tt:Object in sjrArr){
+                        if(message.author == tt.username){
+                            tt.selected=true;
                         }
                     }
 

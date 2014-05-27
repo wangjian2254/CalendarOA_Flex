@@ -53,6 +53,7 @@
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:ItemClickEvent):void {
+			var data:Object=new Object();
             switch (e.item.mode){
                 case 'add':
                         messageWin = new MessagePanel();
@@ -67,7 +68,6 @@
                         showType();
                         break;
                 case 'read':
-                        var data:Object=new Object();
                         data["id"]=messageGrid.selectedItem.rid;
                         data["do"] = true;
                         messageGrid.selectedItem.is_read=true;
@@ -75,7 +75,7 @@
                         HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage",null).send(data);
                         break;
                 case 'unread':
-                        var data:Object=new Object();
+                        
                         data["id"]=messageGrid.selectedItem.rid;
                         data["do"] = false;
                         messageGrid.selectedItem.is_read=false;
@@ -132,7 +132,7 @@
             currentDataItem.is_read=true;
 
             HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageById",selectionMessageResult).send(data);
-            var data:Object=new Object();
+            data=new Object();
             data["id"]=messageGrid.selectedItem.rid;
             data["do"] = true;
             messageGrid.selectedItem.is_read=true;
