@@ -252,16 +252,12 @@
 					<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
 					</s:TextInput>
 				</s:FormItem>
-				<s:FormItem>
-					<s:layout>
-						<s:HorizontalLayout>
-						</s:HorizontalLayout>
-					</s:layout>
+				<mx:ControlBar>
 					<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savSubKindData()">
 					</s:Button>
 					<s:Button id="delBtn" label="删除" height="25" click="delSubKindData()" enabled="false">
 					</s:Button>
-				</s:FormItem>
+				</mx:ControlBar>
 			</s:Form>
 		</s:BorderContainer>
 		
