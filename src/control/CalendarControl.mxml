@@ -62,6 +62,10 @@
 				dispatchEvent(e);
 				
 			}
+
+            override public function resizeContainer(e:ResizeEvent):void{
+                resize(null,false);
+            }
 			
 			private function changeShowModel():void{
 				currentMonth=-1;

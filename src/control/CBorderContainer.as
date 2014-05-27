@@ -7,8 +7,9 @@ package control
 	import mx.core.FlexGlobals;
 	import mx.core.INavigatorContent;
 	import mx.events.FlexEvent;
-	
-	import spark.components.BorderContainer;
+import mx.events.ResizeEvent;
+
+import spark.components.BorderContainer;
 	
 	public class CBorderContainer extends BorderContainer implements INavigatorContent
 	{
@@ -44,6 +45,8 @@ package control
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,init);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,reloadParamData);
 			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);
+            FlexGlobals.topLevelApplication.addEventListener(ResizeEvent.RESIZE,resizeContainer);
+
 		}
 		
 		public function get flag():String
@@ -118,7 +121,9 @@ package control
 		public function reloadParamData(e:FlexEvent):void{
 			param=null;
 		}
-		
+        public function resizeContainer(e:ResizeEvent):void{
+
+        }
 		
 
 	}

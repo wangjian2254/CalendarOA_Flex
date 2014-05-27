@@ -13,6 +13,8 @@
 			private var num:int=0;
 			
 			public function showIn():void{
+                this.width = FlexGlobals.topLevelApplication.width;
+                this.height = FlexGlobals.topLevelApplication.height;
 				num++;
 					this.visible=true;
 					if(this.parent==null){
@@ -82,8 +84,7 @@
 			}
 			
 			private function init():void{
-				this.width = FlexGlobals.topLevelApplication.width;
-				this.height = FlexGlobals.topLevelApplication.height;
+
 				
 				open.addEventListener(TimerEvent.TIMER,openevent);
 				close.addEventListener(TimerEvent.TIMER,closeevent);

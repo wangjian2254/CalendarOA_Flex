@@ -40,7 +40,9 @@ package httpcontrol
 		{
 			try{
 				this.loading.showIn();
-				this.url=baseUrl+this.url;
+                if(this.url.indexOf(baseUrl)<0){
+                    this.url=baseUrl+this.url;
+                }
 				if(this.url.indexOf("?")!=-1){
 					this.url+="&requesttimestr="+(new Date()).toString();
 				}else{
