@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
-			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx"
-			   preloader="uicontrol.LoadingExampleProgressBar"
-			   creationComplete="init()"  minWidth="955" minHeight="600" skinClass="skins.ApplicationSkinBlue" xmlns:httpcontrol="httpcontrol.*" xmlns:control="control.*" xmlns:uicontrol="uicontrol.*">
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   creationComplete="init()"    minWidth="955" minHeight="600" skinClass="skins.WindowApplicationSkinBlue" 
+					   xmlns:uicontrol="uicontrol.*" xmlns:httpcontrol="httpcontrol.*"
+					   showStatusBar="false"
+					    viewSourceURL="srcview/index.html">
 	<fx:Style source="/assets/customrControls.css">
 		
 	</fx:Style>
@@ -15,11 +17,11 @@
 	<fx:Script source="menu.as">
 		
 	</fx:Script>
-	<fx:Script source="flex.as">
-		
+	<fx:Script source="air.as">
+	
 	</fx:Script>
 	<fx:Declarations>
-		<httpcontrol:CHTTPService id="menuXML" url="{CHTTPService.baseUrl}/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
+		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 		
 	</fx:Declarations>
 	<fx:Style source="/assets/style.css"/>
@@ -34,20 +36,31 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
-			<mx:LinkButton icon="{CBorderContainer.refreshimg}" label="{ToolUtil.unreadMessageNum} 未读消息" click="openMessage()" styleName="textStyle2" textDecoration="underline" />
-			<s:Label text="用户:{ToolUtil.sessionUser.nickname} | 用户名:{ToolUtil.sessionUser.username}" styleName="textStyle2"/>
+			<mx:LinkButton icon="{CBorderContainer.refreshimg}" label="{ToolUtil.unreadMessageNum}" click="openMessage()" styleName="textStyle2" textDecoration="underline" />
+			<s:HGroup gap="0">
+				<s:Label text="用户:" styleName="textStyle2"/>	
+				<s:Label text="{ToolUtil.sessionUser.nickname}" styleName="textStyle2"/>	
+				<s:Label text=" | " styleName="textStyle2"/>	
+				<s:Label text=" 用户名:" styleName="textStyle2"/>	
+				<s:Label text="{ToolUtil.sessionUser.username}" styleName="textStyle2"/>
+			</s:HGroup>	
+				
 			<s:SkinnableContainer  id="loginBtnPanel"  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
 				
-				<mx:LinkButton x="0" y="2" height="25" label="登出"  styleName="textStyle1" click="logout()"/>
-				<s:Label text="|" styleName="textStyle1"/>
+				
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>
-				<s:Label text="|" styleName="textStyle1" id="closeAppLine1"/>
-				<mx:LinkButton x="0" y="2" height="25" label="关闭程序" id="closeAppBtn1" styleName="textStyle1" visible="true" />
+				<s:Label text="|" styleName="textStyle1" />
+				<mx:LinkButton x="0" y="2" height="25" label="最小化"  styleName="textStyle1" visible="true" click="this.minimize()" />
+				<s:Label text="|" styleName="textStyle1" />
+				
+				<mx:LinkButton x="0" y="2" height="25" label="最大化" id="resizeBtn1"  styleName="textStyle1"  click="this.maxResize()" />
+				<s:Label text="|" styleName="textStyle1"  />
+				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  styleName="textStyle1" visible="true" click="logout()" />
 				
 			</s:SkinnableContainer>
 			
@@ -64,8 +77,13 @@
 				<mx:LinkButton x="0" y="2" height="25" label="登录"  styleName="textStyle1" click="login()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="注册" styleName="textStyle1" click="reg()"/>
-				<s:Label text="|" styleName="textStyle1"  id="closeAppLine2"/>
-				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  id="closeAppBtn2" styleName="textStyle1" visible="true" />
+				<s:Label text="|" styleName="textStyle1" />
+				<mx:LinkButton x="0" y="2" height="25" label="最小化"  styleName="textStyle1" visible="true" click="this.minimize()" />
+				<s:Label text="|" styleName="textStyle1" />
+				
+				<mx:LinkButton x="0" y="2" height="25" label="最大化"  id="resizeBtn2"  styleName="textStyle1"  click="this.maxResize()" />
+				<s:Label text="|" styleName="textStyle1"  />
+				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  styleName="textStyle1" visible="true" click="logout()" />
 			</s:SkinnableContainer>
 			
 		</s:Group>
@@ -100,6 +118,4 @@
 	<uicontrol:CTabBar id="cbar" dataProvider="{gongNengStack}" left="2" right="2" width="100%" bottom="1" height="31" borderVisible="false"  creationComplete="trace('tabbar')">
 		
 	</uicontrol:CTabBar>
-	
-</s:Application>
-
+</s:WindowedApplication>

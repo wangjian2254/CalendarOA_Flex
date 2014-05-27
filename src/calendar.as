@@ -51,16 +51,7 @@ import util.UserUtil;
 
 
 public function init():void {
-	if (this is Application) {
-		loginBtnPanel2.removeElement(closeAppBtn2);
-		loginBtnPanel.removeElement(closeAppBtn1);
-		loginBtnPanel2.removeElement(closeAppLine2);
-		loginBtnPanel.removeElement(closeAppLine1);
-		loginBtnPanel.invalidateSize();
-		loginBtnPanel.invalidateDisplayList();
-		loginBtnPanel2.invalidateSize();
-		loginBtnPanel2.invalidateDisplayList();
-	}
+	
 
     if(this.hasOwnProperty("initAir")){
         this["initAir"]();
@@ -140,7 +131,6 @@ public function updateinfo():void {
 }
 
 public function logout():void {
-	HttpServiceUtil.getCHTTPServiceAndResult("/ca/logout", currentUser, "POST").send();
 	if(this.hasOwnProperty("quite")){
 		this["quite"]();
 	}

@@ -45,7 +45,7 @@ import spark.components.BorderContainer;
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,init);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,reloadParamData);
 			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);
-            FlexGlobals.topLevelApplication.addEventListener(ResizeEvent.RESIZE,resizeContainer);
+            this.addEventListener(ResizeEvent.RESIZE,resizeContainer);
 
 		}
 		
