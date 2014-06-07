@@ -4,19 +4,17 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-        import control.MessagePanel;
-
-        import events.ChangeUserEvent;
-        import events.CloseEvent;
-
-        import httpcontrol.HttpServiceUtil;
-
-        import mx.collections.ArrayCollection;
-        import mx.core.FlexGlobals;
-        import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
-        import mx.managers.PopUpManager;
-        import mx.rpc.events.ResultEvent;
+			import events.AutoGridEvent;
+			import events.ChangeUserEvent;
+			import events.CloseEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.events.ItemClickEvent;
+			import mx.events.ListEvent;
+			import mx.managers.PopUpManager;
 
         [Bindable]
         private var buttonArr0:ArrayCollection = new ArrayCollection([
@@ -41,7 +39,10 @@
         ]);
 
         [Bindable]
-        private var messagelist:ArrayCollection = new ArrayCollection();
+        private var subjectList:ArrayCollection = new ArrayCollection([
+			{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0},
+			{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0}
+		]);
         private var messageWin:MessagePanel;
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
@@ -59,44 +60,14 @@
 
         }
 
-        // 全部、未读、已读 筛选
-        private function showType():void {
-            pagebar1.initPage();
-            messagelist.removeAll();
-            getMessages();
-
-        }
-
-        private function getMessages():void {
-            var data:Object = new Object();
-            data["type"] = messageType.selectedItem.mode;
-            data["start"] = pagebar1.PageIndex * pagebar1.mPageSize;
-            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageByUser", getMessagesResult, "POST").send(data);
-
-        }
-
-        private function getMessagesResult(result:Object, e:ResultEvent):void {
-            if (result.success) {
-
-                if (messagelist.length == 0) {
-                    pagebar1.mPageSize = result.result.limit;
-                    pagebar1.RecordCount = result.result.total;
-                    pagebar1.initPage();
-                }
-
-                messagelist.removeAll();
-                messagelist.addAll(new ArrayCollection(result.result.list as Array));
-                pagebar1.RecordCount = result.result.total;
-            }
-        }
 
 
         override public function init(e:FlexEvent):void {
-            getMessages();
+			optionGrid.dataProvider=new ArrayCollection();
+			optionGrid.dataProvider.addAll(new ArrayCollection([{}]));
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-            getMessages();
 
         }
 
@@ -106,93 +77,127 @@
 
         // 重新进入时执行
         override public function reloadParamData(e:FlexEvent):void {
-            if (param) {
-                if (param.hasOwnProperty("messageType")) {
-                    for each(var obj:Object in buttonArr0) {
-                        if (obj.mode == param["messageType"]) {
-                            messageType.selectedItem = obj;
-                        }
-                    }
-                    showType();
-                }
-
-            }
-            super.reloadParamData(e);
         }
+
+
+		protected function optionGrid_optionHandler(event:AutoGridEvent):void
+		{	
+			var data:Object=event.data;
+			if(event.type==AutoGridEvent.DELETE){
+				if(data["id"]==""){
+					var dataProvider:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
+					dataProvider.removeItemAt(data.rowIndex);
+				}
+			}
+		}
+
         ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
-	<s:layout>
-		<s:VerticalLayout  >
-			
-		</s:VerticalLayout>
-	</s:layout>
-	<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
 		<s:layout>
-			<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
+			<s:VerticalLayout>
 				
-			</s:HorizontalLayout>
+			</s:VerticalLayout>
 		</s:layout>
-		<s:ButtonBar id="messageType" dataProvider="{buttonArr0}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showType()" >
-		</s:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr1}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr2}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr3}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-	</s:BorderContainer>
-	<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
-		<s:layout>
-			<s:HorizontalLayout gap="2" verticalAlign="top">
-				
-			</s:HorizontalLayout>
-		</s:layout>
-		<s:VGroup width="250" height="100%">
-			<s:DataGrid id="messageGrid" dataProvider="{messagelist}"  width="100%" height="100%" rowHeight="50"  >
-				<s:columns>
-					<s:ArrayList>
-						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" >
-							<s:itemRenderer>
-								<fx:Component>
-									<s:GridItemRenderer>
-										<s:HGroup width="100%" height="100%" verticalAlign="middle" gap="5" paddingLeft="5" paddingTop="3" paddingRight="3">
-											
-											<s:BorderContainer visible="{!data.is_read}" width="10" height="10" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
-												
-											</s:BorderContainer>
-											<s:VGroup width="100%" height="100%">
-												<s:Label width="100%" height="12" paddingLeft="10" text="{data.authorname}" textDecoration="underline" fontSize="12" color="#434343">
-													
-												</s:Label>
-												<s:Label width="100%" height="100%" text="{data.title}" maxDisplayedLines="-1" fontSize="15" color="#000000">
-													
-												</s:Label>
-												
-											</s:VGroup>
-										</s:HGroup>
-									</s:GridItemRenderer>
-									
-								</fx:Component>
-							</s:itemRenderer>
-						</s:GridColumn>
-					</s:ArrayList>
-				</s:columns>
-			</s:DataGrid>
-			<uicontrol:Pageing id="pagebar1" infolbl="false">
-			</uicontrol:Pageing>
-		</s:VGroup>
-		
-		<s:Scroller width="100%" height="100%">
-			<s:Group width="100%" height="100%">
-				<s:BorderContainer width="100%" height="100%">
+		<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+			<s:layout>
+				<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
 					
-				</s:BorderContainer>
-			</s:Group>
-		</s:Scroller>
-	</s:BorderContainer>
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:HGroup height="20">
+				<s:Label text="关键字" height="100%" verticalAlign="middle">
+				</s:Label>
+				<s:TextInput height="100%">
+				</s:TextInput>
+			</s:HGroup>
+			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  requireSelection="true">
+			</s:ButtonBar>
+		</s:BorderContainer>
+		<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
+			<s:layout>
+				<s:HorizontalLayout gap="2">
+					
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:VGroup height="100%" width="430" >
+				<mx:DataGrid id="subjectGrid" height="100%" width="100%" dataProvider="{subjectList}">
+					<mx:columns>
+						<mx:DataGridColumn headerText="题目" dataField="title">
+							
+						</mx:DataGridColumn>
+						<mx:DataGridColumn headerText="分类" dataField="kinds">
+							
+						</mx:DataGridColumn>
+						<mx:DataGridColumn headerText="正确率" dataField="accuracy">
+							
+						</mx:DataGridColumn>
+					</mx:columns>
+				</mx:DataGrid>
+				<uicontrol:Pageing id="pagebar1" infolbl="false">
+				</uicontrol:Pageing>
+			</s:VGroup>
+			<s:BorderContainer width="100%" height="100%" borderVisible="true">
+				<s:layout>
+					<s:HorizontalLayout>
+						
+					</s:HorizontalLayout>
+				</s:layout>
+				<s:Form width="100%" height="100%">
+					<s:FormItem label="题目">
+						<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增题目" height="100%">
+						</s:TextInput>
+					</s:FormItem>
+					<s:FormItem label="分类">
+						<mx:ComboBox id="subKind" width="200" height="100%">
+						</mx:ComboBox>
+					</s:FormItem>
+					<mx:FormItem width="400" minWidth="400">
+						<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" option="optionGrid_optionHandler(event)">
+							<uicontrol:columns>
+								<mx:DataGridColumn headerText="选项内容" dataField="content">
+								</mx:DataGridColumn>
+								<mx:DataGridColumn headerText="是否正确" dataField="is_right" width="70" editable="false">
+									<mx:itemRenderer>
+										<fx:Component>
+											<mx:Canvas width="100%">
+												<mx:VBox horizontalAlign="center" width="100%">
+													<fx:Script>
+														<![CDATA[
+															import mx.events.ListEvent;
+															private var _data:Object;
+															override public function set data(o:Object):void{
+																_data=o;
+																is_right.selected=o["is_right"];
+															}
+															private function clickHandler():void{
+																_data["is_right"]=is_right.selected;
+																dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,-1,null,this));
+															}
+														]]>
+													</fx:Script>
+													<mx:CheckBox id="is_right" click="clickHandler()">
+													</mx:CheckBox>
+												</mx:VBox>
+											</mx:Canvas>
+										</fx:Component>
+									</mx:itemRenderer>
+								</mx:DataGridColumn>
+							</uicontrol:columns>
+						</uicontrol:AutoGrid>
+					</mx:FormItem>
+					<mx:ControlBar>
+						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25">
+						</s:Button>
+						<s:Button id="delBtn" label="删除" height="25"  enabled="false">
+						</s:Button>
+					</mx:ControlBar>
+				</s:Form>
+			</s:BorderContainer>
+			
+		</s:BorderContainer>
 	</s:BorderContainer>
 </control:CBorderContainer>
