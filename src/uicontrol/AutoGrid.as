@@ -32,6 +32,9 @@ package uicontrol
 				
 				data.addEventListener(CollectionEvent.COLLECTION_CHANGE,initRow);
 				data.addEventListener("sortChanged",sortChangedHandler);
+				if(data.length<=0){
+					data.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
+				}
 			}
 			if(!value){
 				data.dispatchEvent(new CollectionEvent(CollectionEvent.COLLECTION_CHANGE));
@@ -78,11 +81,6 @@ package uicontrol
 		}
 		private var isBreak:Boolean=false;
 		private function initRow(e:CollectionEvent):void{
-			if(isBreak){
-				isBreak=false;
-				return;
-			}
-			e.kind;
 			var o:Object=createRow();
 			var data:ArrayCollection=dataProvider as ArrayCollection;
 			if(!lastRow){

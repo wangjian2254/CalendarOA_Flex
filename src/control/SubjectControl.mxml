@@ -8,88 +8,182 @@
 			import events.ChangeUserEvent;
 			import events.CloseEvent;
 			
+			import httpcontrol.HttpServiceUtil;
+			
 			import mx.collections.ArrayCollection;
-			import mx.collections.ArrayList;
-			import mx.core.FlexGlobals;
+			import mx.controls.Alert;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
 			import mx.events.ListEvent;
-			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.DataUtil;
 
-        [Bindable]
-        private var buttonArr0:ArrayCollection = new ArrayCollection([
-            {'label': '全部', 'mode': 'all'},
-            {'label': '未读信息', 'mode': 'unread'},
-            {'label': '已读信息', 'mode': 'read'}
-        ]);
-        [Bindable]
-        private var buttonArr1:ArrayCollection = new ArrayCollection([
-            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
-            {'label': '写信息', 'ico': wximg, 'mode': 'add'}
-        ]);
-        [Bindable]
-        private var buttonArr2:ArrayCollection = new ArrayCollection([
-            {'label': '回复', 'ico': saveimg, 'mode': 'huifu'},
-            {'label': '转发', 'ico': saveimg, 'mode': 'add'}
-        ]);
-        [Bindable]
-        private var buttonArr3:ArrayCollection = new ArrayCollection([
-            {'label': '标记已读', 'ico': saveimg, 'mode': 'read'},
-            {'label': '标记未读', 'ico': saveimg, 'mode': 'unread'}
-        ]);
-
-        [Bindable]
-        private var subjectList:ArrayCollection = new ArrayCollection([
-			{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0},
-			{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0}
-		]);
-        private var messageWin:MessagePanel;
-        //新增，保存，删除,回复，转发的处理函数
-        //多个按钮点击事件的处理函数
-        private function clickHander(e:ItemClickEvent):void {
-            if (e.item.mode == 'add') {
-                if (messageWin == null) {
-                    messageWin = new MessagePanel();
-                    messageWin.title = "发送信息";
-                }
-                PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                PopUpManager.bringToFront(messageWin);
-                PopUpManager.centerPopUp(messageWin);
-            }
-
-
-        }
-
-
-
-        override public function init(e:FlexEvent):void {
-			optionGrid.dataProvider=new ArrayCollection();
-			optionGrid.dataProvider.addAll(new ArrayCollection([{}]));
-        }
-
-        override public function changeCurrentUser(e:ChangeUserEvent):void {
-
-        }
-
-        override public function closeContainer(e:CloseEvent):void {
-
-        }
-
-        // 重新进入时执行
-        override public function reloadParamData(e:FlexEvent):void {
-        }
-
-
-		protected function optionGrid_optionHandler(event:AutoGridEvent):void
-		{	
-			var data:Object=event.data;
-			if(event.type==AutoGridEvent.DELETE){
-				if(data["id"]==""){
-					var dataProvider:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
-					dataProvider.removeItemAt(data.rowIndex);
+	        [Bindable]
+	        private var buttonArr1:ArrayCollection = new ArrayCollection([
+	            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
+	            {'label': '新增', 'ico': wximg, 'mode': 'add'}
+	        ]);
+			private var state:String="refresh";//refresh(查询状态),add(新增),mod(修改状态)
+	        [Bindable]
+	        private var subjectArr:ArrayCollection = new ArrayCollection([
+				{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0},
+				{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0}
+			]);
+			[Bindable]
+			private var subKindArr:ArrayCollection=new ArrayCollection([{"name":"java试题","id":1,"fatherid":null},{"name":"java面向对象题目","id":2,"fatherid":1},{"name":"java面向对象继承","id":3,"fatherid":2}]);
+	        //新增，保存，删除,回复，转发的处理函数
+	        //多个按钮点击事件的处理函数
+	        private function clickHander(e:MouseEvent):void {
+				ba1.requireSelection=true;
+				var item:Object=ba1.selectedItem;
+	            if (item.mode == 'refresh') {
+					loadSubject();
+	            }
+				if (item.mode == 'add') {
+					resetFormData();
+				}
+	
+	        }
+			private var isPaging:Boolean;
+			private function loadSubject():void{
+				var o:Object={};//如果需要补齐查询参数
+				o["kind"]=kindKey.text;
+				var url:String= o["kind"]||o["kind"]==""? "/kaoshi/getSubjectAll":"/kaoshi/getSubjectByKind";
+				isPaging= o["kind"]||o["kind"]==""?false:true;
+				HttpServiceUtil.getCHTTPServiceAndResult(url, loadSubDataResult, "POST").send(o);
+			}
+			private function loadSubDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					resetFormData();
+					var arr:Array;
+					if(isPaging){
+						pagebar1.mPageSize = result.result.limit;
+						pagebar1.RecordCount = result.result.total;
+						pagebar1.initPage();
+						arr= result.result.list is Array ?  result.result.list : [];
+					}else{
+						arr= result.result is Array ?  result.result : [];
+					}
+					subjectArr.removeAll();
+					subjectArr.addAll(new ArrayCollection(arr));
 				}
 			}
-		}
+			private function savSubject():void{
+				if(!isValid()){
+					return;
+				}
+				var o:Object=getFormData();
+				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/updateSubject", savSubjectDataResult, "POST").send(o);
+			}
+			private function savSubjectDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					loadSubject();
+				}
+			}
+			private function resetFormData():void{
+				title.text="";
+				subKind.selectedIndex=-1;
+				if(optionGrid.dataProvider==null){
+					optionGrid.dataProvider=new ArrayCollection();
+				}else{
+					optionGrid.dataProvider.removeAll();
+				}
+				bz.text="";
+				delBtn.enabled=false;
+			}
+			private function getFormData():Object{
+				var o:Object={};
+				if(state=="mod"){
+					o["id"]=subjectGrid.selectedItem["id"];
+				}
+				if(state=="add"){
+					o["id"]="";
+				}
+				o["title"]=title.text;
+				var kinds:Array = subKind.selectedItem ? [subKind.selectedItem["id"]] : [];
+				o["kinds"]=kinds;
+				o["bz"]=bz.text;
+				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
+				var arr:Array=(dp.toArray()).slice(0,dp.length-1);
+				DataUtil.serializationArr("","option_",o,arr);
+				return o;
+			}
+			private function setFormData(o:Object):void{
+				title.text=o["title"];
+				subKind.selectedIndex=o["kinds"][0];
+				bz.text=o["bz"];
+				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
+				dp.removeAll();
+				dp.addAll(new ArrayCollection(o["options"]));
+			}
+			private function isValid():Boolean{
+				var o:Object=getFormData();
+				if(!subjectGrid.selectedItem&&state!="add"){
+					Alert.show("请选择要保存的题目","提示");
+					return false;
+				}
+				if(o["title"]==""){
+					Alert.show("题目不能为空","提示");
+					return false;
+				}
+				if(subKind.text==""){
+					Alert.show("分类不能为空","提示");
+					return false;
+				}
+				if(optionGrid.dataProvider.length<=1){
+					Alert.show("选项不能为空","提示");
+					return false;
+				}
+				var arr:Array=optionGrid.dataProvider.toArray();
+				for(var i:int;i<(arr.length-2);i++){
+					if(arr[i]["content"]==""){
+						Alert.show("选项内容不能为空","提示");
+						return false;
+					}
+					if(arr[i]["is_right"]!=true){
+						arr[i]["is_right"]=false;
+					}
+				}
+				if(o["bz"]==""){
+					Alert.show("备注不能为空","提示");
+					return false;
+				}
+				return true;
+			}
+			private function seletSubjec():void{
+				ba1.requireSelection=false;
+				var o:Object=subjectGrid.selectedItem;
+				state=="mod";
+				setFormData(o);
+			}
+	        override public function init(e:FlexEvent):void {
+				loadSubject();
+	        }
+	
+	        override public function changeCurrentUser(e:ChangeUserEvent):void {
+	
+	        }
+	
+	        override public function closeContainer(e:CloseEvent):void {
+	
+	        }
+	
+	        // 重新进入时执行
+	        override public function reloadParamData(e:FlexEvent):void {
+	        }
+	
+	
+			protected function optionGrid_optionHandler(event:AutoGridEvent):void
+			{	
+				var data:Object=event.data;
+				if(event.type==AutoGridEvent.DELETE){
+					if(data["id"]==""){
+						var dataProvider:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
+						dataProvider.removeItemAt(data.rowIndex);
+					}
+				}
+			}
 
         ]]>
 	</fx:Script>
@@ -111,10 +205,10 @@
 			<s:HGroup height="20">
 				<s:Label text="关键字" height="100%" verticalAlign="middle">
 				</s:Label>
-				<s:TextInput height="100%">
+				<s:TextInput id="kindKey" height="100%">
 				</s:TextInput>
 			</s:HGroup>
-			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  requireSelection="true">
+			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  requireSelection="true" click="clickHander(event)">
 			</s:ButtonBar>
 		</s:BorderContainer>
 		<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
@@ -124,7 +218,7 @@
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:VGroup height="100%" width="430" >
-				<mx:DataGrid id="subjectGrid" height="100%" width="100%" dataProvider="{subjectList}">
+				<mx:DataGrid id="subjectGrid" height="100%" width="100%" dataProvider="{subjectArr}" itemClick="seletSubjec();">
 					<mx:columns>
 						<mx:DataGridColumn headerText="题目" dataField="title">
 							
@@ -148,11 +242,11 @@
 				</s:layout>
 				<s:Form width="100%" height="100%">
 					<s:FormItem label="题目">
-						<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增题目" height="100%">
+						<s:TextInput id="title" maxChars="200" width="200" prompt="新增题目" height="100%">
 						</s:TextInput>
 					</s:FormItem>
 					<s:FormItem label="分类">
-						<mx:ComboBox id="subKind" width="200" height="100%">
+						<mx:ComboBox id="subKind" width="200" height="100%" dataProvider="{subKindArr}" labelField="name" selectedIndex="-1">
 						</mx:ComboBox>
 					</s:FormItem>
 					<mx:FormItem width="400" minWidth="400">
@@ -189,8 +283,13 @@
 							</uicontrol:columns>
 						</uicontrol:AutoGrid>
 					</mx:FormItem>
+					<s:FormItem label="备注">
+						<s:TextArea id="bz" width="200" height="150">
+							
+						</s:TextArea>
+					</s:FormItem>
 					<mx:ControlBar>
-						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25">
+						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savSubject();">
 						</s:Button>
 						<s:Button id="delBtn" label="删除" height="25"  enabled="false">
 						</s:Button>
