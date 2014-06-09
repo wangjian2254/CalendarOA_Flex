@@ -38,10 +38,13 @@
 				ba1.requireSelection=true;
 				var item:Object=ba1.selectedItem;
 	            if (item.mode == 'refresh') {
+					state="refresh";
 					loadSubject();
 	            }
 				if (item.mode == 'add') {
+					state="add";
 					resetFormData();
+					delBtn.enabled=false;
 				}
 	
 	        }
@@ -56,6 +59,7 @@
 			private function loadSubDataResult(result:Object, e:ResultEvent):void {
 				if (result.success) {
 					resetFormData();
+					delBtn.enabled=false;
 					var arr:Array;
 					if(isPaging){
 						pagebar1.mPageSize = result.result.limit;
@@ -90,7 +94,6 @@
 					optionGrid.dataProvider.removeAll();
 				}
 				bz.text="";
-				delBtn.enabled=false;
 			}
 			private function getFormData():Object{
 				var o:Object={};
@@ -115,6 +118,7 @@
 				bz.text=o["bz"];
 				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
 				dp.removeAll();
+				var optiosArr:Array= o["options"] is Array?o["options"]:[];
 				dp.addAll(new ArrayCollection(o["options"]));
 			}
 			private function isValid():Boolean{
@@ -154,8 +158,9 @@
 			private function seletSubjec():void{
 				ba1.requireSelection=false;
 				var o:Object=subjectGrid.selectedItem;
-				state=="mod";
+				state="mod";
 				setFormData(o);
+				delBtn.enabled=true;
 			}
 	        override public function init(e:FlexEvent):void {
 				loadSubject();
