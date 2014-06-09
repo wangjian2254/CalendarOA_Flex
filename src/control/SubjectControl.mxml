@@ -85,6 +85,35 @@
 					loadSubject();
 				}
 			}
+			private function delSubject():void{
+				state="del";
+				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
+					if(e.detail==Alert.YES){
+						var o:Object=getFormData();
+						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delSubject", delSubjectDataResult, "POST").send(o);
+					}
+				});
+			}
+			private function delSubjectDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					loadSubject();
+				}
+			}
+			private function delSubjectKind():void{
+				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
+					if(e.detail==Alert.YES){
+						var o:Object={};
+						o["id"]=optionGrid.selectedItem["id"];
+						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delOption", delSubjectKindDataResult, "POST").send(o);
+					}
+				});
+			}
+			private function delSubjectKindDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
+					dp.removeItemAt(optionGrid.selectedIndex);
+				}
+			}
 			private function resetFormData():void{
 				title.text="";
 				subKind.selectedIndex=-1;
@@ -97,11 +126,15 @@
 			}
 			private function getFormData():Object{
 				var o:Object={};
-				if(state=="mod"){
-					o["id"]=subjectGrid.selectedItem["id"];
+				var n:Object=subjectGrid.selectedItem;
+				if((state=="mod"||state=="del")&&!n){
+					o["id"]=n["id"];
 				}
 				if(state=="add"){
-					o["id"]="";
+					o["id"]=null;
+				}
+				if((state=="add"||state=="del"||state=="refresh"||state=="mod")&&!n){
+					o["id"]=null;
 				}
 				o["title"]=title.text;
 				var kinds:Array = subKind.selectedItem ? [subKind.selectedItem["id"]] : [];
@@ -123,10 +156,6 @@
 			}
 			private function isValid():Boolean{
 				var o:Object=getFormData();
-				if(!subjectGrid.selectedItem&&state!="add"){
-					Alert.show("请选择要保存的题目","提示");
-					return false;
-				}
 				if(o["title"]==""){
 					Alert.show("题目不能为空","提示");
 					return false;
@@ -157,13 +186,15 @@
 			}
 			private function seletSubjec():void{
 				ba1.requireSelection=false;
+				ba1.selectedIndex=-1;
 				var o:Object=subjectGrid.selectedItem;
 				state="mod";
 				setFormData(o);
 				delBtn.enabled=true;
 			}
 	        override public function init(e:FlexEvent):void {
-				loadSubject();
+				optionGrid.dataProvider=new ArrayCollection([{}]);
+//				loadSubject();
 	        }
 	
 	        override public function changeCurrentUser(e:ChangeUserEvent):void {
@@ -183,9 +214,11 @@
 			{	
 				var data:Object=event.data;
 				if(event.type==AutoGridEvent.DELETE){
-					if(data["id"]==""){
+					if(!data["id"]||data["id"]==""){
 						var dataProvider:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
 						dataProvider.removeItemAt(data.rowIndex);
+					}else{
+						delSubjectKind();
 					}
 				}
 			}
@@ -255,7 +288,7 @@
 						</mx:ComboBox>
 					</s:FormItem>
 					<mx:FormItem width="400" minWidth="400">
-						<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" option="optionGrid_optionHandler(event)">
+						<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" autoDelete="optionGrid_optionHandler(event)" >
 							<uicontrol:columns>
 								<mx:DataGridColumn headerText="选项内容" dataField="content">
 								</mx:DataGridColumn>
@@ -296,7 +329,7 @@
 					<mx:ControlBar>
 						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savSubject();">
 						</s:Button>
-						<s:Button id="delBtn" label="删除" height="25"  enabled="false">
+						<s:Button id="delBtn" label="删除" height="25"  enabled="false" click="delSubject();">
 						</s:Button>
 					</mx:ControlBar>
 				</s:Form>
