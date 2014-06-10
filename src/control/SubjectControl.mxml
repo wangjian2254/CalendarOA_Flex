@@ -280,15 +280,15 @@
 				</s:layout>
 				<s:Form width="100%" height="100%">
 					<s:FormItem label="题目">
-						<s:TextInput id="title" maxChars="200" width="200" prompt="新增题目" height="100%">
-						</s:TextInput>
+						<s:TextArea id="title" maxChars="200" width="300" prompt="新增题目" height="100">
+						</s:TextArea>
 					</s:FormItem>
 					<s:FormItem label="分类">
-						<mx:ComboBox id="subKind" width="200" height="100%" dataProvider="{subKindArr}" labelField="name" selectedIndex="-1">
+						<mx:ComboBox id="subKind" width="300" height="100%" dataProvider="{subKindArr}" labelField="name" selectedIndex="-1">
 						</mx:ComboBox>
 					</s:FormItem>
 					<mx:FormItem width="400" minWidth="400">
-						<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" autoDelete="optionGrid_optionHandler(event)" >
+						<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" autoDelete="optionGrid_optionHandler(event)" sortableColumns="false">
 							<uicontrol:columns>
 								<mx:DataGridColumn headerText="选项内容" dataField="content">
 								</mx:DataGridColumn>
@@ -322,7 +322,7 @@
 						</uicontrol:AutoGrid>
 					</mx:FormItem>
 					<s:FormItem label="备注">
-						<s:TextArea id="bz" width="200" height="150">
+						<s:TextArea id="bz" width="300" height="150">
 							
 						</s:TextArea>
 					</s:FormItem>

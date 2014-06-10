@@ -14,6 +14,7 @@
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
+			import mx.core.mx_internal;
 			import mx.events.CloseEvent;
 			import mx.events.FlexEvent;
 			import mx.events.ItemClickEvent;
@@ -40,6 +41,7 @@
 			var item:Object=ba1.selectedItem;
 			typeName.text="";
 			delBtn.enabled=false;
+			var o:Object=subjectKindTree.selectedItem;
 			if(item.mode=="refresh"){
 				state="refresh";
 				loadSubKindData();
@@ -47,10 +49,19 @@
 			}
             if (item.mode == 'addSam') {
 				state="addSam";
+				var parent:Object=subjectKindTree.getParentItem(o);
+				if(o&&parent){
+					parentName.text=parent.name;
+				}else{
+					parentName.text="";
+				}
 				return;
             }
 			if (item.mode == 'addNex') {
 				state="addNex";
+				if(o){
+					parentName.text=o.name;
+				}
 				return;
 			}
         }
@@ -74,10 +85,14 @@
 		private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
 			if (result.success) {
 				typeName.text="";
+				parentName.text="";
 				delBtn.enabled=false;
 				var arr:Array= result.result is Array ?  result.result : [];
 				subKindArr.removeAll();
 				subKindArr.addAll(new ArrayCollection(arr));
+				for(var i:int=0;i<subKindArr.length;i++){
+					subjectKindTree.expandChildrenOf(subKindArr[i],true);
+				}
 //				var arr:Array=createNodeDataByJson("id","fatherid",result.result as Array);
 //				subKindArr=new ArrayCollection(arr);
 			}
@@ -170,6 +185,12 @@
 		private function setFormData():void{
 			var o:Object=subjectKindTree.selectedItem;
 			typeName.text=o.name;
+			var parent:Object=subjectKindTree.getParentItem(o);
+			if(parent){
+				parentName.text=parent.name;
+			}else{
+				parentName.text="";
+			}
 		}
 		public function getData():Object{
 			var o:Object={};
@@ -239,7 +260,7 @@
 				
 			</s:HorizontalLayout>
 		</s:layout>
-		<mx:Tree id="subjectKindTree" itemClick="selectNode()" dataProvider="{subKindArr}" height="100%" width="430" labelField="name">
+		<mx:Tree id="subjectKindTree" itemClick="selectNode()" dataProvider="{subKindArr}" height="100%" width="430" labelField="name" >
 		</mx:Tree>
 		<s:BorderContainer width="100%" height="100%" borderVisible="true">
 			<s:layout>
@@ -248,6 +269,10 @@
 				</s:HorizontalLayout>
 			</s:layout>
 			<s:Form width="100%" height="100%">
+				<s:FormItem label="父级名称">
+					<s:TextInput id="parentName" maxChars="200" width="200" editable="false">
+					</s:TextInput>
+				</s:FormItem>
 				<s:FormItem label="类型名称">
 					<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
 					</s:TextInput>
