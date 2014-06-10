@@ -4,10 +4,10 @@ package events
 	
 	public class AutoGridEvent extends Event
 	{
-		public static const DELETE:String="delete";
-		public static const ADD:String="add";
+		public static const DELETE:String="autoDelete";
+		public static const ADD:String="autoAdd";
 		public var data:Object;
-		public function AutoGridEvent(data:Object,type:String="delete", bubbles:Boolean=false, cancelable:Boolean=false)
+		public function AutoGridEvent(data:Object,type:String="autoDelete", bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
 			this.data=data;

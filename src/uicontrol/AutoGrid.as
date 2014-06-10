@@ -13,7 +13,8 @@ package uicontrol
 	import mx.events.DataGridEvent;
 	import mx.events.FlexEvent;
 	import mx.events.ListEvent;
-	[Event(name="option",type="events.AutoGridEvent")]
+	[Event(name="autoDelete",type="events.AutoGridEvent")]
+	[Event(name="autoAdd",type="events.AutoGridEvent")]
 	public class AutoGrid extends DataGrid
 	{
 		public function AutoGrid()
@@ -79,7 +80,6 @@ package uicontrol
 			}
 			return result;
 		}
-		private var isBreak:Boolean=false;
 		private function initRow(e:CollectionEvent):void{
 			var o:Object=createRow();
 			var data:ArrayCollection=dataProvider as ArrayCollection;

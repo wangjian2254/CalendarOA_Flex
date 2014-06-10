@@ -37,6 +37,7 @@
 				var item:Object=ba1.selectedItem;
 				typeName.text="";
 				delBtn.enabled=false;
+				var o:Object=paperKindTree.selectedItem;
 				if(item.mode=="refresh"){
 					state="refresh";
 					loadPagKindData();
@@ -44,10 +45,19 @@
 				}
 				if (item.mode == 'addSam') {
 					state="addSam";
+					var parent:Object=paperKindTree.getParentItem(o);
+					if(o&&parent){
+						parentName.text=parent.name;
+					}else{
+						parentName.text="";
+					}
 					return;
 				}
 				if (item.mode == 'addNex') {
 					state="addNex";
+					if(o){
+						parentName.text=o.name;
+					}
 					return;
 				}
 			}
@@ -71,10 +81,14 @@
 			private function loadPagKindDataResult(result:Object, e:ResultEvent):void {
 				if (result.success) {
 					typeName.text="";
+					parentName.text="";
 					delBtn.enabled=false;
 					var arr:Array= result.result is Array ?  result.result : [];
 					papKindArr.removeAll();
 					papKindArr.addAll(new ArrayCollection(arr));
+					for(var i:int=0;i<papKindArr.length;i++){
+						paperKindTree.expandChildrenOf(papKindArr[i],true);
+					}
 //					var arr:Array=createNodeDataByJson("id","fatherid",result.result as Array);
 //					papKindArr=new ArrayCollection(arr);
 				}
@@ -167,6 +181,12 @@
 			private function setFormData():void{
 				var o:Object=paperKindTree.selectedItem;
 				typeName.text=o.name;
+				var parent:Object=paperKindTree.getParentItem(o);
+				if(parent){
+					parentName.text=parent.name;
+				}else{
+					parentName.text="";
+				}
 			}
 			public function getData():Object{
 				var o:Object={};
@@ -240,6 +260,10 @@
 			</mx:Tree>
 			<s:BorderContainer width="100%" height="100%" borderVisible="true">
 				<s:Form width="100%" height="100%">
+					<s:FormItem label="父级名称">
+						<s:TextInput id="parentName" maxChars="200" width="200" editable="false">
+						</s:TextInput>
+					</s:FormItem>
 					<s:FormItem label="类型名称">
 						<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
 						</s:TextInput>
