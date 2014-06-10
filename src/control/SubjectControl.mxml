@@ -99,17 +99,16 @@
 					loadSubject();
 				}
 			}
-			private function delSubjectKind():void{
-				state="del";
+			private function delOption():void{
 				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
 					if(e.detail==Alert.YES){
 						var o:Object={};
 						o["id"]=optionGrid.selectedItem["id"];
-						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delOption", delSubjectKindDataResult, "POST").send(o);
+						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delOption", delOptionDataResult, "POST").send(o);
 					}
 				});
 			}
-			private function delSubjectKindDataResult(result:Object, e:ResultEvent):void {
+			private function delOptionDataResult(result:Object, e:ResultEvent):void {
 				if (result.success) {
 					var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
 					dp.removeItemAt(optionGrid.selectedIndex);
@@ -219,7 +218,7 @@
 						var dataProvider:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
 						dataProvider.removeItemAt(data.rowIndex);
 					}else{
-						delSubjectKind();
+						delOption();
 					}
 				}
 			}
