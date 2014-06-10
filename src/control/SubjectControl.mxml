@@ -24,7 +24,7 @@
 	            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
 	            {'label': '新增', 'ico': wximg, 'mode': 'add'}
 	        ]);
-			private var state:String="refresh";//refresh(查询状态),add(新增),mod(修改状态)
+			private var state:String="refresh";//refresh(查询状态),add(新增状态),mod(修改状态)del(删除状态)
 	        [Bindable]
 	        private var subjectArr:ArrayCollection = new ArrayCollection([
 				{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0},
@@ -100,6 +100,7 @@
 				}
 			}
 			private function delSubjectKind():void{
+				state="del";
 				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
 					if(e.detail==Alert.YES){
 						var o:Object={};
