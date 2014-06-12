@@ -5,8 +5,10 @@
 	<fx:Script>
 		<![CDATA[
 			import events.AutoGridEvent;
+			import events.ChangeJoinUserEvent;
 			import events.ChangeUserEvent;
 			import events.CloseEvent;
+			import events.DelItemEvent;
 			
 			import httpcontrol.HttpServiceUtil;
 			
@@ -16,6 +18,9 @@
 			import mx.events.ItemClickEvent;
 			import mx.events.ListEvent;
 			import mx.rpc.events.ResultEvent;
+			
+			import uicontrol.ContactItem;
+			import uicontrol.DelItem;
 			
 			import util.DataUtil;
 
@@ -137,7 +142,12 @@
 					o["id"]=null;
 				}
 				o["title"]=title.text;
-				var kinds:Array = subKind.selectedItem ? [subKind.selectedItem["id"]] : [];
+				var kinds:Array = [];
+				for(var i:int;i<subKindArr.length;i++){
+					if(subKindArr[i].selected===true){
+						kinds.push(subKindArr[i].id);
+					}
+				}
 				o["kinds"]=kinds;
 				o["bz"]=bz.text;
 				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
@@ -160,7 +170,14 @@
 					Alert.show("题目不能为空","提示");
 					return false;
 				}
-				if(subKind.text==""){
+				var isFind:Boolean=false;
+				for(var j:int=0;j<subKindArr.length;j++){
+					if(subKindArr[i].selected===true){
+						isFind=true;
+						break;
+					}
+				}
+				if(!isFind){
 					Alert.show("分类不能为空","提示");
 					return false;
 				}
@@ -191,6 +208,23 @@
 				state="mod";
 				setFormData(o);
 				delBtn.enabled=true;
+			}
+			public function changeSubKind():void{
+				subkinds.removeAllElements();
+				var address:DelItem = null;
+				for each(var obj:Object in subKindArr){
+					if(obj.selected){
+						address = new DelItem();
+						address.modifyEnable = true;
+						address.data = obj;
+						address.labelField="name";
+						subkinds.addElement(address);
+						address.addEventListener(DelItemEvent.Delelte,delSubkin);
+					}
+				}
+			}
+			private function delSubkin(e:DelItemEvent):void{
+				subKind.invalidateList();
 			}
 	        override public function init(e:FlexEvent):void {
 				optionGrid.dataProvider=new ArrayCollection([{}]);
@@ -249,7 +283,7 @@
 			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  requireSelection="true" click="clickHander(event)">
 			</s:ButtonBar>
 		</s:BorderContainer>
-		<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
+		<s:BorderContainer height="100%" width="100%" borderVisible="false">
 			<s:layout>
 				<s:HorizontalLayout gap="2">
 					
@@ -275,57 +309,104 @@
 			<s:BorderContainer width="100%" height="100%" borderVisible="true">
 				<s:layout>
 					<s:HorizontalLayout>
-						
 					</s:HorizontalLayout>
 				</s:layout>
 				<s:Form width="100%" height="100%">
-					<s:FormItem label="题目">
-						<s:TextArea id="title" maxChars="200" width="300" prompt="新增题目" height="100">
-						</s:TextArea>
-					</s:FormItem>
-					<s:FormItem label="分类">
-						<mx:ComboBox id="subKind" width="300" height="100%" dataProvider="{subKindArr}" labelField="name" selectedIndex="-1">
-						</mx:ComboBox>
-					</s:FormItem>
-					<mx:FormItem width="400" minWidth="400">
-						<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" autoDelete="optionGrid_optionHandler(event)" sortableColumns="false">
-							<uicontrol:columns>
-								<mx:DataGridColumn headerText="选项内容" dataField="content">
-								</mx:DataGridColumn>
-								<mx:DataGridColumn headerText="是否正确" dataField="is_right" width="70" editable="false">
-									<mx:itemRenderer>
-										<fx:Component>
-											<mx:Canvas width="100%">
-												<mx:VBox horizontalAlign="center" width="100%">
-													<fx:Script>
-														<![CDATA[
-															import mx.events.ListEvent;
-															private var _data:Object;
-															override public function set data(o:Object):void{
-																_data=o;
-																is_right.selected=o["is_right"];
-															}
-															private function clickHandler():void{
-																_data["is_right"]=is_right.selected;
-																dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,-1,null,this));
-															}
-														]]>
-													</fx:Script>
-													<mx:CheckBox id="is_right" click="clickHandler()">
-													</mx:CheckBox>
-												</mx:VBox>
-											</mx:Canvas>
-										</fx:Component>
-									</mx:itemRenderer>
-								</mx:DataGridColumn>
-							</uicontrol:columns>
-						</uicontrol:AutoGrid>
-					</mx:FormItem>
-					<s:FormItem label="备注">
-						<s:TextArea id="bz" width="300" height="150">
-							
-						</s:TextArea>
-					</s:FormItem>
+					<mx:HBox width="100%" height="300">
+						<s:FormItem label="题目" height="100%"  id="content">
+							<s:TextArea id="title"  width="300" prompt="新增题目" height="{content.height-20}">
+							</s:TextArea>
+						</s:FormItem>
+						<s:FormItem label="分类" width="50%" height="100%">
+							<mx:VBox width="100%" height="100%">
+								<s:Scroller width="100%" height="60" >
+									<s:Group width="100%" height="100%">
+										<s:TileGroup id="subkinds" height="100%"  width="100%" requestedColumnCount="-1">
+											
+										</s:TileGroup>
+									</s:Group>
+								</s:Scroller>
+								<mx:DataGrid id="subKind" width="100%" height="150" dataProvider="{subKindArr}">
+									<mx:columns>
+										<mx:DataGridColumn headerText="选择"  width="40" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
+											<mx:itemRenderer>
+												<fx:Component>
+													<mx:HBox horizontalAlign="center">
+														<fx:Script>
+															<![CDATA[
+																public function get selected():Boolean{
+																	
+																	return cb.selected;
+																}
+																public function set selected(value:Boolean):void{
+																	cb.selected=value;
+																}
+																private function changeValue():void{
+																	if(data.selected!=cb.selected){
+																		data.selected = cb.selected;
+																		outerDocument.changeSubKind();
+																	}
+																}
+															]]>
+														</fx:Script>
+														
+														<mx:CheckBox id="cb" selected="{data.selected}" change="changeValue()" >
+															
+														</mx:CheckBox>
+													</mx:HBox>
+												</fx:Component>
+											</mx:itemRenderer>
+										</mx:DataGridColumn>
+										<mx:DataGridColumn headerText="分类" dataField="name" editable="false">
+										</mx:DataGridColumn>
+									</mx:columns>
+								</mx:DataGrid>
+							</mx:VBox>
+							<!--<mx:ComboBox id="subKind" width="300" height="100%" dataProvider="{subKindArr}" labelField="name" selectedIndex="-1">
+							</mx:ComboBox>-->
+						</s:FormItem>
+					</mx:HBox>
+					<mx:HBox width="100%" height="200">
+						<mx:FormItem width="400" minWidth="400" label="选项" height="200">
+							<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" height="100%" autoDelete="optionGrid_optionHandler(event)"  sortableColumns="false">
+								<uicontrol:columns>
+									<mx:DataGridColumn headerText="选项内容" dataField="content">
+									</mx:DataGridColumn>
+									<mx:DataGridColumn headerText="是否正确" dataField="is_right" width="70" editable="false">
+										<mx:itemRenderer>
+											<fx:Component>
+												<mx:Canvas width="100%">
+													<mx:VBox horizontalAlign="center" width="100%">
+														<fx:Script>
+															<![CDATA[
+																import mx.events.ListEvent;
+																private var _data:Object;
+																override public function set data(o:Object):void{
+																	_data=o;
+																	is_right.selected=o["is_right"];
+																}
+																private function clickHandler():void{
+																	_data["is_right"]=is_right.selected;
+																	dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,-1,null,this));
+																}
+															]]>
+														</fx:Script>
+														<mx:CheckBox id="is_right" click="clickHandler()">
+														</mx:CheckBox>
+													</mx:VBox>
+												</mx:Canvas>
+											</fx:Component>
+										</mx:itemRenderer>
+									</mx:DataGridColumn>
+								</uicontrol:columns>
+							</uicontrol:AutoGrid>
+						</mx:FormItem>
+						<s:FormItem label="备注" id="content1" height="200">
+							<s:TextArea id="bz" width="300" height="{content1.height-10}">
+								
+							</s:TextArea>
+						</s:FormItem>
+					</mx:HBox>
 					<mx:ControlBar>
 						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savSubject();">
 						</s:Button>
