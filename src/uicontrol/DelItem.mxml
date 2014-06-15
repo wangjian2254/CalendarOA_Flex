@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="{linkItem.width+10+10+2}" height="18" borderVisible="false" creationComplete="init()" remove="removeHandler(event)">
+	<s:layout>
+		<s:HorizontalLayout gap="2" paddingLeft="10" verticalAlign="middle" horizontalAlign="left"/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import events.DelItemEvent;
+			
+			import mx.controls.Alert;
+			import mx.core.IVisualElementContainer;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			
+			
+			[Bindable]
+			[Embed("/assets/img/tabbutton/X_down.png")]
+			public var X_down:Class;
+			[Bindable]
+			[Embed("/assets/img/tabbutton/X_hover.png")]
+			public var X_hover:Class;
+			[Bindable]
+			[Embed("/assets/img/tabbutton/X_out.png")]
+			public var X_out:Class;
+			
+			
+			[Bindable]
+			public var data:Object = null;
+			
+			[Bindable]
+			public var modifyEnable:Boolean = false;
+			
+			
+			public var labelFunction:Function=null;
+			private var _labelField:String;
+			public function get labelField():String{
+				return _labelField
+			}
+			public function set labelField(value:String):void{
+				_labelField=value;
+			}
+			private function init():void{
+				var text:String = labelFunction is Function ? labelFunction():data[labelField];
+				if(text){
+					linkItem.label=text;
+				}else{
+					linkItem.label="";
+				}
+			}
+			private function removeHandler(event:FlexEvent):void
+			{
+				labelFunction=null;
+				data=null;
+			}
+			private function clickHandler():void{
+				data.selected = false;
+				this.parent is IVisualElementContainer ? IVisualElementContainer(this.parent).removeElement(this):UIComponent(this.parent).removeChild(this);
+				dispatchEvent(new DelItemEvent());
+			}
+			public function closeO():void{
+				
+				this.clo.source=X_hover;
+			}
+			public function closeD():void{
+				
+				this.clo.source=X_down;
+			}
+			public function closeU():void{
+				this.clo.source=X_out;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<mx:LinkButton id="linkItem">
+		
+	</mx:LinkButton>
+	<mx:Image id="clo" visible="{modifyEnable}"  source="{X_out}"  click="clickHandler()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
+	
+</s:BorderContainer>

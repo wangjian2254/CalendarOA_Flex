@@ -31,12 +31,9 @@
 	        ]);
 			private var state:String="refresh";//refresh(查询状态),add(新增状态),mod(修改状态)del(删除状态)
 	        [Bindable]
-	        private var subjectArr:ArrayCollection = new ArrayCollection([
-				{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0},
-				{title:"java试题",kinds:"java>面向对象",bz:"对于面向对象的理解",rightnum:0,wrongnum:0,accuracy:0}
-			]);
+	        private var subjectArr:ArrayCollection = new ArrayCollection([]);
 			[Bindable]
-			private var subKindArr:ArrayCollection=new ArrayCollection([{"name":"java试题","id":1,"fatherid":null},{"name":"java面向对象题目","id":2,"fatherid":1},{"name":"java面向对象继承","id":3,"fatherid":2}]);
+			private var subKindArr:ArrayCollection=new ArrayCollection([]);
 	        //新增，保存，删除,回复，转发的处理函数
 	        //多个按钮点击事件的处理函数
 	        private function clickHander(e:MouseEvent):void {
@@ -53,12 +50,24 @@
 				}
 	
 	        }
+			//查询分类
+			private function loadSubKindData():void{
+				var o:Object={};//如果需要补齐查询参数
+				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllKind", loadSubKindDataResult, "POST").send(o);
+			};
+			private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					var arr:Array= result.result is Array ?  result.result : [];
+					subKindArr.removeAll();
+					subKindArr.addAll(new ArrayCollection(arr));
+				}
+			}
 			private var isPaging:Boolean;
 			private function loadSubject():void{
 				var o:Object={};//如果需要补齐查询参数
 				o["kind"]=kindKey.text;
 				var url:String= o["kind"]||o["kind"]==""? "/kaoshi/getSubjectAll":"/kaoshi/getSubjectByKind";
-				isPaging= o["kind"]||o["kind"]==""?false:true;
+				isPaging= !o["kind"]||o["kind"]==""?true:false;
 				HttpServiceUtil.getCHTTPServiceAndResult(url, loadSubDataResult, "POST").send(o);
 			}
 			private function loadSubDataResult(result:Object, e:ResultEvent):void {
@@ -70,9 +79,9 @@
 						pagebar1.mPageSize = result.result.limit;
 						pagebar1.RecordCount = result.result.total;
 						pagebar1.initPage();
-						arr= result.result.list is Array ?  result.result.list : [];
+						arr= result.result.result is Array ?  result.result.result : [];
 					}else{
-						arr= result.result is Array ?  result.result : [];
+						arr= result.result.result is Array ?  result.result.result : [];
 					}
 					subjectArr.removeAll();
 					subjectArr.addAll(new ArrayCollection(arr));
@@ -122,6 +131,11 @@
 			private function resetFormData():void{
 				title.text="";
 				subKind.selectedIndex=-1;
+				for(var j:int;j<subKindArr.length;j++){
+						subKindArr[j].selected=false;
+				}
+				changeSubKind();
+				subKind.invalidateList();
 				if(optionGrid.dataProvider==null){
 					optionGrid.dataProvider=new ArrayCollection();
 				}else{
@@ -152,17 +166,34 @@
 				o["bz"]=bz.text;
 				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
 				var arr:Array=(dp.toArray()).slice(0,dp.length-1);
-				DataUtil.serializationArr("","option_",o,arr);
+				DataUtil.serializationArr("mx_internal","option_",o,arr);
 				return o;
 			}
 			private function setFormData(o:Object):void{
 				title.text=o["title"];
-				subKind.selectedIndex=o["kinds"][0];
 				bz.text=o["bz"];
+				subKind.selectedIndex=-1;
 				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
 				dp.removeAll();
 				var optiosArr:Array= o["options"] is Array?o["options"]:[];
 				dp.addAll(new ArrayCollection(o["options"]));
+				var subKinds:Array = o["kinds"] is Array?o["kinds"]:[];
+				var isFind:Boolean=false;
+				for(var j:int;j<subKindArr.length;j++){
+					isFind=false;
+					for(var i:int;i<subKinds.length;i++){
+						if(subKinds[i]==subKindArr[j]["id"]){
+							subKindArr[j].selected=true;
+							isFind=true;
+							break;
+						}
+					}
+					if(!isFind){
+						subKindArr[j].selected=false;
+					}
+				}
+				changeSubKind();
+				subKind.invalidateList();
 			}
 			private function isValid():Boolean{
 				var o:Object=getFormData();
@@ -227,8 +258,9 @@
 				subKind.invalidateList();
 			}
 	        override public function init(e:FlexEvent):void {
-				optionGrid.dataProvider=new ArrayCollection([{}]);
-//				loadSubject();
+				optionGrid.dataProvider=new ArrayCollection();
+				loadSubject();
+				loadSubKindData();
 	        }
 	
 	        override public function changeCurrentUser(e:ChangeUserEvent):void {
@@ -295,9 +327,6 @@
 						<mx:DataGridColumn headerText="题目" dataField="title">
 							
 						</mx:DataGridColumn>
-						<mx:DataGridColumn headerText="分类" dataField="kinds">
-							
-						</mx:DataGridColumn>
 						<mx:DataGridColumn headerText="正确率" dataField="accuracy">
 							
 						</mx:DataGridColumn>
@@ -312,23 +341,23 @@
 					</s:HorizontalLayout>
 				</s:layout>
 				<s:Form width="100%" height="100%">
-					<mx:HBox width="100%" height="300">
-						<s:FormItem label="题目" height="100%"  id="content">
-							<s:TextArea id="title"  width="300" prompt="新增题目" height="{content.height-20}">
+					<mx:HBox width="100%" height="250">
+						<s:FormItem label="题目" height="100%" width="400"  id="content1">
+							<s:TextArea id="title"  width="100%" prompt="新增题目" height="{content1.height-20}">
 							</s:TextArea>
 						</s:FormItem>
-						<s:FormItem label="分类" width="50%" height="100%">
-							<mx:VBox width="100%" height="100%">
-								<s:Scroller width="100%" height="60" >
+						<s:FormItem id="content2" label="分类" width="400" height="100%">
+							<mx:VBox width="100%" height="{content2.height-20}" verticalGap="0">
+								<s:Scroller width="100%" height="100%" >
 									<s:Group width="100%" height="100%">
 										<s:TileGroup id="subkinds" height="100%"  width="100%" requestedColumnCount="-1">
 											
 										</s:TileGroup>
 									</s:Group>
 								</s:Scroller>
-								<mx:DataGrid id="subKind" width="100%" height="150" dataProvider="{subKindArr}">
+								<mx:DataGrid id="subKind" width="100%" height="170" dataProvider="{subKindArr}">
 									<mx:columns>
-										<mx:DataGridColumn headerText="选择"  width="40" dataField="selected"  sortable="false"  editorDataField="selected" rendererIsEditor="true">
+										<mx:DataGridColumn headerText="选择" dataField="selected" width="40" sortable="false"  editorDataField="selected" rendererIsEditor="true">
 											<mx:itemRenderer>
 												<fx:Component>
 													<mx:HBox horizontalAlign="center">
@@ -366,11 +395,11 @@
 							</mx:ComboBox>-->
 						</s:FormItem>
 					</mx:HBox>
-					<mx:HBox width="100%" height="200">
-						<mx:FormItem width="400" minWidth="400" label="选项" height="200">
-							<uicontrol:AutoGrid editable="true" id="optionGrid" width="100%" height="100%" autoDelete="optionGrid_optionHandler(event)"  sortableColumns="false">
+					<mx:HBox width="100%" height="250">
+						<s:FormItem width="400" id="content3" minWidth="400" label="选项" height="100%">
+							<uicontrol:AutoGrid editable="true" width="100%" id="optionGrid" height="{content3.height-20}" autoDelete="optionGrid_optionHandler(event)"  sortableColumns="false">
 								<uicontrol:columns>
-									<mx:DataGridColumn headerText="选项内容" dataField="content">
+									<mx:DataGridColumn headerText="选项内容" dataField="content" textAlign="left">
 									</mx:DataGridColumn>
 									<mx:DataGridColumn headerText="是否正确" dataField="is_right" width="70" editable="false">
 										<mx:itemRenderer>
@@ -400,10 +429,9 @@
 									</mx:DataGridColumn>
 								</uicontrol:columns>
 							</uicontrol:AutoGrid>
-						</mx:FormItem>
-						<s:FormItem label="备注" id="content1" height="200">
-							<s:TextArea id="bz" width="300" height="{content1.height-10}">
-								
+						</s:FormItem>
+						<s:FormItem label="备注" id="content4" width="400" height="100%">
+							<s:TextArea id="bz" height="{content4.height-20}" width="100%" prompt="备注">
 							</s:TextArea>
 						</s:FormItem>
 					</mx:HBox>

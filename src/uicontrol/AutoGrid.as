@@ -13,6 +13,8 @@ package uicontrol
 	import mx.events.DataGridEvent;
 	import mx.events.FlexEvent;
 	import mx.events.ListEvent;
+	import mx.events.ResizeEvent;
+
 	[Event(name="autoDelete",type="events.AutoGridEvent")]
 	[Event(name="autoAdd",type="events.AutoGridEvent")]
 	public class AutoGrid extends DataGrid
@@ -21,6 +23,7 @@ package uicontrol
 		{
 			super();
 			this.addEventListener(FlexEvent.PREINITIALIZE,preinitializeHandler);
+			this.addEventListener(ResizeEvent.RESIZE,resizeHandler);
 			this.addEventListener(ListEvent.ITEM_CLICK,itemClick);
 			this.addEventListener(DataGridEvent.ITEM_EDIT_BEGINNING,itemEdit);
 		}
@@ -179,6 +182,15 @@ package uicontrol
 		}
 		private function preinitializeHandler(e:FlexEvent):void{
 			createOptionColumn();
+		}
+		private function resizeHandler(e:ResizeEvent):void{
+			updateDisplayList(this.width,this.height);
+		}
+		override protected function updateDisplayList(unscaledWidth:Number,unscaledHeight:Number):void{
+			if(unscaledWidth<=0){
+				return;
+			}
+			super.updateDisplayList(unscaledWidth,unscaledHeight);
 		}
 	}
 }
