@@ -146,7 +146,7 @@
 			private function getFormData():Object{
 				var o:Object={};
 				var n:Object=subjectGrid.selectedItem;
-				if((state=="mod"||state=="del")&&!n){
+				if((state=="mod"||state=="del")&&n){
 					o["id"]=n["id"];
 				}
 				if(state=="add"){
