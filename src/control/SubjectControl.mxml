@@ -357,7 +357,7 @@
 								</s:Scroller>
 								<mx:DataGrid id="subKind" width="100%" height="170" dataProvider="{subKindArr}">
 									<mx:columns>
-										<mx:DataGridColumn headerText="选择" dataField="selected" width="40" sortable="false"  editorDataField="selected" rendererIsEditor="true">
+										<mx:DataGridColumn headerText="选择" dataField="selected" width="40" sortable="false" textAlign="center">
 											<mx:itemRenderer>
 												<fx:Component>
 													<mx:HBox horizontalAlign="center">
@@ -386,7 +386,7 @@
 												</fx:Component>
 											</mx:itemRenderer>
 										</mx:DataGridColumn>
-										<mx:DataGridColumn headerText="分类" dataField="name" editable="false">
+										<mx:DataGridColumn headerText="分类" dataField="name" textAlign="left">
 										</mx:DataGridColumn>
 									</mx:columns>
 								</mx:DataGrid>
