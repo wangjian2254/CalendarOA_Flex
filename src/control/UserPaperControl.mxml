@@ -4,195 +4,447 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-        import control.MessagePanel;
-
-        import events.ChangeUserEvent;
-        import events.CloseEvent;
-
-        import httpcontrol.HttpServiceUtil;
-
-        import mx.collections.ArrayCollection;
-        import mx.core.FlexGlobals;
-        import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
-        import mx.managers.PopUpManager;
-        import mx.rpc.events.ResultEvent;
-
-        [Bindable]
-        private var buttonArr0:ArrayCollection = new ArrayCollection([
-            {'label': '全部', 'mode': 'all'},
-            {'label': '未读信息', 'mode': 'unread'},
-            {'label': '已读信息', 'mode': 'read'}
-        ]);
-        [Bindable]
-        private var buttonArr1:ArrayCollection = new ArrayCollection([
-            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
-            {'label': '写信息', 'ico': wximg, 'mode': 'add'}
-        ]);
-        [Bindable]
-        private var buttonArr2:ArrayCollection = new ArrayCollection([
-            {'label': '回复', 'ico': saveimg, 'mode': 'huifu'},
-            {'label': '转发', 'ico': saveimg, 'mode': 'add'}
-        ]);
-        [Bindable]
-        private var buttonArr3:ArrayCollection = new ArrayCollection([
-            {'label': '标记已读', 'ico': saveimg, 'mode': 'read'},
-            {'label': '标记未读', 'ico': saveimg, 'mode': 'unread'}
-        ]);
-
-        [Bindable]
-        private var messagelist:ArrayCollection = new ArrayCollection();
-        private var messageWin:MessagePanel;
-        //新增，保存，删除,回复，转发的处理函数
-        //多个按钮点击事件的处理函数
-        private function clickHander(e:ItemClickEvent):void {
-            if (e.item.mode == 'add') {
-                if (messageWin == null) {
-                    messageWin = new MessagePanel();
-                    messageWin.title = "发送信息";
-                }
-                PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                PopUpManager.bringToFront(messageWin);
-                PopUpManager.centerPopUp(messageWin);
-            }
-
-
-        }
-
-        // 全部、未读、已读 筛选
-        private function showType():void {
-            pagebar1.initPage();
-            messagelist.removeAll();
-            getMessages();
-
-        }
-
-        private function getMessages():void {
-            var data:Object = new Object();
-            data["type"] = messageType.selectedItem.mode;
-            data["start"] = pagebar1.PageIndex * pagebar1.mPageSize;
-            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageByUser", getMessagesResult, "POST").send(data);
-
-        }
-
-        private function getMessagesResult(result:Object, e:ResultEvent):void {
-            if (result.success) {
-
-                if (messagelist.length == 0) {
-                    pagebar1.mPageSize = result.result.limit;
-                    pagebar1.RecordCount = result.result.total;
-                    pagebar1.initPage();
-                }
-
-                messagelist.removeAll();
-                messagelist.addAll(new ArrayCollection(result.result.list as Array));
-                pagebar1.RecordCount = result.result.total;
-            }
-        }
-
-
-        override public function init(e:FlexEvent):void {
-            getMessages();
-        }
-
-        override public function changeCurrentUser(e:ChangeUserEvent):void {
-            getMessages();
-
-        }
-
-        override public function closeContainer(e:CloseEvent):void {
-
-        }
-
-        // 重新进入时执行
-        override public function reloadParamData(e:FlexEvent):void {
-            if (param) {
-                if (param.hasOwnProperty("messageType")) {
-                    for each(var obj:Object in buttonArr0) {
-                        if (obj.mode == param["messageType"]) {
-                            messageType.selectedItem = obj;
-                        }
-                    }
-                    showType();
-                }
-
-            }
-            super.reloadParamData(e);
-        }
-        ]]>
+			import events.ChangeUserEvent;
+			import events.CloseEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import uicontrol.MessAlert;
+			
+			[Bindable]
+			private var buttonArr1:ArrayCollection = new ArrayCollection([
+				{'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'}
+			]);
+			private var state:String="refresh";//refresh(查询状态),mod(修改状态)
+			[Bindable]
+			private var paperArr:ArrayCollection = new ArrayCollection([//这是一个试卷
+				{
+					"title":'java试题',
+					"is_replay":true,
+					"subjects":[//这是试卷的题目
+						{
+							"title":"关于java三个基本特征",
+							"options":[//这是题目的选项
+								{
+									"content":"继承"
+								},
+								{
+									"content":"封装"
+								},
+								{
+									"content":"多态"
+								},
+								{
+									"content":"指针调用"
+								}
+							]
+						},
+						{
+							"title":"关于java继承",
+							"options":[
+								{
+									"content":"子类可以继承父类所有属性和方法"
+								},
+								{
+									"content":"子类可以继承父类的公共和私有属性和方法"
+								},
+								{
+									"content":"子类可以继承父类的私有和保护属性和方法"
+								},
+								{
+									"content":"子类可以继承父类的公共和保护属性和方法"
+								}
+							]
+						}
+					]
+				},
+				{
+					"title":'项目管理PMP试题',
+					"is_replay":false,
+					"subjects":[
+						{
+							"title":"项目管理办公室分几类",
+							"options":[
+								{
+									"content":"支持型"
+								},
+								{
+									"content":"控制型"
+								},
+								{
+									"content":"指令型"
+								}
+							]
+						},
+						{
+							"title":"项目管理过程组分几大过程组",
+							"options":[
+								{
+									"content":"启动"
+								},
+								{
+									"content":"规划"
+								},
+								{
+									"content":"执行"
+								},
+								{
+									"content":"监控"
+								},
+								{
+									"content":"结束"
+								}
+							]
+						}
+					]
+				}
+			]);
+			[Bindable]
+			public var subjectArr:ArrayCollection = new ArrayCollection([]);
+			[Bindable]
+			private var optionArr:ArrayCollection = new ArrayCollection([]);
+			//新增，保存，删除,回复，转发的处理函数
+			//多个按钮点击事件的处理函数
+			private function clickHander(e:MouseEvent):void {
+				ba1.requireSelection=true;
+				var item:Object=ba1.selectedItem;
+				if (item.mode == 'refresh') {
+					state="refresh";
+					loadPager();
+				}
+				
+			}
+			private var isPaging:Boolean;
+			private function loadPager():void{
+				var o:Object={};//如果需要补齐查询参数
+				o["kind"]=kindKey.text;
+				var url:String= o["kind"]||o["kind"]==""? "/kaoshi/getSubjectAll":"/kaoshi/getSubjectByKind";//?????????配置查询所有和带有关键字的url
+				isPaging= !o["kind"]||o["kind"]==""?true:false;
+				HttpServiceUtil.getCHTTPServiceAndResult(url, loadPagerDataResult, "POST").send(o);
+			}
+			private function loadPagerDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					resetFormData();
+					var arr:Array;
+					if(isPaging){
+						pagebar1.mPageSize = result.result.limit;
+						pagebar1.RecordCount = result.result.total;
+						pagebar1.initPage();
+						arr= result.result.result is Array ?  result.result.result : [];
+					}else{
+						arr= result.result.result is Array ?  result.result.result : [];
+					}
+					paperArr.removeAll();
+					paperArr.addAll(new ArrayCollection(arr));
+				}
+			}
+			private function savPager():void{
+				if(!isValid()){
+					return;
+				}
+				var o:Object=getFormData();
+				var url:String="";//???????????????这里配置保存试卷答案url
+				HttpServiceUtil.getCHTTPServiceAndResult(url, savPagerDataResult, "POST").send(o);
+			}
+			private function savPagerDataResult(result:Object, e:ResultEvent):void {
+				if (result.success) {
+					loadPager();
+				}
+			}
+			private function getFormData():Object{
+				var o:Object={};
+				var n:Object=pagerGrid.selectedItem;
+				o["id"]=n["id"];
+				o["userid"]="";//?????????根据实际需要改写属性名称
+				o["subjects"]=n["subjects"];//?????????根据实际需要改写属性名称
+				return o;
+			}
+			private function resetFormData():void{
+				title.text="";
+				repaly.text=""
+				bz.text="";
+				optionArr.removeAll();
+				subjectArr.removeAll();
+			}
+			private function setPaperFormData(o:Object):void{
+				title.text=o["title"];//?????????根据实际需要改写属性名称
+				repaly.text=o["repaly"];//?????????根据实际需要改写属性名称 
+				if(o["is_replay"]===true){//?????????根据实际需要改写属性名称 
+					repaly.editable=true;
+					repaly.setStyle("borderColor","#000000");
+				}else{
+					repaly.editable=false;
+					repaly.setStyle("borderColor","#cccccc");
+				}
+				var subjects:Array = o["subjects"] is Array?o["subjects"]:[];//?????????根据实际需要改写属性名称
+				bz.text="";
+				optionArr.removeAll();
+				subjectArr.removeAll();
+				subjectArr.addAll(new ArrayCollection(subjects));
+			}
+			private function setSubjectFormData(o:Object):void{
+				bz.text=o["title"];//?????????根据实际需要改写属性名称
+				var options:Array = o["options"] is Array?o["options"]:[];//?????????根据实际需要改写属性名称
+				optionArr.removeAll();
+				optionArr.addAll(new ArrayCollection(options));
+			}
+			private function isValid():Boolean{
+				var n:Object=pagerGrid.selectedItem;
+				if(!n){
+					Alert.show("请选择试卷","提示");
+					return false;
+				}
+				var o:Object=getFormData();
+				var isFind:Boolean=false;
+				var i:int=0;
+				var j:int=0;
+				var options:Array;
+				for(;i<o["subjects"].length;i++){
+					isFind=false;
+					j=0;
+					options=o["subjects"][i]["options"];
+					for(;j<options.length;j++){
+						if(options[j].is_right===true){//?????????根据实际需要改写属性名称
+							isFind=true;
+							break;
+						}
+					}
+					if(!isFind){
+						Alert.show("当前试卷第"+(i+1)+"题没有答案","提示");
+						return false;
+					}
+				}
+				return true;
+			}
+			private function seletPaper():void{
+				ba1.requireSelection=false;
+				ba1.selectedIndex=-1;
+				var o:Object=pagerGrid.selectedItem;
+				state="mod";
+				setPaperFormData(o);
+			}
+			private function seletSubjec():void{
+				var o:Object=subjectGrid.selectedItem;
+				setSubjectFormData(o);
+			}
+			protected function optionGrid_focusInHandler(event:FocusEvent):void
+			{	
+				if(event.currentTarget==optionGrid){
+					var msgWin:MessAlert=new MessAlert();
+					msgWin.alertT("<font size='14'>1.你可以按大键盘上方区域的<font color='#ff0000'>+</font>切换下一试卷或<font color='#ff0000'>shift</font>+<font color='#ff0000'>+</font>切换上一试卷<p></p>2.你可以按<font color='#ff0000'>回车</font>切换下一题或<font color='#ff0000'>shift</font>+<font color='#ff0000'>回车</font>切换上一题</font>");
+				}
+			}
+			protected function switchRow(event:KeyboardEvent):void
+			{	
+				event.preventDefault();
+				var keyCode:int=event.keyCode;
+				switch(true){
+					case keyCode==13:{
+						if(subjectArr.length>=1){
+							processKeyHander(subjectGrid,subjectArr,event);
+						}
+						break;
+					}
+					case keyCode==187:{
+						if(paperArr.length>=1){
+							processKeyHander(pagerGrid,paperArr,event);
+						}
+						break;
+					}
+						
+				}
+			}
+			private function processKeyHander(grid:DataGrid,arr:ArrayCollection,event:KeyboardEvent):void{
+				var index:int;
+				if(arr.length>1){
+					index=arr.getItemIndex(grid.selectedItem);
+					var data:Object;
+					if(index!=-1){
+						if(!event.shiftKey){
+							if(++index>=arr.length){
+								index=0;
+							}
+						}
+						if(event.shiftKey){
+							if(--index<0){
+								index=arr.length-1;
+							}
+						}
+						data=arr.getItemAt(index);
+						grid.selectedItem=data;
+					}else{
+						index=0;
+						data=arr.getItemAt(index);
+						grid.selectedItem=data;
+					}
+				}
+				if(arr.length==1){
+					index=0;
+					data=arr.getItemAt(index);
+					grid.selectedItem=data;
+				}
+				grid.dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,index));
+			}
+			override public function init(e:FlexEvent):void {
+				//				loadPager();//?????????如果业务都已经完成放开这个方法里的代码
+			}
+			
+			override public function changeCurrentUser(e:ChangeUserEvent):void {
+				
+			}
+			
+			override public function closeContainer(e:CloseEvent):void {
+				
+			}
+			
+			// 重新进入时执行
+			override public function reloadParamData(e:FlexEvent):void {
+			}
+		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
-	<s:layout>
-		<s:VerticalLayout  >
-			
-		</s:VerticalLayout>
-	</s:layout>
-	<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
 		<s:layout>
-			<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
+			<s:VerticalLayout>
 				
-			</s:HorizontalLayout>
+			</s:VerticalLayout>
 		</s:layout>
-		<s:ButtonBar id="messageType" dataProvider="{buttonArr0}"  selectedIndex="0"  chromeColor="#faf0cc"  labelField="label"  height="30" change="showType()" >
-		</s:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr1}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr2}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-		<mx:ButtonBar dataProvider="{buttonArr3}"  doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  itemClick="clickHander(event);">
-		</mx:ButtonBar>
-	</s:BorderContainer>
-	<s:BorderContainer height="100%" width="100%" borderVisible="false"  >
-		<s:layout>
-			<s:HorizontalLayout gap="2" verticalAlign="top">
-				
-			</s:HorizontalLayout>
-		</s:layout>
-		<s:VGroup width="250" height="100%">
-			<s:DataGrid id="messageGrid" dataProvider="{messagelist}"  width="100%" height="100%" rowHeight="50"  >
-				<s:columns>
-					<s:ArrayList>
-						<s:GridColumn dataField="title" headerText="按时间排序" sortable="false" >
-							<s:itemRenderer>
-								<fx:Component>
-									<s:GridItemRenderer>
-										<s:HGroup width="100%" height="100%" verticalAlign="middle" gap="5" paddingLeft="5" paddingTop="3" paddingRight="3">
-											
-											<s:BorderContainer visible="{!data.is_read}" width="10" height="10" cornerRadius="20" borderWeight="1" backgroundColor="#aecfea" borderColor="#000000">
-												
-											</s:BorderContainer>
-											<s:VGroup width="100%" height="100%">
-												<s:Label width="100%" height="12" paddingLeft="10" text="{data.authorname}" textDecoration="underline" fontSize="12" color="#434343">
-													
-												</s:Label>
-												<s:Label width="100%" height="100%" text="{data.title}" maxDisplayedLines="-1" fontSize="15" color="#000000">
-													
-												</s:Label>
-												
-											</s:VGroup>
-										</s:HGroup>
-									</s:GridItemRenderer>
-									
-								</fx:Component>
-							</s:itemRenderer>
-						</s:GridColumn>
-					</s:ArrayList>
-				</s:columns>
-			</s:DataGrid>
-			<uicontrol:Pageing id="pagebar1" infolbl="false">
-			</uicontrol:Pageing>
-		</s:VGroup>
-		
-		<s:Scroller width="100%" height="100%">
-			<s:Group width="100%" height="100%">
-				<s:BorderContainer width="100%" height="100%">
+		<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+			<s:layout>
+				<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
 					
-				</s:BorderContainer>
-			</s:Group>
-		</s:Scroller>
-	</s:BorderContainer>
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:HGroup height="20">
+				<s:Label text="关键字" height="100%" verticalAlign="middle">
+				</s:Label>
+				<s:TextInput id="kindKey" height="100%">
+				</s:TextInput>
+			</s:HGroup>
+			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  requireSelection="true" click="clickHander(event)">
+			</s:ButtonBar>
+		</s:BorderContainer>
+		<s:BorderContainer height="100%" width="100%" borderVisible="false">
+			<s:layout>
+				<s:HorizontalLayout gap="2">
+					
+				</s:HorizontalLayout>
+			</s:layout>
+			<s:VGroup height="100%" width="230" >
+				<mx:DataGrid id="pagerGrid" height="100%" width="100%" dataProvider="{paperArr}" itemClick="seletPaper();">
+					<mx:columns>
+						<mx:DataGridColumn headerText="考卷名称" dataField="title">
+							
+						</mx:DataGridColumn>
+					</mx:columns>
+				</mx:DataGrid>
+				<uicontrol:Pageing id="pagebar1" infolbl="false">
+				</uicontrol:Pageing>
+			</s:VGroup>
+			<s:BorderContainer width="100%" height="100%" borderVisible="true">
+				<s:layout>
+					<s:HorizontalLayout>
+					</s:HorizontalLayout>
+				</s:layout>
+				<s:Form width="100%" height="100%">
+					<mx:HBox width="100%" height="30%">
+						<s:FormItem label="考卷名称" height="100%" width="33%"  id="content1">
+							<s:TextArea id="title"  width="100%" height="{content1.height-20}" editable="false" borderColor="#cccccc">
+							</s:TextArea>
+						</s:FormItem>
+						<s:FormItem label="题目" id="content4" width="33%" height="100%">
+							<s:TextArea id="bz" height="{content4.height-20}" width="100%" editable="false" borderColor="#cccccc">
+							</s:TextArea>
+						</s:FormItem>
+						<s:FormItem id="content2" label="评论" width="33%" height="100%">
+							<s:TextArea id="repaly"  width="100%" height="{content2.height-20}">
+							</s:TextArea>
+						</s:FormItem>
+					</mx:HBox>
+					<mx:HBox width="100%" height="30%">
+						<s:FormItem width="33%" id="content3" label="题目" height="100%">
+							<mx:DataGrid id="subjectGrid" width="100%" height="{content3.height-20}" dataProvider="{subjectArr}" itemClick="seletSubjec()">
+								<mx:columns>
+									<mx:DataGridColumn headerText="序号" textAlign="left">
+										<mx:itemRenderer>
+											<fx:Component>
+												<mx:Canvas width="100%">
+													<mx:VBox horizontalAlign="center" width="100%">
+														<fx:Script>
+															<![CDATA[
+																override public function set data(o:Object):void{
+																	rowNum.text=(outerDocument.subjectArr.getItemIndex(o)+1).toString();
+																}
+															]]>
+														</fx:Script>
+														<mx:Label id="rowNum"></mx:Label>
+													</mx:VBox>
+												</mx:Canvas>
+											</fx:Component>
+										</mx:itemRenderer>
+									</mx:DataGridColumn>
+									<mx:DataGridColumn headerText="名称" dataField="title" textAlign="left">
+									</mx:DataGridColumn>
+								</mx:columns>
+							</mx:DataGrid>
+						</s:FormItem>
+						<s:FormItem width="33%" id="content5" label="选项" height="100%">
+							<mx:DataGrid width="100%" id="optionGrid" dataProvider="{optionArr}" height="{content5.height-20}"  sortableColumns="false" variableRowHeight="true" focusIn="optionGrid_focusInHandler(event)" keyUp="switchRow(event)">
+								<mx:columns>
+									<mx:DataGridColumn headerText="选项内容" dataField="content" textAlign="left" wordWrap="true">
+									</mx:DataGridColumn>
+									<mx:DataGridColumn headerText="是否正确" dataField="is_right" minWidth="70" textAlign="center">
+										<mx:itemRenderer>
+											<fx:Component>
+												<mx:Canvas width="100%">
+													<mx:VBox horizontalAlign="center" width="100%" remove="removeHandler(event)">
+														<fx:Script>
+															<![CDATA[
+																import mx.events.ListEvent;
+																private var _data:Object;
+																import mx.events.FlexEvent;
+																
+																protected function removeHandler(event:FlexEvent):void
+																{
+																	_data=null;
+																}
+																
+																override public function set data(o:Object):void{
+																	_data=o;
+																	is_right.selected=o["is_right"];
+																}
+																private function clickHandler():void{
+																	_data["is_right"]=is_right.selected;
+																	dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,-1,null,this));
+																}
+															]]>
+														</fx:Script>
+														<mx:CheckBox id="is_right" click="clickHandler()" focusEnabled="false">
+														</mx:CheckBox>
+													</mx:VBox>
+												</mx:Canvas>
+											</fx:Component>
+										</mx:itemRenderer>
+									</mx:DataGridColumn>
+								</mx:columns>
+							</mx:DataGrid>
+						</s:FormItem>
+					</mx:HBox>
+					<mx:ControlBar>
+						<s:Button id="savBtn" label="保存" color="white" chromeColor="red" height="25" click="savPager();">
+						</s:Button>
+					</mx:ControlBar>
+				</s:Form>
+			</s:BorderContainer>
+			
+		</s:BorderContainer>
 	</s:BorderContainer>
 </control:CBorderContainer>
