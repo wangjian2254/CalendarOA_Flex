@@ -2,6 +2,16 @@
 <control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace control "control.*";
+		@namespace uicontrol "uicontrol.*";
+		.boder{
+			border-color:#cccccc;
+			color:#8b8787;
+		}
+	</fx:Style>
 	<fx:Script>
 		<![CDATA[
 			import control.MessagePanel;
@@ -260,12 +270,12 @@
 			</mx:Tree>
 			<s:BorderContainer width="100%" height="100%" borderVisible="true">
 				<s:Form width="100%" height="100%">
-					<s:FormItem label="父级名称">
-						<s:TextInput id="parentName" maxChars="200" width="200" editable="false">
-						</s:TextInput>
-					</s:FormItem>
 					<s:FormItem label="类型名称">
 						<s:TextInput id="typeName" maxChars="200" width="200" prompt="新增类型名称">
+						</s:TextInput>
+					</s:FormItem>
+					<s:FormItem label="父级名称">
+						<s:TextInput id="parentName" width="200" styleName="boder" editable="false">
 						</s:TextInput>
 					</s:FormItem>
 					<mx:ControlBar>
