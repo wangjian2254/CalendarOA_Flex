@@ -74,10 +74,32 @@ package httpcontrol
 //			trace(e.result.toString());
 			var result:Object=e.result;
 			var o:Object=JSON.parse(result as String);
-			if(o.success==false&&o.status_code==400){
-				if(ToolUtil.loginUser.parent==null){
-					PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
-				}
+			if(o.success==false){
+                switch (o.status_code){
+                    case 400:
+                        break;
+                    case 401:
+                        Alert.show(o.message,"警告");
+                        if(ToolUtil.loginUser.parent==null){
+                            PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
+                        }
+                        return;
+                        break;
+                    case 402:
+                        break;
+                    case 403:
+                        break;
+                    case 404:
+                        if(ToolUtil.loginUser.parent==null){
+                            PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
+                        }
+                        return;
+                        break;
+
+
+
+                }
+
 				//PopUpManager.removePopUp(ToolUtil.loginUser);
 				return;
 			}

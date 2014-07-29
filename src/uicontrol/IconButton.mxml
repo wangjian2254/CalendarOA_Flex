@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+  Created by wangjian2254 on 14-7-29.
+-->
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+        width="48" height="48"  cornerRadius="7"  borderColor="#ffffff" borderWeight="4"  creationComplete="init()"
+        >
+    <fx:Script><![CDATA[
+        import uicontrol.conobj.HeadSelectArray;
+
+        public var border_color:uint=0xffffff;
+
+
+        [Bindable]
+        public var headSelectArray:HeadSelectArray=null;
+
+        public var selected:Boolean = false;
+
+        [Bindable]
+        public var iconurl:String='';
+
+        public function click_image():void{
+            if(headSelectArray.selectedButtons()){
+                headSelectArray.selectedButtons().clear_border();
+            }
+            this.setStyle("borderColor","#ff0000");
+            selected = true;
+        }
+        public function clear_border():void{
+            this.setStyle("borderColor","#ffffff");
+            selected = false;
+        }
+
+        public function isSelected():Boolean{
+            return selected;
+        }
+
+        private function init():void{
+            headSelectArray.addArr(this);
+            if(selected){
+               click_image();
+            }
+        }
+
+
+
+        ]]></fx:Script>
+    <s:Image source="{iconurl}" x="0" y="0" click="click_image()">
+
+    </s:Image>
+</s:BorderContainer>
