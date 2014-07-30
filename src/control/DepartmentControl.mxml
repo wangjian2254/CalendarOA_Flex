@@ -7,22 +7,13 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import events.ChangeMenuEvent;
-			import events.ChangeUserEvent;
 			import events.CloseEvent;
-			import events.PageChangeEvent;
-			
-			import httpcontrol.CHTTPService;
-			import httpcontrol.HttpServiceUtil;
-			
+
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.core.FlexGlobals;
 			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
-			
+
 			import util.ToolUtil;
 			
 			
@@ -49,6 +40,20 @@
 
         ]]>
 	</fx:Script>
+    <s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
+        <s:layout>
+            <s:VerticalLayout gap="0">
+
+            </s:VerticalLayout>
+        </s:layout>
+        <s:Scroller width="100%" height="50%">
+            <s:Group width="100%" height="100%">
+                <s:BorderContainer id="orgChart" borderVisible="false">
+
+                </s:BorderContainer>
+            </s:Group>
+        </s:Scroller>
+    </s:BorderContainer>
 
 
 </control:CBorderContainer>

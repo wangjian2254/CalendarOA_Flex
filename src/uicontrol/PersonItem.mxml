@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!--
+  Created by wangjian2254 on 14-7-30.
+-->
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:uicontrol="uicontrol.*"
+                   width="100" height="18" borderVisible="true" borderColor="#000000" cornerRadius="7"
+                   creationComplete="init()"
+        >
+    <fx:Script><![CDATA[
+        private var _person:Object = null;
+
+        private function init():void {
+            personName.text = _person.name;
+        }
+
+
+        public function get person():Object {
+            return _person;
+        }
+
+        public function set person(value:Object):void {
+            _person = value;
+            try{
+                init();
+            } catch (e:Error){
+
+            }
+
+        }
+
+        public function delPerson():void{
+
+        }
+        ]]></fx:Script>
+    <s:layout>
+        <s:HorizontalLayout gap="5" verticalAlign="middle">
+
+        </s:HorizontalLayout>
+    </s:layout>
+    <s:Label id="personName" ></s:Label>
+    <uicontrol:BtnDel clickFun="delPerson"></uicontrol:BtnDel>
+</s:BorderContainer>

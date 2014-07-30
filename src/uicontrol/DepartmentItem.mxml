@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+  Created by wangjian2254 on 14-7-30.
+-->
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+        width="100" height="150" borderVisible="true" borderColor="#000000" cornerRadius="7"  creationComplete="init()"
+        >
+    <fx:Script><![CDATA[
+        private var _department:Object = null;
+
+        private function init():void {
+            orgHead.source = _department.icon;
+        }
+
+        public function get department():Object {
+            return _department;
+        }
+
+        public function set department(value:Object):void {
+            _department = value;
+            try{
+                init();
+            } catch (e:Error){
+
+            }
+
+        }
+        ]]></fx:Script>
+            <s:layout>
+                <s:HorizontalLayout gap="5" verticalAlign="middle">
+
+                </s:HorizontalLayout>
+            </s:layout>
+    <s:Image id="orgHead"  width="45" height="45"></s:Image>
+    <s:Form width="100%">
+        <s:FormItem label="部门名称：">
+            <s:TextInput id="depatementName" width="70">
+            </s:TextInput>
+        </s:FormItem>
+        <s:FormItem label="负责人：" id="fzrFormItem">
+            <s:layout>
+                <s:TileLayout columnAlign="justifyUsingGap" >
+
+                </s:TileLayout>
+            </s:layout>
+        </s:FormItem>
+    </s:Form>
+</s:BorderContainer>
