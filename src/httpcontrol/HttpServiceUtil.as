@@ -99,17 +99,18 @@ package httpcontrol
 
 
                 }
-
-				//PopUpManager.removePopUp(ToolUtil.loginUser);
-				return;
-			}
-			if(o.success==false){
-				Alert.show(o.message,"警告");
+                Alert.show(o.message,"警告");
 			}else{
 				if(o.message){
-					ToolUtil.resultMsg = o.message;
-					time.reset();
-					time.start();
+                    if(o.dialog==1){
+                        ToolUtil.resultMsg = o.message;
+                        time.reset();
+                        time.start();
+                    }
+                    if(o.dialog==2){
+                        Alert.show(o.message,"提示");
+                    }
+
 				}
 			}
 		}

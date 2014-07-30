@@ -69,7 +69,7 @@
 	<s:Form width="100%" id="form" >
 		
 		<s:FormItem label="用户名:" textAlign="right">
-			<s:TextInput id="username" width="200"  text="" tabIndex="1" enter="foucePass()">
+			<s:TextInput id="username"  prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass()">
 				
 			</s:TextInput>
 		</s:FormItem>

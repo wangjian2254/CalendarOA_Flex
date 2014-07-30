@@ -1,6 +1,7 @@
 import control.CBorderContainer;
 import control.CalendarControl;
 import control.ContactControl;
+import control.DepartmentControl;
 import control.GroupControl;
 import control.LogPanel;
 import control.MessageControl;
@@ -154,7 +155,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				c = new ContactControl();
 				break;
 			case 'group':
-				c = new GroupControl();
+				c = new DepartmentControl();
 				break;
 			case 'message':
 				c = new MessageControl();

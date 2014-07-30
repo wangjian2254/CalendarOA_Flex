@@ -148,9 +148,9 @@ public class ToolUtil
     public static function contactsRefresh(fun:*=null,e:*=null):void{
 
         if(!(fun is Function)){
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllContacts,"POST").send();
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getContacts",resultAllContacts,"POST").send();
         }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getContacts",resultAllContacts,"POST");
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getContacts",resultAllContacts,"POST");
             http.resultFunArr.addItem(fun);
             http.send();
 

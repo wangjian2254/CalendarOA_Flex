@@ -2,15 +2,18 @@
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                xmlns:s="library://ns.adobe.com/flex/spark"
                xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
-               width="450" height="550"
+               width="450" height="500"
                title="注册用户" close="closeWin()">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
 			import httpcontrol.RemoteUtil;
-			
-			import mx.controls.Alert;
-			import mx.managers.PopUpManager;
+
+            import mx.collections.ArrayCollection;
+
+            import mx.controls.Alert;
+            import mx.events.FlexEvent;
+            import mx.managers.PopUpManager;
 			import mx.rpc.AbstractOperation;
 			import mx.rpc.events.ResultEvent;
 			
@@ -21,7 +24,7 @@
 			public function closeWin():void{
 				PopUpManager.removePopUp(this);
 			}
-			
+
 			public function save():void{
 				if(username.text==""||truename.text==""||password.text==""||rpassword.text==""||orgname.text==""){
 					Alert.show("请填写完整信息。 用户名、密码、姓名、组织名称必须填写","提示");
@@ -52,6 +55,10 @@
 //					Alert.show("修改密码失败","提示");
 				}
 			}
+
+        public function foucePass(obj:Object):void{
+            obj.setFocus();
+        }
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -66,7 +73,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="username" prompt="电子邮件" width="200"  text="" tabIndex="1">
+			<s:TextInput id="username" prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass(truename)">
 				
 			</s:TextInput>
 			<s:Label text="电子邮件作为用户名" color="red" />
@@ -75,7 +82,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="truename"   width="200"  tabIndex="2">
+			<s:TextInput id="truename"   width="200"  tabIndex="2" enter="foucePass(password)">
 				
 			</s:TextInput>
 			<s:Label text="昵称" color="red" />
@@ -95,7 +102,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="password" displayAsPassword="true"  width="200"  tabIndex="3">
+			<s:TextInput id="password" displayAsPassword="true"  width="200"  tabIndex="3"  enter="foucePass(rpassword)">
 				
 			</s:TextInput>
 			<s:Label text="*" color="red" />
@@ -104,11 +111,12 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="rpassword" displayAsPassword="true"  width="200"  tabIndex="4">
+			<s:TextInput id="rpassword" displayAsPassword="true"  width="200"  tabIndex="4" enter="foucePass(orgname)">
 				
 			</s:TextInput>
 			<s:Label text="*" color="red" />
 		</s:FormItem>
+
 		<s:FormItem label="组织名称:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
@@ -116,8 +124,9 @@
 			<s:TextInput id="orgname"  width="200"  tabIndex="5">
 				
 			</s:TextInput>
-			<s:Label text="日程提醒需要使用" color="red" />
+			<s:Label text="公司或团队名称" color="red" />
 		</s:FormItem>
+
 		<s:FormItem label="组织图标:" textAlign="right">
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
