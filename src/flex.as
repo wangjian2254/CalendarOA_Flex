@@ -9,7 +9,7 @@ public function quite(e:*=null):void {
 
 public function CloseWindow(event:CloseEvent):void{
 	if(event.detail==Alert.YES){//如果按下了确定按钮
-		HttpServiceUtil.getCHTTPServiceAndResult("/ca/logout", currentUser, "POST").send();
+		HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", currentUser, "POST").send();
 	}
 }
 

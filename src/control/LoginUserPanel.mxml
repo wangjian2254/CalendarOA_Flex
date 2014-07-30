@@ -43,7 +43,7 @@
             obj.username = username.text;
             obj.password = password.text;
 
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/login", refresh, "POST").send(obj);
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/login", refresh, "POST").send(obj);
 
 
         }

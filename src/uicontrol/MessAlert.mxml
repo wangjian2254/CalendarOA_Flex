@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   title="弹出消息" close="closeHandler(event)"
+			   creationComplete="init()" rollOut="outHandler(event)" rollOver="overHandler(event)" fontSize="15">
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.conversion.TextConverter;
+			import flashx.textLayout.elements.TextFlow;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			
+			[Bindable]
+			private var _msg:String;
+			[Bindable]
+			private var _textflow:TextFlow;
+			public function get message():String{
+				return _msg;
+			}
+			public function set message(value:String):void{
+				_msg=value;
+			}
+			private var st:uint;
+			private var isClosing:Boolean;
+			private var isClearST:Boolean;
+			private function init():void{
+				st=setTimeout(close,3000);
+				isClearST=false;
+				isClosing=false;
+			}
+			private function clearST():void{
+				clearTimeout(st);
+				isClearST=true;
+			}
+			protected function closeHandler(event:CloseEvent):void
+			{
+				this.close();
+			}
+			
+			private function close():void{
+				clearST();
+				isClosing=true;
+				PopUpEffert.removePopUp(this);
+			}
+			public function alertT(m:String):void{
+				if(isClearST){
+					init();
+				}
+				message=m;
+				_textflow = TextConverter.importToFlow(m, TextConverter.TEXT_FIELD_HTML_FORMAT); 
+				this.width=FlexGlobals.topLevelApplication.width*0.25;
+				this.height=FlexGlobals.topLevelApplication.height*0.25;
+				//浏览器的分辨率
+				var wx:Number=FlexGlobals.topLevelApplication.width;
+				var wy:Number=FlexGlobals.topLevelApplication.height;
+				
+				this.x=wx-this.width-25;
+				this.y=wy-this.height*2+35;
+				
+				PopUpEffert.addPopUp(this,FlexGlobals.topLevelApplication as DisplayObject,false);
+			}
+
+			protected function overHandler(event:MouseEvent):void
+			{
+				if(!isClearST){
+					clearST();
+				}
+			}
+
+			protected function outHandler(event:MouseEvent):void
+			{
+				if(!isClosing){
+					this.close();
+				};
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:TextArea id="msg" left="10" right="10" top="10" bottom="10" borderVisible="false" textFlow="{_textflow}" editable="false"/>
+</s:TitleWindow>

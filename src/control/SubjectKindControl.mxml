@@ -107,56 +107,6 @@
 //				subKindArr=new ArrayCollection(arr);
 			}
 		}
-		//工具方法把所有带有子父级关系的json数组拼成树节点结构数据(如果json数据层级嵌套太多并且数据量较大可能会影响性能)
-		/**
-		 * cIdField:节点数据的唯一标识符与fIdField进行关联required
-		 * cArrField:节点当中子节点数组 default value children
-		 * arr:将要组成树节点的数据required
-		 * 
-		 * */
-		private function createNodeDataByJson(cIdField:String,fIdField:String,arr:Array,cArrField:String="children"):Array{
-			arr = arr ? arr : [];
-			var arr1:Array=arr.slice();
-			var isFind:Boolean=false;
-			for(var i:int=0;i<arr.length;i++){
-				var findObject:Object=arr[i];
-				for(var j:int=0;j<arr1.length;j++){
-					var targetObject:Object=arr1[j];
-					if(findObject[cIdField]==targetObject[cIdField]){ //如果是同一个对象,跳过本次内部循环
-						continue;
-					}else if(findObject[fIdField]==targetObject[cIdField]){ //如果不是同一对象,迭代对象父id正好等于比较对象的主键
-						isFind=true;
-						if(targetObject[cArrField] is Array){//比较对象对象有子数组
-							targetObject[cArrField].push(findObject);
-						}else{ //比较对象没有子数组
-							targetObject[cArrField]=[];
-							targetObject[cArrField].push(findObject);
-						}
-						arr1.splice(i,1); //比较对象当中删除找到的元素
-						arr1=createNodeDataByJson(cIdField,fIdField,arr1,cArrField);//继续寻找元素
-						break;
-					}if(targetObject[cArrField] is Array){ //如果迭代对象父id不等于比较对象的主键,判断比较对象是否含有子数组
-						var count:int=targetObject[cArrField].unshift(findObject); //将迭代对象放入数组当中
-						var arr2:Array=createNodeDataByJson(cIdField,fIdField,targetObject[cArrField],cArrField);//继续寻找元素
-						if(arr2.length==count){ //如果没有找到
-							targetObject[cArrField].shift();
-						}else{
-							targetObject[cArrField]=arr2;
-							isFind=true;
-							arr1.splice(i,1); //比较对象当中删除找到的元素
-							arr1=createNodeDataByJson(cIdField,fIdField,arr1,cArrField);//继续寻找元素
-							break;
-						}
-					}else if(false){ //继续循环
-						
-					}
-				}
-				if(isFind){
-					break;
-				}
-			}
-			return arr1;
-		}
 		//保存方法
 		private function savSubKindData():void{
 			if(!isValid()){
@@ -251,7 +201,7 @@
 	</fx:Declarations>
 	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
 	<s:layout>
-		<s:VerticalLayout  >
+		<s:VerticalLayout>
 			
 		</s:VerticalLayout>
 	</s:layout>

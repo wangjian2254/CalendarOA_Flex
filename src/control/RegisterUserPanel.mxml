@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
-			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="450" height="550" title="注册用户" close="closeWin()">
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
+               width="450" height="550"
+               title="注册用户" close="closeWin()">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
@@ -21,9 +23,8 @@
 			}
 			
 			public function save():void{
-				if(this.username.text==""||this.truename.text==""||
-					this.password.text==""||this.rpassword.text==""){
-					Alert.show("请填写完整信息。 用户名、密码、姓名、必须填写","提示");
+				if(username.text==""||truename.text==""||password.text==""||rpassword.text==""||orgname.text==""){
+					Alert.show("请填写完整信息。 用户名、密码、姓名、组织名称必须填写","提示");
 					return;
 				}
 				if(this.password.text==""||this.password.text!=this.rpassword.text){
@@ -34,15 +35,12 @@
 				obj.username=username.text;
 				obj.truename = truename.text;
 				obj.password = password.text;
-				obj.email = email.text;
-				obj.zentao_account = zentaoaccount.text;
-				obj.zentao_password = zentaopassword.text;
-				obj.rtx = rtx.text;
-				obj.sms = sms.text;
-				obj.isaction = 'true';
-				obj.ismanager = 'true';
+				obj.name = orgname.text;
+				obj.userhead = headSelectArray.selectedIcon();
+				obj.icon = orgHeadSelectArray.selectedIcon();
+
 				
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/regUser",refresh,"POST").send(obj);
+				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regUser",refresh,"POST").send(obj);
 					
 				
 			}
@@ -58,6 +56,8 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+        <conobj:HeadSelectArray id="headSelectArray"></conobj:HeadSelectArray>
+        <conobj:HeadSelectArray id="orgHeadSelectArray"></conobj:HeadSelectArray>
 	</fx:Declarations>
 	
 	<s:Form width="100%" id="form" >
@@ -66,10 +66,10 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="username" width="200"  text="" tabIndex="1">
+			<s:TextInput id="username" prompt="电子邮件" width="200"  text="" tabIndex="1">
 				
 			</s:TextInput>
-			<s:Label text="*" color="red" />
+			<s:Label text="电子邮件作为用户名" color="red" />
 		</s:FormItem>
 		<s:FormItem label="姓名:" textAlign="right">
 			<s:layout>
@@ -78,8 +78,19 @@
 			<s:TextInput id="truename"   width="200"  tabIndex="2">
 				
 			</s:TextInput>
-			<s:Label text="*" color="red" />
+			<s:Label text="昵称" color="red" />
 		</s:FormItem>
+        <s:FormItem label="头像:" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/9.png" selected="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/20.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/23.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/24.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/30.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/40.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+        </s:FormItem>
 		<s:FormItem label="密码:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
@@ -98,40 +109,28 @@
 			</s:TextInput>
 			<s:Label text="*" color="red" />
 		</s:FormItem>
-		<s:FormItem label="腾讯通账号:" textAlign="right">
+		<s:FormItem label="组织名称:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="rtx"  width="200"  tabIndex="5">
+			<s:TextInput id="orgname"  width="200"  tabIndex="5">
 				
 			</s:TextInput>
 			<s:Label text="日程提醒需要使用" color="red" />
 		</s:FormItem>
-		<s:FormItem label="电子邮箱:" textAlign="right">
-			<s:TextInput id="email"   width="200"  tabIndex="6">
-				
-			</s:TextInput>
+		<s:FormItem label="组织图标:" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/5.png" selected="true" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/12.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/15.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/26.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/34.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/36.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
 		</s:FormItem>
 		
-		<s:FormItem label="手机号:" textAlign="right">
-			<s:TextInput id="sms"   width="200"  tabIndex="7">
-				
-			</s:TextInput>
-		</s:FormItem>
-		<s:FormItem label="禅道账号:" textAlign="right">
-			<s:layout>
-				<s:HorizontalLayout gap="5"/>
-			</s:layout>
-			<s:TextInput id="zentaoaccount"   width="200"  tabIndex="8">
-				
-			</s:TextInput>
-			<s:Label text="配合项目开发使用" color="red" />
-		</s:FormItem>
-		<s:FormItem label="禅道密码:" textAlign="right">
-			<s:TextInput id="zentaopassword"   width="200"  tabIndex="9">
-				
-			</s:TextInput>
-		</s:FormItem>
+
 		<s:FormItem>
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>

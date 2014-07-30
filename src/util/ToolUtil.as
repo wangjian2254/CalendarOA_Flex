@@ -45,7 +45,7 @@ public class ToolUtil
 //			bbRefresh();
 //			userRefresh();
         sessionUserRefresh();
-        groupRefresh();
+//        groupRefresh();
         contactsRefresh();
 //			taskRefresh();
         taskUnRefresh();
@@ -124,11 +124,11 @@ public class ToolUtil
     public static function groupRefresh(fun:Function=null):void{
 
         if(fun==null){
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST").send();
+//            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST").send();
         }else{
             var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST");
             http.resultFunArr.addItem(fun);
-            http.send();
+//            http.send();
 
         }
 
