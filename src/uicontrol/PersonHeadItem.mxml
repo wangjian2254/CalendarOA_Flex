@@ -3,8 +3,8 @@
   Created by wangjian2254 on 14-7-30.
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-                   xmlns:uicontrol="uicontrol.*"
-                   width="100" height="18" borderVisible="false" borderColor="#000000" cornerRadius="7"
+                   xmlns:uicontrol="uicontrol.*" xmlns:mx="library://ns.adobe.com/flex/mx"
+                   width="100" height="55" borderVisible="true" borderColor="#000000" cornerRadius="7"
                    creationComplete="init()"
         >
     <fx:Script><![CDATA[
@@ -12,14 +12,10 @@
         private var _depatement:Object = null;
 
         [Bindable]
-        public var showBtn:Boolean=false;
+        public var showBtn:Boolean = false;
 
         private function init():void {
-            personName.text = _person.name;
-            if(showBtn){
-                 this.width = personName.width+btnDel.width;
-            }
-            this.width = personName.width;
+            personItem.personName = _person;
         }
 
 
@@ -29,16 +25,16 @@
 
         public function set person(value:Object):void {
             _person = value;
-            try{
+            try {
                 init();
-            } catch (e:Error){
+            } catch (e:Error) {
 
             }
 
         }
 
         [Bindable]
-        public var delPerson:Function=null;
+        public var delPerson:Function = null;
 
         public function get depatement():Object {
             return _depatement;
@@ -47,13 +43,16 @@
         public function set depatement(value:Object):void {
             _depatement = value;
         }
-
         ]]></fx:Script>
     <s:layout>
-        <s:HorizontalLayout gap="5" verticalAlign="middle"  horizontalAlign="left" paddingRight="10" paddingLeft="10">
+        <s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="left">
 
         </s:HorizontalLayout>
     </s:layout>
-    <s:Label id="personName" ></s:Label>
-    <uicontrol:BtnDel id="btnDel" visible="{showBtn}" clickFun="delPerson"></uicontrol:BtnDel>
+    <s:Image id="head" source="{}" width="45" height="45" ></s:Image>
+    <s:VGroup width="100%" height="100%">
+        <uicontrol:PersonItem id="personItem" delPerson="{delPerson}" ></uicontrol:PersonItem>
+        <mx:LinkButton id="linkButtonFzr" label="设为负责人"></mx:LinkButton>
+    </s:VGroup>
+
 </s:BorderContainer>

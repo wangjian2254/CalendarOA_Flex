@@ -3,13 +3,51 @@
   Created by wangjian2254 on 14-7-30.
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-        width="100" height="150" borderVisible="true" borderColor="#000000" cornerRadius="7"  creationComplete="init()"
+                   xmlns:uicontrol="uicontrol.*"
+                   width="100" height="150" borderVisible="true" borderColor="#000000" cornerRadius="7"
+                   creationComplete="init()"
         >
     <fx:Script><![CDATA[
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.rpc.events.ResultEvent;
+
+        import util.ToolUtil;
+
         private var _department:Object = null;
+        [Bindable]
+        public var hasPower:Boolean=false;
 
         private function init():void {
-            orgHead.source = _department.icon;
+            orgHead.source = department.icon;
+            depatementName.text = department.name;
+            fzrFormItem.removeAllElements();
+
+            var person:Object=null;
+            var personItem:PersonItem = null;
+
+            if(ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid)>=0){
+
+                hasPower = true;
+            }else{
+
+                for(var i:int=0;i<department.managers.length;i++){
+                    person = department.managers[i];
+                    if(person.id ==  ToolUtil.sessionUser.pid){
+                        hasPower = true;
+                    }
+                }
+            }
+            for(var i:int=0;i<department.managers.length;i++){
+                person = department.managers[i];
+                personItem = new PersonItem();
+                personItem.showBtn = hasPower;
+                personItem.person = person;
+                fzrFormItem.addElement(personItem);
+            }
+            this.width = 60+  formDepart.width;
+            this.height = 10+formDepart.height;
+
         }
 
         public function get department():Object {
@@ -25,24 +63,42 @@
             }
 
         }
+        private function addChildDepartment():void{
+            var obj:Object = new Object();
+            obj['name']='新部门';
+            obj['icon']=department.icon;
+            obj['father']=department.id;
+            obj['flag']='custom';
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/updateDepartment",addChildDepartmentResult,"POST").send(obj);
+        }
+
+        private function addChildDepartmentResult(result:Object,e:ResultEvent):void{
+            if(result.success){
+                ToolUtil.departMentListRefresh();
+            }
+
+        }
         ]]></fx:Script>
             <s:layout>
-                <s:HorizontalLayout gap="5" verticalAlign="middle">
+                <s:HorizontalLayout gap="5" verticalAlign="top" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
 
                 </s:HorizontalLayout>
             </s:layout>
     <s:Image id="orgHead"  width="45" height="45"></s:Image>
-    <s:Form width="100%">
-        <s:FormItem label="部门名称：">
-            <s:TextInput id="depatementName" width="70">
+    <s:VGroup id="formDepart" width="100%" gap="10">
+        <s:HGroup gap="15" horizontalAlign="right" verticalAlign="middle"  width="100%">
+            <uicontrol:BtnAdd toolTip="添加子部门" visible="{hasPower}" clickFun="{addChildDepartment}" ></uicontrol:BtnAdd>
+            <uicontrol:BtnDel toolTip="删除部门" visible="{hasPower}" ></uicontrol:BtnDel>
+        </s:HGroup>
+        <s:HGroup width="100%"  verticalAlign="middle" >
+            <s:Label text="部门名称："></s:Label>
+            <s:TextInput id="depatementName" width="100" borderVisible="{hasPower}" editable="{hasPower}" >
             </s:TextInput>
-        </s:FormItem>
-        <s:FormItem label="负责人：" id="fzrFormItem">
-            <s:layout>
-                <s:TileLayout columnAlign="justifyUsingGap" >
+        </s:HGroup>
+        <s:HGroup  width="100%"  verticalAlign="top" >
+            <s:Label text="负责人："></s:Label>
+            <s:TileGroup id="fzrFormItem" columnAlign="justifyUsingGap" width="100%" minHeight="30" ></s:TileGroup>
+        </s:HGroup>
+    </s:VGroup>
 
-                </s:TileLayout>
-            </s:layout>
-        </s:FormItem>
-    </s:Form>
 </s:BorderContainer>

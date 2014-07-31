@@ -97,7 +97,7 @@
 		
 	</mx:ViewStack>
 	
-	<uicontrol:CTabBar id="cbar" dataProvider="{gongNengStack}" left="2" right="2" width="100%" bottom="1" height="31" borderVisible="false"  creationComplete="trace('tabbar')">
+	<uicontrol:CTabBar id="cbar" dataProvider="{gongNengStack}" left="2" right="2" width="100%" bottom="1" height="31" borderVisible="false" >
 		
 	</uicontrol:CTabBar>
 	

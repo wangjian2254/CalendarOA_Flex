@@ -9,6 +9,7 @@ import events.ChangeUserEvent;
 import flash.events.TimerEvent;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
+import flash.system.System;
 import flash.utils.Timer;
 
 import httpcontrol.CHTTPService;
@@ -45,7 +46,8 @@ public class ToolUtil
 //			bbRefresh();
 //			userRefresh();
         sessionUserRefresh();
-//        groupRefresh();
+        currentOrgRefresh();
+        departMentListRefresh();
         contactsRefresh();
 //			taskRefresh();
         taskUnRefresh();
@@ -117,6 +119,34 @@ public class ToolUtil
     }
 
     [Bindable]
+    public static var departMentList:ArrayCollection=new ArrayCollection();
+
+    public static var departMentTimeline:Number=0;
+
+
+    public static function departMentListRefresh(fun:Function=null):void{
+
+        if(fun==null){
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllDepart",resultAllDepartMent,"POST").send();
+        }else{
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllDepart",resultAllDepartMent,"POST");
+            http.resultFunArr.addItem(fun);
+            http.send();
+
+        }
+
+    }
+    public static function resultAllDepartMent(result:Object,e:ResultEvent):void{
+        if(result.success==true){
+            departMentList.removeAll();
+            departMentList.addAll(new ArrayCollection(result.result as Array));
+            departMentTimeline = new Date().getTime()
+
+        }
+    }
+
+
+    [Bindable]
     public static var groupList:ArrayCollection=new ArrayCollection();
     [Bindable]
     public static var groupColor:Object=new Object();
@@ -142,8 +172,37 @@ public class ToolUtil
             }
         }
     }
+
+    [Bindable]
+    public static var memberList:ArrayCollection=new ArrayCollection();
+
+    [Bindable]
+    public static var org:Object = null;
+
+    public static function currentOrgRefresh(fun:Function=null):void{
+
+        if(fun==null){
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getCurrentOrg",resultCurrentOrg,"POST").send();
+        }else{
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getCurrentOrg",resultCurrentOrg,"POST");
+            http.resultFunArr.addItem(fun);
+            http.send();
+
+        }
+
+    }
+    public static function resultCurrentOrg(result:Object,e:ResultEvent):void{
+        if(result.success==true){
+            org = result.result.org
+            memberList.removeAll();
+            memberList.addAll(new ArrayCollection(result.result.members as Array));
+
+        }
+    }
+
     [Bindable]
     public static var contactsList:ArrayCollection=new ArrayCollection();
+    public static var contactsTimeline:Number=0;
 
     public static function contactsRefresh(fun:*=null,e:*=null):void{
 
@@ -163,10 +222,12 @@ public class ToolUtil
             if(result.result){
                 contactsList.addAll(new ArrayCollection(result.result as Array));
             }
+            contactsTimeline = new Date().getTime();
         }
     }
     [Bindable]
     public static var taskUnList:ArrayCollection=new ArrayCollection();
+    public static var taskunTimeline:Number = 0;
 
     public static function taskUnRefresh(fun:*=null,e:*=null):void{
         var obj:Object=new Object();
@@ -187,10 +248,12 @@ public class ToolUtil
             if(result.result){
                 taskUnList.addAll(new ArrayCollection(result.result as Array));
             }
+            taskunTimeline = new Date().getTime();
         }
     }
     [Bindable]
     public static var taskList:ArrayCollection=new ArrayCollection();
+    public static var taskTimeline:Number = 0;
 
     public static function getTask(id:String):Object{
         for each(var item:Object in taskUnList){
@@ -225,10 +288,14 @@ public class ToolUtil
             if(result.result){
                 taskList.addAll(new ArrayCollection(result.result as Array));
             }
+            taskTimeline = new Date().getTime();
         }
     }
 
     public static var scheduleMap:Object = new Object();
+
+    public static var scheduleTimeline:Number = 0;
+
 
     public static function getSchedule(id:String):Object{
         if(ToolUtil.scheduleMap.hasOwnProperty("schedulemap")&&ToolUtil.scheduleMap.schedulemap.hasOwnProperty(id)){
@@ -266,6 +333,7 @@ public class ToolUtil
                     }
                 }
             }
+            scheduleTimeline = new Date().getTime();
             FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
         }
 

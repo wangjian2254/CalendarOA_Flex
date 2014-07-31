@@ -116,6 +116,7 @@
 				
 				dataProvider.selectedChild=e.getView();
 				refrash();
+                (dataProvider.selectedChild as CBorderContainer).reloadParamData(null);//todo:通过点击 切换的界面，也要重新reload
 //				e.getBtn().flag=CTabButton.STATUS_U;
 			}
 			
