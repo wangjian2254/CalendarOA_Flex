@@ -8,14 +8,52 @@
                    creationComplete="init()"
         >
     <fx:Script><![CDATA[
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.rpc.events.ResultEvent;
+
+        import util.ToolUtil;
+
         private var _person:Object = null;
-        private var _depatement:Object = null;
+        private var _department:Object = null;
 
         [Bindable]
-        public var showBtn:Boolean = false;
+        public var hasPower:Boolean = false;
+        public var ismanager:Boolean = false;
+
 
         private function init():void {
-            personItem.personName = _person;
+            personItem.person = person;
+            head.source = person.icon;
+            ismanager = true;
+            var p:Object = null;
+            for (var i:int = 0; i < department.managers.length; i++) {
+                p = department.managers[i];
+                if (p.id == person.id) {
+                    ismanager = false;
+                }
+            }
+            if (ismanager) {
+                btnGroup.removeElement(linkButtonUFzr);
+            } else {
+                btnGroup.removeElement(linkButtonFzr);
+            }
+
+            if (ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0) {
+
+                hasPower = true;
+            } else {
+
+                for (var i:int = 0; i < department.managers.length; i++) {
+                    person = department.managers[i];
+                    if (person.id == ToolUtil.sessionUser.pid) {
+                        hasPower = true;
+                    }
+                }
+            }
+
+            this.width = 60 + btnGroup.width;
+            this.height = 10 + btnGroup.height;
         }
 
 
@@ -33,26 +71,56 @@
 
         }
 
-        [Bindable]
-        public var delPerson:Function = null;
+        private function delManagerPerson():void {
 
-        public function get depatement():Object {
-            return _depatement;
+            var obj:Object = new Object();
+
+            obj['id'] = department.id;
+            obj['pid'] = person.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delManagerDepartment", addChildDepartmentResult, "POST").send(obj);
         }
 
-        public function set depatement(value:Object):void {
-            _depatement = value;
+        private function managerPerson():void {
+            var obj:Object = new Object();
+
+            obj['id'] = department.id;
+            obj['pid'] = person.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addManagerDepartment", addChildDepartmentResult, "POST").send(obj);
+        }
+
+        private function delPerson():void {
+            var obj:Object = new Object();
+
+            obj['id'] = department.id;
+            obj['pid'] = person.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delPersonDepartment", addChildDepartmentResult, "POST").send(obj);
+        }
+
+        private function addChildDepartmentResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.departMentListRefresh();
+            }
+
+        }
+
+        public function get department():Object {
+            return _department;
+        }
+
+        public function set department(value:Object):void {
+            _department = value;
         }
         ]]></fx:Script>
     <s:layout>
-        <s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="left">
+        <s:HorizontalLayout gap="5" verticalAlign="top" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
 
         </s:HorizontalLayout>
     </s:layout>
-    <s:Image id="head" source="{}" width="45" height="45" ></s:Image>
-    <s:VGroup width="100%" height="100%">
-        <uicontrol:PersonItem id="personItem" delPerson="{delPerson}" ></uicontrol:PersonItem>
-        <mx:LinkButton id="linkButtonFzr" label="设为负责人"></mx:LinkButton>
+    <s:Image id="head"  width="45" height="45" ></s:Image>
+    <s:VGroup id="btnGroup" width="100%" minHeight="45" gap="5">
+        <uicontrol:PersonItem id="personItem" delPerson="{delPerson}" showBtn="{hasPower}" ></uicontrol:PersonItem>
+        <mx:LinkButton id="linkButtonFzr" label="设为负责人" textDecoration="underline"  click="managerPerson()"  visible="{hasPower}" ></mx:LinkButton>
+        <mx:LinkButton id="linkButtonUFzr" label="取消负责人"  textDecoration="underline" click="delManagerPerson()"  visible="{hasPower}" ></mx:LinkButton>
     </s:VGroup>
 
 </s:BorderContainer>

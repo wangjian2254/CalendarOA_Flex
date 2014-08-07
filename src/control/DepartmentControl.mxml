@@ -15,284 +15,320 @@
         import httpcontrol.HttpServiceUtil;
 
         import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-            import mx.events.CollectionEvent;
-            import mx.events.FlexEvent;
-            import mx.events.FlexMouseEvent;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CollectionEvent;
+        import mx.events.FlexEvent;
+        import mx.events.FlexMouseEvent;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
 
-            import org.osmf.events.TimeEvent;
+        import org.osmf.events.TimeEvent;
 
-            import spark.core.IViewport;
+        import spark.core.IViewport;
 
-            import uicontrol.DepartmentItem;
+        import uicontrol.DepartmentItem;
+        import uicontrol.PersonHeadItem;
 
-            import util.ToolUtil;
+        import util.ToolUtil;
 
-            private var departmentTimeline:Number = 0;
-
-
-            [Bindable]
-            private var departmentList :ArrayCollection =null;
-
-            private var departChart:Object = null;
-            private var rootDepart:Object = null;
-
-			
-
-			
-			override public   function  init(e:FlexEvent):void{
-                initDepartment();
-
-                ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
+        private var departmentTimeline:Number = 0;
 
 
-				
-			}
-			override public function closeContainer(e:CloseEvent):void{
-				dispatchEvent(e);
-                ToolUtil.departMentList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
-				
-			}
-            override public function reloadParamData(e:FlexEvent):void {
-                initDepartment();
-                ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
+        [Bindable]
+        private var departmentList:ArrayCollection = null;
+
+        private var departChart:Object = null;
+        private var rootDepart:Object = null;
 
 
-            }
+        override public function init(e:FlexEvent):void {
+            initDepartment();
 
-            private function changeOrg(e:CollectionEvent):void{
-                initDepartment();
-            }
+            ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
 
-            private function initDepartment():void{
-                departmentList = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
-                departmentSelectArray.clear();
-                orgChart.removeAllElements();
 
-                departChart = new Object();
-                var depart:Object = null;
-                var departitem:DepartmentItem = null;
-                for(var i:int=0;i<departmentList.length;i++){
+        }
 
-                    depart = departmentList.getItemAt(i);
-                    departChart['d'+depart.id]=depart;
-                    if(!depart.father){
-                        rootDepart = depart;
-                    }
+        override public function closeContainer(e:CloseEvent):void {
+            dispatchEvent(e);
+            ToolUtil.departMentList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
+
+        }
+
+        override public function reloadParamData(e:FlexEvent):void {
+            initDepartment();
+            ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
+
+
+        }
+
+        private function changeOrg(e:CollectionEvent):void {
+            initDepartment();
+        }
+
+        private function initDepartment():void {
+            departmentList = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
+            departmentSelectArray.clear();
+            orgChart.removeAllElements();
+
+            departChart = new Object();
+            var depart:Object = null;
+            var departitem:DepartmentItem = null;
+            for (var i:int = 0; i < departmentList.length; i++) {
+
+                depart = departmentList.getItemAt(i);
+                departChart['d' + depart.id] = depart;
+                if (!depart.father) {
+                    rootDepart = depart;
                 }
-                for(var i:int=0;i<departmentList.length;i++){
+            }
+            for (var i:int = 0; i < departmentList.length; i++) {
 
-                    depart = departmentList.getItemAt(i);
-                    if(depart.flag=='free'){
-                        continue;
+                depart = departmentList.getItemAt(i);
+                if (depart.flag == 'free') {
+                    continue;
+                }
+                if (depart.father) {
+                    if (!departChart['d' + depart.father].hasOwnProperty("children")) {
+                        departChart['d' + depart.father]['children'] = [];
                     }
-                    if(depart.father){
-                         if(!departChart['d'+depart.father].hasOwnProperty("children")){
-                             departChart['d'+depart.father]['children']=[];
-                         }
-                        departChart['d'+depart.father]['children'].push(depart);
-
-                    }
-                    departitem = new DepartmentItem();
-                    departitem.department = depart;
-                    departitem.departmentSelectArray = departmentSelectArray;
-                    departitem.x=i*200;
-                    departitem.y=i*200;
-                    depart['orgchart']=departitem;
-                    orgChart.addElement(departitem);
+                    departChart['d' + depart.father]['children'].push(depart);
 
                 }
+                departitem = new DepartmentItem();
+                departitem.department = depart;
+                departitem.departmentSelectArray = departmentSelectArray;
+                departitem.x = i * 200;
+                departitem.y = i * 200;
+                depart['orgchart'] = departitem;
+                orgChart.addElement(departitem);
 
-
-                orgChart.addEventListener(FlexEvent.UPDATE_COMPLETE,needDrawOrgChart );
-                orgChart.addEventListener(ChangeDepartmentEvent.ChangeDepartment_EventStr,changeDepartment);
-            }
-
-            private function needDrawOrgChart(e:FlexEvent):void{
-                rootDepart['orgchart'].x=0;
-                rootDepart['orgchart'].y=0;
-                calculateDepartmentCoordinate(rootDepart);
-                orgChart.contentGroup.graphics.clear();
-                drawOrgChart(rootDepart);
-
-                departmentSelectArray.selectedById(selectDepartmentId);
             }
 
 
-            private function calculateDepartmentCoordinateByChildren(departmentItem:Object):void{
-                var x1:int = -1;
-                var x2:int = 0;
-                var x3:int = 0;
+            orgChart.addEventListener(FlexEvent.UPDATE_COMPLETE, needDrawOrgChart);
+            orgChart.addEventListener(ChangeDepartmentEvent.ChangeDepartment_EventStr, changeDepartment);
+        }
+
+        private function needDrawOrgChart(e:FlexEvent):void {
+            rootDepart['orgchart'].x = 0;
+            rootDepart['orgchart'].y = 0;
+            calculateDepartmentCoordinate(rootDepart);
+            orgChart.contentGroup.graphics.clear();
+            drawOrgChart(rootDepart);
+
+            departmentSelectArray.selectedById(selectDepartmentId);
+        }
+
+
+        private function calculateDepartmentCoordinateByChildren(departmentItem:Object):void {
+            var x1:int = -1;
+            var x2:int = 0;
+            var x3:int = 0;
+            var d:Object = null;
+            if (!departmentItem.hasOwnProperty("children")) {
+                return;
+            }
+            for (var i:int = 0; i < departmentItem.children.length; i++) {
+                d = departmentItem.children[i];
+                if (d['orgchart'].x < x1 || x1 < 0) {
+                    x1 = d['orgchart'].x;
+                }
+                if ((d['orgchart'].x + d['orgchart'].width) > x2) {
+                    x2 = d['orgchart'].x + d['orgchart'].width;
+                }
+                if (d.hasOwnProperty('orgchart_x2') && d['orgchart_x2'] > x3) {
+                    x3 = d['orgchart_x2'];
+                }
+            }
+
+            departmentItem['orgchart'].x = (x2 - x1) / 2 - departmentItem['orgchart'].width / 2 + x1;
+
+            if (x3 < x2) {
+                departmentItem['orgchart_x2'] = x2;
+            } else {
+                departmentItem['orgchart_x2'] = x3;
+            }
+
+
+            if (!departChart.hasOwnProperty('d' + departmentItem.father)) {
+                return;
+            }
+            var fatherDepart:Object = departChart['d' + departmentItem.father];
+            var p:Object = null;
+            for (var i:int = 0; i < fatherDepart.children.length; i++) {
+                d = fatherDepart.children[i];
+                if (p == null && d.id != departmentItem.id) {
+                    continue;
+                }
+                if (p == departmentItem) {
+                    d['orgchart'].x = departmentItem['orgchart_x2'] + 50;
+                } else {
+                    if (p != null) {
+                        d['orgchart'].x = p['orgchart'].x + p['orgchart'].width + 50;
+                    }
+                }
+
+
+                p = fatherDepart.children[i];
+            }
+            calculateDepartmentCoordinateByChildren(fatherDepart);
+
+        }
+
+        private function calculateDepartmentCoordinate(departmentItem:Object):void {
+            var x:int = departmentItem['orgchart'].x;
+            var y:int = departmentItem['orgchart'].y;
+            if (departmentItem.hasOwnProperty("children")) {
                 var d:Object = null;
-                if(!departmentItem.hasOwnProperty("children")){
-                    return;
-                }
-                for(var i:int=0;i<departmentItem.children.length;i++){
-                    d = departmentItem.children[i];
-                    if(d['orgchart'].x < x1 || x1<0){
-                        x1 = d['orgchart'].x;
-                    }
-                    if((d['orgchart'].x + d['orgchart'].width) > x2){
-                        x2 = d['orgchart'].x + d['orgchart'].width;
-                    }
-                    if(d.hasOwnProperty('orgchart_x2')&&d['orgchart_x2']>x3){
-                        x3=d['orgchart_x2'];
-                    }
-                }
-
-                departmentItem['orgchart'].x = (x2 - x1)/2 - departmentItem['orgchart'].width/2 + x1;
-
-                if(x3<x2){
-                    departmentItem['orgchart_x2'] = x2;
-                }else{
-                    departmentItem['orgchart_x2'] = x3;
-                }
-
-
-                if(!departChart.hasOwnProperty('d'+departmentItem.father)){
-                    return;
-                }
-                var fatherDepart:Object = departChart['d'+departmentItem.father];
                 var p:Object = null;
-                for(var i:int=0;i<fatherDepart.children.length;i++){
-                    d = fatherDepart.children[i];
-                    if(p == null&& d.id != departmentItem.id){
-                        continue;
-                    }
-                    if(p == departmentItem){
-                        d['orgchart'].x = departmentItem['orgchart_x2']+50;
-                    }else{
-                        if(p!=null){
-                            d['orgchart'].x = p['orgchart'].x + p['orgchart'].width + 50;
-                        }
+                for (var i:int = 0; i < departmentItem.children.length; i++) {
+                    d = departmentItem.children[i];
+
+                    if (p == null) {
+                        d['orgchart'].x = x;
+                    } else {
+                        d['orgchart'].x = p['orgchart'].x + p['orgchart'].width + 36;
                     }
 
+                    d['orgchart'].y = y + departmentItem['orgchart'].height + 30;
 
-                    p = fatherDepart.children[i];
-                }
-                calculateDepartmentCoordinateByChildren(fatherDepart);
-
-            }
-
-            private function calculateDepartmentCoordinate(departmentItem:Object):void{
-                var x:int = departmentItem['orgchart'].x;
-                var y:int = departmentItem['orgchart'].y;
-                if(departmentItem.hasOwnProperty("children")){
-                    var d:Object = null;
-                    var p:Object = null;
-                    for(var i:int=0;i<departmentItem.children.length;i++){
-                        d = departmentItem.children[i];
-
-                        if(p==null){
-                            d['orgchart'].x = x;
-                        }else{
-                            d['orgchart'].x = p['orgchart'].x + p['orgchart'].width+36;
-                        }
-
-                        d['orgchart'].y = y+departmentItem['orgchart'].height+30;
-
-                        p= departmentItem.children[i];
-
-                    }
-
-                    calculateDepartmentCoordinateByChildren(departmentItem);
-
-                    for(var i:int=0;i<departmentItem.children.length;i++){
-                        d = departmentItem.children[i];
-                        calculateDepartmentCoordinate(d);
-                    }
+                    p = departmentItem.children[i];
 
                 }
+
+                calculateDepartmentCoordinateByChildren(departmentItem);
+
+                for (var i:int = 0; i < departmentItem.children.length; i++) {
+                    d = departmentItem.children[i];
+                    calculateDepartmentCoordinate(d);
+                }
+
             }
+        }
 
-            private function drawOrgChart(departmentItem:Object):void{
+        private function drawOrgChart(departmentItem:Object):void {
 
 
-                orgChart.contentGroup.graphics.lineStyle(2, 0x000000);
-                var x1:int = departmentItem['orgchart'].x+departmentItem['orgchart'].width/2;
-                var y1:int = departmentItem['orgchart'].y+departmentItem['orgchart'].height;
-                var h:int=0;
-                if(departmentItem.hasOwnProperty("children")){
-                    var d:Object = null;
-                    var p:Object = null;
-                    for(var i:int=0;i<departmentItem.children.length;i++){
-                        d = departmentItem.children[i];
-                        if(h==0){
-                            h = (d['orgchart'].y-y1)/2;
-                            orgChart.contentGroup.graphics.moveTo(x1, y1);
-                            orgChart.contentGroup.graphics.lineTo(x1,y1+h);
-                        }
-                        var x2:int=0;
-                        var y2:int=0;
-                        x2=d['orgchart'].x+d['orgchart'].width/2;
-                        y2=d['orgchart'].y;
-
-                        orgChart.contentGroup.graphics.moveTo(x2, y1+h);
-                        orgChart.contentGroup.graphics.lineTo(x2,y2);
-
-                        orgChart.contentGroup.graphics.moveTo(x2, y1+h);
-                        orgChart.contentGroup.graphics.lineTo(x1,y1+h);
+            orgChart.contentGroup.graphics.lineStyle(2, 0x000000);
+            var x1:int = departmentItem['orgchart'].x + departmentItem['orgchart'].width / 2;
+            var y1:int = departmentItem['orgchart'].y + departmentItem['orgchart'].height;
+            var h:int = 0;
+            if (departmentItem.hasOwnProperty("children")) {
+                var d:Object = null;
+                var p:Object = null;
+                for (var i:int = 0; i < departmentItem.children.length; i++) {
+                    d = departmentItem.children[i];
+                    if (h == 0) {
+                        h = (d['orgchart'].y - y1) / 2;
+                        orgChart.contentGroup.graphics.moveTo(x1, y1);
+                        orgChart.contentGroup.graphics.lineTo(x1, y1 + h);
                     }
+                    var x2:int = 0;
+                    var y2:int = 0;
+                    x2 = d['orgchart'].x + d['orgchart'].width / 2;
+                    y2 = d['orgchart'].y;
+
+                    orgChart.contentGroup.graphics.moveTo(x2, y1 + h);
+                    orgChart.contentGroup.graphics.lineTo(x2, y2);
+
+                    orgChart.contentGroup.graphics.moveTo(x2, y1 + h);
+                    orgChart.contentGroup.graphics.lineTo(x1, y1 + h);
+                }
 
 
-                    for(var i:int=0;i<departmentItem.children.length;i++){
-                        d = departmentItem.children[i];
-                        drawOrgChart(d);
-                    }
-
+                for (var i:int = 0; i < departmentItem.children.length; i++) {
+                    d = departmentItem.children[i];
+                    drawOrgChart(d);
                 }
 
             }
 
-            protected function mainScroller_mouseWheelChangingHandler(event:FlexMouseEvent):void
-            {
-                event.preventDefault();
-                var modifier:int = 5;
-                var delta:Number = Number(event.delta) * modifier;
-                var viewport:IViewport = mainScroller.verticalScrollBar.viewport;
-                var vPos:Number = viewport.verticalScrollPosition;
-                var maximum:Number = mainScroller.verticalScrollBar.maximum;
+        }
 
-                if (delta < 0)
-                {
-                    mainScroller.verticalScrollBar.viewport.verticalScrollPosition =  Math.min(vPos - delta, maximum) ;
-                }
-                else
-                {
-                    mainScroller.verticalScrollBar.viewport.verticalScrollPosition = Math.max(vPos - delta, 0);
-                }
+        protected function mainScroller_mouseWheelChangingHandler(event:FlexMouseEvent):void {
+            event.preventDefault();
+            var modifier:int = 5;
+            var delta:Number = Number(event.delta) * modifier;
+            var viewport:IViewport = mainScroller.verticalScrollBar.viewport;
+            var vPos:Number = viewport.verticalScrollPosition;
+            var maximum:Number = mainScroller.verticalScrollBar.maximum;
 
+            if (delta < 0) {
+                mainScroller.verticalScrollBar.viewport.verticalScrollPosition = Math.min(vPos - delta, maximum);
+            }
+            else {
+                mainScroller.verticalScrollBar.viewport.verticalScrollPosition = Math.max(vPos - delta, 0);
             }
 
-            private function changeDepartment(e:ChangeDepartmentEvent):void{
-                selectDepartmentId = e.depart.id;
-                departmentName.text = e.depart.name;
-            }
+        }
 
-            private var selectDepartmentId:*=null;
-            private function saveDepartment():void{
-                var obj:Object = new Object();
+        private function changeDepartment(e:ChangeDepartmentEvent):void {
+            selectDepartmentId = e.depart.id;
+            departmentName.text = e.depart.name;
 
-
-                obj['name']=departmentName.text;
-                obj['id']=selectDepartmentId;
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/saveDepartment",saveDepartmentResult,"POST").send(obj);
-            }
-
-            private function saveDepartmentResult(result:Object,e:ResultEvent):void{
-                if(result.success){
-                    ToolUtil.departMentListRefresh();
+            memebers.removeAllElements();
+            var departitem:DepartmentItem;
+            var depart:Object;
+            if (e.depart.hasOwnProperty('children')) {
+                for (var i:int = 0; i < e.depart.children.length; i++) {
+                    depart = e.depart.children[i];
+                    departitem = new DepartmentItem();
+                    departitem.buttonMode = false;
+                    departitem.department = depart;
+                    memebers.addElement(departitem);
                 }
             }
-
-            private function addMember():void{
-
+            var personHead:PersonHeadItem;
+            var person:Object;
+            for (var i:int = 0; i < e.depart.members.length; i++) {
+                person = e.depart.members[i];
+                personHead = new PersonHeadItem();
+                personHead.person = person;
+                personHead.department = e.depart;
+                memebers.addElement(personHead);
             }
 
+        }
 
+        private var selectDepartmentId:* = null;
+
+        private function saveDepartment():void {
+            var obj:Object = new Object();
+
+
+            obj['name'] = departmentName.text;
+            obj['id'] = selectDepartmentId;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/saveDepartment", saveDepartmentResult, "POST").send(obj);
+        }
+
+        private function saveDepartmentResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.departMentListRefresh();
+            }
+        }
+
+        private function addMember():void {
+            if(memberBox.selectedItem==null){
+                return;
+            }
+            var obj:Object = new Object();
+
+            obj['id'] = selectDepartmentId;
+            obj['pid'] = memberBox.selectedItem.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addPersonDepartment", addMemberResult, "POST").send(obj);
+            memberBox.selectedIndex = -1;
+            memebers.setFocus();
+        }
+
+
+        private function addMemberResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.departMentListRefresh();
+            }
+
+        }
         ]]>
 	</fx:Script>
     <fx:Declarations>
@@ -304,6 +340,9 @@
         </s:VerticalLayout>
     </control:layout>
 
+    <mx:VDividedBox width="100%" height="100%">
+
+
         <s:Scroller id="mainScroller" width="100%" height="100%" mouseWheelChanging="mainScroller_mouseWheelChangingHandler(event)">
             <s:Group width="100%" height="100%">
                 <s:BorderContainer id="orgChart" borderVisible="false">
@@ -312,26 +351,29 @@
             </s:Group>
         </s:Scroller>
 
-        <s:BorderContainer width="100%" height="45" borderVisible="false" cornerRadius="7" backgroundImage="{toolbgimg}">
-            <s:layout>
-                <s:HorizontalLayout gap="5" horizontalAlign="left" verticalAlign="middle"></s:HorizontalLayout>
-            </s:layout>
-            <s:Label text="部门名称:"></s:Label>
-            <s:TextInput id="departmentName" width="200" prompt="按回车键保存" toolTip="按回车键保存" enter="saveDepartment()"></s:TextInput>
-            <s:Label text="添加成员:"></s:Label>
-            <s:ComboBox id="memberBox" dataProvider="{ToolUtil.memberList}" labelField="name" width="150" change="addMember()"  >
+        <s:VGroup width="100%" height="300" gap="5">
+            <s:BorderContainer width="100%" height="45" borderVisible="false"  backgroundImage="{CBorderContainer.toolbgimg}">
+                <s:layout>
+                    <s:HorizontalLayout gap="5" horizontalAlign="left" verticalAlign="middle"></s:HorizontalLayout>
+                </s:layout>
+                <s:Label text="部门名称:"></s:Label>
+                <s:TextInput id="departmentName" width="200" prompt="按回车键保存" toolTip="按回车键保存" enter="saveDepartment()"></s:TextInput>
+                <s:Label text="添加成员:"></s:Label>
+                <s:ComboBox id="memberBox" dataProvider="{ToolUtil.memberList}" labelField="name" width="150" change="addMember()"  >
 
-            </s:ComboBox>
-        </s:BorderContainer>
-        <s:Scroller width="100%" height="300">
-            <s:Group width="100%" height="100%">
-                <s:BorderContainer id="memebers" width="100%" borderVisible="false">
-                     <s:layout>
-                         <s:TileLayout columnAlign="justifyUsingGap" horizontalGap="5" verticalGap="5"></s:TileLayout>
-                     </s:layout>
-                </s:BorderContainer>
-            </s:Group>
-        </s:Scroller>
+                </s:ComboBox>
+            </s:BorderContainer>
+            <s:Scroller width="100%"  height="100%" >
+                <s:Group width="100%" height="100%">
+                    <s:BorderContainer id="memebers" width="100%" borderVisible="false">
+                        <s:layout>
+                            <s:TileLayout columnAlign="justifyUsingGap" horizontalGap="5" verticalGap="5"></s:TileLayout>
+                        </s:layout>
+                    </s:BorderContainer>
+                </s:Group>
+            </s:Scroller>
+        </s:VGroup>
 
+    </mx:VDividedBox>
 
 </control:CBorderContainer>

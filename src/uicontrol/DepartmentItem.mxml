@@ -32,6 +32,9 @@
         }
 
         private function m_Out():void{
+            if(!this.buttonMode){
+                return;
+            }
             if(selected){
                 this.setStyle("backgroundColor",0xaecfea);
             }else{
@@ -40,10 +43,16 @@
         }
 
         private function m_Over():void{
+            if(!this.buttonMode){
+                return;
+            }
             this.setStyle("backgroundColor",0x7ae7bf);
         }
 
         public function selectDepart(e:Boolean=false):void{
+            if(!this.buttonMode){
+                return;
+            }
             if(departmentSelectArray.selectedButtons()){
                 departmentSelectArray.selectedButtons().unselectDepart();
             }
@@ -60,7 +69,10 @@
         }
 
         private function init():void {
-            departmentSelectArray.addArr(this);
+            if(departmentSelectArray!=null){
+                departmentSelectArray.addArr(this);
+            }
+
             orgHead.source = department.icon;
             depatementName.text = department.name;
             fzrFormItem.removeAllElements();
