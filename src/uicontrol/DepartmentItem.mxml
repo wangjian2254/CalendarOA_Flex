@@ -5,12 +5,16 @@
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:uicontrol="uicontrol.*"
                    width="100" height="150" borderVisible="true" borderColor="#000000" cornerRadius="7"
-                   creationComplete="init()"
+                   creationComplete="init()" mouseOut="m_Out()" mouseOver="m_Over()" click="selectDepart()" buttonMode="true"
         >
     <fx:Script><![CDATA[
+        import events.ChangeDepartmentEvent;
+
         import httpcontrol.HttpServiceUtil;
 
         import mx.rpc.events.ResultEvent;
+
+        import uicontrol.conobj.DepartmentSelectArray;
 
         import util.ToolUtil;
 
@@ -18,7 +22,45 @@
         [Bindable]
         public var hasPower:Boolean=false;
 
+        [Bindable]
+        public var departmentSelectArray:DepartmentSelectArray=null;
+
+        private var selected:Boolean = false;
+
+        public function isSelected():Boolean{
+            return selected;
+        }
+
+        private function m_Out():void{
+            if(selected){
+                this.setStyle("backgroundColor",0xaecfea);
+            }else{
+                this.setStyle("backgroundColor",0xffffff);
+            }
+        }
+
+        private function m_Over():void{
+            this.setStyle("backgroundColor",0x7ae7bf);
+        }
+
+        public function selectDepart(e:Boolean=false):void{
+            if(departmentSelectArray.selectedButtons()){
+                departmentSelectArray.selectedButtons().unselectDepart();
+            }
+            this.setStyle("backgroundColor",0xaecfea);
+            selected = true;
+            var event:ChangeDepartmentEvent = new ChangeDepartmentEvent(true);
+            event.depart = department;
+            dispatchEvent(event);
+
+        }
+        public function unselectDepart():void{
+            this.setStyle("backgroundColor",0xffffff);
+            selected = false;
+        }
+
         private function init():void {
+            departmentSelectArray.addArr(this);
             orgHead.source = department.icon;
             depatementName.text = department.name;
             fzrFormItem.removeAllElements();
@@ -37,6 +79,12 @@
                         hasPower = true;
                     }
                 }
+            }
+            if(department.flag=='free'){
+                hasPower = false;
+            }
+            if(department.flag == 'root'){
+                group.removeElement(btnDel);
             }
             for(var i:int=0;i<department.managers.length;i++){
                 person = department.managers[i];
@@ -63,9 +111,21 @@
             }
 
         }
+
+        private function delDepartment():void{
+            var obj:Object = new Object();
+
+            obj['id']=department.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delDepartment",addChildDepartmentResult,"POST").send(obj);
+        }
         private function addChildDepartment():void{
             var obj:Object = new Object();
-            obj['name']='新部门';
+            if(department.hasOwnProperty("children")){
+                obj['name']=department.name+'-'+(department.children.length+1);
+            }else{
+                obj['name']=department.name+'-1';
+            }
+
             obj['icon']=department.icon;
             obj['father']=department.id;
             obj['flag']='custom';
@@ -85,15 +145,15 @@
                 </s:HorizontalLayout>
             </s:layout>
     <s:Image id="orgHead"  width="45" height="45"></s:Image>
-    <s:VGroup id="formDepart" width="100%" gap="10">
-        <s:HGroup gap="15" horizontalAlign="right" verticalAlign="middle"  width="100%">
+    <s:VGroup id="formDepart" width="100%" gap="5">
+        <s:HGroup gap="15" id="group" horizontalAlign="right" verticalAlign="middle"  width="100%">
             <uicontrol:BtnAdd toolTip="添加子部门" visible="{hasPower}" clickFun="{addChildDepartment}" ></uicontrol:BtnAdd>
-            <uicontrol:BtnDel toolTip="删除部门" visible="{hasPower}" ></uicontrol:BtnDel>
+            <uicontrol:BtnDel id="btnDel" toolTip="删除部门" visible="{hasPower}" clickFun="{delDepartment}" ></uicontrol:BtnDel>
         </s:HGroup>
         <s:HGroup width="100%"  verticalAlign="middle" >
             <s:Label text="部门名称："></s:Label>
-            <s:TextInput id="depatementName" width="100" borderVisible="{hasPower}" editable="{hasPower}" >
-            </s:TextInput>
+            <s:Label id="depatementName" minWidth="100" />
+
         </s:HGroup>
         <s:HGroup  width="100%"  verticalAlign="top" >
             <s:Label text="负责人："></s:Label>

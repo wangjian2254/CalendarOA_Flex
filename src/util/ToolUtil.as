@@ -121,7 +121,6 @@ public class ToolUtil
     [Bindable]
     public static var departMentList:ArrayCollection=new ArrayCollection();
 
-    public static var departMentTimeline:Number=0;
 
 
     public static function departMentListRefresh(fun:Function=null):void{
@@ -140,7 +139,7 @@ public class ToolUtil
         if(result.success==true){
             departMentList.removeAll();
             departMentList.addAll(new ArrayCollection(result.result as Array));
-            departMentTimeline = new Date().getTime()
+
 
         }
     }
@@ -202,7 +201,6 @@ public class ToolUtil
 
     [Bindable]
     public static var contactsList:ArrayCollection=new ArrayCollection();
-    public static var contactsTimeline:Number=0;
 
     public static function contactsRefresh(fun:*=null,e:*=null):void{
 
@@ -222,12 +220,11 @@ public class ToolUtil
             if(result.result){
                 contactsList.addAll(new ArrayCollection(result.result as Array));
             }
-            contactsTimeline = new Date().getTime();
+
         }
     }
     [Bindable]
     public static var taskUnList:ArrayCollection=new ArrayCollection();
-    public static var taskunTimeline:Number = 0;
 
     public static function taskUnRefresh(fun:*=null,e:*=null):void{
         var obj:Object=new Object();
@@ -248,12 +245,11 @@ public class ToolUtil
             if(result.result){
                 taskUnList.addAll(new ArrayCollection(result.result as Array));
             }
-            taskunTimeline = new Date().getTime();
+
         }
     }
     [Bindable]
     public static var taskList:ArrayCollection=new ArrayCollection();
-    public static var taskTimeline:Number = 0;
 
     public static function getTask(id:String):Object{
         for each(var item:Object in taskUnList){
@@ -288,13 +284,12 @@ public class ToolUtil
             if(result.result){
                 taskList.addAll(new ArrayCollection(result.result as Array));
             }
-            taskTimeline = new Date().getTime();
+
         }
     }
 
     public static var scheduleMap:Object = new Object();
 
-    public static var scheduleTimeline:Number = 0;
 
 
     public static function getSchedule(id:String):Object{
@@ -333,7 +328,7 @@ public class ToolUtil
                     }
                 }
             }
-            scheduleTimeline = new Date().getTime();
+
             FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
         }
 

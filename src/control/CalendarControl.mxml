@@ -589,12 +589,11 @@
 		</mx:DateFormatter>
 	</fx:Declarations>
 	
-	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
-		<s:layout>
+		<control:layout>
 			<s:HorizontalLayout gap="0">
 				
 			</s:HorizontalLayout>
-		</s:layout>
+		</control:layout>
 		<s:Scroller  width="190" height="100%">
 			<s:Group>
 				<s:BorderContainer id="datePanel" width="100%" borderVisible="false" >
@@ -770,5 +769,4 @@
 				</s:BorderContainer>
 			</s:Group>
 		</s:Scroller>
-	</s:BorderContainer>
 </control:CBorderContainer>

@@ -9,6 +9,8 @@ package control
 	import mx.events.FlexEvent;
 import mx.events.ResizeEvent;
 
+import skins.contentBoxSkin;
+
 import spark.components.BorderContainer;
 	
 	public class CBorderContainer extends BorderContainer implements INavigatorContent
@@ -41,7 +43,12 @@ import spark.components.BorderContainer;
 		public function CBorderContainer()
 		{
 			super();
+//            color="0x333333" skinClass="skins.contentBoxSkin"
+            this.setStyle('color',0x333333);
+//            this.skin
+//            this.skin = skins.contentBoxSkin;
 			this.setStyle("borderVisible",false);
+			this.setStyle("skinClass",contentBoxSkin);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,init);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,reloadParamData);
 			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);

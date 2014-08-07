@@ -26,7 +26,7 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Rect id="fill" left="1" right="1" top="1" bottom="1" radiusX="3">
+	<s:Rect id="fill" left="5" right="5" top="5" bottom="5" radiusX="3">
 		<s:fill>
 			<s:LinearGradient rotation="90">
 				<s:GradientEntry color="0xffffff" alpha="1" />
@@ -35,7 +35,7 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Rect id="border" left="1" right="1" top="1" bottom="1" radiusX="3">
+	<s:Rect id="border" left="5" right="5" top="5" bottom="5" radiusX="3">
 		<s:stroke>
 			<s:LinearGradientStroke rotation="90" weight="1">
 				<s:GradientEntry color="0xc7c7c7" alpha="1" />
@@ -45,7 +45,7 @@
 	</s:Rect>
 	
 	
-	<s:Group id="contentGroup" left="1" right="1" top="1" bottom="1" minWidth="0" minHeight="0">
+	<s:Group id="contentGroup" left="10" right="10" top="10" bottom="10" minWidth="0" minHeight="0">
 		<s:layout>
 			<s:BasicLayout/>
 		</s:layout>
