@@ -1,4 +1,6 @@
 import mx.events.CloseEvent;
+import mx.managers.BrowserManager;
+import mx.managers.IBrowserManager;
 
 // ActionScript file
 
@@ -13,3 +15,7 @@ public function CloseWindow(event:CloseEvent):void{
 	}
 }
 
+public function initFlex():void{
+    var br:IBrowserManager = BrowserManager.getInstance();
+    br.setTitle("鲤鱼协同系统");
+}

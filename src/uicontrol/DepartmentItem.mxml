@@ -8,68 +8,81 @@
                    creationComplete="init()" mouseOut="m_Out()" mouseOver="m_Over()" click="selectDepart()" buttonMode="true"
         >
     <fx:Script><![CDATA[
+        import control.CBorderContainer;
+
         import events.ChangeDepartmentEvent;
 
         import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+
+        import mx.controls.Alert;
+        import mx.controls.Menu;
+        import mx.events.MenuEvent;
 
         import mx.rpc.events.ResultEvent;
 
         import uicontrol.conobj.DepartmentSelectArray;
 
+        import util.RightClickManager;
+
+        import util.RightClickManager;
+
         import util.ToolUtil;
 
         private var _department:Object = null;
         [Bindable]
-        public var hasPower:Boolean=false;
+        public var hasPower:Boolean = false;
 
         [Bindable]
-        public var departmentSelectArray:DepartmentSelectArray=null;
+        public var departmentSelectArray:DepartmentSelectArray = null;
 
         private var selected:Boolean = false;
 
-        public function isSelected():Boolean{
+        public function isSelected():Boolean {
             return selected;
         }
 
-        private function m_Out():void{
-            if(!this.buttonMode){
+        private function m_Out():void {
+            if (!this.buttonMode) {
                 return;
             }
-            if(selected){
-                this.setStyle("backgroundColor",0xaecfea);
-            }else{
-                this.setStyle("backgroundColor",0xffffff);
+            if (selected) {
+                this.setStyle("backgroundColor", 0xaecfea);
+            } else {
+                this.setStyle("backgroundColor", 0xffffff);
             }
         }
 
-        private function m_Over():void{
-            if(!this.buttonMode){
+        private function m_Over():void {
+            if (!this.buttonMode) {
                 return;
             }
-            this.setStyle("backgroundColor",0x7ae7bf);
+            this.setStyle("backgroundColor", 0x7ae7bf);
         }
 
-        public function selectDepart(e:Boolean=false):void{
-            if(!this.buttonMode){
+        public function selectDepart(e:Boolean = false):void {
+            if (!this.buttonMode) {
                 return;
             }
-            if(departmentSelectArray.selectedButtons()){
+            if (departmentSelectArray.selectedButtons()) {
                 departmentSelectArray.selectedButtons().unselectDepart();
             }
-            this.setStyle("backgroundColor",0xaecfea);
+            this.setStyle("backgroundColor", 0xaecfea);
             selected = true;
             var event:ChangeDepartmentEvent = new ChangeDepartmentEvent(true);
             event.depart = department;
             dispatchEvent(event);
 
         }
-        public function unselectDepart():void{
-            this.setStyle("backgroundColor",0xffffff);
+
+        public function unselectDepart():void {
+            this.setStyle("backgroundColor", 0xffffff);
             selected = false;
         }
 
         private function init():void {
-            if(departmentSelectArray!=null){
+            if (departmentSelectArray != null) {
                 departmentSelectArray.addArr(this);
             }
 
@@ -77,36 +90,77 @@
             depatementName.text = department.name;
             fzrFormItem.removeAllElements();
 
-            var person:Object=null;
+            var person:Object = null;
             var personItem:PersonItem = null;
 
-            if(ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid)>=0){
+            if (ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0) {
 
                 hasPower = true;
-            }else{
+            } else {
 
-                for(var i:int=0;i<department.managers.length;i++){
+                for (var i:int = 0; i < department.managers.length; i++) {
                     person = department.managers[i];
-                    if(person.id ==  ToolUtil.sessionUser.pid){
+                    if (person.id == ToolUtil.sessionUser.pid) {
                         hasPower = true;
                     }
                 }
             }
-            if(department.flag=='free'){
+            if (department.flag == 'free') {
                 hasPower = false;
             }
-            if(department.flag == 'root'){
+            if (department.flag == 'root') {
                 group.removeElement(btnDel);
             }
-            for(var i:int=0;i<department.managers.length;i++){
+            for (var i:int = 0; i < department.managers.length; i++) {
                 person = department.managers[i];
                 personItem = new PersonItem();
                 personItem.showBtn = hasPower;
                 personItem.person = person;
+                personItem.department = department;
                 fzrFormItem.addElement(personItem);
             }
-            this.width = 60+  formDepart.width;
-            this.height = 10+formDepart.height;
+            this.width = 60 + formDepart.width;
+            this.height = 10 + formDepart.height;
+
+            this.addEventListener(RightClickManager.RIGHT_CLICK,menuDepartment);
+        }
+
+        private var contextMenuItems:ArrayCollection;
+        private function menuDepartment(e:MouseEvent):void{
+
+            if(hasPower){
+                contextMenuItems=new ArrayCollection([{"icon":CBorderContainer.wximg,"text":"发送消息","mode":"chat"},{"icon":CBorderContainer.addimg,"text":"添加下级部门","mode":"add"},{"icon":CBorderContainer.saveimg,"text":"查看部门信息","mode":"show"}]);
+            }else{
+                contextMenuItems=new ArrayCollection([{"icon":CBorderContainer.wximg,"text":"发送消息","mode":"chat"}]);
+            }
+            var menu:Menu = RightClickManager.getMenu(this,contextMenuItems,false);
+
+            menu.labelField="text";
+            menu.iconField="icon";
+            menu.variableRowHeight = true;
+            menu.rowHeight = 35;
+            menu.addEventListener(MenuEvent.ITEM_CLICK, menuItemClickHandler);
+
+//              var point:Point = new Point(mouseX,mouseY);
+//              point = localToGlobal(point);
+            menu.show(stage.mouseX,stage.mouseY);
+        }
+
+        private function menuItemClickHandler(e:MenuEvent):void{
+            var item:Object = e.item;
+            var mod:String =item.mode;
+            switch (mod){
+                case 'chat':
+                    Alert.show(department.name,"发送信息");
+                    break;
+                case 'add':
+                    addChildDepartment();
+                    break;
+                case 'show':
+                    selectDepart();
+                    break;
+
+            }
 
         }
 
@@ -116,36 +170,37 @@
 
         public function set department(value:Object):void {
             _department = value;
-            try{
+            try {
                 init();
-            } catch (e:Error){
+            } catch (e:Error) {
 
             }
 
         }
 
-        private function delDepartment():void{
+        private function delDepartment():void {
             var obj:Object = new Object();
 
-            obj['id']=department.id;
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delDepartment",addChildDepartmentResult,"POST").send(obj);
+            obj['id'] = department.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delDepartment", addChildDepartmentResult, "POST").send(obj);
         }
-        private function addChildDepartment():void{
+
+        private function addChildDepartment():void {
             var obj:Object = new Object();
-            if(department.hasOwnProperty("children")){
-                obj['name']=department.name+'-'+(department.children.length+1);
-            }else{
-                obj['name']=department.name+'-1';
+            if (department.hasOwnProperty("children")) {
+                obj['name'] = department.name + '-' + (department.children.length + 1);
+            } else {
+                obj['name'] = department.name + '-1';
             }
 
-            obj['icon']=department.icon;
-            obj['father']=department.id;
-            obj['flag']='custom';
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/updateDepartment",addChildDepartmentResult,"POST").send(obj);
+            obj['icon'] = department.icon;
+            obj['father'] = department.id;
+            obj['flag'] = 'custom';
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/updateDepartment", addChildDepartmentResult, "POST").send(obj);
         }
 
-        private function addChildDepartmentResult(result:Object,e:ResultEvent):void{
-            if(result.success){
+        private function addChildDepartmentResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
                 ToolUtil.departMentListRefresh();
             }
 

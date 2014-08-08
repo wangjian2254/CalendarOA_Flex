@@ -8,18 +8,29 @@
                    creationComplete="init()"
         >
     <fx:Script><![CDATA[
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.rpc.events.ResultEvent;
+
+        import util.ToolUtil;
+
         private var _person:Object = null;
-        private var _depatement:Object = null;
+        private var _department:Object = null;
 
         [Bindable]
-        public var showBtn:Boolean=false;
+        public var showBtn:Boolean = false;
 
         private function init():void {
-            personName.text = _person.name;
-            if(showBtn){
-                 this.width = personName.width+btnDel.width;
+            try{
+                personName.text = _person.name;
+                if (showBtn) {
+                    this.width = personName.width + btnDel.width;
+                }
+                this.width = personName.width;
+            }catch (e:Error){
+
             }
-            this.width = personName.width;
+
         }
 
 
@@ -29,25 +40,30 @@
 
         public function set person(value:Object):void {
             _person = value;
-            try{
-                init();
-            } catch (e:Error){
+            init();
+        }
+        private function delPerson():void {
+            var obj:Object = new Object();
 
+            obj['id'] = department.id;
+            obj['pid'] = person.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delPersonDepartment", addChildDepartmentResult, "POST").send(obj);
+        }
+
+        private function addChildDepartmentResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.departMentListRefresh();
             }
 
         }
 
-        [Bindable]
-        public var delPerson:Function=null;
-
-        public function get depatement():Object {
-            return _depatement;
+        public function get department():Object {
+            return _department;
         }
 
-        public function set depatement(value:Object):void {
-            _depatement = value;
+        public function set department(value:Object):void {
+            _department = value;
         }
-
         ]]></fx:Script>
     <s:layout>
         <s:HorizontalLayout gap="5" verticalAlign="middle"  horizontalAlign="left" paddingRight="10" paddingLeft="10">

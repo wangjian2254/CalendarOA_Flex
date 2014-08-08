@@ -267,6 +267,15 @@
         private function changeDepartment(e:ChangeDepartmentEvent):void {
             selectDepartmentId = e.depart.id;
             departmentName.text = e.depart.name;
+            departmentName.enabled = departmentSelectArray.getById(selectDepartmentId).hasPower;
+            orgHead.buttonMode = departmentSelectArray.getById(selectDepartmentId).hasPower;
+            if(orgHead.buttonMode){
+                orgHead.toolTip = "点击修改部门头像";
+            }else{
+                orgHead.toolTip = "您没有权限修改部门头像";
+            }
+            memberBox.enabled = departmentSelectArray.getById(selectDepartmentId).hasPower;
+            orgHead.source = e.depart.icon;
 
             memebers.removeAllElements();
             var departitem:DepartmentItem;
@@ -285,11 +294,16 @@
             for (var i:int = 0; i < e.depart.members.length; i++) {
                 person = e.depart.members[i];
                 personHead = new PersonHeadItem();
-                personHead.person = person;
                 personHead.department = e.depart;
+                personHead.person = person;
+
                 memebers.addElement(personHead);
             }
 
+        }
+
+        private function showHeadPanel():void{
+            Alert.show("修改头像","提示");
         }
 
         private var selectDepartmentId:* = null;
@@ -319,7 +333,7 @@
             obj['pid'] = memberBox.selectedItem.id;
             HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addPersonDepartment", addMemberResult, "POST").send(obj);
             memberBox.selectedIndex = -1;
-            memebers.setFocus();
+//            departmentName.setFocus();
         }
 
 
@@ -327,7 +341,6 @@
             if (result.success) {
                 ToolUtil.departMentListRefresh();
             }
-
         }
         ]]>
 	</fx:Script>
@@ -354,8 +367,10 @@
         <s:VGroup width="100%" height="300" gap="5">
             <s:BorderContainer width="100%" height="45" borderVisible="false"  backgroundImage="{CBorderContainer.toolbgimg}">
                 <s:layout>
-                    <s:HorizontalLayout gap="5" horizontalAlign="left" verticalAlign="middle"></s:HorizontalLayout>
+                    <s:HorizontalLayout paddingLeft="15" gap="5" horizontalAlign="left" verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>
+                <s:Label text="部门头像:"></s:Label>
+                <s:Image id="orgHead"  width="45" height="45" click="showHeadPanel()" toolTip="点击修改部门头像" buttonMode="true"></s:Image>
                 <s:Label text="部门名称:"></s:Label>
                 <s:TextInput id="departmentName" width="200" prompt="按回车键保存" toolTip="按回车键保存" enter="saveDepartment()"></s:TextInput>
                 <s:Label text="添加成员:"></s:Label>

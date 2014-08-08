@@ -46,15 +46,21 @@ import spark.components.Button;
 
 import util.InfoUtil;
 import util.LoadingUtil;
+import util.RightClickRegister;
 import util.ToolUtil;
 import util.UserUtil;
 
 
 public function init():void {
-	
+    new RightClickRegister();
+
 
     if(this.hasOwnProperty("initAir")){
         this["initAir"]();
+
+    }
+    if(this.hasOwnProperty("initFlex")){
+        this["initFlex"]();
 
     }
 	ToolUtil.currentUserFun = currentUser;

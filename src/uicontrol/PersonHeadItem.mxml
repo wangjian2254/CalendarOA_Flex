@@ -4,7 +4,7 @@
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:uicontrol="uicontrol.*" xmlns:mx="library://ns.adobe.com/flex/mx"
-                   width="100" height="55" borderVisible="true" borderColor="#000000" cornerRadius="7"
+                   width="100" height="55" borderVisible="true" borderColor="#cccccc" cornerRadius="7"
                    creationComplete="init()"
         >
     <fx:Script><![CDATA[
@@ -24,6 +24,7 @@
 
         private function init():void {
             personItem.person = person;
+            personItem.department = department;
             head.source = person.icon;
             ismanager = true;
             var p:Object = null;
@@ -63,12 +64,6 @@
 
         public function set person(value:Object):void {
             _person = value;
-            try {
-                init();
-            } catch (e:Error) {
-
-            }
-
         }
 
         private function delManagerPerson():void {
@@ -86,14 +81,6 @@
             obj['id'] = department.id;
             obj['pid'] = person.id;
             HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addManagerDepartment", addChildDepartmentResult, "POST").send(obj);
-        }
-
-        private function delPerson():void {
-            var obj:Object = new Object();
-
-            obj['id'] = department.id;
-            obj['pid'] = person.id;
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delPersonDepartment", addChildDepartmentResult, "POST").send(obj);
         }
 
         private function addChildDepartmentResult(result:Object, e:ResultEvent):void {
@@ -118,7 +105,7 @@
     </s:layout>
     <s:Image id="head"  width="45" height="45" ></s:Image>
     <s:VGroup id="btnGroup" width="100%" minHeight="45" gap="5">
-        <uicontrol:PersonItem id="personItem" delPerson="{delPerson}" showBtn="{hasPower}" ></uicontrol:PersonItem>
+        <uicontrol:PersonItem id="personItem"  showBtn="{hasPower}" ></uicontrol:PersonItem>
         <mx:LinkButton id="linkButtonFzr" label="设为负责人" textDecoration="underline"  click="managerPerson()"  visible="{hasPower}" ></mx:LinkButton>
         <mx:LinkButton id="linkButtonUFzr" label="取消负责人"  textDecoration="underline" click="delManagerPerson()"  visible="{hasPower}" ></mx:LinkButton>
     </s:VGroup>
