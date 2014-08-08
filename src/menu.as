@@ -25,6 +25,7 @@ import mx.rpc.events.ResultEvent;
 
 import spark.components.Button;
 
+import uicontrol.MenuButton;
 
 
 public function failMenu(evt:FaultEvent):void {
@@ -58,12 +59,22 @@ public function setMenu(evt:ResultEvent):void {
 	if (myMenuXML != null) {
 		for each(var xml1:XML in myMenuXML..menu) {
 			xml = xml1 as XML;
-			var btn:Button = new Button();
+			var btn:MenuButton = new MenuButton();
 			btn.height = 29;
 			btn.width = 130;
 			btn.styleName = "menuBtn";
-			btn.label = xml.attribute('label').toString()
-			btn.addEventListener(MouseEvent.MOUSE_OVER, showHandler);
+			btn.label = xml.attribute('label').toString();
+            if(xml.attribute('mod').toString()!=''){
+                btn.mod = xml.attribute('mod').toString();
+                btn.addEventListener(MouseEvent.CLICK, clickMenu);
+                btn.addEventListener(MouseEvent.MOUSE_OVER, closeMenu);
+                btn.buttonMode = true;
+            }else{
+                btn.buttonMode = false;
+                btn.addEventListener(MouseEvent.MOUSE_OVER, showHandler);
+            }
+
+
 			menuContainer.addElement(btn);
 		}
 	}
@@ -71,12 +82,32 @@ public function setMenu(evt:ResultEvent):void {
 	welcome(null, null);
 }
 
+private function closeMenu(evt:MouseEvent):void{
+    if (myMenu != null) {
+        myMenu.hide();
+        myMenu = null;
+    }
+}
 
+private function clickMenu(evt:MouseEvent):void{
+    var btn:MenuButton = evt.currentTarget as MenuButton;
+    var event:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+    var xml:XML;
+    var xml2:XML;
+    for each(var xml1:XML in myMenuXML..menu) {
+        xml2 = xml1 as XML;
+        if (xml2.attribute('mod').toString() == btn.mod) {
+            xml = xml2 as XML;
+            break;
+        }
+    }
+    event.item = xml;
+
+    onMenuChange(event);
+}
 
 private function changeMenu(evt:ChangeMenuEvent):void {
 	var event:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
-	var label:String;
-	var mod:String;
 	var xml:XML;
 	var xml2:XML;
 	for each(var xml1:XML in myMenuXML..menuitem) {
@@ -86,6 +117,13 @@ private function changeMenu(evt:ChangeMenuEvent):void {
 			break;
 		}
 	}
+    for each(var xml1:XML in myMenuXML..menu) {
+        xml2 = xml1 as XML;
+        if (xml2.attribute('mod').toString() == evt.getMenuMod()) {
+            xml = xml2 as XML;
+            break;
+        }
+    }
 	event.item = xml;
 	
 	onMenuChange(event, evt.getObj());
@@ -95,7 +133,7 @@ private var myMenu:Menu = new Menu();
 private var menuflag:String;
 
 protected function showHandler(event:MouseEvent):void {
-	var btn:Button = event.currentTarget as Button;
+	var btn:MenuButton = event.currentTarget as MenuButton;
 	var index:Number = 0;
 	var xml:XML;
 	for each(var xml1:XML in myMenuXML..menu) {

@@ -177,11 +177,30 @@
                 var list:ArrayCollection = new ArrayCollection(result.result as Array);
                 logArea.text = "";
                 for each(var obj:Object in list){
-                    logArea.text+="时间："+obj.action_time+'  \n操作人："'+obj.nickname+' : '+obj.username+'" \n动作：'+obj.action_flag;
+                    logArea.text+="时间："+obj.action_time+'  \n操作人：'+personNameById(obj.pid)+' \n动作：'+obj.action_flag;
                     logArea.text+="\n\n";
                     logArea.text+=obj.change_message;
                     logArea.text+="\n\n\n";
                 }
+            }
+
+            private function personShow(item:Object, column:GridColumn):String{
+                var str:String="";
+                for(var i:int=0;i<ToolUtil.memberList.length;i++){
+                    if(item.pid==ToolUtil.memberList.getItemAt(i).id){
+                        return ToolUtil.memberList.getItemAt(i).name;
+                    }
+                }
+                return str;
+            }
+            private function personNameById(item:Object):String{
+                var str:String="";
+                for(var i:int=0;i<ToolUtil.memberList.length;i++){
+                    if(item.pid==ToolUtil.memberList.getItemAt(i).id){
+                        return ToolUtil.memberList.getItemAt(i).name;
+                    }
+                }
+                return str;
             }
 
 				
@@ -193,12 +212,11 @@
 			
 		</s:RadioButtonGroup>
 	</fx:Declarations>
-	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
-		<s:layout>
+		<control:layout>
 			<s:VerticalLayout verticalAlign="top" >
 				
 			</s:VerticalLayout>
-		</s:layout>
+		</control:layout>
 		<s:BorderContainer  width="100%" height="45"   borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">	
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle" paddingLeft="25" gap="8">
@@ -212,9 +230,7 @@
 			<s:Label text="~"/>
 			<mx:DateField id="enddate"  formatString="YYYY/MM/DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="queryparamchange()"/>
 			<s:Button label="查询" click="queryLog()" />
-			<s:CheckBox id="showUsername" label="显示用户名">
-				
-			</s:CheckBox>
+
 		</s:BorderContainer>
 		<s:BorderContainer  width="100%" height="100%"  backgroundAlpha="0"  borderVisible="false">	
 			<s:layout>
@@ -223,18 +239,16 @@
 				</s:HorizontalLayout>
 			</s:layout>
 			
-			<s:DataGrid id="logGrid" dataProvider="{list}"  width="{showUsername.selected?690:600}" height="100%" click="click_logItem()"   >
+			<s:DataGrid id="logGrid" dataProvider="{list}"  width="600" height="100%" click="click_logItem()"   >
 				<s:columns>
 					<s:ArrayList>
 						<s:GridColumn dataField="action_time" headerText="日期" width="125">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="nickname" headerText="操作者" width="70">
+						<s:GridColumn dataField="nickname" headerText="操作者" width="70" labelFunction="personShow">
 							
 						</s:GridColumn>
-						<s:GridColumn dataField="username" headerText="操作者账号" visible="{showUsername.selected}" width="90">
-							
-						</s:GridColumn>
+
 						<s:GridColumn dataField="action_flag" headerText="动作" width="40">
 							
 						</s:GridColumn>
@@ -268,5 +282,4 @@
 
 		</s:BorderContainer>
 		</s:BorderContainer>
-	</s:BorderContainer>
 </control:CBorderContainer>
