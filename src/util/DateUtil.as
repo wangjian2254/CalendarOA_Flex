@@ -15,10 +15,15 @@ package util
 	
 		public static var myDateFormatter:DateFormatter=new DateFormatter();
 		myDateFormatter.formatString="YYYY/MM/DD";
-		public static function dateLbl(currentDate:Date):String{
-			return myDateFormatter.format(currentDate);
+        public static var myDateFormatter2:DateFormatter=new DateFormatter();
+        myDateFormatter2.formatString="YYYY/MM/DD HH:NN:SS";
+		public static function dateLblChat(currentDate:Date):String{
+			return myDateFormatter2.format(currentDate);
 		}
-		
+
+        public static function dateLbl(currentDate:Date):String{
+            return myDateFormatter.format(currentDate);
+        }
 		public static function parseDate(value:String):Date{
 			if (!value){
 				return new Date();

@@ -151,6 +151,6 @@
 		</s:fill>
 	</s:Rect>
 	
-	<s:Label id="btnLabel" text="{label}" minWidth="80" paddingLeft="10" paddingRight="{view.closeEnable?25:10}" textAlign="center" verticalAlign="middle" top="5" bottom="5"/>
-	<mx:Image id="clo" visible="{view.closeEnable}" source="{X_out}" click="close()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
+	<s:Label id="btnLabel" text="{label}"  minWidth="80" paddingLeft="10" paddingRight="{view.closeEnable?25:10}" textAlign="center" verticalAlign="middle" top="5" bottom="5"/>
+	<mx:Image id="clo" visible="{view.closeEnable}"  source="{X_out}" click="close()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
 </s:BorderContainer>

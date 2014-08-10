@@ -177,7 +177,7 @@
                 var list:ArrayCollection = new ArrayCollection(result.result as Array);
                 logArea.text = "";
                 for each(var obj:Object in list){
-                    logArea.text+="时间："+obj.action_time+'  \n操作人：'+personNameById(obj.pid)+' \n动作：'+obj.action_flag;
+                    logArea.text+="时间："+obj.action_time+'  \n操作人：'+personNameById(obj)+' \n动作：'+obj.action_flag;
                     logArea.text+="\n\n";
                     logArea.text+=obj.change_message;
                     logArea.text+="\n\n\n";

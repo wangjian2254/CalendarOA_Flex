@@ -9,7 +9,8 @@
 			import events.ChangeMenuEvent;
 			import events.ChangeUserEvent;
 			import events.CloseEvent;
-			import events.PageChangeEvent;
+            import events.ListClickEvent;
+            import events.PageChangeEvent;
 			
 			import httpcontrol.CHTTPService;
 			import httpcontrol.HttpServiceUtil;
@@ -44,15 +45,9 @@
 			override public   function  init(e:FlexEvent):void{
 				dateChooser.selectedDate = new Date();
 				
-				if(ToolUtil.groupList.length==0){
-					ToolUtil.groupRefresh(regetGroup);
-					showCalendar();
-				}else{
-					regetGroup();
+
 					changeShowModel();
-				}
 				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
-				ToolUtil.groupList.addEventListener(CollectionEvent.COLLECTION_CHANGE,regetGroup);
 				taskChange(null);
 			}
 			
@@ -67,6 +62,11 @@
             override public function resizeContainer(e:ResizeEvent):void{
                 resize(null,false);
             }
+
+            private function listItemClick_handler(e:ListClickEvent):void{
+
+            }
+
 			
 			private function changeShowModel():void{
 				currentMonth=-1;
@@ -99,77 +99,43 @@
 					
 				}
 				ToolUtil.taskUnRefresh(showTaskList);
-				regetGroup();
 			}
 			
-			public function regetGroup(result:Object=null,e:ResultEvent=null):void{
-				
-				mygrouppanel.removeAllElements();
-				joingrouppanel.removeAllElements();
-				lookgrouppanel.removeAllElements();
-				
-				var groupItem:GroupItem=null;
-				var obj:Object = null;
-				var h:Number=0;
-				for(var i:Number=ToolUtil.groupList.length-1;i>=0;i--){
-					groupItem = new GroupItem();
-					h = groupItem.height;
-					obj = ToolUtil.groupList.getItemAt(i);
-					groupItem.color = obj.color;
-					groupItem.groupId = obj.id;
-					groupItem.groupName = obj.name;
-					groupItem.groupData = obj;
-					groupItem.fun=showGroup;
-					groupItem.isshow=true;
-					
-					if(obj.pem=="create"){
-						mygrouppanel.addElement(groupItem)
-					}else if(obj.pem=="join"){
-						joingrouppanel.addElement(groupItem);
-					}else if(obj.pem=="look"){
-						lookgrouppanel.addElement(groupItem);
-					}
-				}
-			mygrouppanel.invalidateSize()
-			joingrouppanel.invalidateSize()
-			lookgrouppanel.invalidateSize()
-			datePanel.invalidateSize();
-			
-			}
-			
-			public function showGroup(group:GroupItem,g:Object):void{
-				if(group.isshow){
-					group.color = 0xffffff;
-					group.isshow = false;
-				}else{
-					group.color = g.color;
-					group.isshow = true;
-				}
-				
-				var dayItem:DayItem=null;
-				for(var  i:Number=1;i<50;i++){
-					if(calendarPanel.numElements-1>=i){
-						
-						dayItem = calendarPanel.getElementAt(i-1) as DayItem;
-						
-						dayItem.showSchedule(g.id,group.isshow);
-						
-					}
-					if(calendarBorder.numElements-1>=i){
-						dayItem = calendarBorder.getElementAt(i) as DayItem;
-						
-						dayItem.showSchedule(g.id,group.isshow);
-						
-					}
-					if(daySchedule.numElements-1>=i){
-						dayItem = daySchedule.getElementAt(i) as DayItem;
-						
-						dayItem.showSchedule(g.id,group.isshow);
-						
-					}
 
-				}
-			}
+			
+//			public function showGroup(group:GroupItem,g:Object):void{
+//				if(group.isshow){
+//					group.color = 0xffffff;
+//					group.isshow = false;
+//				}else{
+//					group.color = g.color;
+//					group.isshow = true;
+//				}
+//
+//				var dayItem:DayItem=null;
+//				for(var  i:Number=1;i<50;i++){
+//					if(calendarPanel.numElements-1>=i){
+//
+//						dayItem = calendarPanel.getElementAt(i-1) as DayItem;
+//
+//						dayItem.showSchedule(g.id,group.isshow);
+//
+//					}
+//					if(calendarBorder.numElements-1>=i){
+//						dayItem = calendarBorder.getElementAt(i) as DayItem;
+//
+//						dayItem.showSchedule(g.id,group.isshow);
+//
+//					}
+//					if(daySchedule.numElements-1>=i){
+//						dayItem = daySchedule.getElementAt(i) as DayItem;
+//
+//						dayItem.showSchedule(g.id,group.isshow);
+//
+//					}
+//
+//				}
+//			}
 			
 			
 			private var currentMonth:Number=-1;
@@ -590,82 +556,49 @@
 	</fx:Declarations>
 	
 		<control:layout>
-			<s:HorizontalLayout gap="0">
+			<s:HorizontalLayout gap="5">
 				
 			</s:HorizontalLayout>
 		</control:layout>
-		<s:Scroller  width="190" height="100%">
-			<s:Group>
-				<s:BorderContainer id="datePanel" width="100%" borderVisible="false" >
-					<s:layout>
-						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
-						</s:VerticalLayout>
-					</s:layout>
-					<s:BorderContainer width="100%" height="30" borderVisible="false">
-						<s:layout>
-							<s:HorizontalLayout gap="5" verticalAlign="middle">
-								
-							</s:HorizontalLayout>
-						</s:layout>
-						<s:Button chromeColor="red" label="创建日程" color="#ffffff"   height="25" click="createSchedule()" />
-						<s:BorderContainer width="100%" height="30" borderVisible="false">
-							<s:layout>
-								<s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="3">
-									
-								</s:HorizontalLayout>
-							</s:layout>
-							<s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
-						</s:BorderContainer>
-					</s:BorderContainer>
-					
-					<s:Label text="{monthstr.format(dateChooser.selectedDate)}" fontSize="18" fontWeight="bold" paddingTop="10" >
-						
-					</s:Label>
-					<mx:DateChooser id="dateChooser" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-					
-					<s:Label id="mytasklbl" text="我的备忘" fontSize="18"  paddingTop="10" >
-					</s:Label>
-					<uicontrol:ScheduleItem id="mytask" color="#fad165" scheduleName="备忘" fun="showTask"/>
-					<s:BorderContainer width="100%" height="30" borderVisible="false" >
-						<s:layout>
-							<s:HorizontalLayout gap="5" verticalAlign="middle"/>
-						</s:layout>
-						<s:Label text="我的分组：" fontSize="18"  paddingTop="10"/>
-						<s:BorderContainer  width="100%" height="30" borderVisible="false" >
-							<s:layout>
-								<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
-							</s:layout>
-							
-							<uicontrol:BtnAdd clickFun="createGroup" />
-							
-						</s:BorderContainer>
-					</s:BorderContainer>
-					<s:BorderContainer id="mygrouppanel" width="100%" borderVisible="false" >
-						<s:layout>
-							<s:VerticalLayout>
-							</s:VerticalLayout>
-						</s:layout>
-					</s:BorderContainer>
-					<s:Label id="myjoingrouplbl" text="参与的分组" fontSize="18"  paddingTop="10" >
-					</s:Label>
-					<s:BorderContainer id="joingrouppanel" width="100%" borderVisible="false"  >
-						<s:layout>
-							<s:VerticalLayout>
-							</s:VerticalLayout>
-						</s:layout>
-					</s:BorderContainer>
-					<s:Label text="分享的分组" fontSize="18"  paddingTop="10" >
-					</s:Label>
-					<s:BorderContainer id="lookgrouppanel" width="100%" borderVisible="false"  >
-						<s:layout>
-							<s:VerticalLayout>
-							</s:VerticalLayout>
-						</s:layout>
-					</s:BorderContainer>
-				</s:BorderContainer>
-			</s:Group>
-		</s:Scroller>
-		
+
+        <s:BorderContainer id="datePanel" width="230" height="100%" borderVisible="false" >
+            <s:layout>
+                <s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
+                </s:VerticalLayout>
+            </s:layout>
+            <s:BorderContainer width="100%" height="30" borderVisible="false">
+                <s:layout>
+                    <s:HorizontalLayout gap="5" verticalAlign="middle">
+
+                    </s:HorizontalLayout>
+                </s:layout>
+                <s:Button chromeColor="red" label="创建日程" color="#ffffff"   height="25" click="createSchedule()" />
+                <s:BorderContainer width="100%" height="30" borderVisible="false">
+                    <s:layout>
+                        <s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="3">
+
+                        </s:HorizontalLayout>
+                    </s:layout>
+                    <s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
+                </s:BorderContainer>
+            </s:BorderContainer>
+
+            <s:Label text="{monthstr.format(dateChooser.selectedDate)}" fontSize="18" fontWeight="bold" paddingTop="10" >
+
+            </s:Label>
+            <mx:DateChooser id="dateChooser" width="100%" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+
+            <s:Label id="mytasklbl" text="我的备忘" fontSize="18"  paddingTop="10" >
+            </s:Label>
+            <uicontrol:ScheduleItem id="mytask" color="#fad165" scheduleName="备忘" fun="showTask"/>
+            <s:Label  text="组织结构" fontSize="18"  paddingTop="10" >
+            </s:Label>
+            <uicontrol:OrgChatList id="addressList"   type="org" borderVisible="false"
+                                   listItemClick="listItemClick_handler(event)"
+                                   width="100%" height="100%" />
+
+        </s:BorderContainer>
+
 		<s:BorderContainer id="rightContainner" width="100%" height="100%" backgroundAlpha="0"  borderVisible="false">
 			<s:layout>
 				<s:VerticalLayout gap="1">

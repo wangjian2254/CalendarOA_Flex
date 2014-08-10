@@ -123,8 +123,8 @@
 				isFirstForAni=false;
 			}
 			public  function closeAnimation():void{
-				mve.xFrom=this.width;
-				mve.yFrom=this.height;
+				mve.xFrom=this.x;
+				mve.yFrom=this.y;
 				mve.xTo=FlexGlobals.topLevelApplication.width;
 				mve.yTo =FlexGlobals.topLevelApplication.height;
 				var pa:Point=new Point(mve.xFrom,mve.yFrom);

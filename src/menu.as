@@ -1,8 +1,10 @@
+import control.AddPersonPanel;
 import control.CBorderContainer;
 import control.CalendarControl;
 import control.ContactControl;
 import control.DepartmentControl;
 import control.GroupControl;
+import control.IMControl;
 import control.LogPanel;
 import control.MessageControl;
 import control.PaperControl;
@@ -13,13 +15,17 @@ import control.UserPaperControl;
 
 import events.ChangeMenuEvent;
 
+import flash.display.DisplayObject;
+
 import flash.events.Event;
 import flash.events.MouseEvent;
 
 import mx.controls.Alert;
 import mx.controls.Menu;
+import mx.core.FlexGlobals;
 import mx.events.FlexEvent;
 import mx.events.MenuEvent;
+import mx.managers.PopUpManager;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 
@@ -196,7 +202,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				c = new DepartmentControl();
 				break;
 			case 'message':
-				c = new MessageControl();
+				c = new IMControl();
 				break;
 			case 'log':
 				c = new LogPanel();
@@ -215,6 +221,11 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				break;
 			case 'subjectkind':
 				c = new SubjectKindControl();
+				break;
+            case 'addPerson':
+				var personPanel = new AddPersonPanel();
+//                PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
+                PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,AddPersonPanel,true);
 				break;
 			
 			

@@ -230,12 +230,11 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
-	<s:layout>
+	<control:layout>
 		<s:VerticalLayout  >
 			
 		</s:VerticalLayout>
-	</s:layout>
+	</control:layout>
 	<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
 		<s:layout>
 			<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
@@ -297,6 +296,5 @@
 
 			</s:VGroup>
 		</s:Scroller>
-	</s:BorderContainer>
 	</s:BorderContainer>
 </control:CBorderContainer>

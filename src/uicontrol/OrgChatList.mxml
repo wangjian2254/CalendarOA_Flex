@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<!--
+  Created by wangjian2254 on 14-8-10.
+-->
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:uicontrol="uicontrol.*" creationComplete="init()">
+    <fx:Metadata>
+        [Event(name="listItemClick",type="events.ListClickEvent")]
+        [Event(name="listItemZhanKai",type="events.ListClickEvent")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import events.ListClickEvent;
+
+        import mx.collections.ArrayCollection;
+        import mx.events.CollectionEvent;
+        import mx.utils.ObjectUtil;
+
+        import util.ToolUtil;
+
+        [Bindable]
+        private var addressMember:ArrayCollection = new ArrayCollection();
+
+        public var type:String="org";
+
+        [Bindable]
+        public var borderVisible:Boolean = true;
+
+        public function init():void {
+            ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
+            ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
+            initAddress();
+        }
+
+        private function changeMember(e:CollectionEvent):void{
+            initAddress();
+        }
+
+        private function initAddress():void{
+            addressMember.removeAll();
+
+            if(type == "chat"){
+                var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+                var contact:Object = new Object();
+                contact['id'] = -1;
+                contact['name'] = '常用联系人';
+                contact['icon'] = '/static/image/address2.png';
+                contact['flag'] = 'contact';
+                contact['children'] = new ArrayCollection();
+                contact['childrenstatus'] = true;
+                contact['level'] = 0;
+                for each(var member :Object in members){
+                    member['depart_id']=contact.id;
+                    member['level']=contact.level+1;
+                }
+                var liyu:Object=new Object();
+                liyu['id']=0;
+                liyu['name']='客服鲤鱼王';
+                liyu['icon']='/static/image/liyu2.png';
+                liyu['depart_id']=-1;
+                liyu['level']=contact.level+1;
+                contact.children.addItem(liyu);
+                contact.children.addAll(new ArrayCollection(members as Array));
+                addressMember.addItem(contact);
+
+                var l2:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
+                var f:Boolean = false;
+                for each(var item2:Object in l2){
+                    f=false;
+                    for each(var p:Object in item2.members){
+                        if(p.id == ToolUtil.sessionUser.pid){
+                            f=true;
+                        }
+                    }
+                    if(f){
+                        item2.level = 0;
+                        addressMember.addItem(item2);
+                    }
+                }
+                if(contact!=null){
+                    var listclickevent2:ListClickEvent=new ListClickEvent("listItemZhanKai",contact);
+                    listItemZhanKai_handler(listclickevent2);
+                }
+
+            }
+
+
+            if(type == "org"){
+                var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
+                var depart:Object = new Object();
+                var rootDepart:Object = null;
+                for each(var item:Object in l){
+                    depart['d'+item.id] = item;
+                    if(!item.father){
+                        rootDepart=item;
+                        item.level = 0;
+                    }
+                }
+                for each(item in l){
+
+                    if(item.members.length==0){
+                        continue;
+                    }
+                    if(item.father){
+                        item.level = depart['d'+item.father].level+1;
+                    }
+                    if(!item.hasOwnProperty('children')){
+                        item.children=new ArrayCollection();
+                        item.childrenstatus=true;
+                    }
+
+                    for each(var member :Object in item.members){
+                        member['depart_id']=item.id;
+                        member['level']=item.level+1;
+                    }
+                    item.children.addAll(new ArrayCollection(item.members as Array));
+                }
+                for each(item in l){
+
+                    if(item.father){
+                        if(!depart['d'+item.father].hasOwnProperty('children')){
+                            depart['d'+item.father].children=new ArrayCollection();
+                            depart['d'+item.father].childrenstatus=true;
+
+                        }
+                        depart['d'+item.father].children.addItem(item);
+                        item.level = depart['d'+item.father].level+1;
+                    }
+
+                }
+                for each(item in l){
+                    if(item.flag=='free'){
+                        depart['d'+item.father].children.removeItemAt(depart['d'+item.father].children.getItemIndex(item));
+                        depart['d'+item.father].children.addItem(item);
+                    }
+                }
+                addressMember.addItem(rootDepart);
+                if(rootDepart!=null){
+                    var listclickevent:ListClickEvent=new ListClickEvent("listItemZhanKai",rootDepart);
+                    listItemZhanKai_handler(listclickevent);
+                }
+
+            }
+        }
+
+//        private function listItemClick_handler(e:ListClickEvent):void{
+//            dispatchEvent(e);
+//
+//        }
+        private function listItemZhanKai_handler(e:ListClickEvent):void{
+            var depart:Object = e.data;
+            var index:int=0;
+            for(var i:int=0;i<addressMember.length;i++){
+                if(depart.id == addressMember.getItemAt(i).id){
+                    index = i;
+                    break;
+                }
+            }
+            var childrenDepart:ArrayCollection;
+            if(depart.hasOwnProperty('childrenstatus')&&depart['childrenstatus']){
+                depart['childrenstatus'] = false;
+                childrenDepart = depart.children;
+
+                if(index==addressMember.length-1&&addressMember.length!=1){
+                    addressMember.addAll(childrenDepart);
+                }else{
+                    addressMember.addAllAt(childrenDepart,index+1);
+                }
+            }else if(depart.hasOwnProperty('childrenstatus')&&!depart['childrenstatus']){
+                depart['childrenstatus']=true;
+                var dellist : Array = new Array();
+                dellist.push(depart);
+                deleteChildren(addressMember,dellist);
+            }
+
+        }
+
+        private function deleteChildren(list:ArrayCollection, items:Array):void{
+            var tempDepart:Object;
+            var dellist : Array = new Array();
+            for each(var item:Object in items){
+                for(var k:int = list.length-1;k>=0;k--){
+                    tempDepart = list.getItemAt(k);
+                    if((tempDepart.hasOwnProperty('father')&&tempDepart.father==item.id)||(tempDepart.hasOwnProperty('depart_id')&&tempDepart.depart_id==item.id)){
+                        if(tempDepart.hasOwnProperty('flag')){
+                            if(tempDepart.hasOwnProperty('childrenstatus')){
+                                tempDepart.childrenstatus=true;
+                            }
+                            dellist.push(tempDepart);
+                        }
+
+                        list.removeItemAt(k);
+                    }
+                }
+            }
+            if(dellist.length>0){
+                deleteChildren(list,dellist);
+            }
+
+
+        }
+
+
+        ]]></fx:Script>
+
+    <uicontrol:AddressList id="addressList" dataProvider="{addressMember}" borderVisible="{borderVisible}}"
+                           listItemZhanKai="listItemZhanKai_handler(event)"
+                           horizontalScrollPolicy="off"
+                           itemRenderer="uicontrol.renderer.AddressItemRenderer" width="100%" height="100%">
+
+    </uicontrol:AddressList>
+</s:Group>

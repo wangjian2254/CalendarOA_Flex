@@ -2,7 +2,7 @@
 <s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                xmlns:s="library://ns.adobe.com/flex/spark"
                xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
-               width="450" height="500"
+               width="450" height="500"   creationComplete="init()"
                title="注册用户" close="closeWin()">
 	<fx:Script>
 		<![CDATA[
@@ -12,10 +12,12 @@
             import mx.collections.ArrayCollection;
 
             import mx.controls.Alert;
+            import mx.core.FlexGlobals;
             import mx.events.FlexEvent;
             import mx.managers.PopUpManager;
 			import mx.rpc.AbstractOperation;
-			import mx.rpc.events.ResultEvent;
+            import mx.rpc.events.FaultEvent;
+            import mx.rpc.events.ResultEvent;
 			
 			import util.ToolUtil;
 			import util.UserUtil;
@@ -25,11 +27,91 @@
 				PopUpManager.removePopUp(this);
 			}
 
+            private function init():void{
+                form.validateNow();
+                if(ToolUtil.joinOrgFlag){
+                    form.removeElement(orgNameItem);
+                    form.removeElement(orgIconItem);
+                    //getOrgByFlag
+                    var obj:Object=new Object();
+                    obj.flag=ToolUtil.joinOrgFlag;
+                    HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByFlag",getOrgByFlagResult,"POST").send(obj);
+                    this.height = 415;
+                }else{
+                    form.removeElement(userTypeItem);
+                    this.height = 500;
+                    this.title = "注册用户";
+                }
+                loginForm.visible = false;
+                form.validateNow();
+
+                loginForm.validateNow();
+
+                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+            }
+
+            private function getOrgByFlagResult(result:Object,e:ResultEvent):void{
+                 this.title = result.result.name + " 新成员注册";
+            }
+//            private function getOrgByFlagFault(e:FaultEvent):void{
+//                ToolUtil.joinOrgFlag = null;
+//                init();
+//            }
+
+            private function userTypeChanged():void{
+                if(userType.selectedValue == 2){
+                    loginForm.visible = true;
+                    form.visible = false;
+                    userType2.selectedValue = 2;
+                    loginForm.validateNow();
+
+                    this.height = loginForm.height+25;
+                }
+
+
+            }
+
+            private function userTypeChanged2():void{
+                if(userType2.selectedValue == 1){
+                    loginForm.visible = false;
+                    form.visible = true;
+                    userType.selectedValue = 1;
+                    form.validateNow();
+
+                    this.height = form.height+25;
+                }
+            }
+
+            private function join():void{
+                if (this.loginUsername.text == "" ||
+                        this.loginPassword.text == "") {
+                    Alert.show("请填写完整信息。", "提示");
+                    return;
+                }
+
+                var obj:Object = new Object();
+                obj.username = loginUsername.text;
+                obj.password = loginPassword.text;
+                obj.flag = ToolUtil.joinOrgFlag;
+
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addOrganization", refresh, "POST").send(obj);
+            }
+
 			public function save():void{
-				if(username.text==""||truename.text==""||password.text==""||rpassword.text==""||orgname.text==""){
-					Alert.show("请填写完整信息。 用户名、密码、姓名、组织名称必须填写","提示");
-					return;
-				}
+                if(!ToolUtil.joinOrgFlag){
+                    if(username.text==""||truename.text==""||password.text==""||rpassword.text==""||orgname.text==""){
+                        Alert.show("请填写完整信息。 用户名、密码、姓名、组织名称必须填写","提示");
+                        return;
+                    }
+                }else{
+                    if(username.text==""||truename.text==""||password.text==""||rpassword.text==""){
+                        Alert.show("请填写完整信息。 用户名、密码、姓名必须填写","提示");
+                        return;
+                    }
+                }
+
+
 				if(this.password.text==""||this.password.text!=this.rpassword.text){
 					Alert.show("密码和确认密码要一致。","提示");
 					return;
@@ -38,7 +120,12 @@
 				obj.username=username.text;
 				obj.truename = truename.text;
 				obj.password = password.text;
-				obj.name = orgname.text;
+                if(ToolUtil.joinOrgFlag){
+                    obj.flag = ToolUtil.joinOrgFlag;
+                }else{
+                    obj.name = orgname.text;
+                }
+
 				obj.userhead = headSelectArray.selectedIcon();
 				obj.icon = orgHeadSelectArray.selectedIcon();
 
@@ -49,8 +136,9 @@
 			}
 			public function refresh(r:Object,e:ResultEvent):void{
 				if(r.success){
-//					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
-					closeWin();
+                    closeWin();
+					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+
 				}else{
 //					Alert.show("修改密码失败","提示");
 				}
@@ -65,10 +153,56 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
         <conobj:HeadSelectArray id="headSelectArray"></conobj:HeadSelectArray>
         <conobj:HeadSelectArray id="orgHeadSelectArray"></conobj:HeadSelectArray>
+        <s:RadioButtonGroup id="userType" change="userTypeChanged()"></s:RadioButtonGroup>
+        <s:RadioButtonGroup id="userType2" change="userTypeChanged2()"></s:RadioButtonGroup>
 	</fx:Declarations>
-	
+
+
+
+    <s:Form width="100%" id="loginForm" visible="false">
+        <s:FormItem  label="是否新用户：" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="10"></s:HorizontalLayout>
+            </s:layout>
+            <s:RadioButton label="新用户" selected="true" value="1" group="{userType2}"></s:RadioButton>
+            <s:RadioButton label="已有账户" value="2" group="{userType2}"></s:RadioButton>
+        </s:FormItem>
+        <s:FormItem label="用户名:" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <s:TextInput id="loginUsername" prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass(loginPassword)">
+
+            </s:TextInput>
+        </s:FormItem>
+        <s:FormItem label="密码:" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <s:TextInput id="loginPassword" displayAsPassword="true"  width="200"  tabIndex="3"  enter="join()">
+
+            </s:TextInput>
+        </s:FormItem>
+        <s:FormItem>
+            <s:layout>
+                <s:HorizontalLayout gap="10" />
+            </s:layout>
+            <s:Button label="加入" click="join()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
+
+            </s:Button>
+            <s:Button label="放弃" click="closeWin()" chromeColor="#ffffff" color="#000000" height="25">
+
+            </s:Button>
+        </s:FormItem>
+    </s:Form>
 	<s:Form width="100%" id="form" >
-		
+		<s:FormItem id="userTypeItem" label="是否新用户：" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="10"></s:HorizontalLayout>
+            </s:layout>
+            <s:RadioButton label="新用户" selected="true" value="1" group="{userType}"></s:RadioButton>
+            <s:RadioButton label="已有账户" value="2" group="{userType}"></s:RadioButton>
+		</s:FormItem>
 		<s:FormItem label="用户名:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
@@ -117,7 +251,7 @@
 			<s:Label text="*" color="red" />
 		</s:FormItem>
 
-		<s:FormItem label="组织名称:" textAlign="right">
+		<s:FormItem id="orgNameItem" label="组织名称:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
@@ -127,7 +261,7 @@
 			<s:Label text="公司或团队名称" color="red" />
 		</s:FormItem>
 
-		<s:FormItem label="组织图标:" textAlign="right">
+		<s:FormItem id="orgIconItem" label="组织图标:" textAlign="right">
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
             </s:layout>
@@ -144,7 +278,7 @@
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
-				<s:Button label="提交" click="save()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
+				<s:Button label="注册" click="save()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
 					
 				</s:Button>
 				<s:Button label="放弃" click="closeWin()" chromeColor="#ffffff" color="#000000" height="25">

@@ -1,6 +1,4 @@
 import mx.events.CloseEvent;
-import mx.managers.BrowserManager;
-import mx.managers.IBrowserManager;
 
 // ActionScript file
 
@@ -16,6 +14,16 @@ public function CloseWindow(event:CloseEvent):void{
 }
 
 public function initFlex():void{
-    var br:IBrowserManager = BrowserManager.getInstance();
-    br.setTitle("鲤鱼协同系统");
+    var url:String = ExternalInterface.call('window.location.href.toString');
+    if(url.indexOf("addPerson?flag=")>0){
+        for each(var u:String in url.split('?')){
+            for each(var r:String in u.split('&')){
+                if(r.split('=')[0]=='flag'){
+                    ToolUtil.joinOrgFlag = r.split('=')[1];
+                }
+            }
+
+        }
+
+    }
 }

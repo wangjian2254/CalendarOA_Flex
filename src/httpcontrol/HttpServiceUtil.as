@@ -1,24 +1,21 @@
 package httpcontrol
 {
 	import control.Loading;
-	
-	import flash.display.DisplayObject;
+import control.RegisterUserPanel;
+
+import flash.display.DisplayObject;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
 	import mx.controls.Alert;
 	import mx.core.FlexGlobals;
-	import mx.managers.PopUpManager;
-	import mx.managers.PopUpManagerChildList;
-	import mx.messaging.ChannelSet;
-	import mx.messaging.channels.AMFChannel;
-	import mx.rpc.AbstractOperation;
+    import mx.managers.PopUpManager;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
-	import mx.rpc.remoting.Operation;
-	import mx.rpc.remoting.RemoteObject;
-	
-	import util.LoadingUtil;
+
+import spark.components.TitleWindow;
+
+import util.LoadingUtil;
 	import util.ToolUtil;
 
 	public class HttpServiceUtil
@@ -88,8 +85,18 @@ package httpcontrol
                     case 402:
                         break;
                     case 403:
+                        PopUpManager.addPopUp(ToolUtil.orgPanel, FlexGlobals.topLevelApplication as DisplayObject, true);
+                        return;
                         break;
                     case 404:
+                        if(ToolUtil.joinOrgFlag!=null){
+                            if(ToolUtil.regUser.parent == null){
+                                PopUpManager.addPopUp(ToolUtil.regUser, FlexGlobals.topLevelApplication as DisplayObject, true);
+                            }
+
+                            return;
+                        }
+
                         if(ToolUtil.loginUser.parent==null){
                             PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
                         }

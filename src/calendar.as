@@ -125,9 +125,7 @@ public function login():void {
 }
 
 public function reg():void {
-	var changepassword:RegisterUserPanel = RegisterUserPanel(PopUpManager.createPopUp(
-		this, RegisterUserPanel, true) as spark.components.TitleWindow);
-	PopUpManager.centerPopUp(changepassword);
+    PopUpManager.addPopUp(ToolUtil.regUser, FlexGlobals.topLevelApplication as DisplayObject, true);
 }
 
 public function updateinfo():void {

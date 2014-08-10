@@ -2,6 +2,8 @@ package util
 {
 import control.Loading;
 import control.LoginUserPanel;
+import control.RegisterUserPanel;
+import control.SelectOrgPanel;
 
 import events.ChangeScheduleEvent;
 import events.ChangeUserEvent;
@@ -35,8 +37,12 @@ public class ToolUtil
     [Bindable]
     public static var resultMsg:String="";
 
+    public static var joinOrgFlag:String;
+
     public static var  currentUserFun:Function=null;
     public static var loginUser:LoginUserPanel= new LoginUserPanel();
+    public static var regUser:RegisterUserPanel= new RegisterUserPanel();
+    public static var orgPanel:SelectOrgPanel= new SelectOrgPanel();
 
     private static var time:Timer = new Timer(1000*60*5,0);
 
@@ -82,7 +88,7 @@ public class ToolUtil
     }
     public static function resultFinduser(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            if(sessionUser["id"]!=result.result["id"]){
+            if(sessionUser["pid"]!=result.result["pid"]){
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,result.result,true));
             }
             sessionUser=result.result;
@@ -174,6 +180,15 @@ public class ToolUtil
 
     [Bindable]
     public static var memberList:ArrayCollection=new ArrayCollection();
+
+    public static function getPersonById(id:*):Object{
+        for each(var item:Object in memberList){
+            if(item.id == id){
+                return item;
+            }
+        }
+        return new Object();
+    }
 
     [Bindable]
     public static var org:Object = null;

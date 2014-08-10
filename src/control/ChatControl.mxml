@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
+	<fx:Script>
+		<![CDATA[
+
+        import events.ChangeUserEvent;
+        import events.CloseEvent;
+        import events.ListClickEvent;
+
+
+
+        import mx.collections.ArrayCollection;
+        import mx.events.CollectionEvent;
+        import mx.events.CollectionEventKind;
+        import mx.events.FlexEvent;
+        import mx.utils.ObjectUtil;
+
+        import util.DateUtil;
+
+        import util.ToolUtil;
+
+        [Bindable]
+        private var chatsArr:ArrayCollection=new ArrayCollection();
+
+        [Bindable]
+        public var members:ArrayCollection;
+
+        [Bindable]
+        public var chatUser:Object;
+
+
+
+
+        override public function init(e:FlexEvent):void {
+            if(members==null){
+                horGroup.validateNow();
+                horGroup.removeElement(addressList);
+            }else{
+
+            }
+            head.source = chatUser.icon;
+            nameLabel.text = chatUser.name;
+        }
+
+        override public function changeCurrentUser(e:ChangeUserEvent):void {
+
+
+        }
+
+        override public function closeContainer(e:CloseEvent):void {
+            dispatchEvent(e);
+        }
+
+        private function changeMember():void{
+//            var c:ArrayCollection = new ArrayCollection();
+            for each(var member:Object in members){
+                member['online']=false;
+//                c.addItem(member);
+
+            }
+            members.refresh();
+//            for each(var m:Object in c){
+//                members.removeItemAt(members.getItemIndex(m));
+//                members.addItem(m);
+//            }
+
+        }
+
+
+
+        // 重新进入时执行
+        override public function reloadParamData(e:FlexEvent):void {
+            if (param) {
+                if (param.hasOwnProperty("messageType")) {
+
+                }
+
+            }
+            super.reloadParamData(e);
+        }
+
+
+        private function listItemClick_handler(e:ListClickEvent):void{
+
+        }
+
+        private function chatItemClick_handler(e:ListClickEvent):void{
+
+        }
+
+        protected function sendBTN_clickHandler(event:MouseEvent=null):void
+        {
+            trace("//****TextInputer.sendBTN_clickHandler 执行****//");
+            var _re:RegExp = /^\s*$/;
+            var __msg:String = ti.text;
+            if(_re.test(__msg))
+            //如果输入的字符串仅包含空格、回车或者空，就不能发送信息
+            {
+                ti.setFocus();
+                return;
+            }
+            var chat:Object = new Object();
+
+            chat['id'] = new Date().getTime();
+            chat['text'] = __msg;
+            chat['color'] = cp.selectedColor;
+            chat['weight'] = bBTN.selected?'bold':'normal';
+            chat['style'] = iBTN.selected?'italic':'normal';
+            chat['dec'] = uBTN.selected?'underline':'none';
+            chat['size'] =ns.value ;
+            chat['from'] = ToolUtil.sessionUser.pid;
+            chat['date'] = DateUtil.dateLblChat(new Date());
+            chatsArr.addItem(chat);
+
+            chat = new Object();
+
+            chat['id'] = new Date().getTime();
+            chat['text'] = __msg;
+            chat['color'] = cp.selectedColor;
+            chat['weight'] = bBTN.selected?'bold':'normal';
+            chat['style'] = iBTN.selected?'italic':'normal';
+            chat['dec'] = uBTN.selected?'underline':'none';
+            chat['size'] =ns.value ;
+            chat['from'] = 2;
+            chat['date'] = DateUtil.dateLblChat(new Date());
+            chatsArr.addItem(chat);
+
+            addressList.validateNow();
+            changeMember();
+//            addressList.up;
+
+            ti.text = '';
+            ti.setFocus();
+        }
+
+        private function pressEnter(event:KeyboardEvent):void{
+            if(event.keyCode == 13)  {
+                sendBTN_clickHandler();
+            }
+        }
+
+
+        ]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<control:layout>
+		<s:VerticalLayout gap="5" >
+			
+		</s:VerticalLayout>
+	</control:layout>
+        <s:HGroup width="100%" height="50" paddingLeft="10" verticalAlign="middle">
+            <s:Image id="head" width="45" height="45"></s:Image>
+            <s:Label id="nameLabel"  ></s:Label>
+        </s:HGroup>
+    <s:HGroup id="horGroup"  width="100%" height="100%">
+        <uicontrol:AddressList id="chatList"  dataProvider="{chatsArr}"
+                               listItemClick="chatItemClick_handler(event)"
+                               itemRenderer="uicontrol.renderer.ChatItemRenderer" width="100%" height="100%">
+        </uicontrol:AddressList>
+        <uicontrol:AddressList id="addressList" dataProvider="{members}"
+                               listItemClick="listItemClick_handler(event)"
+                               itemRenderer="uicontrol.renderer.AddressItemRenderer" width="150" height="100%">
+        </uicontrol:AddressList>
+
+    </s:HGroup>
+
+        <s:BorderContainer width="100%" height="45" backgroundImage="{CBorderContainer.toolbgimg}" borderVisible="false">
+            <s:layout>
+                <s:HorizontalLayout paddingLeft="10" gap="10" verticalAlign="middle"></s:HorizontalLayout>
+            </s:layout>
+
+            <mx:ColorPicker id="cp"/>
+            <s:Label text="字号"/>
+            <s:NumericStepper id="ns" minimum="12" value="14" maximum="24" stepSize="2"/>
+            <mx:Button id="bBTN" width="25" toggle="true" icon="@Embed('/assets/img/b.png')"/>
+            <mx:Button id="iBTN" width="25" toggle="true" icon="@Embed('/assets/img/i.png')"/>
+            <mx:Button id="uBTN" width="25" toggle="true" icon="@Embed('/assets/img/u.png')"/>
+            <mx:Spacer width="100%" height="10"/>
+        </s:BorderContainer>
+        <s:TextArea id="ti" width="100%" height="100"
+                    paddingTop="10" paddingBottom="5" paddingLeft="5" paddingRight="5"
+                     focusEnabled="true" fontLookup="device"
+                     fontFamily="simsun,MINGLIU"
+                     alignmentBaseline="ideographicCenter"
+                     color="{cp.selectedColor}"
+                     fontWeight="{bBTN.selected?'bold':'normal'}"
+                     fontStyle="{iBTN.selected?'italic':'normal'}"
+                     textDecoration="{uBTN.selected?'underline':'none'}"
+                     fontSize="{ns.value}"
+                     editable="true"
+                     keyUp="pressEnter(event)"
+                      />
+        <s:HGroup width="100%" height="30" horizontalAlign="right" verticalAlign="middle">
+            <s:Button  label="清空" width="80" height="25" click="{ti.text='';}"  />
+            <s:Button id="sendBTN" label="发送(Enter键)" width="120" height="25" click="sendBTN_clickHandler(event)"/>
+        </s:HGroup>
+
+
+
+
+
+
+</control:CBorderContainer>

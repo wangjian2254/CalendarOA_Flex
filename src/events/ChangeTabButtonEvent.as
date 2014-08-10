@@ -22,7 +22,7 @@ package events
 			return e;
 		}
 		
-		public function getView():CBorderContainer{
+		public function getViewBorderContainer():CBorderContainer{
 			return view;
 		}
 		public function getBtn():CTabButton{
