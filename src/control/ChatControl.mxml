@@ -60,7 +60,10 @@
 //                c.addItem(member);
 
             }
-            members.refresh();
+            if(members!=null){
+                members.refresh();
+            }
+
 //            for each(var m:Object in c){
 //                members.removeItemAt(members.getItemIndex(m));
 //                members.addItem(m);
