@@ -3,11 +3,75 @@
   Created by wangjian2254 on 14-8-11.
 -->
 <uicontrol:CTabButton xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:uicontrol="uicontrol.*"
-                      xmlns:s="library://ns.adobe.com/flex/spark">
+                      xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+                      backgroundAlpha="0" creationComplete="mouseU()" borderVisible="false" width="{btnLabel2.width>80?btnLabel2.width:80}"  click="clickBtn()" mouseDown="mouseD()" mouseUp="mouseU()" mouseOut="mouseU()" buttonMode="true" height="31"
+        >
     <uicontrol:states>
         <s:State name="unSelected" />
         <s:State name="selected" />
     </uicontrol:states>
+
+    <fx:Script>
+		<![CDATA[
+        import control.CBorderContainer;
+
+        import events.ChangeTabButtonEvent;
+        import events.CloseTabButtonEvent;
+
+
+
+        override public function clickBtn():void {
+            var e:ChangeTabButtonEvent = new ChangeTabButtonEvent(ChangeTabButtonEvent.Change_TabButton, view, this, true);
+            dispatchEvent(e);
+        }
+
+        override public function close():void {
+            var e:CloseTabButtonEvent = new CloseTabButtonEvent(CloseTabButtonEvent.Close_TabButton, view, this, true);
+            dispatchEvent(e);
+        }
+
+        //////
+
+
+
+        private var _flag:String = STATUS_U;
+        override public function get flag():String {
+            return _flag;
+        }
+
+        override public function set flag(value:String):void {
+            _flag = value;
+            mouseU();
+        }
+
+
+        override public function mouseU():void {
+            if (STATUS_D == flag) {
+                mouseD();
+            } else {
+                this.currentState = "selected";
+            }
+        }
+
+        override public function mouseD():void {
+            this.currentState = "unSelected";
+        }
+
+        override public function closeO():void {
+
+            this.clo2.source = X_hover;
+        }
+
+        override public function closeD():void {
+
+            this.clo2.source = X_down;
+        }
+
+        override public function closeU():void {
+            this.clo2.source = X_out;
+        }
+        ]]>
+	</fx:Script>
     <!--- @private -->
     <s:Rect id="shadow" left="-1" right="-1" top="0" bottom="-1" radiusX="5" includeIn="selected">
         <s:fill>
@@ -31,47 +95,53 @@
 
     <s:Rect id="border" left="0" right="0" top="0" bottom="1" bottom.selected="0" radiusX="4">
         <s:stroke>
-    <s:LinearGradientStroke rotation="90" weight="1">
-        <s:GradientEntry color="0x546679" alpha="1" />
-        <s:GradientEntry color="0x546679" alpha="1" />
-    </s:LinearGradientStroke>
-</s:stroke>
-        </s:Rect>
+            <s:LinearGradientStroke rotation="90" weight="1">
+                <s:GradientEntry color="0x546679" alpha="1" />
+                <s:GradientEntry color="0x546679" alpha="1" />
+            </s:LinearGradientStroke>
+        </s:stroke>
+    </s:Rect>
 
 
-<s:Rect id="fill2" left="0" right="0" top="0" height="5" radiusX="0">
-<s:fill>
-    <s:LinearGradient rotation="90">
-        <s:GradientEntry color="0x546679" alpha="1" />
-        <s:GradientEntry color="0x546679" alpha="1" />
-    </s:LinearGradient>
-</s:fill>
-</s:Rect>
+    <s:Rect id="fill2" left="0" right="0" radiusX="0"
+            left.selected="0" right.selected="0" bottom.selected="0" height.selected="5"
+            left.unSelected="0" right.unSelected="0" bottom.unSelected="0" height.unSelected="5">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0x546679" alpha="1" />
+                <s:GradientEntry color="0x546679" alpha="1" />
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
 
-<s:Rect id="fill3" left="1" right="1" top="0" height="5" radiusX="0">
-<s:fill>
-    <s:LinearGradient rotation="90">
-        <s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
-        <s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
-    </s:LinearGradient>
-</s:fill>
-</s:Rect>
+    <s:Rect id="fill3" left="1" right="1" radiusX="0"
+            left.selected="1" right.selected="1" bottom.selected="0" height.selected="5"
+            left.unSelected="1" right.unSelected="1" bottom.unSelected="0" height.unSelected="5">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
+                <s:GradientEntry color="0xcbd0d2" color.selected="0xf5f5f3" alpha="1" />
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
 
-<s:Rect id="fill4" left="0" right="0" top="0" height="1" radiusX="0" includeIn="unSelected">
-<s:fill>
-    <s:LinearGradient rotation="90">
-        <s:GradientEntry color="0x000000" alpha="0.4" ratio="0"/>
-        <s:GradientEntry color="0x000000" alpha="0.4" ratio="1"/>
-    </s:LinearGradient>
-</s:fill>
-</s:Rect>
+    <s:Rect id="fill4" includeIn="unSelected" left="0" right="0" bottom="0" height="1" radiusX="0">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0x000000" alpha="0.4" ratio="0"/>
+                <s:GradientEntry color="0x000000" alpha="0.4" ratio="1"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
 
-<s:Rect id="fill5" left="0" right="0" top="1" height="1" radiusX="0"  includeIn="unSelected">
-<s:fill>
-    <s:LinearGradient rotation="90">
-        <s:GradientEntry color="0x000000" alpha="0.2" ratio="0"/>
-        <s:GradientEntry color="0x000000" alpha="0.2" ratio="1"/>
-    </s:LinearGradient>
-</s:fill>
-</s:Rect>
+    <s:Rect id="fill5" includeIn="unSelected" left="0" right="0" bottom="1" height="1" radiusX="0">
+        <s:fill>
+            <s:LinearGradient rotation="90">
+                <s:GradientEntry color="0x000000" alpha="0.2" ratio="0"/>
+                <s:GradientEntry color="0x000000" alpha="0.2" ratio="1"/>
+            </s:LinearGradient>
+        </s:fill>
+    </s:Rect>
+    <s:Label id="btnLabel2" text="{label}"  minWidth="80" paddingLeft="10" paddingRight="{view.closeEnable?25:10}" textAlign="center" verticalAlign="middle" top="5" bottom="5"/>
+    <mx:Image id="clo2" visible="{view.closeEnable}"  source="{X_out}" click="close()" mouseOver="closeO()" mouseDown="closeD()" mouseUp="closeU()" mouseOut="closeU()" buttonMode="true" right="5" top="7" />
 </uicontrol:CTabButton>
