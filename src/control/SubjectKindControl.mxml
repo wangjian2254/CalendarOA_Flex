@@ -14,177 +14,184 @@
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[
-			import control.MessagePanel;
-			
-			import events.ChangeUserEvent;
-			import events.CloseEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.core.mx_internal;
-			import mx.events.CloseEvent;
-			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
-			import mx.graphics.SolidColor;
-			import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			import mx.validators.StringValidator;
-			
-			import spark.events.IndexChangeEvent;
+        import control.window.MessagePanel;
+
+        import events.ChangeUserEvent;
+        import events.CloseEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.core.mx_internal;
+        import mx.events.CloseEvent;
+        import mx.events.FlexEvent;
+        import mx.events.ItemClickEvent;
+        import mx.graphics.SolidColor;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+        import mx.validators.StringValidator;
+
+        import spark.events.IndexChangeEvent;
 
         [Bindable]
         private var buttonArr1:ArrayCollection = new ArrayCollection([
             {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
             {'label': '新增同级', 'ico': addimg, 'mode': 'addSam'},
-			{'label': '新增下级', 'ico': addimg, 'mode': 'addNex'}
+            {'label': '新增下级', 'ico': addimg, 'mode': 'addNex'}
         ]);
         [Bindable]
-		private var subKindArr:ArrayCollection=new ArrayCollection();
-		private var state:String="refresh";//refresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态),del(删除)
-		//新增，保存，删除,回复，转发的处理函数
-		//多个按钮点击事件的处理函数
+        private var subKindArr:ArrayCollection = new ArrayCollection();
+        private var state:String = "refresh";//refresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态),del(删除)
+        //新增，保存，删除,回复，转发的处理函数
+        //多个按钮点击事件的处理函数
         private function clickHander(e:MouseEvent):void {
-			ba1.requireSelection=true;
-			var item:Object=ba1.selectedItem;
-			typeName.text="";
-			delBtn.enabled=false;
-			var o:Object=subjectKindTree.selectedItem;
-			if(item.mode=="refresh"){
-				state="refresh";
-				loadSubKindData();
-				return;
-			}
-            if (item.mode == 'addSam') {
-				state="addSam";
-				var parent:Object=subjectKindTree.getParentItem(o);
-				if(o&&parent){
-					parentName.text=parent.name;
-				}else{
-					parentName.text="";
-				}
-				return;
+            ba1.requireSelection = true;
+            var item:Object = ba1.selectedItem;
+            typeName.text = "";
+            delBtn.enabled = false;
+            var o:Object = subjectKindTree.selectedItem;
+            if (item.mode == "refresh") {
+                state = "refresh";
+                loadSubKindData();
+                return;
             }
-			if (item.mode == 'addNex') {
-				state="addNex";
-				if(o){
-					parentName.text=o.name;
-				}
-				return;
-			}
+            if (item.mode == 'addSam') {
+                state = "addSam";
+                var parent:Object = subjectKindTree.getParentItem(o);
+                if (o && parent) {
+                    parentName.text = parent.name;
+                } else {
+                    parentName.text = "";
+                }
+                return;
+            }
+            if (item.mode == 'addNex') {
+                state = "addNex";
+                if (o) {
+                    parentName.text = o.name;
+                }
+                return;
+            }
         }
-		private function isValid():Boolean{
-			var o:Object=getData();
-			if(o["name"]==""){
-				Alert.show("类型名称不能为空","提示");
-				return false;
-			}
-			if(o["name"].length>200){
-				Alert.show("类型名称不能超过200个字","提示");
-				return false;
-			}
-			return true;
-		}
-		//查询方法
-		private function loadSubKindData():void{
-			var o:Object={};//如果需要补齐查询参数
-			HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllKind", loadSubKindDataResult, "POST").send(o);
-		};
-		private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
-			if (result.success) {
-				typeName.text="";
-				parentName.text="";
-				delBtn.enabled=false;
-				var arr:Array= result.result is Array ?  result.result : [];
-				subKindArr.removeAll();
-				subKindArr.addAll(new ArrayCollection(arr));
-				for(var i:int=0;i<subKindArr.length;i++){
-					subjectKindTree.expandChildrenOf(subKindArr[i],true);
-				}
+
+        private function isValid():Boolean {
+            var o:Object = getData();
+            if (o["name"] == "") {
+                Alert.show("类型名称不能为空", "提示");
+                return false;
+            }
+            if (o["name"].length > 200) {
+                Alert.show("类型名称不能超过200个字", "提示");
+                return false;
+            }
+            return true;
+        }
+
+        //查询方法
+        private function loadSubKindData():void {
+            var o:Object = {};//如果需要补齐查询参数
+            HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllKind", loadSubKindDataResult, "POST").send(o);
+        };
+        private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                typeName.text = "";
+                parentName.text = "";
+                delBtn.enabled = false;
+                var arr:Array = result.result is Array ? result.result : [];
+                subKindArr.removeAll();
+                subKindArr.addAll(new ArrayCollection(arr));
+                for (var i:int = 0; i < subKindArr.length; i++) {
+                    subjectKindTree.expandChildrenOf(subKindArr[i], true);
+                }
 //				var arr:Array=createNodeDataByJson("id","fatherid",result.result as Array);
 //				subKindArr=new ArrayCollection(arr);
-			}
-		}
-		//保存方法
-		private function savSubKindData():void{
-			if(!isValid()){
-				return;
-			}
-			var o:Object=getData();
-			HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/updateKind", savSubKindDataResult, "POST").send(o);
-		};
-		private function savSubKindDataResult(result:Object, e:ResultEvent):void {
-			if (result.success) {
-				loadSubKindData();
-			}
-		}
-		//删除方法
-		private function delSubKindData():void{
-			state="del";
-			Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
-					if(e.detail==Alert.YES){
-						var o:Object=getData();
-						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delKind", delSubKindDataResult, "POST").send(o);
-					}
-			});
-		};
-		private function delSubKindDataResult(result:Object, e:ResultEvent):void {
-			if (result.success) {
-				loadSubKindData();
-			}
-		}
-		private function selectNode():void{
-			ba1.requireSelection=false;
-			ba1.selectedIndex=-1;
-			state="mod";
-			delBtn.enabled=true;
-			setFormData();
-		}
-		private function setFormData():void{
-			var o:Object=subjectKindTree.selectedItem;
-			typeName.text=o.name;
-			var parent:Object=subjectKindTree.getParentItem(o);
-			if(parent){
-				parentName.text=parent.name;
-			}else{
-				parentName.text="";
-			}
-		}
-		public function getData():Object{
-			var o:Object={};
-			var n:Object=subjectKindTree.selectedItem;
-			o["name"] = typeName.text;
-			var parent:Object;
-			if(state=="addSam"&&n){
-				parent=subjectKindTree.getParentItem(subjectKindTree.selectedItem);
-				if(parent){
-					o["father_kind"]=parent.id;
-				}
-				o["id"]=null;
-			}
-			if(state=="addNex"&&n){
-				o["father_kind"]=n.id;
-				o["id"]=null;
-			}
-			if((state=="addSam"||state=="addNex"||state=="refresh"||state=="mod"||state=="del")&&!n){
-				o["father_kind"]=null;
-				o["id"]=null;
-			}
-			if((state=="mod"||state=="del")&&n){
-				o["father_kind"]=n.fatherid;
-				o["id"]=n.id;
-			}
-			return o;
-		}
+            }
+        }
+
+        //保存方法
+        private function savSubKindData():void {
+            if (!isValid()) {
+                return;
+            }
+            var o:Object = getData();
+            HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/updateKind", savSubKindDataResult, "POST").send(o);
+        };
+        private function savSubKindDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadSubKindData();
+            }
+        }
+
+        //删除方法
+        private function delSubKindData():void {
+            state = "del";
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+                if (e.detail == Alert.YES) {
+                    var o:Object = getData();
+                    HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delKind", delSubKindDataResult, "POST").send(o);
+                }
+            });
+        };
+        private function delSubKindDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadSubKindData();
+            }
+        }
+
+        private function selectNode():void {
+            ba1.requireSelection = false;
+            ba1.selectedIndex = -1;
+            state = "mod";
+            delBtn.enabled = true;
+            setFormData();
+        }
+
+        private function setFormData():void {
+            var o:Object = subjectKindTree.selectedItem;
+            typeName.text = o.name;
+            var parent:Object = subjectKindTree.getParentItem(o);
+            if (parent) {
+                parentName.text = parent.name;
+            } else {
+                parentName.text = "";
+            }
+        }
+
+        public function getData():Object {
+            var o:Object = {};
+            var n:Object = subjectKindTree.selectedItem;
+            o["name"] = typeName.text;
+            var parent:Object;
+            if (state == "addSam" && n) {
+                parent = subjectKindTree.getParentItem(subjectKindTree.selectedItem);
+                if (parent) {
+                    o["father_kind"] = parent.id;
+                }
+                o["id"] = null;
+            }
+            if (state == "addNex" && n) {
+                o["father_kind"] = n.id;
+                o["id"] = null;
+            }
+            if ((state == "addSam" || state == "addNex" || state == "refresh" || state == "mod" || state == "del") && !n) {
+                o["father_kind"] = null;
+                o["id"] = null;
+            }
+            if ((state == "mod" || state == "del") && n) {
+                o["father_kind"] = n.fatherid;
+                o["id"] = n.id;
+            }
+            return o;
+        }
 
         override public function init(e:FlexEvent):void {
-			loadSubKindData();
+            loadSubKindData();
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-			loadSubKindData();
+            loadSubKindData();
         }
 
         override public function closeContainer(e:events.CloseEvent):void {

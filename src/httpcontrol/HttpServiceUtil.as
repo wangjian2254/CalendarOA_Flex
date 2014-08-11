@@ -1,7 +1,9 @@
 package httpcontrol
 {
 	import control.Loading;
-import control.RegisterUserPanel;
+import control.window.RegisterUserPanel;
+
+import flash.display.DisplayObject;
 
 import flash.display.DisplayObject;
 	import flash.events.TimerEvent;
@@ -74,34 +76,38 @@ import util.LoadingUtil;
 			if(o.success==false){
                 switch (o.status_code){
                     case 400:
-                        break;
+                            break;
                     case 401:
-                        Alert.show(o.message,"警告");
-                        if(ToolUtil.loginUser.parent==null){
-                            PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
-                        }
-                        return;
-                        break;
+                            Alert.show(o.message,"警告");
+                            if(ToolUtil.loginUser.parent==null){
+                                PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
+                            }
+                            return;
+                            break;
                     case 402:
-                        break;
+                            break;
                     case 403:
-                        PopUpManager.addPopUp(ToolUtil.orgPanel, FlexGlobals.topLevelApplication as DisplayObject, true);
-                        return;
-                        break;
+                            ToolUtil.orgPanel.loginNickname = o.result.name;
+                            PopUpManager.addPopUp(ToolUtil.orgPanel, FlexGlobals.topLevelApplication as DisplayObject, true);
+                            return;
+                            break;
                     case 404:
-                        if(ToolUtil.joinOrgFlag!=null){
-                            if(ToolUtil.regUser.parent == null){
-                                PopUpManager.addPopUp(ToolUtil.regUser, FlexGlobals.topLevelApplication as DisplayObject, true);
+                            if(ToolUtil.orgPanel!=null&&ToolUtil.orgPanel.parent!=null){
+                                PopUpManager.removePopUp(ToolUtil.orgPanel);
+                            }
+                            if(ToolUtil.joinOrgFlag!=null){
+                                if(ToolUtil.regUser.parent == null){
+                                    PopUpManager.addPopUp(ToolUtil.regUser, FlexGlobals.topLevelApplication as DisplayObject, true);
+                                }
+
+                                return;
                             }
 
+                            if(ToolUtil.loginUser.parent==null){
+                                PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
+                            }
                             return;
-                        }
-
-                        if(ToolUtil.loginUser.parent==null){
-                            PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
-                        }
-                        return;
-                        break;
+                            break;
 
 
 

@@ -1,23 +1,24 @@
 // ActionScript file
 import control.CBorderContainer;
 import control.CalendarControl;
-import control.ChangePasswordPanel;
+import control.window.ChangePasswordPanel;
 import control.ContactControl;
 import control.GroupControl;
 import control.Loading;
-import control.LogPanel;
-import control.LoginUserPanel;
+import control.window.LogPanel;
+import control.window.LoginUserPanel;
 import control.MessageControl;
 import control.PaperControl;
 import control.PaperKindControl;
-import control.RegisterUserPanel;
+import control.window.RegisterUserPanel;
 import control.SubjectControl;
 import control.SubjectKindControl;
-import control.UserInfoPanel;
+import control.window.UserInfoPanel;
 import control.UserPaperControl;
 
 import events.ChangeMenuEvent;
 import events.ChangeUserEvent;
+import events.QuiteEvent;
 
 import flash.display.DisplayObject;
 
@@ -69,6 +70,8 @@ public function init():void {
 	
 	menuXML.send();
 	FlexGlobals.topLevelApplication.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr, changeMenu);
+    FlexGlobals.topLevelApplication.addEventListener(QuiteEvent.Quite,logout);
+
 	
 }
 
@@ -134,7 +137,7 @@ public function updateinfo():void {
 	PopUpManager.centerPopUp(changepassword);
 }
 
-public function logout():void {
+public function logout(e:*=null):void {
 	if(this.hasOwnProperty("quite")){
 		this["quite"]();
 	}

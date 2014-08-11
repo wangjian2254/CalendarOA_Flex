@@ -47,12 +47,8 @@
         }
 
         public function refresh(r:Object, e:ResultEvent):void {
-            if (r.success) {
                 ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
                 closeWin();
-            } else {
-//					Alert.show("修改密码失败","提示");
-            }
         }
 
         private function foucePass():void {

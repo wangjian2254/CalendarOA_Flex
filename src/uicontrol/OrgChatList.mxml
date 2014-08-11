@@ -115,8 +115,9 @@
                         depart['d' + item.father].dep_children.addItem(item);
                     }
                 }
-                addressMember.addItem(rootDepart);
+
                 if (rootDepart != null) {
+                    addressMember.addItem(rootDepart);
                     showDepartChildren_handler(rootDepart);
 //                    var listclickevent:ListClickEvent = new ListClickEvent("listItemZhanKai", rootDepart);
 //                    listItemZhanKai_handler(listclickevent);

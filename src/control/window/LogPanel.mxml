@@ -7,7 +7,9 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import events.CloseEvent;
+        import control.*;
+
+        import events.CloseEvent;
 			import events.PageChangeEvent;
 			
 			import httpcontrol.CHTTPService;

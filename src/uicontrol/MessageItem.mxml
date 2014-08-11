@@ -7,58 +7,58 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-        import control.MessagePanel;
+        import control.window.MessagePanel;
 
         import mx.core.FlexGlobals;
         import mx.managers.PopUpManager;
 
         [Bindable]
-        public  var message:Object;
+        public var message:Object;
 
-        public function setBackColor():void{
-            this.setStyle("borderVisible",true);
+        public function setBackColor():void {
+            this.setStyle("borderVisible", true);
         }
 
-        private function init():void{
-            for each(var toU:Object in message.to){
-                lblToUsers.text+=toU.nickname+":"+toU.username+" ;";
+        private function init():void {
+            for each(var toU:Object in message.to) {
+                lblToUsers.text += toU.nickname + ":" + toU.username + " ;";
             }
 
 
-            if(this.height<richText.contentHeight+messageInfo.height){
-                richText.height=300;
+            if (this.height < richText.contentHeight + messageInfo.height) {
+                richText.height = 300;
 
 
-                this.height=richText.height+messageInfo.height+20;
+                this.height = richText.height + messageInfo.height + 20;
             }
 
         }
 
-        private function  replayMessage():void{
-            var  messageWin:MessagePanel = new MessagePanel();
-            messageWin.title = "回复："+message.title;
+        private function replayMessage():void {
+            var messageWin:MessagePanel = new MessagePanel();
+            messageWin.title = "回复：" + message.title;
             messageWin.message = message;
             messageWin.type = "huifu";
-            messageWin.x=0-messageWin.width;
-            messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+            messageWin.x = 0 - messageWin.width;
+            messageWin.y = (FlexGlobals.topLevelApplication.height - messageWin.height) / 2;
 
             PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
             PopUpManager.bringToFront(messageWin);
         }
-        private function  changeSendMessage():void{
-            var  messageWin:MessagePanel = new MessagePanel();
+
+        private function changeSendMessage():void {
+            var messageWin:MessagePanel = new MessagePanel();
             messageWin = new MessagePanel();
-            messageWin.title = "转发："+message.title;
+            messageWin.title = "转发：" + message.title;
             messageWin.message = message;
             messageWin.type = "zhuanfa";
-            messageWin.x=0-messageWin.width;
-            messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+            messageWin.x = 0 - messageWin.width;
+            messageWin.y = (FlexGlobals.topLevelApplication.height - messageWin.height) / 2;
 
             PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
             PopUpManager.bringToFront(messageWin);
         }
-			
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

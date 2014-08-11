@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
+               width="430" height="500"   creationComplete="init()"
+               title="选择工作的组织" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+        import events.ListClickEvent;
+        import events.QuiteEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+            import mx.collections.ArrayCollection;
+
+            import mx.core.FlexGlobals;
+            import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+
+            [Bindable]
+            private var orglist:ArrayCollection;
+			public function closeWin():void{
+				PopUpManager.removePopUp(this);
+			}
+
+        public var loginNickname:String;
+
+            private function init():void{
+
+                //getOrgByFlag
+                var obj:Object=new Object();
+                obj.flag=ToolUtil.joinOrgFlag;
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllOrg",getAllOrgResult,"POST").send(obj);
+
+
+                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+            }
+
+            private function getAllOrgResult(result:Object, e:ResultEvent):void{
+                orglist = new ArrayCollection(result.result as Array);
+            }
+
+        public function addOrgItem(item:Object):void{
+            var f:Boolean = false;
+            for each(var obj:Object in orglist){
+                if(obj.id == item.id){
+                    f=true;
+                }
+            }
+            if(!f){
+                orglist.addItem(item);
+            }
+        }
+
+        public function delOrgItem(item:Object):void{
+            for each(var obj:Object in orglist){
+                if(obj.id == item.id){
+                    orglist.removeItemAt(orglist.getItemIndex(obj));
+                }
+            }
+        }
+
+
+
+
+			public function listItemClick_handler(e:ListClickEvent):void{
+
+				var obj:Object=new Object();
+                obj.orgid = e.data.id;
+				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/selectedOrg",refresh,"POST").send(obj);
+			}
+			public function refresh(r:Object,e:ResultEvent):void{
+					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+					closeWin();
+			}
+        protected function quite():void{
+            var e:QuiteEvent = new QuiteEvent(QuiteEvent.Quite,true);
+            FlexGlobals.topLevelApplication.dispatchEvent(e);
+
+        }
+
+        protected function regOrg():void{
+            var applyPanel:RegisterOrgPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,RegisterOrgPanel,true) as RegisterOrgPanel;
+        }
+
+        protected function joinOrg():void{
+            if(ToolUtil.joinorgPanel!=null&&ToolUtil.joinorgPanel.parent==null){
+                PopUpManager.addPopUp(ToolUtil.joinorgPanel,FlexGlobals.topLevelApplication as DisplayObject,true);
+            }
+        }
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+
+	</fx:Declarations>
+    <s:VGroup width="100%" height="100%" gap="5">
+        <uicontrol:AddressList dataProvider="{orglist}"
+                               borderVisible="false" width="100%" height="100%"
+                               itemRenderer="uicontrol.renderer.OrgItemRenderer"
+                               listItemClick="listItemClick_handler(event)">
+
+        </uicontrol:AddressList>
+        <s:HGroup width="100%" height="35" horizontalAlign="center" paddingLeft="10" gap="20">
+            <s:Button label="加入已注册的公司或组织" click="joinOrg()" chromeColor="#ff0000" color="#ffffff" height="25"></s:Button>
+            <s:Button label="新建公司或组织" click="regOrg()" chromeColor="#ff0000" color="#ffffff" height="25"></s:Button>
+            <s:Button label="退出" click="quite()" height="25"></s:Button>
+        </s:HGroup>
+    </s:VGroup>
+
+</s:TitleWindow>

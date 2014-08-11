@@ -1,9 +1,11 @@
 package util
 {
+import control.window.ApplyOrgPanel;
+import control.window.JoinOrgPanel;
 import control.Loading;
-import control.LoginUserPanel;
-import control.RegisterUserPanel;
-import control.SelectOrgPanel;
+import control.window.LoginUserPanel;
+import control.window.RegisterUserPanel;
+import control.window.SelectOrgPanel;
 
 import events.ChangeScheduleEvent;
 import events.ChangeUserEvent;
@@ -43,6 +45,7 @@ public class ToolUtil
     public static var loginUser:LoginUserPanel= new LoginUserPanel();
     public static var regUser:RegisterUserPanel= new RegisterUserPanel();
     public static var orgPanel:SelectOrgPanel= new SelectOrgPanel();
+    public static var joinorgPanel:JoinOrgPanel= new JoinOrgPanel();
 
     private static var time:Timer = new Timer(1000*60*5,0);
 

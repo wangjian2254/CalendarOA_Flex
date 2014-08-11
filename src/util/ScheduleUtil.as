@@ -1,6 +1,6 @@
 package util
 {
-	import control.SchedulePanel;
+	import control.window.SchedulePanel;
 	import control.ScheduleShow;
 	
 	import flash.display.DisplayObject;

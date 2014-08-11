@@ -7,256 +7,254 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import control.SchedulePanel;
-			
-			import events.ChangeScheduleEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.core.FlexGlobals;
-			import mx.events.FlexEvent;
-			import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			
-			import spark.layouts.BasicLayout;
-			import spark.skins.spark.BorderContainerSkin;
-			
-			import util.DateUtil;
-			import util.ScheduleUtil;
-			import util.ToolUtil;
-			
-			
-			[Bindable]
-			public var blank:Boolean=false;
-			[Bindable]
-			public var date:String="";
-			[Bindable]
-			public var nowdate:String="";
-			
-			[Bindable]
-			public var is_all_day:Number=0;
-			
-			private var groupShowData:Object=new Object();
-			
-			private var scheduleArr:ArrayCollection=new ArrayCollection();
-			
-			public function init():void{
-				this.contentGroup.clipAndEnableScrolling=true;
-				if(blank){
-					return;
-				}
-				if(is_all_day==2){
-					dbor.height=0;
-					dstr.height =0;
-					mstr.height = 0;
-					scheduleList.layout = new BasicLayout();
-					
-				}else{
-					dbor.height=25;
-					dstr.height =25;
-					mstr.height = 25;
-					scheduleList.layout = new VerticalLayout() 
-				}
-				if(date==""){
-					showTimeLine(50,true);
-					showTime();
-					return;
-				}
-				
-				if(date.substr(0,6)==nowdate.substr(0,6)){
-					this.setStyle("backgroundColor",0xffffff);
-					dstr.setStyle("color",0x000000);
-					mstr.setStyle("color",0x000000);
-					
-				}else{
-					
-					dstr.setStyle("color",0xcccccc);
-					mstr.setStyle("color",0xcccccc);
-				}
-				if(date==monthstr.format(new Date())){
-					this.setStyle("backgroundColor",0xeaeaea);
-				}
-				getScheduleByDate();
-				FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr,getScheduleByDate);
+        import control.window.SchedulePanel;
+
+        import events.ChangeScheduleEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+        import mx.core.FlexGlobals;
+        import mx.events.FlexEvent;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+
+        import spark.layouts.BasicLayout;
+        import spark.skins.spark.BorderContainerSkin;
+
+        import util.DateUtil;
+        import util.ScheduleUtil;
+        import util.ToolUtil;
+
+
+        [Bindable]
+        public var blank:Boolean = false;
+        [Bindable]
+        public var date:String = "";
+        [Bindable]
+        public var nowdate:String = "";
+
+        [Bindable]
+        public var is_all_day:Number = 0;
+
+        private var groupShowData:Object = new Object();
+
+        private var scheduleArr:ArrayCollection = new ArrayCollection();
+
+        public function init():void {
+            this.contentGroup.clipAndEnableScrolling = true;
+            if (blank) {
+                return;
+            }
+            if (is_all_day == 2) {
+                dbor.height = 0;
+                dstr.height = 0;
+                mstr.height = 0;
+                scheduleList.layout = new BasicLayout();
+
+            } else {
+                dbor.height = 25;
+                dstr.height = 25;
+                mstr.height = 25;
+                scheduleList.layout = new VerticalLayout()
+            }
+            if (date == "") {
+                showTimeLine(50, true);
+                showTime();
+                return;
+            }
+
+            if (date.substr(0, 6) == nowdate.substr(0, 6)) {
+                this.setStyle("backgroundColor", 0xffffff);
+                dstr.setStyle("color", 0x000000);
+                mstr.setStyle("color", 0x000000);
+
+            } else {
+
+                dstr.setStyle("color", 0xcccccc);
+                mstr.setStyle("color", 0xcccccc);
+            }
+            if (date == monthstr.format(new Date())) {
+                this.setStyle("backgroundColor", 0xeaeaea);
+            }
+            getScheduleByDate();
+            FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr, getScheduleByDate);
 //				showTimeLine();
-			}
-			
-			private function getScheduleByDate(e:Event=null):void{
-				
-				scheduleArr.removeAll();
-				groupShowData=new Object();
-				if(ToolUtil.scheduleMap.hasOwnProperty("schedulelist")&&ToolUtil.scheduleMap.schedulelist.hasOwnProperty(date)){
-					for each(var i:String in ToolUtil.scheduleMap.schedulelist[date]){
-						
-						scheduleArr.addItem(ToolUtil.scheduleMap.schedulemap[i]);
-					}
-				}
-				showSchedule();
-			}
-			
-			private function createSchedule(e:MouseEvent):void{
-				if(!(e.target is BorderContainerSkin)){
-					return;
-				}
-				if(is_all_day==2){
-					var y:String=Number(e.localY/40)+"";
-					var h:String=y.substring(0,y.indexOf("."));
-					if(Number(h)%2==1){
-						var m:String="30";
-					}else{
-						m="00";
-					}
-					if(Number(h)<20){
-						h="0"+(Number(h)/2);
-					}else{
-						h=""+(Number(h)/2);
-					}
-					if(h.indexOf(".")>0){
-						h=h.substring(0,h.indexOf("."));
-					}
-					
-					var d:Date=DateUtil.parseDate(date+h+m);
-					var ed:Date=DateUtil.parseDate(date+h+m);
-						ed.minutes+=30;
-					if(d.date!=ed.date){
-						ed.minutes-=1;
-					}
-					ScheduleUtil.createSchedule(d,ed);
-					
-				}else{
-					
-					ScheduleUtil.createSchedule(DateUtil.parseDate(date+timestr.format(new Date())),DateUtil.parseDate(date+timestr.format(new Date())));
-				}
-			}
-			
-//			private function queryResult(result:Object,e:ResultEvent):void{
-//				scheduleArr.removeAll();
-//				if(result.success){
-//					
-//				}
-//				
-//				
-//			}
-			
-			private var schedulePos:Object=null;
-			
-			public function showSchedule(gid:Number=0,show:Boolean=true):void{
-				schedulePos=new Object();
-				if(gid!=0){
-					groupShowData[gid+""]=show;
-				}
-				scheduleList.removeAllElements();
-				var scheduleItem:ScheduleItem=null;
-				for each(var obj:Object in scheduleArr){
-					scheduleItem = new ScheduleItem();
-					scheduleItem.scheduleData = obj;
-					scheduleItem.scheduleName = obj.title;
-					scheduleItem.color = obj.color;
-					scheduleItem.scheduleId = obj.id;
-					if(!groupShowData.hasOwnProperty(""+obj.group)||groupShowData[""+obj.group]){
-						
-						if(is_all_day==2&&!obj.is_all_day){
-							var x:Number=2;
-							var y:Number=0;
-							y=Number(obj.time_start.substr(0,2))*this.height/24+(Number(obj.time_start.substr(2,2))/60*this.height/24)+2;
-							while(schedulePos.hasOwnProperty(y.toString())){
-								y+=20;
-								if(this.width<300){
-									x+=25;
-								}else{
-									x+=40;
-								}
-							}
-							if(this.width<300){
-								x+=25*yisused(y);
-							}else{
-								x+=40*yisused(y);
-							}
-							schedulePos[y.toString()]=true;
-							scheduleItem.x=x;
-							scheduleItem.y=y;
-							scheduleItem.width = this.width-1-x;
-							scheduleItem.height = Number(obj.time_end.substr(0,2))*this.height/24+(Number(obj.time_end.substr(2,2))/60*this.height/24)-y-1;
-							scheduleItem.setStyle("borderVisible",true);
-							scheduleItem.setStyle("borderColor",ToolUtil.groupColor[""+obj.group]);
-							scheduleItem.setStyle("borderWeight",4);
-							scheduleItem.setStyle("cornerRadius",7);
-							scheduleItem.setStyle("backgroundAlpha",1);
-							scheduleItem.setStyle("backgroundColor",obj.color);
-							scheduleItem.descShow = true;
-							
-							scheduleList.addElement(scheduleItem);
-							
-						}
-						if(is_all_day==3&&obj.is_all_day){
-							scheduleList.addElement(scheduleItem);
-						}
-						if(is_all_day==1){
-							scheduleList.addElement(scheduleItem);
-						}
-					}
-				}
-			}
-			
-			private function yisused(y:Number):Number{
-				var n:Number=0;
-				for(var i:Number=0;i<60;i++){
-					if(schedulePos.hasOwnProperty((y-i).toString())){
-						n++;
-					}
-				}
-				return n;
-			}
-			
-			public function showTimeLine(w:Number,flag:Boolean):void{
-				this.contentGroup.graphics.clear();
-				if(this.height>200&&flag){
-					for(var i:Number=0;i<47;i++){
-						drawline(w,i);
-					}
-					
-				}
-				var d:Date=new Date();
-				this.contentGroup.graphics.lineStyle(2,0xFF0000);
-				this.contentGroup.graphics.moveTo(0,this.height/24*(d.hours)+(d.minutes/60*this.height/24));
-				this.contentGroup.graphics.lineTo(w,this.height/24*(d.hours)+(d.minutes/60*this.height/24));
-			}
-			
-			private function drawline(w:Number,i:Number):void{
-				
-				this.contentGroup.graphics.lineStyle(1,0x000000);
-				if(i%2==1){
-					this.contentGroup.graphics.moveTo(0,this.height/48*(i+1));
-					this.contentGroup.graphics.lineTo(w,this.height/48*(i+1));
-				}else{
-					for(var s:Number=0;s<w/5;s++){
-						if(s%2==0){
-							this.contentGroup.graphics.moveTo(s*5,this.height/48*(i+1));
-							this.contentGroup.graphics.lineTo(s*5+5,this.height/48*(i+1));
-						}
-					}
-				}
-				
-			}
-			
-			private function showTime():void{
-				var d:Date = DateUtil.parseDate("201401010000");
-				var lbl:Label=null;
-				for(var i:Number=0;i<48;i++){
-					d.minutes+=30;
-					lbl=new Label();
-					lbl.text = timestr2.format(d);
-					lbl.x= 10;
-					lbl.y= (this.height/48)*i+30;
-					scheduleList.addElement(lbl);
-					
-					
-				}
-			}
-			
-			
-		]]>
+        }
+
+        private function getScheduleByDate(e:Event = null):void {
+
+            scheduleArr.removeAll();
+            groupShowData = new Object();
+            if (ToolUtil.scheduleMap.hasOwnProperty("schedulelist") && ToolUtil.scheduleMap.schedulelist.hasOwnProperty(date)) {
+                for each(var i:String in ToolUtil.scheduleMap.schedulelist[date]) {
+
+                    scheduleArr.addItem(ToolUtil.scheduleMap.schedulemap[i]);
+                }
+            }
+            showSchedule();
+        }
+
+        private function createSchedule(e:MouseEvent):void {
+            if (!(e.target is BorderContainerSkin)) {
+                return;
+            }
+            if (is_all_day == 2) {
+                var y:String = Number(e.localY / 40) + "";
+                var h:String = y.substring(0, y.indexOf("."));
+                if (Number(h) % 2 == 1) {
+                    var m:String = "30";
+                } else {
+                    m = "00";
+                }
+                if (Number(h) < 20) {
+                    h = "0" + (Number(h) / 2);
+                } else {
+                    h = "" + (Number(h) / 2);
+                }
+                if (h.indexOf(".") > 0) {
+                    h = h.substring(0, h.indexOf("."));
+                }
+
+                var d:Date = DateUtil.parseDate(date + h + m);
+                var ed:Date = DateUtil.parseDate(date + h + m);
+                ed.minutes += 30;
+                if (d.date != ed.date) {
+                    ed.minutes -= 1;
+                }
+                ScheduleUtil.createSchedule(d, ed);
+
+            } else {
+
+                ScheduleUtil.createSchedule(DateUtil.parseDate(date + timestr.format(new Date())), DateUtil.parseDate(date + timestr.format(new Date())));
+            }
+        }
+
+        //			private function queryResult(result:Object,e:ResultEvent):void{
+        //				scheduleArr.removeAll();
+        //				if(result.success){
+        //
+        //				}
+        //
+        //
+        //			}
+
+        private var schedulePos:Object = null;
+
+        public function showSchedule(gid:Number = 0, show:Boolean = true):void {
+            schedulePos = new Object();
+            if (gid != 0) {
+                groupShowData[gid + ""] = show;
+            }
+            scheduleList.removeAllElements();
+            var scheduleItem:ScheduleItem = null;
+            for each(var obj:Object in scheduleArr) {
+                scheduleItem = new ScheduleItem();
+                scheduleItem.scheduleData = obj;
+                scheduleItem.scheduleName = obj.title;
+                scheduleItem.color = obj.color;
+                scheduleItem.scheduleId = obj.id;
+                if (!groupShowData.hasOwnProperty("" + obj.group) || groupShowData["" + obj.group]) {
+
+                    if (is_all_day == 2 && !obj.is_all_day) {
+                        var x:Number = 2;
+                        var y:Number = 0;
+                        y = Number(obj.time_start.substr(0, 2)) * this.height / 24 + (Number(obj.time_start.substr(2, 2)) / 60 * this.height / 24) + 2;
+                        while (schedulePos.hasOwnProperty(y.toString())) {
+                            y += 20;
+                            if (this.width < 300) {
+                                x += 25;
+                            } else {
+                                x += 40;
+                            }
+                        }
+                        if (this.width < 300) {
+                            x += 25 * yisused(y);
+                        } else {
+                            x += 40 * yisused(y);
+                        }
+                        schedulePos[y.toString()] = true;
+                        scheduleItem.x = x;
+                        scheduleItem.y = y;
+                        scheduleItem.width = this.width - 1 - x;
+                        scheduleItem.height = Number(obj.time_end.substr(0, 2)) * this.height / 24 + (Number(obj.time_end.substr(2, 2)) / 60 * this.height / 24) - y - 1;
+                        scheduleItem.setStyle("borderVisible", true);
+                        scheduleItem.setStyle("borderColor", ToolUtil.groupColor["" + obj.group]);
+                        scheduleItem.setStyle("borderWeight", 4);
+                        scheduleItem.setStyle("cornerRadius", 7);
+                        scheduleItem.setStyle("backgroundAlpha", 1);
+                        scheduleItem.setStyle("backgroundColor", obj.color);
+                        scheduleItem.descShow = true;
+
+                        scheduleList.addElement(scheduleItem);
+
+                    }
+                    if (is_all_day == 3 && obj.is_all_day) {
+                        scheduleList.addElement(scheduleItem);
+                    }
+                    if (is_all_day == 1) {
+                        scheduleList.addElement(scheduleItem);
+                    }
+                }
+            }
+        }
+
+        private function yisused(y:Number):Number {
+            var n:Number = 0;
+            for (var i:Number = 0; i < 60; i++) {
+                if (schedulePos.hasOwnProperty((y - i).toString())) {
+                    n++;
+                }
+            }
+            return n;
+        }
+
+        public function showTimeLine(w:Number, flag:Boolean):void {
+            this.contentGroup.graphics.clear();
+            if (this.height > 200 && flag) {
+                for (var i:Number = 0; i < 47; i++) {
+                    drawline(w, i);
+                }
+
+            }
+            var d:Date = new Date();
+            this.contentGroup.graphics.lineStyle(2, 0xFF0000);
+            this.contentGroup.graphics.moveTo(0, this.height / 24 * (d.hours) + (d.minutes / 60 * this.height / 24));
+            this.contentGroup.graphics.lineTo(w, this.height / 24 * (d.hours) + (d.minutes / 60 * this.height / 24));
+        }
+
+        private function drawline(w:Number, i:Number):void {
+
+            this.contentGroup.graphics.lineStyle(1, 0x000000);
+            if (i % 2 == 1) {
+                this.contentGroup.graphics.moveTo(0, this.height / 48 * (i + 1));
+                this.contentGroup.graphics.lineTo(w, this.height / 48 * (i + 1));
+            } else {
+                for (var s:Number = 0; s < w / 5; s++) {
+                    if (s % 2 == 0) {
+                        this.contentGroup.graphics.moveTo(s * 5, this.height / 48 * (i + 1));
+                        this.contentGroup.graphics.lineTo(s * 5 + 5, this.height / 48 * (i + 1));
+                    }
+                }
+            }
+
+        }
+
+        private function showTime():void {
+            var d:Date = DateUtil.parseDate("201401010000");
+            var lbl:Label = null;
+            for (var i:Number = 0; i < 48; i++) {
+                d.minutes += 30;
+                lbl = new Label();
+                lbl.text = timestr2.format(d);
+                lbl.x = 10;
+                lbl.y = (this.height / 48) * i + 30;
+                scheduleList.addElement(lbl);
+
+
+            }
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

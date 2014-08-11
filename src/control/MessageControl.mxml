@@ -4,7 +4,7 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-        import control.MessagePanel;
+        import control.window.MessagePanel;
 
         import events.ChangeUserEvent;
         import events.CloseEvent;
@@ -49,114 +49,113 @@
         private var messagelist:ArrayCollection = new ArrayCollection();
         private var messageWin:MessagePanel;
         [Bindable]
-        private var  message:Object=null;
+        private var message:Object = null;
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:ItemClickEvent):void {
-			var data:Object=new Object();
-            switch (e.item.mode){
+            var data:Object = new Object();
+            switch (e.item.mode) {
                 case 'add':
-                        messageWin = new MessagePanel();
-                        messageWin.title = "发送信息";
-                        messageWin.x=0-messageWin.width;
-                        messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+                    messageWin = new MessagePanel();
+                    messageWin.title = "发送信息";
+                    messageWin.x = 0 - messageWin.width;
+                    messageWin.y = (FlexGlobals.topLevelApplication.height - messageWin.height) / 2;
 
-                        PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                        PopUpManager.bringToFront(messageWin);
-                        break;
+                    PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+                    PopUpManager.bringToFront(messageWin);
+                    break;
                 case 'refresh':
-                        showType();
-                        break;
+                    showType();
+                    break;
                 case 'read':
-                        data["id"]=messageGrid.selectedItem.rid;
-                        data["do"] = true;
-                        messageGrid.selectedItem.is_read=true;
-                        messageGrid.invalidateTypicalItem();
-                        HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage",null).send(data);
-                        break;
+                    data["id"] = messageGrid.selectedItem.rid;
+                    data["do"] = true;
+                    messageGrid.selectedItem.is_read = true;
+                    messageGrid.invalidateTypicalItem();
+                    HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage", null).send(data);
+                    break;
                 case 'unread':
-                        
-                        data["id"]=messageGrid.selectedItem.rid;
-                        data["do"] = false;
-                        messageGrid.selectedItem.is_read=false;
-                        messageGrid.invalidateTypicalItem();
 
-                        HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage",null).send(data);
-                        break;
+                    data["id"] = messageGrid.selectedItem.rid;
+                    data["do"] = false;
+                    messageGrid.selectedItem.is_read = false;
+                    messageGrid.invalidateTypicalItem();
+
+                    HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage", null).send(data);
+                    break;
 
                 case 'huifu':
-                        messageWin = new MessagePanel();
-                        messageWin.title = "回复："+message.title;
-                        messageWin.message = message;
-                        messageWin.type = "huifu";
-                        messageWin.x=0-messageWin.width;
-                        messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+                    messageWin = new MessagePanel();
+                    messageWin.title = "回复：" + message.title;
+                    messageWin.message = message;
+                    messageWin.type = "huifu";
+                    messageWin.x = 0 - messageWin.width;
+                    messageWin.y = (FlexGlobals.topLevelApplication.height - messageWin.height) / 2;
 
-                        PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                        PopUpManager.bringToFront(messageWin);
-                        break;
+                    PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+                    PopUpManager.bringToFront(messageWin);
+                    break;
                 case 'zhuanfa':
-                        messageWin = new MessagePanel();
-                        messageWin.title = "转发："+message.title;
-                        messageWin.message = message;
-                        messageWin.type = "zhuanfa";
-                        messageWin.x=0-messageWin.width;
-                        messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+                    messageWin = new MessagePanel();
+                    messageWin.title = "转发：" + message.title;
+                    messageWin.message = message;
+                    messageWin.type = "zhuanfa";
+                    messageWin.x = 0 - messageWin.width;
+                    messageWin.y = (FlexGlobals.topLevelApplication.height - messageWin.height) / 2;
 
-                        PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
-                        PopUpManager.bringToFront(messageWin);
-                        break;
+                    PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
+                    PopUpManager.bringToFront(messageWin);
+                    break;
             }
-
 
 
         }
 
-        private function messageSelectionHandler(event:GridSelectionEvent):void{
+        private function messageSelectionHandler(event:GridSelectionEvent):void {
             const eventGrid:DataGrid = event.currentTarget as DataGrid;
             var currentDataItem:Object = eventGrid.selectedItem;
-            if(currentDataItem.flag){
+            if (currentDataItem.flag) {
                 messageWin = new MessagePanel();
                 messageWin.title = currentDataItem.title;
                 messageWin.message = currentDataItem;
                 messageWin.type = null;
-                messageWin.x=0-messageWin.width;
-                messageWin.y=(FlexGlobals.topLevelApplication.height-messageWin.height)/2;
+                messageWin.x = 0 - messageWin.width;
+                messageWin.y = (FlexGlobals.topLevelApplication.height - messageWin.height) / 2;
 
                 PopUpManager.addPopUp(messageWin, FlexGlobals.topLevelApplication as DisplayObject);
                 PopUpManager.bringToFront(messageWin);
                 return;
             }
-            var data:Object=new Object();
-            data["id"]=currentDataItem.id;
-            currentDataItem.is_read=true;
+            var data:Object = new Object();
+            data["id"] = currentDataItem.id;
+            currentDataItem.is_read = true;
 
-            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageById",selectionMessageResult).send(data);
-            data=new Object();
-            data["id"]=messageGrid.selectedItem.rid;
+            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getMessageById", selectionMessageResult).send(data);
+            data = new Object();
+            data["id"] = messageGrid.selectedItem.rid;
             data["do"] = true;
-            messageGrid.selectedItem.is_read=true;
-            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage",null).send(data);
+            messageGrid.selectedItem.is_read = true;
+            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/flagMessage", null).send(data);
             messageGrid.invalidateTypicalItem()
         }
 
-        private function selectionMessageResult(result:Object,e:ResultEvent):void{
+        private function selectionMessageResult(result:Object, e:ResultEvent):void {
 
 
             var messagelist:ArrayCollection = new ArrayCollection(result.result as Array);
 
-            var messageItem:MessageItem=null;
+            var messageItem:MessageItem = null;
             messageGroup.removeAllElements();
-            for each(var message:Object in messagelist){
+            for each(var message:Object in messagelist) {
                 messageItem = new MessageItem();
-                if(messageGrid.selectedItem.id == message.id){
+                if (messageGrid.selectedItem.id == message.id) {
                     this.message = message;
                     messageItem.setBackColor();
                 }
 
                 messageItem.message = message;
-                if(messagelist.length==1){
-                    messageItem.height = messageGroup.height-20;
+                if (messagelist.length == 1) {
+                    messageItem.height = messageGroup.height - 20;
                 }
                 messageGroup.addElement(messageItem);
             }
@@ -195,7 +194,7 @@
 
 
         override public function init(e:FlexEvent):void {
-            if(!param){
+            if (!param) {
                 getMessages();
             }
 

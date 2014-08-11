@@ -7,51 +7,52 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import control.SchedulePanel;
-			import control.ScheduleShow;
-			
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.managers.PopUpManager;
-			
-			import util.ScheduleUtil;
-			import util.ToolUtil;
-			[Bindable]
-			public var color:Number = 0xffffff;
-			[Bindable]
-			public var scheduleName : String = "开会";
-			
-			[Bindable]
-			public var scheduleId:String="21";
-			
-			[Bindable]
-			public var scheduleData:Object = null;
-			[Bindable]
-			public var descShow:Boolean = false;
+        import control.window.SchedulePanel;
+        import control.ScheduleShow;
 
-			
-			public var fun:Function=null;
-			
-			private function init():void{
-				if(!descShow){
-					lbldesc.height=0;
-					lbldesc.visible=false;
-				}
-			}
-			
-			private function openSchedule(e:MouseEvent):void{
-				if(!(e.target is LinkButton)){
-					return;
-				}
-				if(fun!=null){
-					fun();
-				}else{
-					ScheduleUtil.showSchedulePanel(scheduleId);
-				}
-				
-				
-			}
-		]]>
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.managers.PopUpManager;
+
+        import util.ScheduleUtil;
+        import util.ToolUtil;
+
+        [Bindable]
+        public var color:Number = 0xffffff;
+        [Bindable]
+        public var scheduleName:String = "开会";
+
+        [Bindable]
+        public var scheduleId:String = "21";
+
+        [Bindable]
+        public var scheduleData:Object = null;
+        [Bindable]
+        public var descShow:Boolean = false;
+
+
+        public var fun:Function = null;
+
+        private function init():void {
+            if (!descShow) {
+                lbldesc.height = 0;
+                lbldesc.visible = false;
+            }
+        }
+
+        private function openSchedule(e:MouseEvent):void {
+            if (!(e.target is LinkButton)) {
+                return;
+            }
+            if (fun != null) {
+                fun();
+            } else {
+                ScheduleUtil.showSchedulePanel(scheduleId);
+            }
+
+
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

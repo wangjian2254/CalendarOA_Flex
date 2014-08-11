@@ -7,62 +7,64 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import control.SchedulePanel;
-			
-			import events.ChangeJoinUserEvent;
-			
-			import mx.controls.Alert;
-			
-			import spark.components.TileGroup;
+        import control.window.SchedulePanel;
 
-			[Bindable]
-			[Embed("/assets/img/tabbutton/X_down.png")]
-			public var X_down:Class;
-			[Bindable]
-			[Embed("/assets/img/tabbutton/X_hover.png")]
-			public var X_hover:Class;
-			[Bindable]
-			[Embed("/assets/img/tabbutton/X_out.png")]
-			public var X_out:Class;
-			
-			
-			[Bindable]
-			public var userData:Object = null;
-			
-			[Bindable]
-			public var modifyEnable:Boolean = false;
-			
-			public var tileGroup:TileGroup =null;
-			
-			public var fun:Function=null;
-			
-			private function openSchedule():void{
-				userData.selected = false;
-				if(tileGroup!=null){
-					tileGroup.removeElement(this);
-				}
-				if(fun!=null){
-					fun();
-				}else{
+        import events.ChangeJoinUserEvent;
+
+        import mx.controls.Alert;
+
+        import spark.components.TileGroup;
+
+        [Bindable]
+        [Embed("/assets/img/tabbutton/X_down.png")]
+        public var X_down:Class;
+        [Bindable]
+        [Embed("/assets/img/tabbutton/X_hover.png")]
+        public var X_hover:Class;
+        [Bindable]
+        [Embed("/assets/img/tabbutton/X_out.png")]
+        public var X_out:Class;
+
+
+        [Bindable]
+        public var userData:Object = null;
+
+        [Bindable]
+        public var modifyEnable:Boolean = false;
+
+        public var tileGroup:TileGroup = null;
+
+        public var fun:Function = null;
+
+        private function openSchedule():void {
+            userData.selected = false;
+            if (tileGroup != null) {
+                tileGroup.removeElement(this);
+            }
+            if (fun != null) {
+                fun();
+            } else {
 //					Alert.show(scheduleName,"日程");
-				}
-				
-				dispatchEvent(new ChangeJoinUserEvent(true));
-				
-			}
-			
-			public function closeO():void{
-				
-				this.clo.source=X_hover;
-			}
-			public function closeD():void{
-				
-				this.clo.source=X_down;
-			}
-			public function closeU():void{
-				this.clo.source=X_out;
-			}
-		]]>
+            }
+
+            dispatchEvent(new ChangeJoinUserEvent(true));
+
+        }
+
+        public function closeO():void {
+
+            this.clo.source = X_hover;
+        }
+
+        public function closeD():void {
+
+            this.clo.source = X_down;
+        }
+
+        public function closeU():void {
+            this.clo.source = X_out;
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

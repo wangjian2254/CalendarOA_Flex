@@ -1,11 +1,11 @@
-import control.AddPersonPanel;
+import control.window.AddPersonPanel;
 import control.CBorderContainer;
 import control.CalendarControl;
 import control.ContactControl;
 import control.DepartmentControl;
 import control.GroupControl;
 import control.IMControl;
-import control.LogPanel;
+import control.window.LogPanel;
 import control.MessageControl;
 import control.PaperControl;
 import control.PaperKindControl;

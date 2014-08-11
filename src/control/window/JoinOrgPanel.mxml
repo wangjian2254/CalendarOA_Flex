@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
+               width="430" height="500"   creationComplete="init()"
+               title="选择工作的组织" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+        import events.ListClickEvent;
+        import events.QuiteEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+            import mx.collections.ArrayCollection;
+
+            import mx.core.FlexGlobals;
+            import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+
+            [Bindable]
+            private var orglist:ArrayCollection=new ArrayCollection();
+			public function closeWin():void{
+				PopUpManager.removePopUp(this);
+			}
+
+            private function init():void{
+                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+                textInput.setFocus();
+            }
+
+        public function addOrgItem(item:Object):void{
+            orglist.refresh();
+        }
+
+        private var queryflag:Boolean = true;
+            private function getAllOrgResult(result:Object, e:ResultEvent):void{
+                var r:ArrayCollection = new ArrayCollection(result.result as Array);
+                if(queryflag){
+                    orglist = new ArrayCollection(result.result as Array);
+                    if(orglist.length==0){
+                        queryLabel.text = "没有满足条件的公司或组织";
+                        orgAddressList.visible = false;
+                    }else{
+                        orgAddressList.visible = true;
+                        queryLabel.text ="";
+                        if(r.length==20){
+                            var lastobj:Object = new Object();
+                            lastobj['type'] = 'next';
+                            orglist.addItem(lastobj);
+                        }
+
+                    }
+                }else{
+
+                    orglist.addAllAt(r,orglist.length-1);
+                    if(r.length<20){
+                        orglist.removeItemAt(orglist.length-1);
+                    }
+                }
+
+
+            }
+
+			public function queryOrg(start:Boolean = true):void{
+                queryflag = start;
+                if(textInput.text.length==0){
+                    textInput.setFocus();
+                    return;
+                }
+				var obj:Object=new Object();
+                obj['content'] =  textInput.text;
+                if(!start){
+                    obj['start'] = orglist.length-1;
+                }
+
+				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByName",getAllOrgResult,"POST").send(obj);
+			}
+
+			public function listItemClick_handler(e:ListClickEvent):void{
+
+				var obj:Object=new Object();
+                obj.orgid = e.data.id;
+				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/selectedOrg",refresh,"POST").send(obj);
+			}
+        public function refreshList():void{
+              orglist.refresh();
+        }
+
+			public function refresh(r:Object,e:ResultEvent):void{
+					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+					closeWin();
+			}
+
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+
+	</fx:Declarations>
+    <s:Rect top="35" height="1" right="0" left="0">
+        <s:fill>
+            <s:SolidColor color="0xdbdbdb" />
+        </s:fill>
+    </s:Rect>
+    <s:Label id="queryLabel" textAlign="center" top="200" right="30" left="30" height="30" color="#cccccc" ></s:Label>
+    <s:VGroup width="100%" height="100%" gap="5">
+        <s:HGroup width="100%" height="35" verticalAlign="middle" paddingLeft="15" paddingRight="15" gap="10">
+            <s:TextInput id="textInput" height="25" width="100%" enter="queryOrg()" prompt="搜索公司或组织的名称或ID"></s:TextInput>
+            <s:Button height="25" label="搜索" click="queryOrg()" chromeColor="#ff0000" color="#ffffff"></s:Button>
+        </s:HGroup>
+        <uicontrol:AddressList id="orgAddressList" dataProvider="{orglist}"
+                               itemRenderer="uicontrol.renderer.OrgItemRenderer"
+                               width="100%" height="100%" borderVisible="false"
+                               horizontalScrollPolicy="off">
+        </uicontrol:AddressList>
+    </s:VGroup>
+
+</s:TitleWindow>

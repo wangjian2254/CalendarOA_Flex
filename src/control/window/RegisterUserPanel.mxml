@@ -137,6 +137,7 @@
 			public function refresh(r:Object,e:ResultEvent):void{
 				if(r.success){
                     closeWin();
+                    ToolUtil.joinOrgFlag=null;
 					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
 
 				}else{

@@ -10,9 +10,19 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
+        import control.window.ApplyOrgPanel;
+        import control.window.ApplyOrgPanel;
+
         import events.ListClickEvent;
 
+        import httpcontrol.HttpServiceUtil;
+
         import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+
+        import util.ToolUtil;
 
         private var _data:Object;
         override public function get data():Object {
@@ -25,27 +35,90 @@
             if(value==null){
                 return;
             }
-
-            head.source = data.icon;
-            orgLabel.text = data.name;
-
-            headPerson.source = data.person_icon;
-            nameLabel.text = data.person_name;
-
+            init();
+            solidColor.color = getColor();
 
         }
 
+        private function init():void{
+            if(!data.hasOwnProperty('id')&&data.hasOwnProperty('type')){
+                headPerson.source = null;
+                orgStatus.text = "";
+                orgLabel.text = "";
+                head.source = null;
+                statusLabel.text = "";
+                orgLabel2.text = "";
+                nameLabel.text = '继续加载';
+                nameLabel.setStyle("color",0x0000);
+                nameLabel.setStyle("textDecoration","none");
+                nameLabel.buttonMode = false;
+                nameLabel.addEventListener(MouseEvent.CLICK, applyOrg);
+            }else{
+                head.source = data.icon;
+                orgLabel.text = data.name;
+                orgIDLabel.text = data.id;
+                orgLabel2.text = "组织ID：";
+
+                if(data.hasOwnProperty('pid')){
+                    headPerson.source = data.person_icon;
+                    statusLabel.text = "昵称：";
+                    nameLabel.text = data.person_name;
+                    nameLabel.setStyle("color",0x0000);
+                    nameLabel.setStyle("textDecoration","none");
+                    nameLabel.buttonMode = false;
+                    nameLabel.removeEventListener(MouseEvent.CLICK, applyOrg);
+                }else if(data.hasOwnProperty('apply_id')){
+                    statusLabel.text = "等待审核";
+                    nameLabel.text = "取消";
+                    nameLabel.setStyle("color",0x5484ed);
+                    nameLabel.setStyle("textDecoration","underline");
+                    nameLabel.buttonMode = true;
+                    nameLabel.addEventListener(MouseEvent.CLICK, applyOrg);
+                }else{
+                    statusLabel.text = "";
+                    nameLabel.text = "申请加入";
+                    nameLabel.setStyle("color",0x5484ed);
+                    nameLabel.setStyle("textDecoration","underline");
+                    nameLabel.buttonMode = true;
+                    nameLabel.addEventListener(MouseEvent.CLICK, applyOrg);
+                }
+            }
+
+        }
+
+        private function applyOrg(e:MouseEvent):void{
+            if(!data.hasOwnProperty('id')&&data.hasOwnProperty('type')){
+                ToolUtil.joinorgPanel.queryOrg(false);
+                return;
+            }
+            if(data.hasOwnProperty('apply_id')){
+                var obj:Object=new Object();
+                obj.apply_id = data.apply_id;
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delApplyOrg",refresh,"POST").send(obj);
+            }else{
+
+                var applyPanel:ApplyOrgPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,ApplyOrgPanel,true) as ApplyOrgPanel;
+                applyPanel.orgData = data;
+            }
+        }
+
+        private function refresh(result:Object, e:ResultEvent):void{
+            delete data.apply_id;
+            init();
+            ToolUtil.orgPanel.delOrgItem(data);
+        }
+
         private function select_handler(e:MouseEvent):void{
+            if(!data.hasOwnProperty('pid')){
+                return;
+            }
             if(data && !data.person_active){
                 Alert.show("您在 "+data.name +" 已经离职。","提示");
                 return;
             }
                 var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
                 dispatchEvent(listclickevent);
-
         }
-
-
 
         protected function getColor():uint
         {
@@ -77,16 +150,26 @@
         </s:Rect>
         <s:Rect left="1" right="1" top="0" bottom="1">
             <s:fill>
-                <s:SolidColor id="solidColor" color="{getColor()}"  />
+                <s:SolidColor id="solidColor"   />
             </s:fill>
         </s:Rect>
+
         <s:HGroup id="horizontalLayout" verticalAlign="middle" height="100%" gap="5" paddingRight="10" paddingLeft="10">
             <s:Image id="head" width="45" height="45"></s:Image>
-            <s:Label text="组织名称：" ></s:Label>
-            <s:Label id="orgLabel"   paddingRight="40"></s:Label>
+            <s:VGroup width="50%" height="100%" paddingRight="40" gap="5">
+                <s:HGroup width="100%" height="22"  verticalAlign="bottom">
+                    <s:Label id="orgStatus" text="组织名称：" ></s:Label>
+                    <s:Label id="orgLabel"   ></s:Label>
+                </s:HGroup>
+                <s:HGroup width="100%" height="23" verticalAlign="top">
+                    <s:Label id="orgLabel2" text="组织ID：" ></s:Label>
+                    <s:Label id="orgIDLabel"  ></s:Label>
+                </s:HGroup>
+            </s:VGroup>
+
 
             <s:Image id="headPerson" width="45" height="45"></s:Image>
-            <s:Label text="昵称：" ></s:Label>
+            <s:Label id="statusLabel" text="昵称：" ></s:Label>
             <s:Label id="nameLabel"  ></s:Label>
         </s:HGroup>
 

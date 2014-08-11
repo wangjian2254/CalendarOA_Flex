@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+               xmlns:s="library://ns.adobe.com/flex/spark"
+               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
+               width="450" height="250"   creationComplete="init()"
+               title="创建组织" close="closeWin()">
+	<fx:Script>
+		<![CDATA[
+			import httpcontrol.HttpServiceUtil;
+
+            import mx.controls.Alert;
+            import mx.core.FlexGlobals;
+            import mx.events.EffectEvent;
+            import mx.managers.PopUpManager;
+            import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+
+            private var isFirstForAni:Boolean=true;
+
+            public function closeWin():void{
+                closeAnimation();
+			}
+
+            private function init():void{
+                if(isFirstForAni){
+                    showAnimation();
+                }
+                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+            }
+
+            public  function showAnimation():void{
+                mve.xFrom=0-this.width;
+                mve.yFrom=(FlexGlobals.topLevelApplication.height-this.height)/2;
+                mve.xTo=(FlexGlobals.topLevelApplication.width-this.width)/2;
+                mve.yTo=(FlexGlobals.topLevelApplication.height-this.height)/2;
+                var pa:Point=new Point(mve.xFrom,mve.yFrom);
+                var pb:Point=new Point(mve.xTo,mve.yTo);
+                mve.duration = int(Point.distance(pa,pb))/100*70;
+                mve.addEventListener(EffectEvent.EFFECT_END,showAnimationEnd);
+                mve.play();
+            }
+            private function showAnimationEnd(e:EffectEvent):void{
+                isFirstForAni=false;
+            }
+            public  function closeAnimation():void{
+                isFirstForAni = true;
+                mve.xFrom=this.x;
+                mve.yFrom=this.y;
+                mve.xTo=FlexGlobals.topLevelApplication.width;
+                mve.yTo =FlexGlobals.topLevelApplication.height;
+                var pa:Point=new Point(mve.xFrom,mve.yFrom);
+                var pb:Point=new Point(mve.xTo,mve.yTo);
+                mve.duration = int(Point.distance(pa,pb))/100*70;
+                mve.addEventListener(EffectEvent.EFFECT_END,closeAnimationEnd);
+                mve.play();
+            }
+            private function closeAnimationEnd(e:EffectEvent):void{
+                PopUpManager.removePopUp(this);
+            }
+
+            private function getOrgByFlagResult(result:Object,e:ResultEvent):void{
+                 this.title = result.result.name + " 新成员注册";
+            }
+
+			public function save():void{
+                if(orgname.text==""){
+                    Alert.show("组织名称必须填写","提示");
+                    return;
+                }
+
+				var obj:Object=new Object();
+
+                obj.name = orgname.text;
+
+				obj.icon = orgHeadSelectArray.selectedIcon();
+
+				
+				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regOrganization",refresh,"POST").send(obj);
+					
+				
+			}
+			public function refresh(r:Object,e:ResultEvent):void{
+                closeWin();
+                ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+                if(ToolUtil.orgPanel!=null&&ToolUtil.orgPanel.parent!=null){
+                    PopUpManager.removePopUp(ToolUtil.orgPanel);
+                    ToolUtil.orgPanel = new SelectOrgPanel();
+                }
+			}
+
+        public function foucePass(obj:Object):void{
+            obj.setFocus();
+        }
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+        <s:Move id="mve" target="{this}"/>
+        <conobj:HeadSelectArray id="orgHeadSelectArray"></conobj:HeadSelectArray>
+	</fx:Declarations>
+
+
+	<s:Form width="100%" id="form" >
+
+
+		<s:FormItem id="orgNameItem" label="组织名称:" textAlign="right">
+			<s:layout>
+				<s:HorizontalLayout gap="5"/>
+			</s:layout>
+			<s:TextInput id="orgname"  width="200"  tabIndex="5" enter="save()">
+				
+			</s:TextInput>
+			<s:Label text="公司或团队名称" color="red" />
+		</s:FormItem>
+
+		<s:FormItem id="orgIconItem" label="组织图标:" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/5.png" selected="true" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/12.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/15.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/26.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/34.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/36.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
+		</s:FormItem>
+
+		<s:FormItem>
+				<s:layout>
+					<s:HorizontalLayout gap="10"/>
+				</s:layout>
+				<s:Button label="创建" click="save()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
+					
+				</s:Button>
+				<s:Button label="放弃" click="closeWin()" chromeColor="#ffffff" color="#000000" height="25">
+					
+				</s:Button>
+		</s:FormItem>
+	</s:Form>
+</s:TitleWindow>
