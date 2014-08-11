@@ -3,6 +3,7 @@
   Created by wangjian2254 on 14-8-8.
 -->
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                xmlns:uicontrol="uicontrol.*"
                 autoDrawBackground="false"
         >
     <fx:Metadata>
@@ -11,6 +12,8 @@
     </fx:Metadata>
     <fx:Script><![CDATA[
         import events.ListClickEvent;
+
+        import mx.controls.Alert;
 
 
         import spark.components.Group;
@@ -28,11 +31,18 @@
             0, 0, 0, 1, 0];
 
         [Bindable]
-        [Embed("/assets/img/arrow_closed.gif")]
+        [Embed("/assets/img/arrow_closed.png")]
         public static var closed:Class;
         [Bindable]
-        [Embed("/assets/img/arrow_opened.gif")]
+        [Embed("/assets/img/arrow_opened.png")]
         public static var opened:Class;
+
+        [Bindable]
+        [Embed("/assets/img/arrow_closed.gif")]
+        public static var righticon:Class;
+//        [Bindable]
+//        [Embed("/assets/img/arrow_opened.gif")]
+//        public static var opened:Class;
 
         private var _data:Object;
         override public function get data():Object {
@@ -47,26 +57,44 @@
                 return;
             }
 
-            if(!data.hasOwnProperty('childrenstatus')){
-                 childicon.source = null;
+            if(!data.hasOwnProperty('unread')||data.unread<1){
+                num.visible=false;
+            }else{
+                num.visible = true;
+            }
+            if(!data.hasOwnProperty('hideicon')){
+                childicon.source = null;
+                head.source = data.icon;
+                rightContainer.visible = false;
+                rightContainer.width = 0;
+
             }else if(data['childrenstatus']){
+                head.source=null;
+                head.width = 0;
+                head.visible = false;
+                rightContainer.visible = true;
+                rightContainer.width = 50;
                  childicon.source = closed;
             }else{
+                head.source=null;
+                head.width = 0;
+                head.visible = false;
+                rightContainer.visible = true;
+                rightContainer.width = 50;
                  childicon.source = opened;
             }
 
             change_status();
-            head.source = data.icon;
             nameLabel.text = data.name;
             horizontalLayout.paddingLeft = 5+data.level*15;
             solidColor.color = getColor(data);
-            if(data.id>=0){
-                nameLabel.addEventListener(MouseEvent.CLICK, select_handler);
-                nameLabel.buttonMode = true;
-            }else{
-                nameLabel.removeEventListener(MouseEvent.CLICK, select_handler);
-                nameLabel.buttonMode = false;
-            }
+//            if(data.id>=0){
+//                nameLabel.addEventListener(MouseEvent.CLICK, select_handler);
+//                nameLabel.buttonMode = true;
+//            }else{
+//                nameLabel.removeEventListener(MouseEvent.CLICK, select_handler);
+//                nameLabel.buttonMode = false;
+//            }
         }
 
         private function change_status():void{
@@ -82,7 +110,7 @@
         }
 
         private function select_handler(e:MouseEvent):void{
-            if(e.target as Label && data && data.id>=0){
+            if(data && data.id>=0){
                 var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
                 dispatchEvent(listclickevent);
             }
@@ -90,9 +118,8 @@
         }
 
         private function zhankai(e:MouseEvent):void{
-            if(data&&data.hasOwnProperty('children') && e.target as Group){
-
-            }else{
+            if(!rightContainer.visible){
+                select_handler(null);
                 return;
             }
             var listclickevent:ListClickEvent=new ListClickEvent("listItemZhanKai",data);
@@ -124,7 +151,7 @@
         <s:ColorMatrixFilter id="cmf" matrix="{bwMatrix}" />
     </fx:Declarations>
 
-    <s:BorderContainer width="100%" height="50" click="zhankai(event)" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()">
+    <s:BorderContainer width="100%" height="50"  borderVisible="false" mouseOut="m_out()" mouseOver="m_over()" >
 
 
         <s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">
@@ -137,11 +164,24 @@
                 <s:SolidColor id="solidColor"  />
             </s:fill>
         </s:Rect>
-        <s:HGroup id="horizontalLayout" verticalAlign="middle" width="100%" height="100%">
+        <s:HGroup id="horizontalLayout"  click="zhankai(event)" verticalAlign="middle"   width="100%" height="100%" buttonMode="true"  >
+
+
             <s:Image id="childicon" width="10" height="10"  buttonMode="true"></s:Image>
             <s:Image id="head" width="45" height="45"></s:Image>
-            <s:Label id="nameLabel"  ></s:Label>
+            <s:Label id="nameLabel" ></s:Label>
+            <s:BorderContainer id="num" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
+                <s:layout>
+                    <s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"></s:HorizontalLayout>
+                </s:layout>
+                <s:Label id="numLabel" text="10" fontSize="12" color="#ffffff" ></s:Label>
+            </s:BorderContainer>
+
         </s:HGroup>
+        <uicontrol:RightBtn id="rightContainer" right="0" click="select_handler(event)" width="50" top="0" bottom="1" >
+
+        </uicontrol:RightBtn>
 
     </s:BorderContainer>
+
 </s:ItemRenderer>

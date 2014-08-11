@@ -20,7 +20,7 @@
         [Bindable]
         private var addressMember:ArrayCollection = new ArrayCollection();
 
-        public var type:String="org";
+        public var type:String = "org";
 
         [Bindable]
         public var borderVisible:Boolean = true;
@@ -31,159 +31,166 @@
             initAddress();
         }
 
-        private function changeMember(e:CollectionEvent):void{
+        private function changeMember(e:CollectionEvent):void {
             initAddress();
         }
 
-        private function initAddress():void{
+        private function initAddress():void {
             addressMember.removeAll();
 
-            if(type == "chat"){
+            if (type == "chat") {
                 var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
-                var contact:Object = new Object();
-                contact['id'] = -1;
-                contact['name'] = '常用联系人';
-                contact['icon'] = '/static/image/address2.png';
-                contact['flag'] = 'contact';
-                contact['children'] = new ArrayCollection();
-                contact['childrenstatus'] = true;
-                contact['level'] = 0;
-                for each(var member :Object in members){
-                    member['depart_id']=contact.id;
-                    member['level']=contact.level+1;
+//                var contact:Object = new Object();
+//                contact['id'] = -1;
+//                contact['name'] = '常用联系人';
+//                contact['icon'] = '/static/image/address2.png';
+//                contact['flag'] = 'contact';
+//                contact['children'] = new ArrayCollection();
+//                contact['childrenstatus'] = true;
+//                contact['level'] = 0;
+                for each(var member:Object in members) {
+//                    member['depart_id'] = contact.id;
+                    member['level'] = 0;
+                    member['unread'] = 0;
                 }
-                var liyu:Object=new Object();
-                liyu['id']=0;
-                liyu['name']='客服鲤鱼王';
-                liyu['icon']='/static/image/liyu2.png';
-                liyu['depart_id']=-1;
-                liyu['level']=contact.level+1;
-                contact.children.addItem(liyu);
-                contact.children.addAll(new ArrayCollection(members as Array));
-                addressMember.addItem(contact);
+                var liyu:Object = new Object();
+                liyu['id'] = 0;
+                liyu['name'] = '客服鲤鱼王';
+                liyu['icon'] = '/static/image/liyu2.png';
+                liyu['depart_id'] = -1;
+                liyu['level'] = 0;
+                liyu['unread'] = 0;
+                addressMember.addItem(liyu);
+                addressMember.addAll(new ArrayCollection(members as Array));
 
                 var l2:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var f:Boolean = false;
-                for each(var item2:Object in l2){
-                    f=false;
-                    for each(var p:Object in item2.members){
-                        if(p.id == ToolUtil.sessionUser.pid){
-                            f=true;
+                for each(var item2:Object in l2) {
+                    f = false;
+                    for each(var p:Object in item2.members) {
+                        if (p.id == ToolUtil.sessionUser.pid) {
+                            f = true;
                         }
                     }
-                    if(f){
+                    if (f) {
                         item2.level = 0;
+                        item2.unread = 0;
                         addressMember.addItem(item2);
                     }
                 }
-                if(contact!=null){
-                    var listclickevent2:ListClickEvent=new ListClickEvent("listItemZhanKai",contact);
-                    listItemZhanKai_handler(listclickevent2);
-                }
-
             }
 
 
-            if(type == "org"){
+            if (type == "org") {
                 var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var depart:Object = new Object();
                 var rootDepart:Object = null;
-                for each(var item:Object in l){
-                    depart['d'+item.id] = item;
-                    if(!item.father){
-                        rootDepart=item;
+                for each(var item:Object in l) {
+                    depart['d' + item.id] = item;
+                    if (!item.father) {
+                        rootDepart = item;
                         item.level = 0;
                     }
-                }
-                for each(item in l){
-
-                    if(item.members.length==0){
-                        continue;
-                    }
-                    if(item.father){
-                        item.level = depart['d'+item.father].level+1;
-                    }
-                    if(!item.hasOwnProperty('children')){
-                        item.children=new ArrayCollection();
-                        item.childrenstatus=true;
-                    }
-
-                    for each(var member :Object in item.members){
-                        member['depart_id']=item.id;
-                        member['level']=item.level+1;
+                    item.childrenstatus = true;
+                    item.children = new ArrayCollection();
+                    for each(var member:Object in item.members) {
+                        member['depart_id'] = item.id;
+                        member['level'] = item.level + 1;
                     }
                     item.children.addAll(new ArrayCollection(item.members as Array));
+                    item.hideicon=false;
                 }
-                for each(item in l){
-
-                    if(item.father){
-                        if(!depart['d'+item.father].hasOwnProperty('children')){
-                            depart['d'+item.father].children=new ArrayCollection();
-                            depart['d'+item.father].childrenstatus=true;
-
+                for each(item in l) {
+                    if (item.father) {
+                        item.level = depart['d' + item.father].level + 1;
+                        if (!depart['d' + item.father].hasOwnProperty('dep_children')) {
+                            depart['d' + item.father].dep_children = new ArrayCollection();
                         }
-                        depart['d'+item.father].children.addItem(item);
-                        item.level = depart['d'+item.father].level+1;
+                        depart['d' + item.father].dep_children.addItem(item);
                     }
-
                 }
-                for each(item in l){
-                    if(item.flag=='free'){
-                        depart['d'+item.father].children.removeItemAt(depart['d'+item.father].children.getItemIndex(item));
-                        depart['d'+item.father].children.addItem(item);
+                for each(item in l) {
+                    if (item.flag == 'free') {
+                        depart['d' + item.father].dep_children.removeItemAt(depart['d' + item.father].dep_children.getItemIndex(item));
+                        depart['d' + item.father].dep_children.addItem(item);
                     }
                 }
                 addressMember.addItem(rootDepart);
-                if(rootDepart!=null){
-                    var listclickevent:ListClickEvent=new ListClickEvent("listItemZhanKai",rootDepart);
-                    listItemZhanKai_handler(listclickevent);
+                if (rootDepart != null) {
+                    showDepartChildren_handler(rootDepart);
+//                    var listclickevent:ListClickEvent = new ListClickEvent("listItemZhanKai", rootDepart);
+//                    listItemZhanKai_handler(listclickevent);
                 }
 
             }
         }
 
-//        private function listItemClick_handler(e:ListClickEvent):void{
-//            dispatchEvent(e);
-//
-//        }
-        private function listItemZhanKai_handler(e:ListClickEvent):void{
+        private function showDepartChildren_handler(depart:Object):void {
+            var index:int = 0;
+            for (var i:int = 0; i < addressMember.length; i++) {
+                if (depart.id == addressMember.getItemAt(i).id) {
+                    index = i;
+                    break;
+                }
+            }
+            if (depart.hasOwnProperty('dep_children')){
+                if (index == addressMember.length - 1 && addressMember.length != 1) {
+                    addressMember.addAll(depart.dep_children);
+                } else {
+                    addressMember.addAllAt(depart.dep_children, index + 1);
+                }
+                for each(var d:Object in depart.dep_children){
+                    showDepartChildren_handler(d);
+                }
+            }
+
+
+
+        }
+
+        //        private function listItemClick_handler(e:ListClickEvent):void{
+        //            dispatchEvent(e);
+        //
+        //        }
+        private function listItemZhanKai_handler(e:ListClickEvent):void {
             var depart:Object = e.data;
-            var index:int=0;
-            for(var i:int=0;i<addressMember.length;i++){
-                if(depart.id == addressMember.getItemAt(i).id){
+            var index:int = 0;
+            for (var i:int = 0; i < addressMember.length; i++) {
+                if (depart.id == addressMember.getItemAt(i).id) {
                     index = i;
                     break;
                 }
             }
             var childrenDepart:ArrayCollection;
-            if(depart.hasOwnProperty('childrenstatus')&&depart['childrenstatus']){
+            if (depart.hasOwnProperty('childrenstatus') && depart['childrenstatus']) {
                 depart['childrenstatus'] = false;
                 childrenDepart = depart.children;
 
-                if(index==addressMember.length-1&&addressMember.length!=1){
+                if (index == addressMember.length - 1 && addressMember.length != 1) {
                     addressMember.addAll(childrenDepart);
-                }else{
-                    addressMember.addAllAt(childrenDepart,index+1);
+                } else {
+                    addressMember.addAllAt(childrenDepart, index + 1);
                 }
-            }else if(depart.hasOwnProperty('childrenstatus')&&!depart['childrenstatus']){
-                depart['childrenstatus']=true;
-                var dellist : Array = new Array();
+            } else if (depart.hasOwnProperty('childrenstatus') && !depart['childrenstatus']) {
+                depart['childrenstatus'] = true;
+                var dellist:Array = new Array();
                 dellist.push(depart);
-                deleteChildren(addressMember,dellist);
+                deleteChildren(addressMember, dellist);
             }
 
         }
 
-        private function deleteChildren(list:ArrayCollection, items:Array):void{
+        private function deleteChildren(list:ArrayCollection, items:Array):void {
             var tempDepart:Object;
-            var dellist : Array = new Array();
-            for each(var item:Object in items){
-                for(var k:int = list.length-1;k>=0;k--){
+            var dellist:Array = new Array();
+            for each(var item:Object in items) {
+                for (var k:int = list.length - 1; k >= 0; k--) {
                     tempDepart = list.getItemAt(k);
-                    if((tempDepart.hasOwnProperty('father')&&tempDepart.father==item.id)||(tempDepart.hasOwnProperty('depart_id')&&tempDepart.depart_id==item.id)){
-                        if(tempDepart.hasOwnProperty('flag')){
-                            if(tempDepart.hasOwnProperty('childrenstatus')){
-                                tempDepart.childrenstatus=true;
+//                    if((tempDepart.hasOwnProperty('father')&&tempDepart.father==item.id)||(tempDepart.hasOwnProperty('depart_id')&&tempDepart.depart_id==item.id)){
+                    if (tempDepart.hasOwnProperty('depart_id') && tempDepart.depart_id == item.id) {
+                        if (tempDepart.hasOwnProperty('flag')) {
+                            if (tempDepart.hasOwnProperty('childrenstatus')) {
+                                tempDepart.childrenstatus = true;
                             }
                             dellist.push(tempDepart);
                         }
@@ -192,14 +199,12 @@
                     }
                 }
             }
-            if(dellist.length>0){
-                deleteChildren(list,dellist);
+            if (dellist.length > 0) {
+                deleteChildren(list, dellist);
             }
 
 
         }
-
-
         ]]></fx:Script>
 
     <uicontrol:AddressList id="addressList" dataProvider="{addressMember}" borderVisible="{borderVisible}}"
