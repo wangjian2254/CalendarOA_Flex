@@ -98,7 +98,12 @@
             this.removeAllElements();
             var cbtn:CTabButton;
             for each(var o:CBorderContainer in showList) {
-                cbtn = new CTabButton();
+                if(o is ChatControl){
+                    cbtn = new CIMTabButton();
+                }else{
+                    cbtn = new CTabButton();
+                }
+
                 cbtn.label = o.label;
                 cbtn.view = o;
                 cbtn.height = this.height;
