@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
-			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx"  width="500" height="200"  creationComplete="init(event)" close="closeWin(event)" xmlns:uicontrol="uicontrol.*">
-	<s:layout>
-        <s:HorizontalLayout gap="2">
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="200" creationComplete="init(event)"
+                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
 
-        </s:HorizontalLayout>
-	</s:layout>
     <fx:Script>
 		<![CDATA[
 			import events.ChangeJoinUserEvent;
@@ -32,9 +29,7 @@
             public var type:String=null;
 			
 			public function init(e:mx.events.FlexEvent):void{
-				if(isFirstForAni){
-					showAnimation();
-				}
+
                 this.height = form.height+10;
                 this.title ="申请加入";
                 areaUrl.text = "我是 "+ToolUtil.orgPanel.loginNickname;
@@ -42,40 +37,6 @@
 
 			}
 
-			private function closeWin(e:mx.events.CloseEvent):void{
-				closeAnimation();
-			}
-
-
-			public  function showAnimation():void{
-				mve.xFrom=0-this.width;
-				mve.yFrom=(FlexGlobals.topLevelApplication.height-this.height)/2;
-				mve.xTo=(FlexGlobals.topLevelApplication.width-this.width)/2;
-				mve.yTo=(FlexGlobals.topLevelApplication.height-this.height)/2;
-				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-				var pb:Point=new Point(mve.xTo,mve.yTo);
-				mve.duration = int(Point.distance(pa,pb))/100*70;
-				mve.addEventListener(EffectEvent.EFFECT_END,showAnimationEnd);
-				mve.play();
-			}
-			private function showAnimationEnd(e:EffectEvent):void{
-				isFirstForAni=false;
-			}
-			public  function closeAnimation():void{
-                isFirstForAni = true;
-				mve.xFrom=this.x;
-				mve.yFrom=this.y;
-				mve.xTo=FlexGlobals.topLevelApplication.width;
-				mve.yTo =FlexGlobals.topLevelApplication.height;
-				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-				var pb:Point=new Point(mve.xTo,mve.yTo);
-				mve.duration = int(Point.distance(pa,pb))/100*70;
-				mve.addEventListener(EffectEvent.EFFECT_END,closeAnimationEnd);
-				mve.play();
-			}
-			private function closeAnimationEnd(e:EffectEvent):void{
-				PopUpManager.removePopUp(this);
-			}
 //			public  function sendAnimation():void{
 //				mve.xFrom=this.width;
 //				mve.yFrom=this.height;
@@ -87,16 +48,13 @@
 //				mve.addEventListener(EffectEvent.EFFECT_END,sendAnimationEnd);
 //				mve.play();
 //			}
-			private function sendAnimationEnd(e:EffectEvent):void{
-				PopUpManager.removePopUp(this);
 
-			}
 
 			private function sendMessageResult(result:Object,e:ResultEvent):void{
                 orgData.apply_id=result.result.apply_id;
                 ToolUtil.orgPanel.addOrgItem(orgData);
                 ToolUtil.joinorgPanel.addOrgItem(orgData);
-                closeWin(null);
+                closeWin();
 			}
 
         private function copyUrl():void{
@@ -110,7 +68,6 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-		<s:Move id="mve" target="{this}"/>
 	</fx:Declarations>
 
 	<s:Form id="form" width="100%"  >
@@ -123,7 +80,7 @@
 
             </s:TextArea>
             <s:HGroup width="100%" height="40" gap="30" horizontalAlign="right">
-                <s:Button label="取消" click="closeWin(null)" height="25"></s:Button>
+                <s:Button label="取消" click="closeWin()" height="25"></s:Button>
                 <s:Button label="确定" click="copyUrl()" color="white" chromeColor="red" height="25"></s:Button>
 
             </s:HGroup>
@@ -132,4 +89,4 @@
 
 	</s:Form>
 
-</s:TitleWindow>
+</window:EfficientTitleWindow>

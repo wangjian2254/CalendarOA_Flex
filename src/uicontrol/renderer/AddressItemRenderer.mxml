@@ -178,7 +178,7 @@
             </s:BorderContainer>
 
         </s:HGroup>
-        <uicontrol:RightBtn id="rightContainer" right="0" click="select_handler(event)" width="50" top="0" bottom="1" >
+        <uicontrol:RightBtn id="rightContainer" buttonMode="true" right="0" click="select_handler(event)" width="50" top="0" bottom="1" >
 
         </uicontrol:RightBtn>
 

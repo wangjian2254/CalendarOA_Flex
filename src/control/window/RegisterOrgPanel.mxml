@@ -1,64 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
-               xmlns:s="library://ns.adobe.com/flex/spark"
-               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
-               width="450" height="250"   creationComplete="init()"
-               title="创建组织" close="closeWin()">
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:conobj="uicontrol.conobj.*"
+                             width="450" height="250" creationComplete="init()"
+                             title="创建组织" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
 
             import mx.controls.Alert;
             import mx.core.FlexGlobals;
-            import mx.events.EffectEvent;
             import mx.managers.PopUpManager;
             import mx.rpc.events.ResultEvent;
-			
 			import util.ToolUtil;
 
-            private var isFirstForAni:Boolean=true;
-
-            public function closeWin():void{
-                closeAnimation();
-			}
-
             private function init():void{
-                if(isFirstForAni){
-                    showAnimation();
-                }
+
                 this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
                 this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
             }
 
-            public  function showAnimation():void{
-                mve.xFrom=0-this.width;
-                mve.yFrom=(FlexGlobals.topLevelApplication.height-this.height)/2;
-                mve.xTo=(FlexGlobals.topLevelApplication.width-this.width)/2;
-                mve.yTo=(FlexGlobals.topLevelApplication.height-this.height)/2;
-                var pa:Point=new Point(mve.xFrom,mve.yFrom);
-                var pb:Point=new Point(mve.xTo,mve.yTo);
-                mve.duration = int(Point.distance(pa,pb))/100*70;
-                mve.addEventListener(EffectEvent.EFFECT_END,showAnimationEnd);
-                mve.play();
-            }
-            private function showAnimationEnd(e:EffectEvent):void{
-                isFirstForAni=false;
-            }
-            public  function closeAnimation():void{
-                isFirstForAni = true;
-                mve.xFrom=this.x;
-                mve.yFrom=this.y;
-                mve.xTo=FlexGlobals.topLevelApplication.width;
-                mve.yTo =FlexGlobals.topLevelApplication.height;
-                var pa:Point=new Point(mve.xFrom,mve.yFrom);
-                var pb:Point=new Point(mve.xTo,mve.yTo);
-                mve.duration = int(Point.distance(pa,pb))/100*70;
-                mve.addEventListener(EffectEvent.EFFECT_END,closeAnimationEnd);
-                mve.play();
-            }
-            private function closeAnimationEnd(e:EffectEvent):void{
-                PopUpManager.removePopUp(this);
-            }
+
 
             private function getOrgByFlagResult(result:Object,e:ResultEvent):void{
                  this.title = result.result.name + " 新成员注册";
@@ -97,7 +60,6 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-        <s:Move id="mve" target="{this}"/>
         <conobj:HeadSelectArray id="orgHeadSelectArray"></conobj:HeadSelectArray>
 	</fx:Declarations>
 
@@ -139,4 +101,4 @@
 				</s:Button>
 		</s:FormItem>
 	</s:Form>
-</s:TitleWindow>
+</window:EfficientTitleWindow>

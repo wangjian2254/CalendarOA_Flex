@@ -13,6 +13,10 @@ public function quite(e:*=null):void {
 	Alert.show("确定要退出系统吗?","退出系统",3,this,CloseWindow);   
 }
 
+public function quiteNoTip():void{
+    this.nativeWindow.close();//关闭窗体
+}
+
 
 
 public function initAir():void{
@@ -33,7 +37,7 @@ public function pushApp(e:MouseEvent):void{
 
 public function CloseWindow(event:CloseEvent):void{
 	if(event.detail==Alert.YES){//如果按下了确定按钮
-		this.nativeWindow.close();//关闭窗体
+        quiteNoTip();
 	}
 }
 [Bindable]

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:conobj="uicontrol.conobj.*"
+                             width="440" height="500" creationComplete="init()"
+                             title="申请加入组织的请求" xmlns:window="control.window.*">
+	<fx:Script>
+		<![CDATA[
+        import events.ListClickEvent;
+        import events.QuiteEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+            import mx.collections.ArrayCollection;
+
+            import mx.core.FlexGlobals;
+        import mx.events.EffectEvent;
+        import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ToolUtil;
+
+            [Bindable]
+            private var orglist:ArrayCollection;
+
+
+
+
+            private function init():void{
+
+
+                var obj:Object=new Object();
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllApplyOrg",getAllOrgResult,"POST").send(obj);
+                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+            }
+
+            private function getAllOrgResult(result:Object, e:ResultEvent):void{
+                orglist = new ArrayCollection(result.result as Array);
+                if(orglist.length==0){
+                    queryLabel.text = "没有未处理的申请。";
+                    applyAddressList.visible = false;
+                }else{
+                    applyAddressList.visible = true;
+                    queryLabel.visible = false;
+                }
+            }
+
+
+
+
+        public function delOrgItem(item:Object):void{
+            for each(var obj:Object in orglist){
+                if(obj.id == item.id){
+                    orglist.removeItemAt(orglist.getItemIndex(obj));
+                }
+            }
+        }
+
+			public function listItemClick_handler(e:ListClickEvent):void{
+				delOrgItem(e.data);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+    <s:Label id="queryLabel" textAlign="center" top="200" right="30" left="30" height="30" color="#cccccc" ></s:Label>
+
+    <s:VGroup width="100%" height="100%" gap="5">
+        <uicontrol:AddressList id="applyAddressList" dataProvider="{orglist}"
+                               borderVisible="false" width="100%" height="100%"
+                               itemRenderer="uicontrol.renderer.ApplyItemRenderer"
+                               listItemClick="listItemClick_handler(event)">
+
+        </uicontrol:AddressList>
+
+    </s:VGroup>
+
+</window:EfficientTitleWindow>

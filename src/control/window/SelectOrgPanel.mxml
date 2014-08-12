@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
-               xmlns:s="library://ns.adobe.com/flex/spark"
-               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
-               width="430" height="500"   creationComplete="init()"
-               title="选择工作的组织" close="closeWin()">
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:conobj="uicontrol.conobj.*"
+                             width="430" height="500" creationComplete="init()"
+                             title="选择工作的组织" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
         import events.ListClickEvent;
@@ -20,10 +21,7 @@
 			import util.ToolUtil;
 
             [Bindable]
-            private var orglist:ArrayCollection;
-			public function closeWin():void{
-				PopUpManager.removePopUp(this);
-			}
+            public var orglist:ArrayCollection;
 
         public var loginNickname:String;
 
@@ -79,6 +77,7 @@
         protected function quite():void{
             var e:QuiteEvent = new QuiteEvent(QuiteEvent.Quite,true);
             FlexGlobals.topLevelApplication.dispatchEvent(e);
+             closeWin();
 
         }
 
@@ -112,4 +111,4 @@
         </s:HGroup>
     </s:VGroup>
 
-</s:TitleWindow>
+</window:EfficientTitleWindow>

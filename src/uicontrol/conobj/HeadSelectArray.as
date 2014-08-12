@@ -33,5 +33,14 @@ public class HeadSelectArray {
         }
         return "";
     }
+
+
+    public function selectedIconByIcon(url:String):void{
+        for(var i:int =0 ;i<iconButtons.length;i++){
+            if(iconButtons[i].iconurl == url){
+                iconButtons[i].click_image();
+            }
+        }
+    }
 }
 }

@@ -1,20 +1,8 @@
 // ActionScript file
 import control.CBorderContainer;
-import control.CalendarControl;
 import control.window.ChangePasswordPanel;
-import control.ContactControl;
-import control.GroupControl;
-import control.Loading;
-import control.window.LogPanel;
-import control.window.LoginUserPanel;
-import control.MessageControl;
-import control.PaperControl;
-import control.PaperKindControl;
-import control.window.RegisterUserPanel;
-import control.SubjectControl;
-import control.SubjectKindControl;
+
 import control.window.UserInfoPanel;
-import control.UserPaperControl;
 
 import events.ChangeMenuEvent;
 import events.ChangeUserEvent;
@@ -22,31 +10,17 @@ import events.QuiteEvent;
 
 import flash.display.DisplayObject;
 
-import httpcontrol.HttpServiceUtil;
-import httpcontrol.RemoteUtil;
 
 import model.User;
 
 import mx.collections.ArrayCollection;
 import mx.controls.Alert;
-import mx.controls.Menu;
 import mx.core.FlexGlobals;
-import mx.events.FlexEvent;
-import mx.events.MenuEvent;
 import mx.managers.PopUpManager;
-import mx.messaging.ChannelSet;
-import mx.messaging.channels.AMFChannel;
-import mx.rpc.AbstractOperation;
-import mx.rpc.AsyncResponder;
-import mx.rpc.AsyncToken;
-import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 
-import spark.components.Application;
 import spark.components.Button;
 
-import util.InfoUtil;
-import util.LoadingUtil;
 import util.RightClickRegister;
 import util.ToolUtil;
 import util.UserUtil;
@@ -54,7 +28,9 @@ import util.UserUtil;
 
 public function init():void {
     new RightClickRegister();
-
+    Alert.yesLabel = "是";
+    Alert.noLabel = "否";
+    Alert.cancelLabel = "取消";
 
     if(this.hasOwnProperty("initAir")){
         this["initAir"]();
@@ -138,6 +114,19 @@ public function updateinfo():void {
 }
 
 public function logout(e:*=null):void {
+    if(e!=null){
+        var evt:QuiteEvent = e as QuiteEvent;
+        if(evt!=null){
+            if(evt.needTip){
+                if(this.hasOwnProperty("quite")){
+                    this["quite"]();
+                }
+            }else{
+                quiteNoTip();
+            }
+            return;
+        }
+    }
 	if(this.hasOwnProperty("quite")){
 		this["quite"]();
 	}

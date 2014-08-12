@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
-               xmlns:s="library://ns.adobe.com/flex/spark"
-               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
-               width="450" height="500"   creationComplete="init()"
-               title="注册用户" close="closeWin()">
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:conobj="uicontrol.conobj.*"
+                             width="450" height="500" creationComplete="init()"
+                             xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
@@ -23,9 +24,7 @@
 			import util.UserUtil;
 			
 			
-			public function closeWin():void{
-				PopUpManager.removePopUp(this);
-			}
+
 
             private function init():void{
                 form.validateNow();
@@ -287,4 +286,4 @@
 				</s:Button>
 		</s:FormItem>
 	</s:Form>
-</s:TitleWindow>
+</window:EfficientTitleWindow>

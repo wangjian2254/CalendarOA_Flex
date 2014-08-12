@@ -5,8 +5,8 @@ import control.ContactControl;
 import control.DepartmentControl;
 import control.GroupControl;
 import control.IMControl;
-import control.window.LogPanel;
-import control.MessageControl;
+import control.window.CheckApplyPanel;
+import control.LogControl
 import control.PaperControl;
 import control.PaperKindControl;
 import control.SubjectControl;
@@ -205,7 +205,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				c = new IMControl();
 				break;
 			case 'log':
-				c = new LogPanel();
+				c = new LogControl();
 				break;
 			case 'paper':
 				c = new PaperControl();
@@ -223,11 +223,12 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				c = new SubjectKindControl();
 				break;
             case 'addPerson':
-				var personPanel = new AddPersonPanel();
-//                PopUpManager.addPopUp(ToolUtil.loginUser,FlexGlobals.topLevelApplication as DisplayObject,true);
                 PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,AddPersonPanel,true);
 				break;
-			
+			case 'checkApply':
+                PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CheckApplyPanel,true);
+				break;
+
 			
 		}
 	}

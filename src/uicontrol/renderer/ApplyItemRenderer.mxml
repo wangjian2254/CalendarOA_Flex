@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!--
+  Created by wangjian2254 on 14-8-8.
+-->
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                autoDrawBackground="true"
+        >
+    <fx:Metadata>
+        [Event(name="listItemClick",type="events.ListClickEvent")]
+        [Event(name="listItemZhanKai",type="events.ListClickEvent")]
+    </fx:Metadata>
+    <fx:Script><![CDATA[
+        import control.window.ApplyOrgPanel;
+        import control.window.ApplyOrgPanel;
+
+        import events.ListClickEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+
+        import util.ToolUtil;
+
+        private var isFirstForAni:Boolean=true;
+        private var _data:Object;
+        override public function get data():Object {
+            return _data;
+        }
+
+        override public function set data(value:Object):void {
+            _data = value;
+            super.data = value;
+            if(value==null){
+                return;
+            }
+            solidColor.color = getColor();
+            head.source = data.icon;
+            orgLabel.text = data.name;
+            orgIDLabel.text = data.email;
+            contentArea.text = data.content;
+
+
+        }
+
+
+
+        private function checkApply(f:Boolean):void{
+
+                var obj:Object=new Object();
+                obj.apply_id = data.id;
+            if(f){
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/checkApply",refresh,"POST").send(obj);
+            }else{
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delApplyOrg",refresh,"POST").send(obj);
+            }
+
+
+        }
+
+        private function refresh(result:Object, e:ResultEvent):void{
+            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
+            dispatchEvent(listclickevent);
+        }
+
+
+        protected function getColor():uint
+        {
+            if(itemIndex%2==1){
+                return 0xf5f6f6;
+            }
+
+            return 0xffffff;
+        }
+
+        protected function m_over():void{
+            solidColor.color = 0x7ae7bf;
+        }
+
+        protected function m_out():void{
+            solidColor.color = getColor();
+        }
+        ]]></fx:Script>
+    <fx:Declarations>
+    </fx:Declarations>
+
+    <s:BorderContainer width="100%" height="50" buttonMode="true" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()">
+
+
+        <s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">
+            <s:fill>
+                <s:SolidColor color="0xdbdbdb" />
+            </s:fill>
+        </s:Rect>
+        <s:Rect left="1" right="1" top="0" bottom="1">
+            <s:fill>
+                <s:SolidColor id="solidColor"   />
+            </s:fill>
+        </s:Rect>
+
+        <s:HGroup id="horizontalLayout" verticalAlign="middle" height="100%" gap="5" paddingRight="10" paddingLeft="10">
+            <s:Image id="head" width="45" height="45"></s:Image>
+            <s:VGroup width="50%" height="100%" paddingRight="40" gap="5">
+                <s:HGroup width="100%" height="22"  verticalAlign="bottom">
+                    <s:Label  text="昵称：" ></s:Label>
+                    <s:Label id="orgLabel"   ></s:Label>
+                </s:HGroup>
+                <s:HGroup width="100%" height="23" verticalAlign="top">
+                    <s:Label  text="账号：" ></s:Label>
+                    <s:Label id="orgIDLabel"  ></s:Label>
+                </s:HGroup>
+            </s:VGroup>
+            <s:HGroup width="100%" height="100%"  verticalAlign="middle" paddingRight="10">
+                <s:Label  text="附言：" ></s:Label>
+                <s:TextArea id="contentArea" width="100%" height="100%" editable="false"></s:TextArea>
+            </s:HGroup>
+
+            <s:Button height="25" label="拒绝" click="checkApply(false)"></s:Button>
+            <s:Button height="25" label="同意" color="#ffffff" chromeColor="#ff0000" click="checkApply(true)"></s:Button>
+
+        </s:HGroup>
+
+    </s:BorderContainer>
+</s:ItemRenderer>

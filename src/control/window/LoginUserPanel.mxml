@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
-			   xmlns:s="library://ns.adobe.com/flex/spark" 
-			   xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="190" title="用户登录" creationComplete="init()" close="closeWin()">
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="190" title="用户登录"
+                             creationComplete="init()"  xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
         import httpcontrol.HttpServiceUtil;
@@ -21,9 +22,7 @@
             this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
         }
 
-        public function closeWin():void {
-            PopUpManager.removePopUp(this);
-        }
+
 
         public function reg():void {
             PopUpManager.addPopUp(ToolUtil.regUser, FlexGlobals.topLevelApplication as DisplayObject, true);
@@ -59,32 +58,32 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	
+
 	<s:Form width="100%" id="form" >
-		
+
 		<s:FormItem label="用户名:" textAlign="right">
 			<s:TextInput id="username"  prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass()">
-				
+
 			</s:TextInput>
 		</s:FormItem>
-		
+
 		<s:FormItem label="密码:" textAlign="right">
 			<s:TextInput id="password" displayAsPassword="true"  width="200" tabIndex="2" enter="save()">
-				
+
 			</s:TextInput>
 		</s:FormItem>
-		
+
 		<s:FormItem>
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
 				<s:Button label="登录" click="save()" chromeColor="red" color="#ffffff" height="25" tabIndex="3">
-					
+
 				</s:Button>
 				<s:Button label="注册" click="reg()" chromeColor="#ffffff" color="#000000" height="25" tabIndex="4">
-					
+
 				</s:Button>
-			
+
 		</s:FormItem>
 	</s:Form>
-</s:TitleWindow>
+</window:EfficientTitleWindow>

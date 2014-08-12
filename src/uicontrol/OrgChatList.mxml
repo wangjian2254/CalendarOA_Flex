@@ -93,11 +93,6 @@
                     }
                     item.childrenstatus = true;
                     item.children = new ArrayCollection();
-                    for each(var member:Object in item.members) {
-                        member['depart_id'] = item.id;
-                        member['level'] = item.level + 1;
-                    }
-                    item.children.addAll(new ArrayCollection(item.members as Array));
                     item.hideicon=false;
                 }
                 for each(item in l) {
@@ -108,6 +103,12 @@
                         }
                         depart['d' + item.father].dep_children.addItem(item);
                     }
+                    for each(var member:Object in item.members) {
+                        member['depart_id'] = item.id;
+                        member['level'] = item.level + 1;
+                    }
+                    item.children.addAll(new ArrayCollection(item.members as Array));
+                    item.name = item.name+" ("+item.children.length+")";
                 }
                 for each(item in l) {
                     if (item.flag == 'free') {
