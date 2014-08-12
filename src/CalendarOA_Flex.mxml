@@ -85,7 +85,8 @@
 			<s:Label text="当前位置： "  styleName="textStyle3"/>
 			<s:Label id="website"  styleName="textStyle3"/>
 			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" width="100%" textAlign="center" verticalAlign="middle" />
-			<s:TextInput width="200" prompt="搜索日程、任务、备忘、成员或文件" click="searcher()" height="25"/>
+			<!-- 全局搜索框:根据文字显示搜索结果： 历史搜索记录、日程、任务、备忘、成员或文件，每种类型对应相应的图标,以苹果的 Spotlight 为榜样-->
+            <s:TextInput width="200" prompt="搜索日程、任务、备忘、成员或文件" click="searcher()" height="25"/>
             <s:Button label="搜索" chromeColor="0x3e76f4" color="#ffffff" height="25"/>
 		</s:SkinnableContainer>		
 	</s:Group>
