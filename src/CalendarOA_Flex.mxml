@@ -41,13 +41,12 @@
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
 				
-				<mx:LinkButton x="0" y="2" height="25" label="登出"  styleName="textStyle1" click="logout()"/>
+				<mx:LinkButton x="0" y="2" height="25" label="退出"  styleName="textStyle1" click="logout()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
 				<s:Label text="|" styleName="textStyle1"/>
-				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>
-				<s:Label text="|" styleName="textStyle1" id="closeAppLine1"/>
-				<mx:LinkButton x="0" y="2" height="25" label="关闭程序" id="closeAppBtn1" styleName="textStyle1" visible="true" />
+				<mx:LinkButton x="0" y="2" height="25" label="个人信息" styleName="textStyle1" click="updateinfo()"/>
+
 				
 			</s:SkinnableContainer>
 			
@@ -64,8 +63,7 @@
 				<mx:LinkButton x="0" y="2" height="25" label="登录"  styleName="textStyle1" click="login()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="注册" styleName="textStyle1" click="reg()"/>
-				<s:Label text="|" styleName="textStyle1"  id="closeAppLine2"/>
-				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  id="closeAppBtn2" styleName="textStyle1" visible="true" />
+
 			</s:SkinnableContainer>
 			
 		</s:Group>
@@ -80,18 +78,19 @@
 			<s:Button width="130" height="29" label="请假申请" styleName="menuBtn" mouseOver="showHandler(event)"/>-->
 		</s:Group>	
 		
-		<s:SkinnableContainer  height="28" top="77" left="0" right="0" skinClass="skins.locGroupSkin" id="locGroup" visible="true">
+		<s:SkinnableContainer  height="35" top="77" left="0" right="0" skinClass="skins.locGroupSkin" id="locGroup" visible="true">
 			<s:layout>
-				<s:BasicLayout/>
+				<s:HorizontalLayout paddingLeft="20" paddingRight="20" verticalAlign="middle"/>
 			</s:layout>
-			<s:Label text="当前位置： " left="20" top="8" styleName="textStyle3"/>
-			<s:Label id="website" left="85" top="8" styleName="textStyle3"/>
-			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" top="0" bottom="0" left="0" right="0" textAlign="center" verticalAlign="middle" />
-			<mx:LinkButton label="刷新页面数据" visible="true" click="reLogin()" top="3" right="12" color="0x353535"/>
+			<s:Label text="当前位置： "  styleName="textStyle3"/>
+			<s:Label id="website"  styleName="textStyle3"/>
+			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" width="100%" textAlign="center" verticalAlign="middle" />
+			<s:TextInput width="200" prompt="搜索日程、任务、备忘、成员或文件" click="searcher()" height="25"/>
+            <s:Button label="搜索" chromeColor="0x3e76f4" color="#ffffff" height="25"/>
 		</s:SkinnableContainer>		
 	</s:Group>
 	
-	<mx:ViewStack id="gongNengStack" top="105" left="0" right="0" bottom="33"  borderVisible="false" creationComplete="trace('view stack')"  >
+	<mx:ViewStack id="gongNengStack" top="112" left="0" right="0" bottom="33"  borderVisible="false" creationComplete="trace('view stack')"  >
 		
 		
 		

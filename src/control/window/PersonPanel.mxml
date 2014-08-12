@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" width="300" height="200" creationComplete="init(event)"
+                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
+
+    <fx:Script>
+		<![CDATA[
+
+			import httpcontrol.HttpServiceUtil;
+
+            import mx.controls.Alert;
+            import mx.events.CloseEvent;
+            import mx.events.EffectEvent;
+			import mx.rpc.events.ResultEvent;
+			import util.ToolUtil;
+
+            public var personData:Object=null;
+            public var departmentData:Object=null;
+
+			public function init(e:mx.events.FlexEvent):void{
+
+                this.height = hGroup.height+20;
+                if(hGroup.width>300){
+                    this.width = hGroup.width;
+                }
+
+//                this.minWidth = 400;
+                this.title =personData.name +" 的个人信息";
+                head.source = personData.icon;
+//                emailLabel.text = personData.username;
+                nameLabel.text = personData.name;
+                buttonRemove.visible = false;
+                var person:Object;
+                for (var i:int = 0; i < departmentData.managers.length; i++) {
+                    person = departmentData.managers[i];
+                    if (person.id == ToolUtil.sessionUser.pid) {
+                        buttonRemove.visible = true;
+                    }
+                }
+
+
+			}
+
+			private function sendMessageResult(result:Object,e:ResultEvent):void{
+                closeWin();
+			}
+            private function delPerson():void{
+                Alert.show("确定要将 "+personData.name+" 移出组织么？","移除成员",3,this,removePerson);
+            }
+
+        private function removePerson(e:CloseEvent):void{
+            if(e.detail==Alert.YES){
+                var url:String="/riliusers/removePerson";//保存url
+                var obj:Object = new Object();
+                obj['pid'] =  personData.id;
+                HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
+            }
+
+        }
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+    <s:HGroup id="hGroup" height="100%" verticalAlign="top" gap="10" paddingTop="10" paddingRight="10" paddingLeft="10" paddingBottom="10">
+        <s:HGroup paddingTop="30">
+            <s:Image id="head" width="45" height="45" ></s:Image>
+        </s:HGroup>
+
+        <s:Form>
+            <!--<s:FormItem label="用户名：">-->
+                <!--<s:Label id="emailLabel"></s:Label>-->
+            <!--</s:FormItem>-->
+            <s:FormItem label="昵称：">
+                <s:Label id="nameLabel"></s:Label>
+            </s:FormItem>
+            <s:FormItem label="职位：">
+                <s:Label id="zhiLabel"></s:Label>
+            </s:FormItem>
+            <s:FormItem label="电话：">
+                <s:Label id="telLabel"></s:Label>
+            </s:FormItem>
+            <s:FormItem label="QQ：">
+                <s:Label id="qqLabel"></s:Label>
+            </s:FormItem>
+            <mx:ControlBar textAlign="right" paddingRight="20">
+                <s:Button id="buttonRemove" chromeColor="#ff0000" color="#ffffff" click="delPerson()" label="移除本组织"></s:Button>
+            </mx:ControlBar>
+        </s:Form>
+    </s:HGroup>
+
+</window:EfficientTitleWindow>

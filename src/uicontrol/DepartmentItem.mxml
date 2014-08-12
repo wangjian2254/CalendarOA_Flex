@@ -18,21 +18,26 @@
 
         import mx.controls.Alert;
         import mx.controls.Menu;
+        import mx.events.CloseEvent;
         import mx.events.MenuEvent;
 
         import mx.rpc.events.ResultEvent;
 
         import uicontrol.conobj.DepartmentSelectArray;
 
-        import util.RightClickManager;
 
         import util.RightClickManager;
 
         import util.ToolUtil;
 
         private var _department:Object = null;
+
+        private var _fatherDepartment:Object = null;
+
         [Bindable]
-        public var hasPower:Boolean = false;
+        public var powerAdd:Boolean = false;
+        [Bindable]
+        public var powerDel:Boolean = false;
 
         [Bindable]
         public var departmentSelectArray:DepartmentSelectArray = null;
@@ -59,7 +64,7 @@
 
         public function selectDepart(e:Boolean = false):void {
 
-            if(!this.buttonMode){
+            if (!this.buttonMode) {
                 return;
             }
             if (departmentSelectArray.selectedButtons()) {
@@ -90,20 +95,34 @@
             var person:Object = null;
             var personItem:PersonItem = null;
 
+            powerAdd = false;
+            powerDel = false;
             if (ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0) {
 
-                hasPower = true;
+                powerAdd = true;
+                powerDel = true;
             } else {
 
                 for (var i:int = 0; i < department.managers.length; i++) {
                     person = department.managers[i];
                     if (person.id == ToolUtil.sessionUser.pid) {
-                        hasPower = true;
+                        powerAdd = true;
                     }
                 }
+
+                if(fatherDepartment!=null){
+                    for (var i:int = 0; i < fatherDepartment.managers.length; i++) {
+                        person = fatherDepartment.managers[i];
+                        if (person.id == ToolUtil.sessionUser.pid) {
+                            powerDel = true;
+                        }
+                    }
+                }
+
             }
             if (department.flag == 'free') {
-                hasPower = false;
+                powerAdd = false;
+                powerDel = false;
             }
             if (department.flag == 'root') {
                 group.removeElement(btnDel);
@@ -111,7 +130,7 @@
             for (var i:int = 0; i < department.managers.length; i++) {
                 person = department.managers[i];
                 personItem = new PersonItem();
-                personItem.showBtn = hasPower;
+                personItem.showBtn = powerAdd;
                 personItem.person = person;
                 personItem.department = department;
                 fzrFormItem.addElement(personItem);
@@ -119,36 +138,43 @@
             this.width = 60 + formDepart.width;
             this.height = 10 + formDepart.height;
 
-            this.addEventListener(RightClickManager.RIGHT_CLICK,menuDepartment);
+            this.addEventListener(RightClickManager.RIGHT_CLICK, menuDepartment);
         }
 
         private var contextMenuItems:ArrayCollection;
-        private function menuDepartment(e:MouseEvent):void{
 
-            if(hasPower){
-                contextMenuItems=new ArrayCollection([{"icon":CBorderContainer.wximg,"text":"发送消息","mode":"chat"},{"icon":CBorderContainer.addimg,"text":"添加下级部门","mode":"add"},{"icon":CBorderContainer.saveimg,"text":"查看部门信息","mode":"show"}]);
-            }else{
-                contextMenuItems=new ArrayCollection([{"icon":CBorderContainer.wximg,"text":"发送消息","mode":"chat"}]);
+        private function menuDepartment(e:MouseEvent):void {
+
+            if (powerAdd) {
+                contextMenuItems = new ArrayCollection([
+                    {"icon": CBorderContainer.wximg, "text": "发送消息", "mode": "chat"},
+                    {"icon": CBorderContainer.addimg, "text": "添加下级部门", "mode": "add"},
+                    {"icon": CBorderContainer.saveimg, "text": "查看部门信息", "mode": "show"}
+                ]);
+            } else {
+                contextMenuItems = new ArrayCollection([
+                    {"icon": CBorderContainer.wximg, "text": "发送消息", "mode": "chat"}
+                ]);
             }
-            var menu:Menu = RightClickManager.getMenu(this,contextMenuItems,false);
+            var menu:Menu = RightClickManager.getMenu(this, contextMenuItems, false);
 
-            menu.labelField="text";
-            menu.iconField="icon";
+            menu.labelField = "text";
+            menu.iconField = "icon";
             menu.variableRowHeight = true;
             menu.rowHeight = 35;
             menu.addEventListener(MenuEvent.ITEM_CLICK, menuItemClickHandler);
 
 //              var point:Point = new Point(mouseX,mouseY);
 //              point = localToGlobal(point);
-            menu.show(stage.mouseX,stage.mouseY);
+            menu.show(stage.mouseX, stage.mouseY);
         }
 
-        private function menuItemClickHandler(e:MenuEvent):void{
+        private function menuItemClickHandler(e:MenuEvent):void {
             var item:Object = e.item;
-            var mod:String =item.mode;
-            switch (mod){
+            var mod:String = item.mode;
+            switch (mod) {
                 case 'chat':
-                    Alert.show(department.name,"发送信息");
+                    Alert.show(department.name, "发送信息");
                     break;
                 case 'add':
                     addChildDepartment();
@@ -176,10 +202,16 @@
         }
 
         private function delDepartment():void {
-            var obj:Object = new Object();
+            Alert.show("确定要删除部门么?部门下得项目、任务都会被删除，无法恢复。", "删除部门", 3, this, delDepartmentHandler);
 
-            obj['id'] = department.id;
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delDepartment", addChildDepartmentResult, "POST").send(obj);
+        }
+
+        private function delDepartmentHandler(e:CloseEvent):void {
+            if (e.detail == Alert.YES) {//如果按下了确定按钮
+                var obj:Object = new Object();
+                obj['id'] = department.id;
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delDepartment", addChildDepartmentResult, "POST").send(obj);
+            }
         }
 
         private function addChildDepartment():void {
@@ -202,6 +234,14 @@
             }
 
         }
+
+        public function get fatherDepartment():Object {
+            return _fatherDepartment;
+        }
+
+        public function set fatherDepartment(value:Object):void {
+            _fatherDepartment = value;
+        }
         ]]></fx:Script>
             <s:layout>
                 <s:HorizontalLayout gap="5" verticalAlign="top" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
@@ -211,8 +251,8 @@
     <s:Image id="orgHead"  width="45" height="45"></s:Image>
     <s:VGroup id="formDepart" width="100%" gap="5">
         <s:HGroup gap="15" id="group" horizontalAlign="right" verticalAlign="middle"  width="100%">
-            <uicontrol:BtnAdd toolTip="添加子部门" visible="{hasPower}" clickFun="{addChildDepartment}" ></uicontrol:BtnAdd>
-            <uicontrol:BtnDel id="btnDel" toolTip="删除部门" visible="{hasPower}" clickFun="{delDepartment}" ></uicontrol:BtnDel>
+            <uicontrol:BtnAdd toolTip="添加子部门" visible="{powerAdd}" clickFun="{addChildDepartment}" ></uicontrol:BtnAdd>
+            <uicontrol:BtnDel id="btnDel" toolTip="删除部门" visible="{powerDel}" clickFun="{delDepartment}" ></uicontrol:BtnDel>
         </s:HGroup>
         <s:HGroup width="100%"  verticalAlign="middle" >
             <s:Label text="部门名称："></s:Label>

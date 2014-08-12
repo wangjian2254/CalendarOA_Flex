@@ -5,7 +5,7 @@
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:uicontrol="uicontrol.*" xmlns:mx="library://ns.adobe.com/flex/mx"
                    width="100" height="55" borderVisible="true" borderColor="#cccccc" cornerRadius="7"
-                   creationComplete="init()"   mouseOut="m_Out()" mouseOver="m_Over()"
+                   creationComplete="init()"   mouseOut="m_Out()" mouseOver="m_Over()"  buttonMode="true" click="personItem.showDetail(event)"
         >
     <fx:Script><![CDATA[
         import httpcontrol.HttpServiceUtil;
@@ -117,10 +117,10 @@
     </s:layout>
     <s:Image id="head"  width="45" height="45" ></s:Image>
     <s:VGroup id="btnGroup" width="100%" minHeight="45" gap="5">
-            <uicontrol:PersonItem id="personItem"  showBtn="{hasPower}" ></uicontrol:PersonItem>
+            <uicontrol:PersonItem id="personItem"  showBtn="{hasPower}"  ></uicontrol:PersonItem>
 
-        <mx:LinkButton id="linkButtonFzr" label="设为负责人" textDecoration="underline"  click="managerPerson()"  visible="{hasPower}" ></mx:LinkButton>
-        <mx:LinkButton id="linkButtonUFzr" label="取消负责人"  textDecoration="underline" click="delManagerPerson()"  visible="{hasPower}" ></mx:LinkButton>
+        <mx:LinkButton id="linkButtonFzr" label="设为负责人"  textDecoration="underline"  click="managerPerson()"  visible="{hasPower}" ></mx:LinkButton>
+        <mx:LinkButton id="linkButtonUFzr" label="取消负责人" color="#ff0000"  textDecoration="underline" click="delManagerPerson()"  visible="{hasPower}" ></mx:LinkButton>
     </s:VGroup>
 
 </s:BorderContainer>

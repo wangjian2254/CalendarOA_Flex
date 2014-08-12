@@ -142,6 +142,10 @@ public function repassword():void {
 	//				changepassword.y=(this.height-changepassword.height)/2;
 }
 
+public function searcher():void{
+    Alert.show("搜索");
+}
+
 
 public function reLogin():void {
 	FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr, ToolUtil.sessionUser, true));

@@ -36,7 +36,8 @@
 
 
         [Bindable]
-        private var departmentList:ArrayCollection = null;
+        private var departmentList:ArrayCollection = null;[Bindable]
+        private var departmentList2:ArrayCollection = null;
 
         private var departChart:Object = null;
         private var rootDepart:Object = null;
@@ -69,6 +70,13 @@
 
         private function initDepartment():void {
             departmentList = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
+            departmentList2 = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
+            for each(var d:Object in departmentList2){
+                if(d.flag == 'free'){
+                    departmentList2.removeItemAt(departmentList2.getItemIndex(d));
+                    break;
+                }
+            }
             departmentSelectArray.clear();
             orgChart.removeAllElements();
 
@@ -86,15 +94,16 @@
             for (var i:int = 0; i < departmentList.length; i++) {
 
                 depart = departmentList.getItemAt(i);
-
+                departitem = new DepartmentItem();
                 if (depart.father) {
                     if (!departChart['d' + depart.father].hasOwnProperty("children")) {
                         departChart['d' + depart.father]['children'] = [];
                     }
                     departChart['d' + depart.father]['children'].push(depart);
+                    departitem.fatherDepartment = departChart['d' + depart.father];
 
                 }
-                departitem = new DepartmentItem();
+
                 departitem.department = depart;
                 departitem.departmentSelectArray = departmentSelectArray;
                 departitem.x = i * 200;
@@ -265,16 +274,20 @@
         private function changeDepartment(e:ChangeDepartmentEvent):void {
             selectDepartmentId = e.depart.id;
             departmentName.text = e.depart.name;
-            departmentName.enabled = departmentSelectArray.getById(selectDepartmentId).hasPower;
-            orgHead.buttonMode = departmentSelectArray.getById(selectDepartmentId).hasPower;
+            departmentName.enabled = departmentSelectArray.getById(selectDepartmentId).powerAdd;
+            orgHead.buttonMode = departmentSelectArray.getById(selectDepartmentId).powerAdd;
             if(orgHead.buttonMode){
                 orgHead.toolTip = "点击修改部门头像";
             }else{
                 orgHead.toolTip = "您没有权限修改部门头像";
             }
-            memberBox.enabled = departmentSelectArray.getById(selectDepartmentId).hasPower;
+            memberBox.enabled = departmentSelectArray.getById(selectDepartmentId).powerAdd;
+            if(e.depart.flag != 'free'&& e.depart.flag != 'root'&& ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0){
+                departBox.enabled = true;
+            }else{
+                departBox.enabled = false;
+            }
             orgHead.source = e.depart.icon;
-
             memebers.removeAllElements();
             var departitem:DepartmentItem;
             var depart:Object;
@@ -284,6 +297,7 @@
                     departitem = new DepartmentItem();
                     departitem.buttonMode = false;
                     departitem.department = depart;
+                    departitem.fatherDepartment = departChart['d' + depart.father];
                     memebers.addElement(departitem);
                 }
             }
@@ -334,11 +348,20 @@
 //            departmentName.setFocus();
         }
 
-
         private function addMemberResult(result:Object, e:ResultEvent):void {
             if (result.success) {
                 ToolUtil.departMentListRefresh();
             }
+        }
+        private function changeFatherDepartment():void {
+            if(departBox.selectedItem==null){
+                return;
+            }
+            var obj:Object = new Object();
+
+            obj['id'] = selectDepartmentId;
+            obj['fid'] = departBox.selectedItem.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/changeDepartment", addMemberResult, "POST").send(obj);
         }
         ]]>
 	</fx:Script>
@@ -372,9 +395,10 @@
                 <s:Label text="部门名称:"></s:Label>
                 <s:TextInput id="departmentName" width="200" prompt="按回车键保存" toolTip="按回车键保存" enter="saveDepartment()"></s:TextInput>
                 <s:Label text="添加成员:"></s:Label>
-                <s:ComboBox id="memberBox" dataProvider="{ToolUtil.memberList}" labelField="name" width="150" change="addMember()"  >
+                <s:ComboBox id="memberBox" dataProvider="{ToolUtil.memberList}" labelField="name" width="150" change="addMember()"  />
+                <s:Label text="父级部门:"></s:Label>
+                <s:ComboBox id="departBox" dataProvider="{departmentList2}" labelField="name" width="150" change="changeFatherDepartment()"  />
 
-                </s:ComboBox>
             </s:BorderContainer>
             <s:Scroller width="100%"  height="100%" >
                 <s:Group width="100%" height="100%">
