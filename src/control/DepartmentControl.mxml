@@ -91,7 +91,7 @@
                     rootDepart = depart;
                 }
             }
-            for (var i:int = 0; i < departmentList.length; i++) {
+            for ( i = 0; i < departmentList.length; i++) {
 
                 depart = departmentList.getItemAt(i);
                 departitem = new DepartmentItem();
@@ -164,7 +164,7 @@
             }
             var fatherDepart:Object = departChart['d' + departmentItem.father];
             var p:Object = null;
-            for (var i:int = 0; i < fatherDepart.children.length; i++) {
+            for (i = 0; i < fatherDepart.children.length; i++) {
                 d = fatherDepart.children[i];
                 if (p == null && d.id != departmentItem.id) {
                     continue;
@@ -207,7 +207,7 @@
 
                 calculateDepartmentCoordinateByChildren(departmentItem);
 
-                for (var i:int = 0; i < departmentItem.children.length; i++) {
+                for (i = 0; i < departmentItem.children.length; i++) {
                     d = departmentItem.children[i];
                     calculateDepartmentCoordinate(d);
                 }
@@ -245,7 +245,7 @@
                 }
 
 
-                for (var i:int = 0; i < departmentItem.children.length; i++) {
+                for (i = 0; i < departmentItem.children.length; i++) {
                     d = departmentItem.children[i];
                     drawOrgChart(d);
                 }
@@ -287,12 +287,18 @@
             }else{
                 departBox.enabled = false;
             }
+            departBox.selectedIndex=-1;
+            for each(var d:Object in departBox.dataProvider){
+                if(d.id == e.depart.father){
+                    departBox.selectedItem = d;
+                }
+            }
             orgHead.source = e.depart.icon;
             memebers.removeAllElements();
             var departitem:DepartmentItem;
             var depart:Object;
             if (e.depart.hasOwnProperty('children')) {
-                for (var i:int = 0; i < e.depart.children.length; i++) {
+                for (i = 0; i < e.depart.children.length; i++) {
                     depart = e.depart.children[i];
                     departitem = new DepartmentItem();
                     departitem.buttonMode = false;

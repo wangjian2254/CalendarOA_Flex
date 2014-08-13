@@ -103,9 +103,9 @@
                         }
                         depart['d' + item.father].dep_children.addItem(item);
                     }
-                    for each(var member:Object in item.members) {
-                        member['depart_id'] = item.id;
-                        member['level'] = item.level + 1;
+                    for each(var m:Object in item.members) {
+                        m['depart_id'] = item.id;
+                        m['level'] = item.level + 1;
                     }
                     item.children.addAll(new ArrayCollection(item.members as Array));
                     item.name = item.name+" ("+item.children.length+")";

@@ -6,65 +6,66 @@
 
     <fx:Script>
 		<![CDATA[
-			import events.ChangeJoinUserEvent;
-			import events.ChangeMenuEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.events.CloseEvent;
-			import mx.events.EffectEvent;
-			import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			import mx.utils.ObjectUtil;
-			
-			import uicontrol.ContactItem;
-			
-			import util.ToolUtil;
-			private var isFirstForAni:Boolean=true;
+        import events.ChangeJoinUserEvent;
+        import events.ChangeMenuEvent;
 
-            public var orgData:Object=null;
-            public var type:String=null;
-			
-			public function init(e:mx.events.FlexEvent):void{
+        import httpcontrol.HttpServiceUtil;
 
-                this.height = form.height+10;
-                this.title ="申请加入";
-                areaUrl.text = "我是 "+ToolUtil.orgPanel.loginNickname;
-                areaUrl.setFocus();
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
+        import mx.events.EffectEvent;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
 
-			}
+        import uicontrol.ContactItem;
 
-//			public  function sendAnimation():void{
-//				mve.xFrom=this.width;
-//				mve.yFrom=this.height;
-//				mve.xTo=FlexGlobals.topLevelApplication.width;
-//				mve.yTo =0;
-//				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-//				var pb:Point=new Point(mve.xTo,mve.yTo);
-//				mve.duration = int(Point.distance(pa,pb))/100*70;
-//				mve.addEventListener(EffectEvent.EFFECT_END,sendAnimationEnd);
-//				mve.play();
-//			}
+        import util.ToolUtil;
+
+        private var isFirstForAni:Boolean = true;
+
+        public var orgData:Object = null;
+        public var type:String = null;
+
+        public function init(e:mx.events.FlexEvent):void {
+
+            this.height = form.height + 10;
+            this.title = "申请加入";
+            areaUrl.text = "我是 " + ToolUtil.selectOrg.loginNickname;
+            areaUrl.setFocus();
+
+        }
+
+        //			public  function sendAnimation():void{
+        //				mve.xFrom=this.width;
+        //				mve.yFrom=this.height;
+        //				mve.xTo=FlexGlobals.topLevelApplication.width;
+        //				mve.yTo =0;
+        //				var pa:Point=new Point(mve.xFrom,mve.yFrom);
+        //				var pb:Point=new Point(mve.xTo,mve.yTo);
+        //				mve.duration = int(Point.distance(pa,pb))/100*70;
+        //				mve.addEventListener(EffectEvent.EFFECT_END,sendAnimationEnd);
+        //				mve.play();
+        //			}
 
 
-			private function sendMessageResult(result:Object,e:ResultEvent):void{
-                orgData.apply_id=result.result.apply_id;
-                ToolUtil.orgPanel.addOrgItem(orgData);
-                ToolUtil.joinorgPanel.addOrgItem(orgData);
-                closeWin();
-			}
+        private function sendMessageResult(result:Object, e:ResultEvent):void {
+            orgData.apply_id = result.result.apply_id;
+            ToolUtil.selectOrg.addOrgItem(orgData);
+            ToolUtil.searchOrg.addOrgItem(orgData);
+            closeWin();
+        }
 
-        private function copyUrl():void{
-            var url:String="/riliusers/applyOrg";//保存url
+        private function copyUrl():void {
+            var url:String = "/riliusers/applyOrg";//保存url
             var obj:Object = new Object();
             obj['org'] = orgData.id;
-            obj['content'] =  areaUrl.text;
-            HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
+            obj['content'] = areaUrl.text;
+            HttpServiceUtil.getCHTTPServiceAndResult(url, sendMessageResult, "POST").send(obj);
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

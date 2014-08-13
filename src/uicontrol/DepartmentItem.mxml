@@ -111,7 +111,7 @@
                 }
 
                 if(fatherDepartment!=null){
-                    for (var i:int = 0; i < fatherDepartment.managers.length; i++) {
+                    for (i = 0; i < fatherDepartment.managers.length; i++) {
                         person = fatherDepartment.managers[i];
                         if (person.id == ToolUtil.sessionUser.pid) {
                             powerDel = true;
@@ -127,7 +127,7 @@
             if (department.flag == 'root') {
                 group.removeElement(btnDel);
             }
-            for (var i:int = 0; i < department.managers.length; i++) {
+            for (i = 0; i < department.managers.length; i++) {
                 person = department.managers[i];
                 personItem = new PersonItem();
                 personItem.showBtn = powerAdd;

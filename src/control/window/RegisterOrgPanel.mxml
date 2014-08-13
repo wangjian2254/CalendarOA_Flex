@@ -7,56 +7,57 @@
                              title="创建组织" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
-			import httpcontrol.HttpServiceUtil;
+        import httpcontrol.HttpServiceUtil;
 
-            import mx.controls.Alert;
-            import mx.core.FlexGlobals;
-            import mx.managers.PopUpManager;
-            import mx.rpc.events.ResultEvent;
-			import util.ToolUtil;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
 
-            private function init():void{
+        import util.ToolUtil;
 
-                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
-                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+        private function init():void {
+
+            this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+            this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+        }
+
+
+        private function getOrgByFlagResult(result:Object, e:ResultEvent):void {
+            this.title = result.result.name + " 新成员注册";
+        }
+
+        public function save():void {
+            if (orgname.text == "") {
+                Alert.show("组织名称必须填写", "提示");
+                return;
             }
 
+            var obj:Object = new Object();
+
+            obj.name = orgname.text;
+
+            obj.icon = orgHeadSelectArray.selectedIcon();
 
 
-            private function getOrgByFlagResult(result:Object,e:ResultEvent):void{
-                 this.title = result.result.name + " 新成员注册";
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regOrganization", refresh, "POST").send(obj);
+
+
+        }
+
+        public function refresh(r:Object, e:ResultEvent):void {
+            closeWin();
+            ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+            if (ToolUtil.selectOrg != null && ToolUtil.selectOrg.parent != null) {
+                PopUpManager.removePopUp(ToolUtil.selectOrg);
+                ToolUtil.selectOrg = new SelectOrgPanel();
             }
+        }
 
-			public function save():void{
-                if(orgname.text==""){
-                    Alert.show("组织名称必须填写","提示");
-                    return;
-                }
-
-				var obj:Object=new Object();
-
-                obj.name = orgname.text;
-
-				obj.icon = orgHeadSelectArray.selectedIcon();
-
-				
-				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regOrganization",refresh,"POST").send(obj);
-					
-				
-			}
-			public function refresh(r:Object,e:ResultEvent):void{
-                closeWin();
-                ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
-                if(ToolUtil.orgPanel!=null&&ToolUtil.orgPanel.parent!=null){
-                    PopUpManager.removePopUp(ToolUtil.orgPanel);
-                    ToolUtil.orgPanel = new SelectOrgPanel();
-                }
-			}
-
-        public function foucePass(obj:Object):void{
+        public function foucePass(obj:Object):void {
             obj.setFocus();
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

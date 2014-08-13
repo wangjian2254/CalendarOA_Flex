@@ -123,7 +123,7 @@ private function changeMenu(evt:ChangeMenuEvent):void {
 			break;
 		}
 	}
-    for each(var xml1:XML in myMenuXML..menu) {
+    for each(xml1 in myMenuXML..menu) {
         xml2 = xml1 as XML;
         if (xml2.attribute('mod').toString() == evt.getMenuMod()) {
             xml = xml2 as XML;

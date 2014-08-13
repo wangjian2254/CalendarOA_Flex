@@ -44,26 +44,29 @@ public class ToolUtil
     public static var  currentUserFun:Function=null;
     public static var loginUser:LoginUserPanel= new LoginUserPanel();
     public static var regUser:RegisterUserPanel= new RegisterUserPanel();
-    public static var orgPanel:SelectOrgPanel= new SelectOrgPanel();
-    public static var joinorgPanel:JoinOrgPanel= new JoinOrgPanel();
+    public static var selectOrg:SelectOrgPanel= new SelectOrgPanel();
+    public static var searchOrg:JoinOrgPanel= new JoinOrgPanel();
 
     private static var time:Timer = new Timer(1000*60*5,0);
 
     public static function init():void{
-//			hyRefresh();
-//			kjkmRefresh();
-//			bbRefresh();
-//			userRefresh();
+
+        loginUser = new LoginUserPanel();
+        regUser = new RegisterUserPanel();
+        selectOrg = new SelectOrgPanel();
+
+
         sessionUserRefresh();
         currentOrgRefresh();
         departMentListRefresh();
         contactsRefresh();
 //			taskRefresh();
         taskUnRefresh();
-        unreadMessageRefresh();
+
+//        unreadMessageRefresh();
         time.addEventListener(TimerEvent.TIMER,unreadMessageRefresh);
         if(!time.running){
-            time.start();
+//            time.start();
         }
 //			ruleRefresh();
 //			ticketRefresh();

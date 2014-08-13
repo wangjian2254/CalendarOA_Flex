@@ -32,7 +32,7 @@
         override public function set data(value:Object):void {
             _data = value;
             super.data = value;
-            if(value==null){
+            if (value == null) {
                 return;
             }
             init();
@@ -40,8 +40,8 @@
 
         }
 
-        private function init():void{
-            if(!data.hasOwnProperty('id')&&data.hasOwnProperty('type')){
+        private function init():void {
+            if (!data.hasOwnProperty('id') && data.hasOwnProperty('type')) {
                 headPerson.source = null;
                 orgStatus.text = "";
                 orgLabel.text = "";
@@ -49,36 +49,36 @@
                 statusLabel.text = "";
                 orgLabel2.text = "";
                 nameLabel.text = '继续加载';
-                nameLabel.setStyle("color",0x0000);
-                nameLabel.setStyle("textDecoration","none");
+                nameLabel.setStyle("color", 0x0000);
+                nameLabel.setStyle("textDecoration", "none");
                 nameLabel.buttonMode = false;
                 nameLabel.addEventListener(MouseEvent.CLICK, applyOrg);
-            }else{
+            } else {
                 head.source = data.icon;
                 orgLabel.text = data.name;
                 orgIDLabel.text = data.id;
                 orgLabel2.text = "组织ID：";
 
-                if(data.hasOwnProperty('pid')){
+                if (data.hasOwnProperty('pid')) {
                     headPerson.source = data.person_icon;
                     statusLabel.text = "昵称：";
                     nameLabel.text = data.person_name;
-                    nameLabel.setStyle("color",0x0000);
-                    nameLabel.setStyle("textDecoration","none");
+                    nameLabel.setStyle("color", 0x0000);
+                    nameLabel.setStyle("textDecoration", "none");
                     nameLabel.buttonMode = false;
                     nameLabel.removeEventListener(MouseEvent.CLICK, applyOrg);
-                }else if(data.hasOwnProperty('apply_id')){
+                } else if (data.hasOwnProperty('apply_id')) {
                     statusLabel.text = "等待审核";
                     nameLabel.text = "取消";
-                    nameLabel.setStyle("color",0x5484ed);
-                    nameLabel.setStyle("textDecoration","underline");
+                    nameLabel.setStyle("color", 0x5484ed);
+                    nameLabel.setStyle("textDecoration", "underline");
                     nameLabel.buttonMode = true;
                     nameLabel.addEventListener(MouseEvent.CLICK, applyOrg);
-                }else{
+                } else {
                     statusLabel.text = "";
                     nameLabel.text = "申请加入";
-                    nameLabel.setStyle("color",0x5484ed);
-                    nameLabel.setStyle("textDecoration","underline");
+                    nameLabel.setStyle("color", 0x5484ed);
+                    nameLabel.setStyle("textDecoration", "underline");
                     nameLabel.buttonMode = true;
                     nameLabel.addEventListener(MouseEvent.CLICK, applyOrg);
                 }
@@ -86,54 +86,53 @@
 
         }
 
-        private function applyOrg(e:MouseEvent):void{
-            if(!data.hasOwnProperty('id')&&data.hasOwnProperty('type')){
-                ToolUtil.joinorgPanel.queryOrg(false);
+        private function applyOrg(e:MouseEvent):void {
+            if (!data.hasOwnProperty('id') && data.hasOwnProperty('type')) {
+                ToolUtil.searchOrg.queryOrg(false);
                 return;
             }
-            if(data.hasOwnProperty('apply_id')){
-                var obj:Object=new Object();
+            if (data.hasOwnProperty('apply_id')) {
+                var obj:Object = new Object();
                 obj.apply_id = data.apply_id;
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delApplyOrg",refresh,"POST").send(obj);
-            }else{
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delApplyOrg", refresh, "POST").send(obj);
+            } else {
 
-                var applyPanel:ApplyOrgPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,ApplyOrgPanel,true) as ApplyOrgPanel;
+                var applyPanel:ApplyOrgPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, ApplyOrgPanel, true) as ApplyOrgPanel;
                 applyPanel.orgData = data;
             }
         }
 
-        private function refresh(result:Object, e:ResultEvent):void{
+        private function refresh(result:Object, e:ResultEvent):void {
             delete data.apply_id;
             init();
-            ToolUtil.orgPanel.delOrgItem(data);
+            ToolUtil.selectOrg.delOrgItem(data);
         }
 
-        private function select_handler(e:MouseEvent):void{
-            if(!data.hasOwnProperty('pid')){
+        private function select_handler(e:MouseEvent):void {
+            if (!data.hasOwnProperty('pid')) {
                 return;
             }
-            if(data && !data.person_active){
-                Alert.show("您在 "+data.name +" 已经离职。","提示");
+            if (data && !data.person_active) {
+                Alert.show("您在 " + data.name + " 已经离职。", "提示");
                 return;
             }
-                var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
-                dispatchEvent(listclickevent);
+            var listclickevent:ListClickEvent = new ListClickEvent("listItemClick", data);
+            dispatchEvent(listclickevent);
         }
 
-        protected function getColor():uint
-        {
-            if(itemIndex%2==1){
+        protected function getColor():uint {
+            if (itemIndex % 2 == 1) {
                 return 0xf5f6f6;
             }
 
             return 0xffffff;
         }
 
-        protected function m_over():void{
+        protected function m_over():void {
             solidColor.color = 0x7ae7bf;
         }
 
-        protected function m_out():void{
+        protected function m_out():void {
             solidColor.color = getColor();
         }
         ]]></fx:Script>

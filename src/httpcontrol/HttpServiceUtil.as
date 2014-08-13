@@ -87,13 +87,13 @@ import util.LoadingUtil;
                     case 402:
                             break;
                     case 403:
-                            ToolUtil.orgPanel.loginNickname = o.result.name;
-                            PopUpManager.addPopUp(ToolUtil.orgPanel, FlexGlobals.topLevelApplication as DisplayObject, true);
+                            ToolUtil.selectOrg.loginNickname = o.result.name;
+                            PopUpManager.addPopUp(ToolUtil.selectOrg, FlexGlobals.topLevelApplication as DisplayObject, true);
                             return;
                             break;
                     case 404:
-                            if(ToolUtil.orgPanel!=null&&ToolUtil.orgPanel.parent!=null){
-                                PopUpManager.removePopUp(ToolUtil.orgPanel);
+                            if(ToolUtil.selectOrg!=null&&ToolUtil.selectOrg.parent!=null){
+                                PopUpManager.removePopUp(ToolUtil.selectOrg);
                             }
                             if(ToolUtil.joinOrgFlag!=null){
                                 if(ToolUtil.regUser.parent == null){

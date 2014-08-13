@@ -54,7 +54,7 @@
                 hasPower = true;
             } else {
 
-                for (var i:int = 0; i < department.managers.length; i++) {
+                for (i = 0; i < department.managers.length; i++) {
                     person = department.managers[i];
                     if (person.id == ToolUtil.sessionUser.pid) {
                         hasPower = true;
