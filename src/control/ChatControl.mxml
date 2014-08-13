@@ -9,13 +9,20 @@
         import events.CloseEvent;
         import events.ListClickEvent;
 
+        import json.JParser;
 
 
         import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
         import mx.events.CollectionEvent;
         import mx.events.CollectionEventKind;
         import mx.events.FlexEvent;
         import mx.utils.ObjectUtil;
+
+        import org.idream.pomelo.Pomelo;
+        import org.idream.pomelo.PomeloEvent;
+
+        import util.ChatManager;
 
         import util.DateUtil;
 
@@ -42,33 +49,58 @@
             }
             head.source = chatUser.icon;
             nameLabel.text = chatUser.name;
+
+            Pomelo.getIns().addEventListener("pStatus",changeMember);
+            Pomelo.getIns().addEventListener("onLine",changeMember);
+            Pomelo.getIns().addEventListener('onChat', chatHandler);
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-
-
+            Pomelo.getIns().addEventListener("pStatus",changeMember);
+            Pomelo.getIns().addEventListener("onLine",changeMember);
+            Pomelo.getIns().addEventListener('onChat', chatHandler);
         }
 
         override public function closeContainer(e:CloseEvent):void {
+            Pomelo.getIns().removeEventListener("pStatus",changeMember);
+            Pomelo.getIns().removeEventListener("onLine",changeMember);
+            Pomelo.getIns().removeEventListener('onChat', chatHandler);
+
             dispatchEvent(e);
         }
 
-        private function changeMember():void{
-//            var c:ArrayCollection = new ArrayCollection();
+        private function chatHandler(event:PomeloEvent):void{
+            if(event.message.msg.o==chatUser.id || event.message.msg.t == chatUser.id){
+                if(event.message.msg.f==ToolUtil.sessionUser.pid){
+//                    for each(var chat:Object in chatsArr){
+//                        if(event.message.msg.id==chat.id){
+//                            chat.status="success";
+//                        }
+//                    }
+//                    chatsArr.refresh();
+                }else{
+                    chatsArr.addItem(event.message.msg);
+                }
+
+            }
+
+        }
+
+
+        private function changeMember(e:Event=null):void{
             for each(var member:Object in members){
                 member['online']=false;
-//                c.addItem(member);
-
+            }
+            for each(var member:Object in members){
+                for (var p:String in ChatManager.userStatus){
+                     if(member.id == p.split("*")[0]){
+                         member['online']=true;
+                     }
+                }
             }
             if(members!=null){
                 members.refresh();
             }
-
-//            for each(var m:Object in c){
-//                members.removeItemAt(members.getItemIndex(m));
-//                members.addItem(m);
-//            }
-
         }
 
 
@@ -115,27 +147,40 @@
             chat['size'] =ns.value ;
             chat['from'] = ToolUtil.sessionUser.pid;
             chat['date'] = DateUtil.dateLblChat(new Date());
+
+            if(members==null){
+                ChatManager.sendMessageToPerson(chatUser.id,chat,function(data:Object){
+                    al(data,chat);
+                });
+            }else{
+                ChatManager.sendMessageToDeparment(chatUser.id,chat,function(data:Object){
+                    al(data,chat);
+                });
+            }
+
+            chat['status']="loading";
             chatsArr.addItem(chat);
 
-            chat = new Object();
 
-            chat['id'] = new Date().getTime();
-            chat['text'] = __msg;
-            chat['color'] = cp.selectedColor;
-            chat['weight'] = bBTN.selected?'bold':'normal';
-            chat['style'] = iBTN.selected?'italic':'normal';
-            chat['dec'] = uBTN.selected?'underline':'none';
-            chat['size'] =ns.value ;
-            chat['from'] = 2;
-            chat['date'] = DateUtil.dateLblChat(new Date());
-            chatsArr.addItem(chat);
-
-            addressList.validateNow();
-            changeMember();
-//            addressList.up;
 
             ti.text = '';
             ti.setFocus();
+        }
+
+        private function al(data:Object,chat):void{
+            trace("chat:"+JParser.encode(data));
+
+                for each(var c:Object in chatsArr){
+                    if(c.id==chat.id){
+                        if(data.code==200){
+                            c.status="success";
+                        }else{
+                            c.status="failue";
+                        }
+                        chatsArr.refresh();
+                    }
+                }
+//            Alert.show(JParser.encode(data),chat['text']);
         }
 
         private function pressEnter(event:KeyboardEvent):void{

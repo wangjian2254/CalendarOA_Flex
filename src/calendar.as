@@ -67,7 +67,7 @@ private function currentUser(result:Object, e:ResultEvent):void {
             // 成功登陆
 			userinfoGroup2.visible = false;
 			userinfoGroup.visible = true;
-
+            ChatManager.loginChat();
 
 		}
 		menuXML.send();
@@ -121,6 +121,8 @@ public function updateinfo():void {
 }
 
 public function logout(e:*=null):void {
+    ToolUtil.sessionUser=new Object();
+    Pomelo.getIns().disconnect();
     if(e!=null){
         var evt:QuiteEvent = e as QuiteEvent;
         if(evt!=null){

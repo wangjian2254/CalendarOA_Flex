@@ -94,7 +94,7 @@ public class ToolUtil
     }
     public static function resultFinduser(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            if(sessionUser["pid"]!=result.result["pid"]){
+            if(sessionUser==null||sessionUser["pid"]!=result.result["pid"]){
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,result.result,true));
             }
             sessionUser=result.result;

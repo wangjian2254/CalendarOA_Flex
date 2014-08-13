@@ -3,6 +3,7 @@
   Created by wangjian2254 on 14-8-8.
 -->
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                xmlns:mx="library://ns.adobe.com/flex/mx"
                 autoDrawBackground="true"
         >
     <fx:Metadata>
@@ -34,6 +35,7 @@
                 head.source = null;
                 nameLabel.text = "";
                 horizontalLayout.horizontalAlign="right";
+                chatstatus.horizontalAlign="right";
                 heaGroup.horizontalAlign = "right";
             }else{
                  head.source = person.icon;
@@ -41,6 +43,7 @@
                 nameLabel.text = person.name;
                 nameLabel2.text = "";
                 horizontalLayout.horizontalAlign="left";
+                chatstatus.horizontalAlign="left";
                 heaGroup.horizontalAlign="left";
             }
             contentLabel.text = data.text;
@@ -53,6 +56,12 @@
             contentLabel.setStyle("fontSize",data.size);
             dateLabel.text = data.date;
 
+            if(data.hasOwnProperty("status")){
+                statusLabel.text = data.status;
+            }else{
+                statusLabel.text = null;
+
+            }
             contentLabel.validateNow();
 
 
@@ -96,6 +105,11 @@
             </s:HGroup>
             <s:HGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="40" paddingLeft="40">
                 <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="1"  ></s:Label>
+            </s:HGroup>
+            <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="40" paddingLeft="40">
+                <s:Label id="statusLabel" color="#000000"></s:Label>
+                <mx:LinkButton id="myFZRButton" label="我负责"></mx:LinkButton>
+                <mx:LinkButton id="selectFZRButton" label="指派"></mx:LinkButton>
             </s:HGroup>
 
         </s:VGroup>

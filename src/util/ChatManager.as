@@ -6,6 +6,8 @@ import flash.events.Event;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
 
+import json.JParser;
+
 import mx.collections.ArrayCollection;
 
 import org.idream.pomelo.Pomelo;
@@ -18,16 +20,24 @@ import org.idream.pomelo.PomeloEvent;
 public class ChatManager {
     private static var time:Timer = new Timer(1000*30,1);
     public static var type:String = "flex";
+//    private static var chatmanage:ChatManager;
 
     public static var userStatus:Object=new Object();
     public static var unReadMessage:ArrayCollection = new ArrayCollection();
 
     public function ChatManager() {
-        time.addEventListener(TimerEvent.TIMER,loginChat);
+
 
     }
 
+    static public function clearUser():void{
+        for(var u:String in userStatus){
+            userStatus[u]="off";
+        }
+    }
+
     static public function loginChat(e:Event=null):void{
+        time.addEventListener(TimerEvent.TIMER,loginChat);
         for(var u:String in userStatus){
             userStatus[u]="off";
         }
@@ -74,15 +84,22 @@ public class ChatManager {
     static public function regOrg():void{
         var p:Object = new Object();
         p.pid = ToolUtil.sessionUser.pid;
+        p.oid = 'o'+ToolUtil.sessionUser.oid;
         p.flag = ToolUtil.sessionUser.chatflag;
         p.type = type;
         var route:String = "connector.entryHandler.enter";
         Pomelo.getIns().request(route, p, function (data:Object):void {
+            trace("登录成功");
 
             Pomelo.getIns().addEventListener('pStatus', personChangedHandler);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
             Pomelo.getIns().addEventListener('onLine', onlineHandler);
             Pomelo.getIns().addEventListener('sys', systemMessageHandler);
+            clearUser();
+
+            for each(var m:String in data.users){
+                userStatus[m]="on";
+            }
             listenOrg();
         });
     }
@@ -101,16 +118,22 @@ public class ChatManager {
 
     static public function personChangedHandler(event:PomeloEvent):void{
         userStatus[event.message.p]=event.message.s;
+        trace("user changed:"+event.message.p+"_"+event.message.s);
     }
 
 
     static public function onlineHandler(event:PomeloEvent):void{
+        clearUser();
         for each(var m:Object in event.message.users){
-            userStatus[m.p]=m.s;
+            userStatus[m.uid]="on";
+
+
+            trace("online user changed:"+m.uid+"_on");
         }
     }
     static public function chatHandler(event:PomeloEvent):void{
-        unReadMessage.addItem(event.message);
+        unReadMessage.addItem(event.message.msg);
+        trace("chat:"+JParser.encode(event.message.msg));
     }
     static public function systemMessageHandler(event:PomeloEvent):void{
 
@@ -127,7 +150,9 @@ public class ChatManager {
         content["f"]=ToolUtil.sessionUser.pid;
         content['c']=type;
         content["t"]=to;
-        sendMessage('connector.entryHandler.send',content,callback);
+        content["o"]='o'+ToolUtil.sessionUser.oid;
+        sendMessage('chat.chatHandler.send',content,callback);
+//        sendMessage('connector.entryHandler.send',content,callback);
     }
 
     static public function sendMessage(route:String,obj:Object, callback:Function):void{
