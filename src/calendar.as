@@ -19,7 +19,11 @@ import mx.core.FlexGlobals;
 import mx.managers.PopUpManager;
 import mx.rpc.events.ResultEvent;
 
+import org.idream.pomelo.Pomelo;
+
 import spark.components.Button;
+
+import util.ChatManager;
 
 import util.RightClickRegister;
 import util.ToolUtil;
@@ -34,7 +38,7 @@ public function init():void {
 
     if(this.hasOwnProperty("initAir")){
         this["initAir"]();
-
+        ChatManager.type="air";
     }
     if(this.hasOwnProperty("initFlex")){
         this["initFlex"]();
@@ -56,12 +60,15 @@ public function init():void {
 private function currentUser(result:Object, e:ResultEvent):void {
 	if (result.success) {
 		if (!result.result) {
+            // 没有登陆成功
 			userinfoGroup.visible = false;
 			userinfoGroup2.visible = true;
 		} else {
+            // 成功登陆
 			userinfoGroup2.visible = false;
 			userinfoGroup.visible = true;
-			
+
+
 		}
 		menuXML.send();
 		ToolUtil.init();

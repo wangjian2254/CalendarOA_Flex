@@ -1,3 +1,4 @@
+import control.ChatDemoContol;
 import control.window.AddPersonPanel;
 import control.CBorderContainer;
 import control.CalendarControl;
@@ -204,6 +205,9 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 			case 'message':
 				c = new IMControl();
 				break;
+            case 'chat':
+                c = new ChatDemoContol();
+                break;
 			case 'log':
 				c = new LogControl();
 				break;
