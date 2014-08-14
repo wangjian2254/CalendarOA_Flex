@@ -99,7 +99,7 @@
             for each(var member:Object in members){
                 member['online']=false;
             }
-            for each(var member:Object in members){
+            for each(member in members){
                 for (var p:String in ChatManager.userStatus){
                      if(member.id == p.split("*")[0]){
                          member['online']=true;
@@ -156,11 +156,11 @@
             chat['d'] = DateUtil.dateLblChat(new Date());
 
             if(members==null){
-                ChatManager.sendMessageToPerson(chatUser.id,chat,function(data:Object){
+                ChatManager.sendMessageToPerson(chatUser.id,chat,function(data:Object):void{
                     al(data,chat);
                 });
             }else{
-                ChatManager.sendMessageToDeparment(chatUser.id,chat,function(data:Object){
+                ChatManager.sendMessageToDeparment(chatUser.id,chat,function(data:Object):void{
                     al(data,chat);
                 });
             }
@@ -175,7 +175,7 @@
             ti.setFocus();
         }
 
-        private function al(data:Object,chat):void{
+        private function al(data:Object,chat:Object):void{
             trace("chat:"+JParser.encode(data));
 
                 for each(var c:Object in chatsArr){
