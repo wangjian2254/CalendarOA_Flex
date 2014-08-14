@@ -28,7 +28,7 @@
             if(value==null){
                 return;
             }
-            var person:Object = ToolUtil.getPersonById(data.from);
+            var person:Object = ToolUtil.getPersonById(data.f);
             if(person.id==ToolUtil.sessionUser.pid){
                 head2.source = person.icon;
                 nameLabel2.text = person.name;
@@ -46,18 +46,18 @@
                 chatstatus.horizontalAlign="left";
                 heaGroup.horizontalAlign="left";
             }
-            contentLabel.text = data.text;
+            contentLabel.text = data.te;
             contentLabel.setStyle("fontFamily","simsun,MINGLIU");
             contentLabel.setStyle("alignmentBaseline","ideographicCenter");
-            contentLabel.setStyle("color",data.color);
-            contentLabel.setStyle("fontWeight",data.weight);
-            contentLabel.setStyle("fontStyle",data.style);
-            contentLabel.setStyle("textDecoration",data.dec);
-            contentLabel.setStyle("fontSize",data.size);
-            dateLabel.text = data.date;
+            contentLabel.setStyle("color",data.co);
+            contentLabel.setStyle("fontWeight",data.we);
+            contentLabel.setStyle("fontStyle",data.st);
+            contentLabel.setStyle("textDecoration",data.de);
+            contentLabel.setStyle("fontSize",data.si);
+            dateLabel.text = data.d;
 
             if(data.hasOwnProperty("status")){
-                statusLabel.text = data.status;
+//                statusLabel.text = data.status;
             }else{
                 statusLabel.text = null;
 
@@ -74,10 +74,12 @@
         }
 
         protected function m_over():void{
+            chatstatus.visible = true;
             solidColor.color = 0x7ae7bf;
         }
 
         protected function m_out():void{
+            chatstatus.visible = false;
             solidColor.color = 0xffffff;
         }
         ]]></fx:Script>
@@ -106,10 +108,10 @@
             <s:HGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="40" paddingLeft="40">
                 <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="1"  ></s:Label>
             </s:HGroup>
-            <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="40" paddingLeft="40">
+            <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="40" paddingLeft="40" visible="false">
                 <s:Label id="statusLabel" color="#000000"></s:Label>
-                <mx:LinkButton id="myFZRButton" label="我负责"></mx:LinkButton>
-                <mx:LinkButton id="selectFZRButton" label="指派"></mx:LinkButton>
+                <mx:LinkButton id="myFZRButton" label="我负责" textDecoration="underline" ></mx:LinkButton>
+                <mx:LinkButton id="selectFZRButton" label="指派"  textDecoration="underline" ></mx:LinkButton>
             </s:HGroup>
 
         </s:VGroup>

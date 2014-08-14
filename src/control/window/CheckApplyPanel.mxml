@@ -3,7 +3,7 @@
                              xmlns:s="library://ns.adobe.com/flex/spark"
                              xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
                              xmlns:conobj="uicontrol.conobj.*"
-                             width="440" height="500" creationComplete="init()"
+                             width="740" height="500" creationComplete="init()"
                              title="申请加入组织的请求" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[

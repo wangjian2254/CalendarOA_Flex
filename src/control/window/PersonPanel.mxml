@@ -31,18 +31,13 @@
 //                emailLabel.text = personData.username;
                 nameLabel.text = personData.name;
                 buttonRemove.visible = false;
-                var person:Object;
-                for (var i:int = 0; i < departmentData.managers.length; i++) {
-                    person = departmentData.managers[i];
-                    if (person.id == ToolUtil.sessionUser.pid) {
-                        buttonRemove.visible = true;
-                    }
+                if (ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0) {
+                    buttonRemove.visible = true;
                 }
-
-
 			}
 
 			private function sendMessageResult(result:Object,e:ResultEvent):void{
+                ToolUtil.departMentListRefresh();
                 closeWin();
 			}
             private function delPerson():void{

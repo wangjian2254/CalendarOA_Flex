@@ -11,11 +11,15 @@
 
 
         import mx.collections.ArrayCollection;
+        import mx.events.CollectionEvent;
         import mx.events.FlexEvent;
+
+        import util.ChatManager;
 
         override public function init(e:FlexEvent):void {
             if(!param){
             }
+
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
@@ -36,6 +40,7 @@
             }
             super.reloadParamData(e);
         }
+
 
         private function listItemClick_handler(e:ListClickEvent):void{
             var chat:Object = e.data;

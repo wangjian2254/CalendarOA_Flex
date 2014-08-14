@@ -229,10 +229,7 @@
         }
 
         private function addChildDepartmentResult(result:Object, e:ResultEvent):void {
-            if (result.success) {
-                ToolUtil.departMentListRefresh();
-            }
-
+            ToolUtil.departMentListRefresh();
         }
 
         public function get fatherDepartment():Object {

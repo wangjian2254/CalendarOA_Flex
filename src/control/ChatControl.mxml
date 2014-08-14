@@ -41,6 +41,7 @@
 
 
         override public function init(e:FlexEvent):void {
+//            chatsArr.addEventListener(CollectionEvent.COLLECTION_CHANGE, showLastMsg);
             if(members==null){
                 horGroup.validateNow();
                 horGroup.removeElement(addressList);
@@ -55,6 +56,11 @@
             Pomelo.getIns().addEventListener('onChat', chatHandler);
         }
 
+        public function showLastMsg():void{
+            if(chatsArr.length>0){
+                chatList.ensureIndexIsVisible(chatsArr.length-1);
+            }
+        }
         override public function changeCurrentUser(e:ChangeUserEvent):void {
             Pomelo.getIns().addEventListener("pStatus",changeMember);
             Pomelo.getIns().addEventListener("onLine",changeMember);
@@ -83,6 +89,8 @@
                 }
 
             }
+
+            showLastMsg();
 
         }
 
@@ -139,14 +147,13 @@
             var chat:Object = new Object();
 
             chat['id'] = new Date().getTime();
-            chat['text'] = __msg;
-            chat['color'] = cp.selectedColor;
-            chat['weight'] = bBTN.selected?'bold':'normal';
-            chat['style'] = iBTN.selected?'italic':'normal';
-            chat['dec'] = uBTN.selected?'underline':'none';
-            chat['size'] =ns.value ;
-            chat['from'] = ToolUtil.sessionUser.pid;
-            chat['date'] = DateUtil.dateLblChat(new Date());
+            chat['te'] = __msg;
+            chat['co'] = cp.selectedColor;
+            chat['we'] = bBTN.selected?'bold':'normal';
+            chat['st'] = iBTN.selected?'italic':'normal';
+            chat['de'] = uBTN.selected?'underline':'none';
+            chat['si'] =ns.value ;
+            chat['d'] = DateUtil.dateLblChat(new Date());
 
             if(members==null){
                 ChatManager.sendMessageToPerson(chatUser.id,chat,function(data:Object){
@@ -160,6 +167,7 @@
 
             chat['status']="loading";
             chatsArr.addItem(chat);
+            showLastMsg();
 
 
 
@@ -180,6 +188,7 @@
                         chatsArr.refresh();
                     }
                 }
+            showLastMsg();
 //            Alert.show(JParser.encode(data),chat['text']);
         }
 

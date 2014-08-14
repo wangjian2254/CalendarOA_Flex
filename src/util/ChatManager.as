@@ -9,6 +9,8 @@ import flash.utils.Timer;
 import json.JParser;
 
 import mx.collections.ArrayCollection;
+import mx.controls.Alert;
+import mx.events.CollectionEvent;
 
 import org.idream.pomelo.Pomelo;
 import org.idream.pomelo.PomeloEvent;
@@ -36,8 +38,20 @@ public class ChatManager {
         }
     }
 
+    static public function unReadChanged(e:CollectionEvent):void{
+        var n:int=0;
+        for each(var chat:Object in ChatManager.unReadMessage){
+                if(chat.unread){
+                    n+=1;
+                }
+
+        }
+        ToolUtil.unreadMessageNum=n+"未读消息";
+    }
+
     static public function loginChat(e:Event=null):void{
         time.addEventListener(TimerEvent.TIMER,loginChat);
+        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChanged);
         for(var u:String in userStatus){
             userStatus[u]="off";
         }
@@ -132,10 +146,30 @@ public class ChatManager {
         }
     }
     static public function chatHandler(event:PomeloEvent):void{
-        unReadMessage.addItem(event.message.msg);
+
+        if(event.message.msg.f!=ToolUtil.sessionUser.pid){
+            event.message.msg.unread=true;
+            unReadMessage.addItem(event.message.msg);
+        }else{
+            if(event.message.msg.c!=type){
+                unReadMessage.addItem(event.message.msg);
+            }
+        }
+
         trace("chat:"+JParser.encode(event.message.msg));
     }
     static public function systemMessageHandler(event:PomeloEvent):void{
+        switch (event.message.msg.type){
+            case "org_users_changed":
+                ToolUtil.departMentListRefresh();
+                break;
+            case "join_apply":
+                Alert.show(event.message.msg.msg,event.message.msg.type);
+                break;
+            default :
+                Alert.show(event.message.msg.msg,event.message.msg.type);
+                break;
+        }
 
     }
 

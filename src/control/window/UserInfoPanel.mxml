@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
-               xmlns:s="library://ns.adobe.com/flex/spark"
-               xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" xmlns:conobj="uicontrol.conobj.*"
-               width="500" height="400"
-               title="修改用户信息" creationComplete="init()" close="closeWin()">
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:conobj="uicontrol.conobj.*"
+                             width="500" height="400"
+                             title="修改用户信息" creationComplete="init()" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
         import events.QuiteEvent;
@@ -22,9 +23,7 @@
 			import util.UserUtil;
 			
 			
-			public function closeWin():void{
-				PopUpManager.removePopUp(this);
-			}
+
 
             public function init():void{
                 headSelectArray.selectedIconByIcon(ToolUtil.sessionUser.uicon);
@@ -149,4 +148,4 @@
             </s:Button>
 		</s:FormItem>
 	</s:Form>
-</s:TitleWindow>
+</window:EfficientTitleWindow>

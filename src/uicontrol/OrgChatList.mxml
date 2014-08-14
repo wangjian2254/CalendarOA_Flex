@@ -15,6 +15,8 @@
         import mx.events.CollectionEvent;
         import mx.utils.ObjectUtil;
 
+        import util.ChatManager;
+
         import util.ToolUtil;
 
         [Bindable]
@@ -28,7 +30,26 @@
         public function init():void {
             ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
             ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
+
+
+
             initAddress();
+        }
+
+
+        private function unReadChange(e:CollectionEvent):void{
+            for each(var p:Object in addressMember){
+                p.unread=0;
+                for each(var chat:Object in ChatManager.unReadMessage){
+                    if((p.hasOwnProperty('flag')&&chat.o==p.id)||(!p.hasOwnProperty('flag')&&chat.t==p.id)){
+                        if(chat.unread){
+                            p.unread+=1;
+                        }
+
+                    }
+                }
+            }
+            addressMember.refresh();
         }
 
         private function changeMember(e:CollectionEvent):void {
@@ -39,6 +60,7 @@
             addressMember.removeAll();
 
             if (type == "chat") {
+                ChatManager.unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChange);
                 var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 //                var contact:Object = new Object();
 //                contact['id'] = -1;
@@ -82,6 +104,7 @@
 
 
             if (type == "org") {
+                ChatManager.unReadMessage.removeEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChange);
                 var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var depart:Object = new Object();
                 var rootDepart:Object = null;
