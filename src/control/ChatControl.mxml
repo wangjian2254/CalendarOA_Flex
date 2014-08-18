@@ -48,8 +48,11 @@
             }else{
 
             }
-            head.source = chatUser.icon;
-            nameLabel.text = chatUser.name;
+            if(chatUser){
+                head.source = chatUser.icon;
+                nameLabel.text = chatUser.name;
+            }
+
 
             Pomelo.getIns().addEventListener("pStatus",changeMember);
             Pomelo.getIns().addEventListener("onLine",changeMember);

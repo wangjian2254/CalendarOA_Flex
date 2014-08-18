@@ -47,7 +47,7 @@
 				
 
 					changeShowModel();
-				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
+//				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
 				taskChange(null);
 			}
 			
@@ -98,7 +98,7 @@
 					}
 					
 				}
-				ToolUtil.taskUnRefresh(showTaskList);
+//				ToolUtil.taskUnRefresh(showTaskList);
 			}
 			
 
@@ -523,15 +523,15 @@
 				
 				taskunpanel.removeAllElements();
 				var taskItem:TaskItem=null;
-				for each(var obj:Object in ToolUtil.taskUnList){
-					taskItem=new TaskItem();
-					taskItem.taskData = obj;
-					taskItem.taskName = obj.title;
-					taskItem.color = obj.color;
-					taskItem.taskId = obj.id;
-					taskunpanel.addElement(taskItem);
-					
-				}
+//				for each(var obj:Object in ToolUtil.taskUnList){
+//					taskItem=new TaskItem();
+//					taskItem.taskData = obj;
+//					taskItem.taskName = obj.title;
+//					taskItem.color = obj.color;
+//					taskItem.taskId = obj.id;
+//					taskunpanel.addElement(taskItem);
+//
+//				}
 				
 			}
 			

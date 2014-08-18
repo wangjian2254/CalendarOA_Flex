@@ -56,10 +56,10 @@ package util
 		
 		
 		public static function updateTaskPanel(scheduleId:String):void{
-			var scheduleData:Object = ToolUtil.getTask(scheduleId);
+//			var scheduleData:Object = ToolUtil.getTask(scheduleId);
 			
 			if(showTask.hasOwnProperty(scheduleId)){
-				showTask[scheduleId].scheduleData = scheduleData;
+//				showTask[scheduleId].scheduleData = scheduleData;
 				if(showTask[scheduleId].isinit){
 					showTask[scheduleId].init(false);
 				}
@@ -69,10 +69,10 @@ package util
 		}
 		
 		public static function showTaskPanel(scheduleId:String,taskItem:TaskItem=null):void{
-			var taskData:Object = ToolUtil.getTask(scheduleId);
+//			var taskData:Object = ToolUtil.getTask(scheduleId);
 				
 			if(showTask.hasOwnProperty(scheduleId)){
-				showTask[scheduleId].taskData = taskData;
+//				showTask[scheduleId].taskData = taskData;
 				if(showTask[scheduleId].isinit){
 					showTask[scheduleId].init();
 				}
@@ -82,7 +82,7 @@ package util
 				
 					var s:TaskPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,TaskPanel,false) as TaskPanel;
 					showTask[scheduleId]=s;
-					s.taskData = taskData;
+//					s.taskData = taskData;
 					PopUpManager.bringToFront(showTask[scheduleId]);
 //					PopUpManager.centerPopUp(showTask[scheduleId]);
 					

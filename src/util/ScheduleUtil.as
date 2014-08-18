@@ -31,9 +31,7 @@ package util
 				newSchedule.endDateValue = new Date();
 				
 			}
-			if(newSchedule.isinit){
-				newSchedule.init();
-			}
+
 				
 			PopUpManager.bringToFront(newSchedule);
 //			PopUpManager.centerPopUp(newSchedule);

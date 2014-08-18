@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!--
+  Created by WangJian on 2014/8/18.
+-->
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+          xmlns:uicontrol="uicontrol.*" xmlns:mx="library://ns.adobe.com/flex/mx">
+
+    <fx:Script><![CDATA[
+        import events.ChatEvent;
+        import events.ListClickEvent;
+
+        import mx.collections.ArrayCollection;
+
+        import util.DateUtil;
+
+        [Bindable]
+        public var chatsArr:ArrayCollection;
+
+        private function chatItemClick_handler(e:ListClickEvent):void{
+            dispatchEvent(e);
+        }
+
+        private function getMessage():Object{
+            var _re:RegExp = /^\s*$/;
+            var __msg:String = ti.text;
+            if(_re.test(__msg))
+            //如果输入的字符串仅包含空格、回车或者空，就不能发送信息
+            {
+                ti.setFocus();
+                return null;
+            }
+            var chat:Object = new Object();
+
+            chat['id'] = new Date().getTime();
+            chat['te'] = __msg;
+            chat['co'] = cp.selectedColor;
+            chat['we'] = bBTN.selected?'bold':'normal';
+            chat['st'] = iBTN.selected?'italic':'normal';
+            chat['de'] = uBTN.selected?'underline':'none';
+            chat['si'] =ns.value ;
+            chat['d'] = DateUtil.dateLblChat(new Date());
+
+
+
+            chat['status']="loading";
+            chatsArr.addItem(chat);
+            showLastMsg();
+
+
+
+            ti.text = '';
+            ti.setFocus();
+            return chat;
+        }
+
+        public function showLastMsg():void{
+            if(chatsArr.length>0){
+                chatList.ensureIndexIsVisible(chatsArr.length-1);
+            }
+        }
+
+        private function pressEnter(e:KeyboardEvent):void{
+            var message:Object = getMessage();
+            if(message!=null){
+                var e:ChatEvent = new ChatEvent();
+                e.message = message;
+                dispatchEvent(e);
+            }
+
+        }
+        protected function sendBTN_clickHandler(event:MouseEvent=null):void
+        {
+            var message:Object = getMessage();
+            if(message!=null){
+                var e:ChatEvent = new ChatEvent();
+                e.message = message;
+                dispatchEvent(e);
+            }
+        }
+        ]]></fx:Script>
+    <fx:Metadata>
+        [Event(name="send_Message",type="events.ChatEvent")]
+    </fx:Metadata>
+    <uicontrol:AddressList id="chatList"  dataProvider="{chatsArr}"
+                           listItemClick="chatItemClick_handler(event)"
+                           itemRenderer="uicontrol.renderer.ChatItemRenderer" width="100%" height="100%">
+    </uicontrol:AddressList>
+    <s:BorderContainer width="100%" height="45" backgroundImage="{CBorderContainer.toolbgimg}" borderVisible="false">
+        <s:layout>
+            <s:HorizontalLayout paddingLeft="10" gap="10" verticalAlign="middle"></s:HorizontalLayout>
+        </s:layout>
+
+        <mx:ColorPicker id="cp"/>
+        <s:Label text="字号"/>
+        <s:NumericStepper id="ns" minimum="12" value="14" maximum="24" stepSize="2"/>
+        <mx:Button id="bBTN" width="25" toggle="true" icon="@Embed('/assets/img/b.png')"/>
+        <mx:Button id="iBTN" width="25" toggle="true" icon="@Embed('/assets/img/i.png')"/>
+        <mx:Button id="uBTN" width="25" toggle="true" icon="@Embed('/assets/img/u.png')"/>
+        <mx:Spacer width="100%" height="10"/>
+    </s:BorderContainer>
+    <s:TextArea id="ti" width="100%" height="100"
+                paddingTop="10" paddingBottom="5" paddingLeft="5" paddingRight="5"
+                focusEnabled="true" fontLookup="device"
+                fontFamily="simsun,MINGLIU"
+                alignmentBaseline="ideographicCenter"
+                color="{cp.selectedColor}"
+                fontWeight="{bBTN.selected?'bold':'normal'}"
+                fontStyle="{iBTN.selected?'italic':'normal'}"
+                textDecoration="{uBTN.selected?'underline':'none'}"
+                fontSize="{ns.value}"
+                editable="true"
+                keyUp="pressEnter(event)"
+            />
+    <s:HGroup width="100%" height="30" horizontalAlign="left" verticalAlign="middle">
+
+        <s:Button id="sendBTN" label="发送(Enter键)" chromeColor="#ff0000" color="#ffffff" width="120" height="25" click="sendBTN_clickHandler(event)"/>
+        <s:Button  label="清空" width="80" height="25" click="{ti.text='';}"  />
+    </s:HGroup>
+
+    <fx:Script><![CDATA[
+        import control.CBorderContainer;
+        ]]></fx:Script>
+</s:VGroup>

@@ -61,7 +61,7 @@ public class ToolUtil
         departMentListRefresh();
         contactsRefresh();
 //			taskRefresh();
-        taskUnRefresh();
+//        taskUnRefresh();
 
 //        unreadMessageRefresh();
         time.addEventListener(TimerEvent.TIMER,unreadMessageRefresh);
@@ -244,70 +244,70 @@ public class ToolUtil
 
         }
     }
-    [Bindable]
-    public static var taskUnList:ArrayCollection=new ArrayCollection();
-
-    public static function taskUnRefresh(fun:*=null,e:*=null):void{
-        var obj:Object=new Object();
-        obj["status"]=false;
-        if(!(fun is Function)){
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllUnTask,"POST").send(obj);
-        }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllUnTask,"POST");
-            http.resultFunArr.addItem(fun);
-            http.send(obj);
-
-        }
-
-    }
-    public static function resultAllUnTask(result:Object,e:ResultEvent):void{
-        if(result.success==true){
-            taskUnList.removeAll();
-            if(result.result){
-                taskUnList.addAll(new ArrayCollection(result.result as Array));
-            }
-
-        }
-    }
-    [Bindable]
-    public static var taskList:ArrayCollection=new ArrayCollection();
-
-    public static function getTask(id:String):Object{
-        for each(var item:Object in taskUnList){
-            if(item.id==id){
-                return item;
-            }
-        }
-        for each(item in taskList){
-            if(item.id==id){
-                return item;
-            }
-        }
-        return null;
-    }
-
-    public static function taskRefresh(fun:*=null,e:*=null):void{
-        var obj:Object=new Object();
-        obj["status"]=true;
-        if(!(fun is Function)){
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllTask,"POST").send(obj);
-        }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllTask,"POST");
-            http.resultFunArr.addItem(fun);
-            http.send(obj);
-
-        }
-
-    }
-    public static function resultAllTask(result:Object,e:ResultEvent):void{
-        if(result.success==true){
-            taskList.removeAll();
-            if(result.result){
-                taskList.addAll(new ArrayCollection(result.result as Array));
-            }
-
-        }
-    }
+//    [Bindable]
+//    public static var taskUnList:ArrayCollection=new ArrayCollection();
+//
+//    public static function taskUnRefresh(fun:*=null,e:*=null):void{
+//        var obj:Object=new Object();
+//        obj["status"]=false;
+//        if(!(fun is Function)){
+//            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllUnTask,"POST").send(obj);
+//        }else{
+//            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllUnTask,"POST");
+//            http.resultFunArr.addItem(fun);
+//            http.send(obj);
+//
+//        }
+//
+//    }
+//    public static function resultAllUnTask(result:Object,e:ResultEvent):void{
+//        if(result.success==true){
+//            taskUnList.removeAll();
+//            if(result.result){
+//                taskUnList.addAll(new ArrayCollection(result.result as Array));
+//            }
+//
+//        }
+//    }
+//    [Bindable]
+//    public static var taskList:ArrayCollection=new ArrayCollection();
+//
+//    public static function getTask(id:String):Object{
+//        for each(var item:Object in taskUnList){
+//            if(item.id==id){
+//                return item;
+//            }
+//        }
+//        for each(item in taskList){
+//            if(item.id==id){
+//                return item;
+//            }
+//        }
+//        return null;
+//    }
+//
+//    public static function taskRefresh(fun:*=null,e:*=null):void{
+//        var obj:Object=new Object();
+//        obj["status"]=true;
+//        if(!(fun is Function)){
+//            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllTask,"POST").send(obj);
+//        }else{
+//            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getTaskByStatus",resultAllTask,"POST");
+//            http.resultFunArr.addItem(fun);
+//            http.send(obj);
+//
+//        }
+//
+//    }
+//    public static function resultAllTask(result:Object,e:ResultEvent):void{
+//        if(result.success==true){
+//            taskList.removeAll();
+//            if(result.result){
+//                taskList.addAll(new ArrayCollection(result.result as Array));
+//            }
+//
+//        }
+//    }
 
     public static var scheduleMap:Object = new Object();
 

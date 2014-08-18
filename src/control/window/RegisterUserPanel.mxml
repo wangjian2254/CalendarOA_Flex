@@ -132,6 +132,7 @@
 				obj.username=username.text;
 				obj.truename = truename.text;
 				obj.password = password.text;
+                obj.code = codeInput.text;
                 obj.regtype = regType.selectedValue;
                 if(ToolUtil.joinOrgFlag){
                     obj.flag = ToolUtil.joinOrgFlag;
@@ -162,8 +163,35 @@
             obj.setFocus();
         }
 
+        private var sendTime:Timer=new Timer(1000,60);
+        private var num:int=0;
         private function sendCode():void{
-
+            if(username.text.length<10||!phoneexp.test(username.text)){
+                Alert.show("请填写正确的手机号","提示");
+                return;
+            }
+            smsButton.enabled=false;
+            num=60;
+            sendTime.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
+                smsButton.label=num+"秒";
+                num-=1;
+                if(num<=0){
+                    smsButton.label = "获取手机验证码";
+                    smsButton.enabled=true;
+                }
+            });
+            sendTime.addEventListener(TimerEvent.TIMER_COMPLETE, function(e:TimerEvent):void{
+                smsButton.label = "获取手机验证码";
+                smsButton.enabled=true;
+            });
+            sendTime.reset();
+            sendTime.repeatCount = 60;
+            sendTime.start();
+            var data:Object=new Object();
+            data["tel"]=username.text;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/sendSmsCode",function(result:Object,e:ResultEvent):void{
+                Alert.show(result.message,"提示");
+            },"POST").send(data);
         }
 		]]>
 	</fx:Script>
@@ -238,7 +266,7 @@
 			</s:layout>
                 <s:TextInput id="username" prompt="{telButton.selected?'手机号':'电子邮件'}" width="200"  text="" tabIndex="1" enter="foucePass(truename)">
                 </s:TextInput>
-                <s:Button visible="{telButton.selected}" height="25" label="获取手机验证码" click="sendCode()" toolTip="每分钟只能获取1次验证码"></s:Button>
+                <s:Button id="smsButton" visible="{telButton.selected}" height="25" label="获取手机验证码" click="sendCode()" toolTip="每分钟只能获取1次验证码"></s:Button>
 		</s:FormItem>
         <s:FormItem label="手机验证码:" height="{telButton.selected?45:0}" visible="{telButton.selected}" textAlign="right">
             <s:layout>
