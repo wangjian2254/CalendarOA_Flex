@@ -3,28 +3,25 @@
                              xmlns:s="library://ns.adobe.com/flex/spark"
                              xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
                              xmlns:conobj="uicontrol.conobj.*"
-                             width="450" height="500" creationComplete="init()"
+                             width="450" height="{getWindowHeight}" creationComplete="init()"
                              xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
 			import httpcontrol.HttpServiceUtil;
-			import httpcontrol.RemoteUtil;
-
-            import mx.collections.ArrayCollection;
-
             import mx.controls.Alert;
             import mx.core.FlexGlobals;
-            import mx.events.FlexEvent;
-            import mx.managers.PopUpManager;
-			import mx.rpc.AbstractOperation;
-            import mx.rpc.events.FaultEvent;
             import mx.rpc.events.ResultEvent;
-			
 			import util.ToolUtil;
-			import util.UserUtil;
-			
-			
 
+            [Bindable]
+            public function get getWindowHeight():Number{
+                if(userType.selectedValue == 2){
+                    return loginForm.height;
+                }else{
+
+                    return form.height;
+                }
+            }
 
             private function init():void{
                 form.validateNow();
@@ -35,10 +32,10 @@
                     var obj:Object=new Object();
                     obj.flag=ToolUtil.joinOrgFlag;
                     HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByFlag",getOrgByFlagResult,"POST").send(obj);
-                    this.height = 415;
+//                    this.height = 415;
                 }else{
                     form.removeElement(userTypeItem);
-                    this.height = 500;
+//                    this.height = 540;
                     this.title = "注册用户";
                 }
                 loginForm.visible = false;
@@ -53,10 +50,7 @@
             private function getOrgByFlagResult(result:Object,e:ResultEvent):void{
                  this.title = result.result.name + " 新成员注册";
             }
-//            private function getOrgByFlagFault(e:FaultEvent):void{
-//                ToolUtil.joinOrgFlag = null;
-//                init();
-//            }
+
 
             private function userTypeChanged():void{
                 if(userType.selectedValue == 2){
@@ -65,7 +59,7 @@
                     userType2.selectedValue = 2;
                     loginForm.validateNow();
 
-                    this.height = loginForm.height+25;
+//                    this.height = loginForm.height+25;
                 }
 
 
@@ -78,14 +72,26 @@
                     userType.selectedValue = 1;
                     form.validateNow();
 
-                    this.height = form.height+25;
+//                    this.height = form.height+25;
                 }
+            }
+
+            private function regTypeChanged():void{
+
+                form.invalidateSize();
+                form.validateNow();
+//                this.height = form.height+25;
+
             }
 
             private function join():void{
                 if (this.loginUsername.text == "" ||
                         this.loginPassword.text == "") {
                     Alert.show("请填写完整信息。", "提示");
+                    return;
+                }
+                if(!emailexp.test(loginUsername.text)||!phoneexp.test(loginUsername.text)){
+                    Alert.show("请填写正确的邮箱或手机号。", "提示");
                     return;
                 }
 
@@ -97,6 +103,8 @@
                 HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addOrganization", refresh, "POST").send(obj);
             }
 
+            private var emailexp:RegExp = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+            private var phoneexp:RegExp =/^1\d{10}$/;
 			public function save():void{
                 if(!ToolUtil.joinOrgFlag){
                     if(username.text==""||truename.text==""||password.text==""||rpassword.text==""||orgname.text==""){
@@ -110,6 +118,11 @@
                     }
                 }
 
+                if((regType.selectedValue == 'email'&&!emailexp.test(username.text))||(regType.selectedValue=='tel'&&!phoneexp.test(username.text))){
+                    Alert.show("请填写正确的邮箱或手机号。", "提示");
+                    return;
+                }
+
 
 				if(this.password.text==""||this.password.text!=this.rpassword.text){
 					Alert.show("密码和确认密码要一致。","提示");
@@ -119,6 +132,7 @@
 				obj.username=username.text;
 				obj.truename = truename.text;
 				obj.password = password.text;
+                obj.regtype = regType.selectedValue;
                 if(ToolUtil.joinOrgFlag){
                     obj.flag = ToolUtil.joinOrgFlag;
                 }else{
@@ -147,6 +161,10 @@
         public function foucePass(obj:Object):void{
             obj.setFocus();
         }
+
+        private function sendCode():void{
+
+        }
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -154,6 +172,7 @@
         <conobj:HeadSelectArray id="headSelectArray"></conobj:HeadSelectArray>
         <conobj:HeadSelectArray id="orgHeadSelectArray"></conobj:HeadSelectArray>
         <s:RadioButtonGroup id="userType" change="userTypeChanged()"></s:RadioButtonGroup>
+        <s:RadioButtonGroup id="regType" change="regTypeChanged()"></s:RadioButtonGroup>
         <s:RadioButtonGroup id="userType2" change="userTypeChanged2()"></s:RadioButtonGroup>
 	</fx:Declarations>
 
@@ -171,7 +190,7 @@
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
             </s:layout>
-            <s:TextInput id="loginUsername" prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass(loginPassword)">
+            <s:TextInput id="loginUsername" prompt="电子邮件/手机号" width="200"  text="" tabIndex="1" enter="foucePass(loginPassword)">
 
             </s:TextInput>
         </s:FormItem>
@@ -196,6 +215,9 @@
         </s:FormItem>
     </s:Form>
 	<s:Form width="100%" id="form" >
+        <s:layout>
+            <s:FormLayout gap="0"></s:FormLayout>
+        </s:layout>
 		<s:FormItem id="userTypeItem" label="是否新用户：" textAlign="right">
             <s:layout>
                 <s:HorizontalLayout gap="10"></s:HorizontalLayout>
@@ -203,25 +225,39 @@
             <s:RadioButton label="新用户" selected="true" value="1" group="{userType}"></s:RadioButton>
             <s:RadioButton label="已有账户" value="2" group="{userType}"></s:RadioButton>
 		</s:FormItem>
+        <s:FormItem height="40" visible="true" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="10"></s:HorizontalLayout>
+            </s:layout>
+            <s:RadioButton label="电子邮件" selected="true" value="email" group="{regType}"></s:RadioButton>
+            <s:RadioButton id="telButton" label="手机号" value="tel" group="{regType}"></s:RadioButton>
+        </s:FormItem>
 		<s:FormItem label="用户名:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="username" prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass(truename)">
-				
-			</s:TextInput>
-			<s:Label text="电子邮件作为用户名" color="red" />
+                <s:TextInput id="username" prompt="{telButton.selected?'手机号':'电子邮件'}" width="200"  text="" tabIndex="1" enter="foucePass(truename)">
+                </s:TextInput>
+                <s:Button visible="{telButton.selected}" height="25" label="获取手机验证码" click="sendCode()" toolTip="每分钟只能获取1次验证码"></s:Button>
 		</s:FormItem>
+        <s:FormItem label="手机验证码:" height="{telButton.selected?45:0}" visible="{telButton.selected}" textAlign="right">
+            <s:layout>
+                <s:VerticalLayout gap="5"/>
+            </s:layout>
+
+            <s:TextInput id="codeInput" prompt="手机验证码" width="100"  text="" enter="foucePass(truename)">
+            </s:TextInput>
+
+        </s:FormItem>
 		<s:FormItem label="姓名:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="truename"   width="200"  tabIndex="2" enter="foucePass(password)">
+			<s:TextInput id="truename" prompt="称呼"   width="200"  tabIndex="2" enter="foucePass(password)">
 				
 			</s:TextInput>
-			<s:Label text="昵称" color="red" />
 		</s:FormItem>
-        <s:FormItem label="头像:" textAlign="right">
+        <s:FormItem label="头像:" height="70" textAlign="right">
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
             </s:layout>
@@ -239,7 +275,6 @@
 			<s:TextInput id="password" displayAsPassword="true"  width="200"  tabIndex="3"  enter="foucePass(rpassword)">
 				
 			</s:TextInput>
-			<s:Label text="*" color="red" />
 		</s:FormItem>
 		<s:FormItem label="确认密码:" textAlign="right">
 			<s:layout>
@@ -248,20 +283,18 @@
 			<s:TextInput id="rpassword" displayAsPassword="true"  width="200"  tabIndex="4" enter="foucePass(orgname)">
 				
 			</s:TextInput>
-			<s:Label text="*" color="red" />
 		</s:FormItem>
 
 		<s:FormItem id="orgNameItem" label="组织名称:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="orgname"  width="200"  tabIndex="5">
+			<s:TextInput id="orgname" prompt="公司或团队名称"  width="200"  tabIndex="5">
 				
 			</s:TextInput>
-			<s:Label text="公司或团队名称" color="red" />
 		</s:FormItem>
 
-		<s:FormItem id="orgIconItem" label="组织图标:" textAlign="right">
+		<s:FormItem id="orgIconItem" height="70" label="组织图标:" textAlign="right">
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
             </s:layout>
@@ -274,7 +307,7 @@
 		</s:FormItem>
 		
 
-		<s:FormItem>
+		<s:FormItem height="40">
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
