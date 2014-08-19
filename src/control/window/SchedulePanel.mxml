@@ -50,6 +50,8 @@
 			[Bindable]
 			private var endtimelist:ArrayCollection = new ArrayCollection();
 
+            [Bindable]
+            private var taxklist:ArrayCollection = new ArrayCollection();
 
 			
 			private var selectColor:Number =0x00CCFF;
@@ -540,8 +542,7 @@
 
             </s:FormItem>
             <s:FormItem label="分解任务：" height="115">
-                <uicontrol:AddressList id="childAddressList" width="100%" height="100%">
-
+                <uicontrol:AddressList id="childAddressList" dataProvider="{taxklist}" itemRenderer="uicontrol.renderer.ChildrenTaskRenderer" width="100%" height="100%">
                 </uicontrol:AddressList>
             </s:FormItem>
             <s:FormItem label="颜色：" height="25">
@@ -586,18 +587,28 @@
             <s:FormItem label="责任人：" height="25">
 
 
+
             </s:FormItem>
             <s:FormItem id="authorpanel" label="审核人：" height="25">
-                <s:Label id="authorlbl" text="{ToolUtil.sessionUser.username}:{ToolUtil.sessionUser.nickname}"  height="25" verticalAlign="middle" />
-
+                <s:DropDownList id="checkerDownList" labelField="name" dataProvider="{ToolUtil.memberList}"></s:DropDownList>
             </s:FormItem>
             <s:FormItem label="提醒：" height="25">
                 <s:layout>
-                    <s:HorizontalLayout gap="5">
-
-                    </s:HorizontalLayout>
+                    <s:TileLayout columnAlign="justifyUsingGap">
+                    </s:TileLayout>
                 </s:layout>
-
+                <s:CheckBox id="alertBox0" label="到点提醒" ></s:CheckBox>
+                <s:CheckBox id="alertBox1" label="提前5分钟"></s:CheckBox>
+                <s:CheckBox id="alertBox2" label="提前10分钟"></s:CheckBox>
+                <s:CheckBox id="alertBox3" label="提前15分钟"></s:CheckBox>
+                <s:CheckBox id="alertBox4" label="提前30分钟"></s:CheckBox>
+                <s:CheckBox id="alertBox5" label="提前45分钟"></s:CheckBox>
+                <s:CheckBox id="alertBox6" label="提前1小时"></s:CheckBox>
+                <s:CheckBox id="alertBox7" label="提前2小时"></s:CheckBox>
+                <s:CheckBox id="alertBox8" label="提前4小时"></s:CheckBox>
+                <s:CheckBox id="alertBox9" label="提前1天"></s:CheckBox>
+                <s:CheckBox id="alertBox10" label="提前2天"></s:CheckBox>
+                <s:CheckBox id="alertBox11" label="提前1周"></s:CheckBox>
             </s:FormItem>
 
 

@@ -123,7 +123,7 @@ public class ChatManager {
         var param:Object = new Object();
         var dids:Array=new Array();
         for each(var depart:Object in ToolUtil.departMentList){
-            dids.push(depart.id);
+            dids.push("d"+depart.id);
         }
         param['dids']=dids;
         Pomelo.getIns().request(route, param);
@@ -173,21 +173,29 @@ public class ChatManager {
 
     }
 
-    static public function sendMessageToDeparment(to:Number,content:Object,callback:Function):void{
+    static public function sendMessageToDeparment(to:Number,t:String,content:Object,callback:Function):void{
         content["f"]=ToolUtil.sessionUser.pid;
         content['c']=type;
-        content["o"]=to;
-        sendMessage('chat.chatHandler.send',content,callback);
+        content['channel']=t+to;
+//        content["o"]=to;
+        sendMessage('connector.entryHandler.send',content,callback);
+//        sendMessage('chat.chatHandler.send',content,callback);
     }
 
     static public function sendMessageToPerson(to:Number,content:Object,callback:Function):void{
         content["f"]=ToolUtil.sessionUser.pid;
         content['c']=type;
+        if(content["f"]>to){
+            content['channel']=to+"p"+content["f"];
+        }else{
+            content['channel']=content["f"]+"p"+to;
+        }
         content["t"]=to;
-        content["o"]='o'+ToolUtil.sessionUser.oid;
-        sendMessage('chat.chatHandler.send',content,callback);
+//        content["o"]='o'+ToolUtil.sessionUser.oid;
+        sendMessage('connector.entryHandler.send',content,callback);
 //        sendMessage('connector.entryHandler.send',content,callback);
     }
+
 
     static public function sendMessage(route:String,obj:Object, callback:Function):void{
         Pomelo.getIns().request(route, obj, callback);

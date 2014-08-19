@@ -38,6 +38,10 @@
         public var chatUser:Object;
 
 
+        [Bindable]
+        public var type:String="d";//部门 为“d” 任务为 “t” 讨论组为：“g”
+
+
 
 
         override public function init(e:FlexEvent):void {
@@ -163,7 +167,7 @@
                     al(data,chat);
                 });
             }else{
-                ChatManager.sendMessageToDeparment(chatUser.id,chat,function(data:Object):void{
+                ChatManager.sendMessageToDeparment(chatUser.id,type,chat,function(data:Object):void{
                     al(data,chat);
                 });
             }
