@@ -90,7 +90,7 @@
                     Alert.show("请填写完整信息。", "提示");
                     return;
                 }
-                if(!emailexp.test(loginUsername.text)||!phoneexp.test(loginUsername.text)){
+                if(!emailexp.test(loginUsername.text)&&!phoneexp.test(loginUsername.text)){
                     Alert.show("请填写正确的邮箱或手机号。", "提示");
                     return;
                 }

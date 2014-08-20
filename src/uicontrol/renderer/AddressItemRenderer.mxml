@@ -61,6 +61,7 @@
                 num.visible=false;
             }else{
                 num.visible = true;
+                numLabel.text = data.unread;
             }
             if(!data.hasOwnProperty('hideicon')){
                 childicon.source = null;

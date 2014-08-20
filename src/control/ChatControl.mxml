@@ -27,6 +27,7 @@
         import util.DateUtil;
 
         import util.ToolUtil;
+        import util.UUIDUtil;
 
         [Bindable]
         private var chatsArr:ArrayCollection=new ArrayCollection();
@@ -48,9 +49,9 @@
 //            chatsArr.addEventListener(CollectionEvent.COLLECTION_CHANGE, showLastMsg);
             if(members==null){
                 horGroup.validateNow();
-                horGroup.removeElement(addressList);
+                addressList.visible=false;
             }else{
-
+                addressList.visible=true;
             }
             if(chatUser){
                 head.source = chatUser.icon;
@@ -61,12 +62,71 @@
             Pomelo.getIns().addEventListener("pStatus",changeMember);
             Pomelo.getIns().addEventListener("onLine",changeMember);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
+            getHistoryChat();
         }
 
-        public function showLastMsg():void{
+        public function getHistoryChat():void{
+            var timeline:String;
             if(chatsArr.length>0){
-                chatList.ensureIndexIsVisible(chatsArr.length-1);
+                timeline = chatsArr.getItemAt(0)._id;
             }
+            var channel:String;
+            if(members==null){
+                if(chatUser.id>ToolUtil.sessionUser.pid){
+                    channel=ToolUtil.sessionUser.pid+"p"+chatUser.id;
+                }else{
+                    channel=+chatUser.id+"p"+ToolUtil.sessionUser.pid;
+                }
+            }else{
+                channel=type+chatUser.id;
+            }
+            Pomelo.getIns().request("connector.entryHandler.history",{channel:channel,id:timeline},function(data:Object):void{
+                if(data.code==200){
+                    var chats:ArrayCollection = new ArrayCollection(data.chats as Array);
+                    if(chats.length==0){
+                        return;
+                    }
+
+                    if(chats.length<30){
+                        historyButton.enabled=false;
+                    }
+                    if(chatsArr.length==0){
+                        chatsArr.addAll(chats);
+                    }else{
+                        chatsArr.addAllAt(chats,0);
+                    }
+                    setPreDate(chatsArr);
+                    showLastMsg(chats.length-1);
+                }
+            })
+        }
+
+        private function setPreDate(list:ArrayCollection):void{
+            var pre:Object;
+            for each(var item:Object in list){
+                if(pre!=null){
+                    item.predate=pre.d;
+                }
+                pre=item;
+            }
+        }
+
+        public function showLastMsg(index:Number=-1):void{
+            if(index<0){
+                if(chatsArr.length>0){
+                    chatList.validateNow();
+                    chatList.ensureIndexIsVisible(chatsArr.length-1);
+                    chatList.validateNow();
+                    chatList.ensureIndexIsVisible(chatsArr.length-1);
+
+                }
+            }else{
+                chatList.validateNow();
+                chatList.ensureIndexIsVisible(index);
+                chatList.validateNow();
+                chatList.ensureIndexIsVisible(index);
+            }
+
         }
         override public function changeCurrentUser(e:ChangeUserEvent):void {
             Pomelo.getIns().addEventListener("pStatus",changeMember);
@@ -83,20 +143,21 @@
         }
 
         private function chatHandler(event:PomeloEvent):void{
-            if(event.message.msg.o==chatUser.id || event.message.msg.t == chatUser.id){
-                if(event.message.msg.f==ToolUtil.sessionUser.pid){
-//                    for each(var chat:Object in chatsArr){
-//                        if(event.message.msg.id==chat.id){
-//                            chat.status="success";
-//                        }
-//                    }
-//                    chatsArr.refresh();
-                }else{
-                    chatsArr.addItem(event.message.msg);
-                }
-
-            }
-
+//            if(event.message.msg.o==chatUser.id || event.message.msg.t == chatUser.id){
+//                if(event.message.msg.f==ToolUtil.sessionUser.pid){
+////                    for each(var chat:Object in chatsArr){
+////                        if(event.message.msg.id==chat.id){
+////                            chat.status="success";
+////                        }
+////                    }
+////                    chatsArr.refresh();
+//                }else{
+//
+//                }
+//
+//            }
+            chatsArr.addItem(event.message.msg);
+            setPreDate(chatsArr);
             showLastMsg();
 
         }
@@ -153,7 +214,7 @@
             }
             var chat:Object = new Object();
 
-            chat['id'] = new Date().getTime();
+            chat['id'] = UUIDUtil.create();
             chat['te'] = __msg;
             chat['co'] = cp.selectedColor;
             chat['we'] = bBTN.selected?'bold':'normal';
@@ -172,9 +233,9 @@
                 });
             }
 
-            chat['status']="loading";
-            chatsArr.addItem(chat);
-            showLastMsg();
+//            chat['status']="loading";
+//            chatsArr.addItem(chat);
+//            showLastMsg();
 
 
 
@@ -185,17 +246,17 @@
         private function al(data:Object,chat:Object):void{
             trace("chat:"+JParser.encode(data));
 
-                for each(var c:Object in chatsArr){
-                    if(c.id==chat.id){
-                        if(data.code==200){
-                            c.status="success";
-                        }else{
-                            c.status="failue";
-                        }
-                        chatsArr.refresh();
-                    }
-                }
-            showLastMsg();
+//                for each(var c:Object in chatsArr){
+//                    if(c.id==chat.id){
+//                        if(data.code==200){
+//                            c.status="success";
+//                        }else{
+//                            c.status="failue";
+//                        }
+//                        chatsArr.refresh();
+//                    }
+//                }
+//            showLastMsg();
 //            Alert.show(JParser.encode(data),chat['text']);
         }
 
@@ -212,14 +273,11 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<control:layout>
-		<s:VerticalLayout gap="5" >
+		<s:VerticalLayout gap="0" >
 			
 		</s:VerticalLayout>
 	</control:layout>
-    <s:HGroup width="100%" height="50" paddingLeft="10" verticalAlign="middle">
-        <s:Image id="head" width="45" height="45"></s:Image>
-        <s:Label id="nameLabel"  ></s:Label>
-    </s:HGroup>
+
     <s:HGroup id="horGroup" width="100%" height="100%">
         <s:VGroup   width="100%" height="100%">
 
@@ -227,20 +285,21 @@
                                    listItemClick="chatItemClick_handler(event)"
                                    itemRenderer="uicontrol.renderer.ChatItemRenderer" width="100%" height="100%">
             </uicontrol:AddressList>
-            <s:BorderContainer width="100%" height="45" backgroundImage="{CBorderContainer.toolbgimg}" borderVisible="false">
+            <s:BorderContainer width="100%" height="30" backgroundImage="{CBorderContainer.toolbgimg}" borderVisible="false">
                 <s:layout>
-                    <s:HorizontalLayout paddingLeft="10" gap="10" verticalAlign="middle"></s:HorizontalLayout>
+                    <s:HorizontalLayout paddingLeft="10" gap="10" paddingRight="15" verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>
 
                 <mx:ColorPicker id="cp"/>
                 <s:Label text="字号"/>
-                <s:NumericStepper id="ns" minimum="12" value="14" maximum="24" stepSize="2"/>
+                <s:NumericStepper id="ns" minimum="12" value="14" maximum="20" stepSize="2"/>
                 <mx:Button id="bBTN" width="25" toggle="true" icon="@Embed('/assets/img/b.png')"/>
                 <mx:Button id="iBTN" width="25" toggle="true" icon="@Embed('/assets/img/i.png')"/>
                 <mx:Button id="uBTN" width="25" toggle="true" icon="@Embed('/assets/img/u.png')"/>
                 <mx:Spacer width="100%" height="10"/>
+                <s:Button id="historyButton" label="加载历史记录" width="150" height="25" click="getHistoryChat()"  />
             </s:BorderContainer>
-            <s:TextArea id="ti" width="100%" height="100"
+            <s:TextArea id="ti" width="100%" height="50"
                         paddingTop="10" paddingBottom="5" paddingLeft="5" paddingRight="5"
                         focusEnabled="true" fontLookup="device"
                         fontFamily="simsun,MINGLIU"
@@ -260,10 +319,17 @@
             </s:HGroup>
 
         </s:VGroup>
-        <uicontrol:AddressList id="addressList" dataProvider="{members}"
-                               listItemClick="listItemClick_handler(event)"
-                               itemRenderer="uicontrol.renderer.AddressItemRenderer" width="150" height="100%">
-        </uicontrol:AddressList>
+        <s:VGroup width="150" height="100%" horizontalAlign="left" gap="5">
+            <s:HGroup verticalAlign="middle" paddingLeft="10" gap="5">
+                <s:Image id="head" width="45" height="45"></s:Image>
+                <s:Label id="nameLabel"  ></s:Label>
+            </s:HGroup>
+            <uicontrol:AddressList  id="addressList" dataProvider="{members}"
+                                   listItemClick="listItemClick_handler(event)"
+                                   itemRenderer="uicontrol.renderer.AddressItemRenderer" width="100%" height="100%">
+            </uicontrol:AddressList>
+        </s:VGroup>
+
     </s:HGroup>
 
 

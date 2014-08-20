@@ -146,6 +146,7 @@ package org.idream.pomelo
 			}
 			else if (type === Message.TYPE_RESPONSE)
 			{
+                trace(id);
 				route = Pomelo.requests[id].route;
 			}
 			

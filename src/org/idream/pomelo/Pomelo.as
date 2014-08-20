@@ -114,6 +114,7 @@ package org.idream.pomelo
 		 */
 		public function request(route:String, msg:Object, callback:Function = null):void
 		{
+            trace(route);
 			if (!route || !route.length) return;
 			
 			if (callback == null) 

@@ -30,7 +30,7 @@
         }
 
         private var emailexp:RegExp = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-        private var phoneexp:RegExp =/^1\d{10}$/gi;
+        private var phoneexp:RegExp =/^1\d{10}$/;
 
         public function save():void {
             if (this.username.text == "" ||
@@ -38,7 +38,7 @@
                 Alert.show("请填写完整信息。", "提示");
                 return;
             }
-            if(!emailexp.test(username.text)||!phoneexp.test(username.text)){
+            if(!emailexp.test(username.text)&&!phoneexp.test(username.text)){
                 Alert.show("请填写正确的邮箱或手机号。", "提示");
                 return;
             }
@@ -64,7 +64,6 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-        <mx:RegExpValidator source="{username}" property="text" expression="{''}" ></mx:RegExpValidator>
 	</fx:Declarations>
 
 	<s:Form width="100%" id="form" >
