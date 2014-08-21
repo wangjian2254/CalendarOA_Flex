@@ -13,9 +13,21 @@
     <fx:Script><![CDATA[
         import events.ListClickEvent;
 
+        import flash.filters.DropShadowFilter;
+
+        import flash.filters.GlowFilter;
+
         import util.ToolUtil;
 
 
+        [Bindable]
+        private var dropBevelFilter:flash.filters.BevelFilter = new flash.filters.BevelFilter(10,270,0,0,0xffffff,.5,8,8,8,8);
+
+        [Bindable]
+        private var dropShadow:flash.filters.DropShadowFilter=new DropShadowFilter(2,90,0x000000,0.35,4,4);
+
+        [Bindable]
+        private var Inner:flash.filters.GlowFilter=new flash.filters.GlowFilter(0xffffff,.5,8,8,2,4,true);
 
         private var _data:Object;
         override public function get data():Object {
@@ -44,6 +56,7 @@
                 horizontalLayout.horizontalAlign="right";
                 chatstatus.horizontalAlign="right";
 //                heaGroup.horizontalAlign = "right";
+
             }else{
                  head.source = person.icon;
                 head2.source = null;
@@ -52,7 +65,9 @@
                 horizontalLayout.horizontalAlign="left";
                 chatstatus.horizontalAlign="left";
 //                heaGroup.horizontalAlign="left";
+
             }
+
             contentLabel.text = data.te;
             contentLabel.setStyle("fontFamily","simsun,MINGLIU");
             contentLabel.setStyle("alignmentBaseline","ideographicCenter");
@@ -70,8 +85,57 @@
 
             }
             contentLabel.validateNow();
+            back1.validateNow();
+            showChatImg();
 
 
+        }
+
+        private function showChatImg():void{
+            var person:Object = ToolUtil.getPersonById(data.f);
+            if(person.id==ToolUtil.sessionUser.pid){
+                back1.setStyle("borderColor",0xb0e861);
+                back10.color=0xb0e861;
+                back2.setStyle("borderColor",0xb0e861);
+                back10.color=0xb0e861;
+
+                var vertices:Vector.<Number> = new Vector.<Number>();
+
+                vertices.push(back1.width-8, back1.height-5);
+                vertices.push(back1.width-18, back1.height-2);
+                vertices.push(back1.width, back1.height+5);
+
+                var indices:Vector.<int> = new Vector.<int>();
+                indices.push(0, 1, 2);
+
+                back1.graphics.clear();
+                back1.graphics.beginFill(0xb0e861);
+
+                back1.graphics.drawTriangles(vertices,indices);
+
+                back1.graphics.endFill();
+            }else{
+                back1.setStyle("borderColor",0xdbe2ed);
+                back10.color=0xdbe2ed;
+                back2.setStyle("borderColor",0xdbe2ed);
+                back20.color=0xdbe2ed;
+
+                var vertices2:Vector.<Number> = new Vector.<Number>();
+
+                vertices2.push(8, back1.height-5);
+                vertices2.push(18, back1.height-2);
+                vertices2.push(0, back1.height+5);
+
+                var indices2:Vector.<int> = new Vector.<int>();
+                indices2.push(0, 1, 2);
+
+                back1.graphics.clear();
+                back1.graphics.beginFill(0xdbe2ed);
+
+                back1.graphics.drawTriangles(vertices2,indices2);
+
+                back1.graphics.endFill();
+            }
         }
 
         private function select_handler(e:MouseEvent):void{
@@ -82,26 +146,26 @@
 
         protected function m_over():void{
             chatstatus.visible = true;
-            solidColor.color = 0x7ae7bf;
+//            solidColor.color = 0x7ae7bf;
         }
 
         protected function m_out():void{
             chatstatus.visible = false;
-            solidColor.color = 0xffffff;
+//            solidColor.color = 0xffffff;
         }
         ]]></fx:Script>
 
     <s:BorderContainer id="borderContainer" width="100%" minHeight="15" click="select_handler(event)" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()">
 
 
-        <s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">
+        <!--<s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">-->
+            <!--<s:fill>-->
+                <!--<s:SolidColor color="0xdbdbdb" />-->
+            <!--</s:fill>-->
+        <!--</s:Rect>-->
+        <s:Rect left="0" right="0" top="0" bottom="0">
             <s:fill>
-                <s:SolidColor color="0xdbdbdb" />
-            </s:fill>
-        </s:Rect>
-        <s:Rect left="1" right="1" top="0" bottom="1">
-            <s:fill>
-                <s:SolidColor id="solidColor" color="0xffffff"  />
+                <s:SolidColor id="solidColor" color="0xe8e8e8"  />
             </s:fill>
         </s:Rect>
         <s:VGroup width="100%">
@@ -113,14 +177,26 @@
                 <s:Image id="head" width="25" height="25"></s:Image>
                 <s:Label id="nameLabel"  color="#000000"></s:Label>
             </s:VGroup>
-            <s:VGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="5" paddingLeft="5">
-
-                <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="10" paddingLeft="10" paddingRight="10"  ></s:Label>
-                <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
-                    <s:Label id="statusLabel" color="#000000"></s:Label>
-                    <mx:LinkButton id="myFZRButton" label="我负责" textDecoration="underline" ></mx:LinkButton>
-                    <mx:LinkButton id="selectFZRButton" label="指派"  textDecoration="underline" ></mx:LinkButton>
-                </s:HGroup>
+            <s:VGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="5" paddingLeft="5" paddingBottom="5">
+                <s:BorderContainer id="back1"  cornerRadius="12" borderColor="#b0e861" borderStyle="solid"  filters="{[dropShadow,Inner]}" render="showChatImg()">
+                    <s:backgroundFill>
+                        <s:SolidColor  id="back10" color="#b0e861" alpha="1"/>
+                    </s:backgroundFill>
+                    <s:layout>
+                        <s:VerticalLayout  paddingLeft="7" paddingRight="7" />
+                    </s:layout>
+                    <s:BorderContainer id="back2" y="0" x="7" height="15" width="100%" cornerRadius="6" filters="{[dropBevelFilter]}"  borderColor="#b0e861" borderStyle="solid" >
+                        <s:backgroundFill>
+                            <s:SolidColor  id="back20" color="#b0e861" alpha="1"/>
+                        </s:backgroundFill>
+                    </s:BorderContainer>
+                    <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="10" paddingLeft="10" paddingRight="10"  ></s:Label>
+                    <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
+                        <s:Label id="statusLabel" color="#000000"></s:Label>
+                        <mx:LinkButton id="myFZRButton" label="我负责" textDecoration="underline" ></mx:LinkButton>
+                        <mx:LinkButton id="selectFZRButton" label="指派"  textDecoration="underline" ></mx:LinkButton>
+                    </s:HGroup>
+                </s:BorderContainer>
             </s:VGroup>
             <s:VGroup paddingTop="5"  horizontalAlign="center" gap="2">
                 <s:Image id="head2" width="25" height="25"></s:Image>
