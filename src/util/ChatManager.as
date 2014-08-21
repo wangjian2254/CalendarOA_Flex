@@ -24,7 +24,7 @@ public class ChatManager {
     public static var type:String = "flex";
 //    private static var chatmanage:ChatManager;
 
-    public static var userStatus:Object=new Object();
+//    public static var userStatus:Object=new Object();
     public static var unReadMessage:ArrayCollection = new ArrayCollection();
 
     public function ChatManager() {
@@ -32,11 +32,11 @@ public class ChatManager {
 
     }
 
-    static public function clearUser():void{
-        for(var u:String in userStatus){
-            userStatus[u]="off";
-        }
-    }
+//    static public function clearUser():void{
+//        for(var u:String in userStatus){
+//            userStatus[u]="off";
+//        }
+//    }
 
     static public function unReadChanged(e:CollectionEvent):void{
         var n:int=0;
@@ -52,9 +52,9 @@ public class ChatManager {
     static public function loginChat(e:Event=null):void{
         time.addEventListener(TimerEvent.TIMER,loginChat);
         unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChanged);
-        for(var u:String in userStatus){
-            userStatus[u]="off";
-        }
+//        for(var u:String in userStatus){
+//            userStatus[u]="off";
+//        }
         unReadMessage.removeAll();
         Pomelo.getIns().disconnect();
         if(ToolUtil.sessionUser){
@@ -105,15 +105,33 @@ public class ChatManager {
         Pomelo.getIns().request(route, p, function (data:Object):void {
             trace("登录成功");
 
-            Pomelo.getIns().addEventListener('pStatus', personChangedHandler);
+//            Pomelo.getIns().addEventListener('pStatus', personChangedHandler);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
-            Pomelo.getIns().addEventListener('onLine', onlineHandler);
+//            Pomelo.getIns().addEventListener('onLine', onlineHandler);
             Pomelo.getIns().addEventListener('sys', systemMessageHandler);
-            clearUser();
+//            clearUser();
 
-            for each(var m:String in data.users){
-                userStatus[m]="on";
+            var groups:ArrayCollection=new ArrayCollection();
+            var g:Object;
+            for each(var channel:Object in data.channels){
+                if(channel.channel.substr(0,1)=="g"){
+                    g=new Object();
+                    g['channel']=channel.channel;
+                    g['name']=channel.name;
+                    g['members']=new ArrayCollection();
+                    for each(var u:Object in channel.members){
+                        for each(var item:Object in ToolUtil.memberList){
+                            if(u.pid==item.id){
+                                g["members"].push(item);
+                                break;
+                            }
+                        }
+                    }
+                    groups.addItem(g);
+                }
+
             }
+            ToolUtil.groupList = groups;
             listenOrg();
         });
     }
@@ -130,21 +148,21 @@ public class ChatManager {
     }
 
 
-    static public function personChangedHandler(event:PomeloEvent):void{
-        userStatus[event.message.p]=event.message.s;
-        trace("user changed:"+event.message.p+"_"+event.message.s);
-    }
-
-
-    static public function onlineHandler(event:PomeloEvent):void{
-        clearUser();
-        for each(var m:Object in event.message.users){
-            userStatus[m.uid]="on";
-
-
-            trace("online user changed:"+m.uid+"_on");
-        }
-    }
+//    static public function personChangedHandler(event:PomeloEvent):void{
+//        userStatus[event.message.p]=event.message.s;
+//        trace("user changed:"+event.message.p+"_"+event.message.s);
+//    }
+//
+//
+//    static public function onlineHandler(event:PomeloEvent):void{
+//        clearUser();
+//        for each(var m:Object in event.message.users){
+//            userStatus[m.uid]="on";
+//
+//
+//            trace("online user changed:"+m.uid+"_on");
+//        }
+//    }
     static public function chatHandler(event:PomeloEvent):void{
 
         if(event.message.msg.f!=ToolUtil.sessionUser.pid){
@@ -171,6 +189,15 @@ public class ChatManager {
                 break;
         }
 
+    }
+
+    static public function sendMessageToChannel(t:String,content:Object,callback:Function):void{
+        content["f"]=ToolUtil.sessionUser.pid;
+        content['c']=type;
+        content['channel']=t;
+//        content["o"]=to;
+        sendMessage('connector.entryHandler.send',content,callback);
+//        sendMessage('chat.chatHandler.send',content,callback);
     }
 
     static public function sendMessageToDeparment(to:Number,t:String,content:Object,callback:Function):void{

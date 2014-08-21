@@ -168,12 +168,12 @@
                 <s:SolidColor id="solidColor" color="0xe8e8e8"  />
             </s:fill>
         </s:Rect>
-        <s:VGroup width="100%">
-        <s:HGroup id="dateGroup" width="100%" height="20" horizontalAlign="center" verticalAlign="middle" >
+        <s:VGroup width="100%" gap="0">
+        <s:HGroup id="dateGroup" width="100%"  horizontalAlign="center" verticalAlign="middle" >
             <s:Label id="dateLabel" color="#000000"></s:Label>
         </s:HGroup>
-        <s:HGroup  verticalAlign="top" horizontalAlign="center" width="100%" gap="0" paddingRight="5" paddingLeft="5">
-            <s:VGroup paddingTop="5" horizontalAlign="center" gap="2">
+        <s:HGroup  verticalAlign="bottom" horizontalAlign="center" width="100%" gap="0" paddingRight="5" paddingLeft="5">
+            <s:VGroup  horizontalAlign="center" gap="2">
                 <s:Image id="head" width="25" height="25"></s:Image>
                 <s:Label id="nameLabel"  color="#000000"></s:Label>
             </s:VGroup>
@@ -183,14 +183,14 @@
                         <s:SolidColor  id="back10" color="#b0e861" alpha="1"/>
                     </s:backgroundFill>
                     <s:layout>
-                        <s:VerticalLayout  paddingLeft="7" paddingRight="7" />
+                        <s:VerticalLayout  paddingLeft="7" paddingRight="7" gap="0" />
                     </s:layout>
-                    <s:BorderContainer id="back2" y="0" x="7" height="15" width="100%" cornerRadius="6" filters="{[dropBevelFilter]}"  borderColor="#b0e861" borderStyle="solid" >
+                    <s:BorderContainer id="back2" y="0" x="7" height="10" width="100%" cornerRadius="6" filters="{[dropBevelFilter]}"  borderColor="#b0e861" borderStyle="solid" >
                         <s:backgroundFill>
                             <s:SolidColor  id="back20" color="#b0e861" alpha="1"/>
                         </s:backgroundFill>
                     </s:BorderContainer>
-                    <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="10" paddingLeft="10" paddingRight="10"  ></s:Label>
+                    <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
                     <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
                         <s:Label id="statusLabel" color="#000000"></s:Label>
                         <mx:LinkButton id="myFZRButton" label="我负责" textDecoration="underline" ></mx:LinkButton>
@@ -198,7 +198,7 @@
                     </s:HGroup>
                 </s:BorderContainer>
             </s:VGroup>
-            <s:VGroup paddingTop="5"  horizontalAlign="center" gap="2">
+            <s:VGroup   horizontalAlign="center" gap="2">
                 <s:Image id="head2" width="25" height="25"></s:Image>
                 <s:Label id="nameLabel2"  color="#000000"></s:Label>
             </s:VGroup>

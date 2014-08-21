@@ -221,6 +221,9 @@ public class ToolUtil
     }
 
     [Bindable]
+    public static var groupsList:ArrayCollection=new ArrayCollection();
+
+    [Bindable]
     public static var contactsList:ArrayCollection=new ArrayCollection();
 
     public static function contactsRefresh(fun:*=null,e:*=null):void{

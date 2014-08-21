@@ -2,8 +2,8 @@
 <!--
   Created by wangjian2254 on 14-8-10.
 -->
-<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-         xmlns:uicontrol="uicontrol.*" creationComplete="init()">
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+         xmlns:uicontrol="uicontrol.*" creationComplete="init()" gap="3">
     <fx:Metadata>
         [Event(name="listItemClick",type="events.ListClickEvent")]
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
@@ -22,14 +22,29 @@
         [Bindable]
         private var addressMember:ArrayCollection = new ArrayCollection();
 
+        [Bindable]
+        private var departMember:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        private var userMember:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        private var groupMember:ArrayCollection = new ArrayCollection();
+
+        [Bindable]
+        private var btnlist:ArrayCollection=new ArrayCollection([{label:"部门",mod:"org"},{label:"员工",mod:"user"},{label:"讨论组",mod:"group"}]);;
+
         public var type:String = "org";
 
         [Bindable]
         public var borderVisible:Boolean = true;
 
         public function init():void {
+            if(type=="org"){
+                this.removeElement(showModel);
+                this.removeElement(liyuwangBtn);
+            }
             ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
             ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
+            ToolUtil.groupList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
 
 
 
@@ -56,10 +71,23 @@
             initAddress();
         }
 
+        public var liyu:Object=new Object();
+
         private function initAddress():void {
+            liyu['id'] = 0;
+            liyu['name'] = '客服鲤鱼王';
+            liyu['icon'] = '/static/image/liyu2.png';
+            liyu['depart_id'] = -1;
+            liyu['level'] = 0;
+            liyu['unread'] = 0;
             addressMember.removeAll();
 
             if (type == "chat") {
+                head.source = liyu['icon'];
+                nameLabel.text = liyu['name'];
+                userMember.removeAll();
+                departMember.removeAll();
+                groupMember.removeAll();
                 ChatManager.unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChange);
                 var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 //                var contact:Object = new Object();
@@ -75,15 +103,10 @@
                     member['level'] = 0;
                     member['unread'] = 0;
                 }
-                var liyu:Object = new Object();
-                liyu['id'] = 0;
-                liyu['name'] = '客服鲤鱼王';
-                liyu['icon'] = '/static/image/liyu2.png';
-                liyu['depart_id'] = -1;
-                liyu['level'] = 0;
-                liyu['unread'] = 0;
-                addressMember.addItem(liyu);
-                addressMember.addAll(new ArrayCollection(members as Array));
+//                var liyu:Object = new Object();
+
+
+                userMember.addAll(new ArrayCollection(members as Array));
 
                 var l2:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var f:Boolean = false;
@@ -97,9 +120,11 @@
                     if (f) {
                         item2.level = 0;
                         item2.unread = 0;
-                        addressMember.addItem(item2);
+                        departMember.addItem(item2);
                     }
                 }
+                groupMember = ObjectUtil.copy(ToolUtil.groupList) as ArrayCollection;
+
             }
 
 
@@ -146,7 +171,7 @@
 //                    var listclickevent:ListClickEvent = new ListClickEvent("listItemZhanKai", rootDepart);
 //                    listItemZhanKai_handler(listclickevent);
                 }
-
+               addressList.dataProvider = addressMember;
             }
         }
 
@@ -171,6 +196,11 @@
 
 
 
+        }
+
+        private function chatliyu():void{
+            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",liyu);
+            dispatchEvent(listclickevent);
         }
 
         //        private function listItemClick_handler(e:ListClickEvent):void{
@@ -230,12 +260,36 @@
 
 
         }
+
+        private function changeShowModel():void{
+            if(showModel.selectedItem.mod=="org"){
+               addressList.dataProvider = departMember;
+            }
+            if(showModel.selectedItem.mod=="user"){
+                addressList.dataProvider = userMember;
+            }
+            if(showModel.selectedItem.mod=="group"){
+                addressList.dataProvider = groupMember;
+            }
+        }
         ]]></fx:Script>
 
-    <uicontrol:AddressList id="addressList" dataProvider="{addressMember}" borderVisible="{borderVisible}}"
+    <s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100%" height="25" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
+    <s:HGroup id="liyuwangBtn" click="chatliyu()"  verticalAlign="middle"   width="100%" height="50" buttonMode="true"  >
+        <s:Image id="head" width="45" height="45"></s:Image>
+        <s:Label id="nameLabel" ></s:Label>
+        <s:BorderContainer id="num" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
+            <s:layout>
+                <s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"></s:HorizontalLayout>
+            </s:layout>
+            <s:Label id="numLabel" text="10" fontSize="12" color="#ffffff" ></s:Label>
+        </s:BorderContainer>
+
+    </s:HGroup>
+    <uicontrol:AddressList id="addressList" dataProvider="{departMember}" borderVisible="{borderVisible}}"
                            listItemZhanKai="listItemZhanKai_handler(event)"
                            horizontalScrollPolicy="off"
                            itemRenderer="uicontrol.renderer.AddressItemRenderer" width="100%" height="100%">
 
     </uicontrol:AddressList>
-</s:Group>
+</s:VGroup>

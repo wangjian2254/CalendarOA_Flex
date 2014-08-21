@@ -57,10 +57,36 @@
                 head.source = chatUser.icon;
                 nameLabel.text = chatUser.name;
             }
+            var pids:Array=new Array();
 
+            var channel:String;
+            if(members==null){
+                if(ToolUtil.sessionUser.pid>chatUser.id){
+                    channel=chatUser.id+"p"+ToolUtil.sessionUser.pid;
+                }else{
+                    channel=ToolUtil.sessionUser.pid+"p"+chatUser.id;
+                }
+                pids.push(chatUser.id);
+                pids.push(ToolUtil.sessionUser.pid);
+            }else{
+                for each(var p:Object in members){
+                    pids.push(p.id);
+                }
+                if(chatUser.channel){
+                    channel = chatUser.channel;
+                }else{
+                    channel = type+chatUser.id;
+                }
 
-            Pomelo.getIns().addEventListener("pStatus",changeMember);
-            Pomelo.getIns().addEventListener("onLine",changeMember);
+            }
+            Pomelo.getIns().request("connector.entryHandler.createChannel",{channel:channel,users:pids},function(data:Object):void{
+                if(data.code==200){
+
+                }
+            })
+
+//            Pomelo.getIns().addEventListener("pStatus",changeMember);
+//            Pomelo.getIns().addEventListener("onLine",changeMember);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
             getHistoryChat();
         }
@@ -129,14 +155,14 @@
 
         }
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-            Pomelo.getIns().addEventListener("pStatus",changeMember);
-            Pomelo.getIns().addEventListener("onLine",changeMember);
+//            Pomelo.getIns().addEventListener("pStatus",changeMember);
+//            Pomelo.getIns().addEventListener("onLine",changeMember);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
         }
 
         override public function closeContainer(e:CloseEvent):void {
-            Pomelo.getIns().removeEventListener("pStatus",changeMember);
-            Pomelo.getIns().removeEventListener("onLine",changeMember);
+//            Pomelo.getIns().removeEventListener("pStatus",changeMember);
+//            Pomelo.getIns().removeEventListener("onLine",changeMember);
             Pomelo.getIns().removeEventListener('onChat', chatHandler);
 
             dispatchEvent(e);
@@ -163,21 +189,21 @@
         }
 
 
-        private function changeMember(e:Event=null):void{
-            for each(var member:Object in members){
-                member['online']=false;
-            }
-            for each(member in members){
-                for (var p:String in ChatManager.userStatus){
-                     if(member.id == p.split("*")[0]){
-                         member['online']=true;
-                     }
-                }
-            }
-            if(members!=null){
-                members.refresh();
-            }
-        }
+//        private function changeMember(e:Event=null):void{
+//            for each(var member:Object in members){
+//                member['online']=false;
+//            }
+//            for each(member in members){
+//                for (var p:String in ChatManager.userStatus){
+//                     if(member.id == p.split("*")[0]){
+//                         member['online']=true;
+//                     }
+//                }
+//            }
+//            if(members!=null){
+//                members.refresh();
+//            }
+//        }
 
 
 
@@ -228,9 +254,16 @@
                     al(data,chat);
                 });
             }else{
-                ChatManager.sendMessageToDeparment(chatUser.id,type,chat,function(data:Object):void{
-                    al(data,chat);
-                });
+                if(chatUser.channel){
+                    ChatManager.sendMessageToChannel(chatUser.channel,chat,function(data:Object):void{
+                        al(data,chat);
+                    });
+                }else{
+                    ChatManager.sendMessageToDeparment(chatUser.id,type,chat,function(data:Object):void{
+                        al(data,chat);
+                    });
+                }
+
             }
 
 //            chat['status']="loading";
@@ -319,7 +352,10 @@
             </s:HGroup>
 
         </s:VGroup>
-        <s:VGroup width="150" height="100%" horizontalAlign="left" gap="5">
+        <s:VGroup width="150" height="100%" horizontalAlign="left" gap="5" paddingTop="10">
+            <s:HGroup verticalAlign="middle" paddingLeft="10" gap="5">
+                <s:Button label="添加成员"></s:Button>
+            </s:HGroup>
             <s:HGroup verticalAlign="middle" paddingLeft="10" gap="5">
                 <s:Image id="head" width="45" height="45"></s:Image>
                 <s:Label id="nameLabel"  ></s:Label>
