@@ -30,7 +30,7 @@
         private var groupMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var btnlist:ArrayCollection=new ArrayCollection([{label:"部门",mod:"org"},{label:"员工",mod:"user"},{label:"讨论组",mod:"group"}]);;
+        private var btnlist:ArrayCollection=new ArrayCollection([{label:"最近联系",mod:"group"},{label:"部门",mod:"org"},{label:"常用联系人",mod:"user"}]);;
 
         public var type:String = "org";
 
@@ -45,10 +45,11 @@
             ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
             ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
             ToolUtil.groupList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
-
-
-
             initAddress();
+            if(type=="chat"&&groupMember.length==0){
+                showModel.selectedIndex=1;
+            }
+
         }
 
 
@@ -106,7 +107,7 @@
 //                var liyu:Object = new Object();
 
 
-                userMember.addAll(new ArrayCollection(members as Array));
+                userMember.addAll(members);
 
                 var l2:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var f:Boolean = false;

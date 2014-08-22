@@ -2,6 +2,8 @@
  * Created by WangJian on 2014/8/13.
  */
 package util {
+import events.QuiteEvent;
+
 import flash.events.Event;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
@@ -10,6 +12,7 @@ import json.JParser;
 
 import mx.collections.ArrayCollection;
 import mx.controls.Alert;
+import mx.core.FlexGlobals;
 import mx.events.CollectionEvent;
 
 import org.idream.pomelo.Pomelo;
@@ -22,6 +25,7 @@ import org.idream.pomelo.PomeloEvent;
 public class ChatManager {
     private static var time:Timer = new Timer(1000*30,1);
     public static var type:String = "flex";
+
 //    private static var chatmanage:ChatManager;
 
 //    public static var userStatus:Object=new Object();
@@ -56,10 +60,10 @@ public class ChatManager {
 //            userStatus[u]="off";
 //        }
         unReadMessage.removeAll();
-        Pomelo.getIns().disconnect();
+//        Pomelo.getIns().disconnect();
         if(ToolUtil.sessionUser){
+                Pomelo.getIns().init(ToolUtil.sessionUser.chathost,ToolUtil.sessionUser.chatport,null,loginResult,1000*30);
 
-            Pomelo.getIns().init(ToolUtil.sessionUser.chathost,ToolUtil.sessionUser.chatport,null,loginResult,1000*30);
         }else{
             time.start();
         }
@@ -87,6 +91,13 @@ public class ChatManager {
                 if (response.code == 200) {
                     time.stop();
                     regOrg();
+//                    Pomelo.getIns().addEventListener(Event.CLOSE,loginChat);
+                    Pomelo.getIns().on("loginOther",function(relogindata:PomeloEvent):void{
+                        Alert.show(relogindata.message.msg.message,"警告");
+                        var e:QuiteEvent = new QuiteEvent(QuiteEvent.Quite, true);
+                        e.needTip = false;
+                        FlexGlobals.topLevelApplication.dispatchEvent(e);
+                    })
                 }else{
                     time.start();
                 }
@@ -114,7 +125,7 @@ public class ChatManager {
             var groups:ArrayCollection=new ArrayCollection();
             var g:Object;
             for each(var channel:Object in data.channels){
-                if(channel.channel.substr(0,1)=="g"){
+                if(channel.channel&&channel.channel.substr(0,1)=="g"){
                     g=new Object();
                     g['channel']=channel.channel;
                     g['name']=channel.name;
@@ -140,9 +151,21 @@ public class ChatManager {
         var route:String = "connector.entryHandler.listenOrg";
         var param:Object = new Object();
         var dids:Array=new Array();
-        for each(var depart:Object in ToolUtil.departMentList){
-            dids.push("d"+depart.id);
+        var f:Boolean = false;
+        for each(var item2:Object in ToolUtil.departMentList) {
+            f = false;
+            for each(var p:Object in item2.members) {
+                if (p.id == ToolUtil.sessionUser.pid) {
+                    f = true;
+                }
+            }
+            if (f) {
+                dids.push("d"+item2.id);
+            }
         }
+//        for each(var depart:Object in ToolUtil.departMentList){
+//            dids.push("d"+depart.id);
+//        }
         param['dids']=dids;
         Pomelo.getIns().request(route, param);
     }

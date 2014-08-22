@@ -7,6 +7,8 @@ import flash.events.Event;
 public class ListClickEvent extends Event {
     public var data:Object;
 
+    public static var CHATUSER:String = "ChatUser";
+
     public function ListClickEvent(type:String, value:Object ) {
         super(type, true);
         this.data = value;

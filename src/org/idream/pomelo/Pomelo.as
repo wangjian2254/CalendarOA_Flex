@@ -300,8 +300,13 @@ package org.idream.pomelo
 							break;
 					}
 				}
+                try{
+                    _socket.bytesAvailable;
+                }catch (err:Error){
+                    return;
+                }
 				
-				trace("[Pomelo] client next:", _socket.bytesAvailable);
+//				trace("[Pomelo] client next:", _socket.bytesAvailable);
 			}
 			while (!_pkg && _socket.bytesAvailable > 4);
 		}

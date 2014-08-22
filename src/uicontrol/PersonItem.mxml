@@ -73,7 +73,7 @@
             if(e.target is BorderContainerSkin){
                 var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel,true) as PersonPanel;
                 p.personData = person;
-                p.departmentData = department;
+//                p.departmentData = department;
             }
 
         }

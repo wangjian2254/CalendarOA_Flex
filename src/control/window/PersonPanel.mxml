@@ -16,7 +16,7 @@
 			import util.ToolUtil;
 
             public var personData:Object=null;
-            public var departmentData:Object=null;
+//            public var departmentData:Object=null;
 
 			public function init(e:mx.events.FlexEvent):void{
 

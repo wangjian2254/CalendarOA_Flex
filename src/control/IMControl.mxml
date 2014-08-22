@@ -20,6 +20,8 @@
             if(!param){
             }
 
+            this.addEventListener(ListClickEvent.CHATUSER,listItemClick_handler);
+
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
@@ -47,8 +49,10 @@
             var mod:String = '';
             if(chat.hasOwnProperty('flag')){
                 mod = 'd'+chat.id;
-            }else{
+            }else if(!chat.hasOwnProperty("channel")){
                 mod = 'p'+chat.id;
+            }else{
+                mod = chat.channel;
             }
             var c:CBorderContainer;
             c = cbar.getView(mod);
@@ -60,6 +64,15 @@
                     for each(var m:Object in chatControl.members){
                         m.level = 0;
                     }
+                    chatControl.type="d";
+                }else if(!chat.hasOwnProperty("channel")){
+                    chatControl.type="p";
+                }else{
+                    chatControl.members = new ArrayCollection(chat.members as Array);
+                    for each(var m:Object in chatControl.members){
+                        m.level = 0;
+                    }
+                    chatControl.type="g";
                 }
 
                 c = chatControl;
@@ -67,8 +80,6 @@
             if (c != null) {
                 c.label = chat.name;
                 c.flag = mod;
-
-
                 c.param = null;
                 if (!cbar.setView(mod)) {
                     cbar.addView(c);

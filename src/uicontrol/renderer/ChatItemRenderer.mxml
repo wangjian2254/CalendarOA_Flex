@@ -72,10 +72,10 @@
             contentLabel.setStyle("fontFamily","simsun,MINGLIU");
             contentLabel.setStyle("alignmentBaseline","ideographicCenter");
             contentLabel.setStyle("color",data.co);
-            contentLabel.setStyle("fontWeight",data.we);
-            contentLabel.setStyle("fontStyle",data.st);
-            contentLabel.setStyle("textDecoration",data.de);
-            contentLabel.setStyle("fontSize",data.si);
+//            contentLabel.setStyle("fontWeight",data.we);
+//            contentLabel.setStyle("fontStyle",data.st);
+//            contentLabel.setStyle("textDecoration",data.de);
+//            contentLabel.setStyle("fontSize",data.si);
             dateLabel.text = data.d;
 
             if(data.hasOwnProperty("status")){
