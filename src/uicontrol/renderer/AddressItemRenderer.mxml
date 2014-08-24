@@ -87,6 +87,9 @@
 
             change_status();
             nameLabel.text = data.name;
+            if(!data.hasOwnProperty('level')){
+                data.level=0;
+            }
             horizontalLayout.paddingLeft = 5+data.level*15;
             solidColor.color = getColor(data);
 //            if(data.id>=0){
@@ -111,7 +114,7 @@
         }
 
         private function select_handler(e:MouseEvent):void{
-            if(data && data.id>=0){
+            if((data && data.id>=0)||data.hasOwnProperty("channel")){
                 var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
                 dispatchEvent(listclickevent);
             }

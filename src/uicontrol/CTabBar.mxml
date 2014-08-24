@@ -73,6 +73,10 @@
             return null;
         }
 
+        public function getCurrentView():CBorderContainer{
+            return dataProvider.selectedChild as CBorderContainer;
+        }
+
         private function close(e:CloseTabButtonEvent):void {
 
             var view:CBorderContainer = e.getView() as CBorderContainer;

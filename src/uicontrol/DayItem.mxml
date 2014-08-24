@@ -179,7 +179,6 @@
                         scheduleItem.width = this.width - 1 - x;
                         scheduleItem.height = Number(obj.time_end.substr(0, 2)) * this.height / 24 + (Number(obj.time_end.substr(2, 2)) / 60 * this.height / 24) - y - 1;
                         scheduleItem.setStyle("borderVisible", true);
-                        scheduleItem.setStyle("borderColor", ToolUtil.groupColor["" + obj.group]);
                         scheduleItem.setStyle("borderWeight", 4);
                         scheduleItem.setStyle("cornerRadius", 7);
                         scheduleItem.setStyle("backgroundAlpha", 1);

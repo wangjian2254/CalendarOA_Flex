@@ -6,21 +6,28 @@
 		<![CDATA[
 
         import events.ChangeUserEvent;
+        import events.ChatTimelineEvent;
         import events.CloseEvent;
         import events.ListClickEvent;
 
 
         import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
         import mx.events.CollectionEvent;
         import mx.events.FlexEvent;
 
+        import org.idream.pomelo.Pomelo;
+
         import util.ChatManager;
+        import util.ToolUtil;
 
         override public function init(e:FlexEvent):void {
             if(!param){
             }
 
             this.addEventListener(ListClickEvent.CHATUSER,listItemClick_handler);
+            this.addEventListener(ChatTimelineEvent.Channel,flagTimeline);
+
 
         }
 
@@ -43,36 +50,56 @@
             super.reloadParamData(e);
         }
 
+        private function flagTimeline(e:ChatTimelineEvent):void{
+            if(e.flag!=cbar.getCurrentView().flag){
+
+            }else{
+                for each(var c:Object in ToolUtil.groupList){
+                    if(c.channel==e.channel){
+                        c.unread=0;
+                        Pomelo.getIns().notify("connector.entryHandler.updatetimeline",{channel: e.channel,pid: ToolUtil.sessionUser.pid});
+                    }
+                }
+                ToolUtil.groupList.refresh();
+            }
+
+        }
+
 
         private function listItemClick_handler(e:ListClickEvent):void{
             var chat:Object = e.data;
             var mod:String = '';
+            var type:String = '';
             if(chat.hasOwnProperty('flag')){
-                mod = 'd'+chat.id;
+                type="d";
             }else if(!chat.hasOwnProperty("channel")){
-                mod = 'p'+chat.id;
+                type="p";
             }else{
-                mod = chat.channel;
+                if(chat.channel.substr(0,1)=='g'){
+                    type="g";
+                }
+                if(chat.channel.substr(0,1)=='d'){
+                    type="d";
+                }
+                if(!isNaN(chat.channel.substr(0,1))){
+                    type="p";
+                }
+
+
             }
+            mod = type+chat.id;
+
             var c:CBorderContainer;
             c = cbar.getView(mod);
             if (c == null) {
                 var chatControl:ChatControl = new ChatControl();
                 chatControl.chatUser = chat;
-                if(chat.hasOwnProperty('flag')){
+                chatControl.type = type;
+                if(chat.hasOwnProperty("members")){
                     chatControl.members = new ArrayCollection(chat.members as Array);
                     for each(var m:Object in chatControl.members){
                         m.level = 0;
                     }
-                    chatControl.type="d";
-                }else if(!chat.hasOwnProperty("channel")){
-                    chatControl.type="p";
-                }else{
-                    chatControl.members = new ArrayCollection(chat.members as Array);
-                    for each(var m:Object in chatControl.members){
-                        m.level = 0;
-                    }
-                    chatControl.type="g";
                 }
 
                 c = chatControl;

@@ -14,6 +14,7 @@ import mx.collections.ArrayCollection;
 import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.events.CollectionEvent;
+import mx.events.FlexEvent;
 
 import org.idream.pomelo.Pomelo;
 import org.idream.pomelo.PomeloEvent;
@@ -25,6 +26,20 @@ import org.idream.pomelo.PomeloEvent;
 public class ChatManager {
     private static var time:Timer = new Timer(1000*30,1);
     public static var type:String = "flex";
+
+    [Bindable]
+    public static var liyuShow:Boolean=false;
+    [Bindable]
+    public static var liyuunread:Number=0;
+    [Bindable]
+    public static var liyu:Object={id:0,name:"客服鲤鱼王",icon:'/static/image/liyu2.png',depart_id:-1,level:0,unread:0};// 全局客服
+
+
+//    liyu['id'] = 0;
+//    liyu['name'] = '客服鲤鱼王';
+//    liyu['icon'] = '/static/image/liyu2.png';
+//    liyu['depart_id'] = -1;
+//    liyu['level'] = 0;
 
 //    private static var chatmanage:ChatManager;
 
@@ -120,29 +135,94 @@ public class ChatManager {
             Pomelo.getIns().addEventListener('onChat', chatHandler);
 //            Pomelo.getIns().addEventListener('onLine', onlineHandler);
             Pomelo.getIns().addEventListener('sys', systemMessageHandler);
+            Pomelo.getIns().addEventListener('createChannel', createChannelHandler);
 //            clearUser();
 
             var groups:ArrayCollection=new ArrayCollection();
+            var channels:Array = new Array();
             var g:Object;
             for each(var channel:Object in data.channels){
-                if(channel.channel&&channel.channel.substr(0,1)=="g"){
-                    g=new Object();
-                    g['channel']=channel.channel;
-                    g['name']=channel.name;
-                    g['members']=new ArrayCollection();
+                if ('o' == channel.channel.substr(0, 1)) {
+                    continue;
+                }
+                if ('0' == channel.channel.substr(0, 1)) {
+                    channels.push({channel:channel.channel, timeline:""+channel.timeline});
+                    continue;
+                }
+                g=new Object();
+                if(channel.channel.substr(0,1)=="g"){
+                    g['id']=channel.channel.substr(1, channel.channel.length - 1);
+                }
+                if(isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!="g"){
+                    g['id']=Number(channel.channel.substr(1, channel.channel.length - 1));
+                }
+                g['channel']=channel.channel;
+                g['father']=null;
+                channels.push({channel:channel.channel, timeline:""+channel.timeline});
+                g['name']=channel.name;
+                g['timeline']=channel.timeline;
+                if(!isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!='0'){
+                    var pid1:int=Number(channel.channel.split('p')[0]);
+                    var pid2:int=Number(channel.channel.split('p')[1]);
+                    if(ToolUtil.sessionUser.pid!=pid1){
+                        pid1=pid2;
+                    }
+                    for each(var p:Object in ToolUtil.memberList){
+                        if(p.id==pid1){
+                            g['id']= p.id;
+                            g['icon']= p.icon;
+                            g['name']= p.name;
+                            break;
+                        }
+                    }
+                }else{
+                    if ('d' == channel.channel.substr(0, 1)) {
+                        for each(var p:Object in ToolUtil.departMentList) {
+                            if (p.id == g['id']) {
+                                g['icon']= p.icon;
+                                g['name']= p.name;
+                                g['flag']= p.flag;
+                                break;
+                            }
+                        }
+                    }
+
+                    g['members']=new Array();
                     for each(var u:Object in channel.members){
                         for each(var item:Object in ToolUtil.memberList){
                             if(u.pid==item.id){
+                                item['level'] = 0;
+                                item['unread'] = 0;
                                 g["members"].push(item);
                                 break;
                             }
                         }
                     }
-                    groups.addItem(g);
                 }
+                groups.addItem(g);
 
             }
             ToolUtil.groupList = groups;
+            Pomelo.getIns().on("channelCount",function(msg:PomeloEvent):void{
+                if(msg.message.channel.substr(0,1)=='0'){
+                    liyuunread=msg.message.count;
+                    if(liyuunread>0){
+                        liyuShow=true;
+                    }else{
+                        liyuShow=false;
+                    }
+                }
+                for each(var c:Object in ToolUtil.groupList){
+                    if(c.channel==msg.message.channel){
+                        c.unread=msg.message.count;
+                    }
+                }
+                if(msg.message.num<=0){
+                    ToolUtil.groupList.refresh();
+                }
+            })
+            Pomelo.getIns().request("connector.entryHandler.unreadcount", {channels:channels});
+
             listenOrg();
         });
     }
@@ -211,6 +291,53 @@ public class ChatManager {
                 Alert.show(event.message.msg.msg,event.message.msg.type);
                 break;
         }
+
+    }
+    static public function createChannelHandler(event:PomeloEvent):void{
+        for each(var org:Object in ToolUtil.groupList){
+            if(org.channel==event.message.group.channel){
+                return;
+            }
+        }
+        var g:Object=new Object();
+        g['channel']=event.message.group.channel;
+        g['name']=event.message.group.name;
+        if(event.message.group.channel.substr(0,1)=="g"){
+            g['id']=event.message.group.channel.substr(1, event.message.group.channel.length - 1);
+        }
+        if(event.message.group.channel.substr(0,1)=="0"){
+            return;
+        }
+        if(!isNaN(event.message.group.channel.substr(0,1))&&event.message.group.channel.substr(0,1)!='0'){
+            var pid1:int=Number(event.message.group.channel.split('p')[0]);
+            var pid2:int=Number(event.message.group.channel.split('p')[1]);
+            if(ToolUtil.sessionUser.pid!=pid1){
+                pid1=pid2;
+            }
+            for each(var p:Object in ToolUtil.memberList){
+                if(p.id==pid1){
+                    g['id']= p.id;
+                    g['icon']= p.icon;
+                    g['name']= p.name;
+                    break;
+                }
+            }
+        }
+
+        g['timeline']=event.message.group.timeline;
+        g['members']=new Array();
+        for each(var u:Object in event.message.group.members){
+            for each(var item:Object in ToolUtil.memberList){
+                if(u.pid==item.id){
+                    item['level'] = 0;
+                    item['unread'] = 0;
+                    g["members"].push(item);
+                    break;
+                }
+            }
+        }
+        ToolUtil.groupList.addItem(g);
+
 
     }
 

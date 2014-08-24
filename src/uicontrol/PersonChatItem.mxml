@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!--
+  Created by wangjian2254 on 14-7-30.
+-->
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:uicontrol="uicontrol.*" xmlns:mx="library://ns.adobe.com/flex/mx"
+                   width="115" height="55" borderVisible="true" borderColor="#cccccc" cornerRadius="7"
+                   creationComplete="init()"   buttonMode="true" click="changeBack()"
+        >
+    <fx:Script><![CDATA[
+        public var selected:Boolean=false;
+        public var enUnselected:Boolean=false;
+
+        private var _person:Object = null;
+
+        private function changeBack():void {
+            if(enUnselected){
+                return;
+            }
+            if(selected){
+                selected = false;
+                this.toolTip = "点击加入讨论组";
+            }else{
+                selected = true;
+                this.toolTip = "点击退出讨论组";
+            }
+            m_Over();
+        }
+
+        private function m_Over():void {
+            if(enUnselected){
+                this.setStyle("backgroundColor", 0x407AFF);
+                return;
+            }
+            if(selected){
+                this.setStyle("backgroundColor", 0x7ae7bf);
+            }else{
+                this.setStyle("backgroundColor", 0xffffff);
+            }
+        }
+
+
+        private function init():void {
+            head.source = person.icon;
+            nameLabel.text = person.name;
+            m_Over();
+        }
+
+
+        public function get person():Object {
+            return _person;
+        }
+
+        public function set person(value:Object):void {
+            _person = value;
+        }
+        ]]></fx:Script>
+    <s:layout>
+        <s:HorizontalLayout gap="5" verticalAlign="middle" paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
+
+        </s:HorizontalLayout>
+    </s:layout>
+    <s:Image id="head" width="45" height="45" ></s:Image>
+    <s:Label id="nameLabel" width="60"></s:Label>
+
+</s:BorderContainer>

@@ -15,6 +15,7 @@
         import mx.events.CollectionEvent;
         import mx.utils.ObjectUtil;
 
+
         import util.ChatManager;
 
         import util.ToolUtil;
@@ -26,8 +27,6 @@
         private var departMember:ArrayCollection = new ArrayCollection();
         [Bindable]
         private var userMember:ArrayCollection = new ArrayCollection();
-        [Bindable]
-        private var groupMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
         private var btnlist:ArrayCollection=new ArrayCollection([{label:"最近联系",mod:"group"},{label:"部门",mod:"org"},{label:"常用联系人",mod:"user"}]);;
@@ -42,73 +41,42 @@
                 this.removeElement(showModel);
                 this.removeElement(liyuwangBtn);
             }
-            ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
-            ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
-            ToolUtil.groupList.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeMember);
-            initAddress();
-            if(type=="chat"&&groupMember.length==0){
-                showModel.selectedIndex=1;
-            }
-
-        }
-
-
-        private function unReadChange(e:CollectionEvent):void{
-            for each(var p:Object in addressMember){
-                p.unread=0;
-                for each(var chat:Object in ChatManager.unReadMessage){
-                    if((p.hasOwnProperty('flag')&&chat.o==p.id)||(!p.hasOwnProperty('flag')&&chat.t==p.id)){
-                        if(chat.unread){
-                            p.unread+=1;
-                        }
-
-                    }
+            ToolUtil.departMentList.addEventListener(CollectionEvent.COLLECTION_CHANGE, initDepartment);
+            ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, initMember);
+            initDepartment(null);
+            initMember(null);
+            if(type=="chat"){
+                if(ToolUtil.groupList.length==0){
+                    showModel.selectedIndex=1;
                 }
+                changeShowModel();
             }
-            addressMember.refresh();
+
+            head.source = ChatManager.liyu['icon'];
+            nameLabel.text = ChatManager.liyu['name'];
+
         }
 
-        private function changeMember(e:CollectionEvent):void {
-            initAddress();
-        }
 
-        public var liyu:Object=new Object();
+//        private function unReadChange(e:CollectionEvent):void{
+//            for each(var p:Object in addressMember){
+//                p.unread=0;
+//                for each(var chat:Object in ChatManager.unReadMessage){
+//                    if((p.hasOwnProperty('flag')&&chat.o==p.id)||(!p.hasOwnProperty('flag')&&chat.t==p.id)){
+//                        if(chat.unread){
+//                            p.unread+=1;
+//                        }
+//
+//                    }
+//                }
+//            }
+//            addressMember.refresh();
+//        }
 
-        private function initAddress():void {
-            liyu['id'] = 0;
-            liyu['name'] = '客服鲤鱼王';
-            liyu['icon'] = '/static/image/liyu2.png';
-            liyu['depart_id'] = -1;
-            liyu['level'] = 0;
-            liyu['unread'] = 0;
-            addressMember.removeAll();
 
-            if (type == "chat") {
-                head.source = liyu['icon'];
-                nameLabel.text = liyu['name'];
-                userMember.removeAll();
+        private function initDepartment(e:CollectionEvent):void{
+            if(type == "chat"){
                 departMember.removeAll();
-                groupMember.removeAll();
-                ChatManager.unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChange);
-                var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
-//                var contact:Object = new Object();
-//                contact['id'] = -1;
-//                contact['name'] = '常用联系人';
-//                contact['icon'] = '/static/image/address2.png';
-//                contact['flag'] = 'contact';
-//                contact['children'] = new ArrayCollection();
-//                contact['childrenstatus'] = true;
-//                contact['level'] = 0;
-                for each(var member:Object in members) {
-//                    member['depart_id'] = contact.id;
-                    member['level'] = 0;
-                    member['unread'] = 0;
-                }
-//                var liyu:Object = new Object();
-
-
-                userMember.addAll(members);
-
                 var l2:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var f:Boolean = false;
                 for each(var item2:Object in l2) {
@@ -123,14 +91,12 @@
                         item2.unread = 0;
                         departMember.addItem(item2);
                     }
+
                 }
-                groupMember = ObjectUtil.copy(ToolUtil.groupList) as ArrayCollection;
-
+                departMember.refresh();
             }
-
-
             if (type == "org") {
-                ChatManager.unReadMessage.removeEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChange);
+                addressMember.removeAll();
                 var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var depart:Object = new Object();
                 var rootDepart:Object = null;
@@ -169,12 +135,26 @@
                 if (rootDepart != null) {
                     addressMember.addItem(rootDepart);
                     showDepartChildren_handler(rootDepart);
-//                    var listclickevent:ListClickEvent = new ListClickEvent("listItemZhanKai", rootDepart);
-//                    listItemZhanKai_handler(listclickevent);
                 }
-               addressList.dataProvider = addressMember;
+                addressList.dataProvider = addressMember;
             }
         }
+        private function initMember(e:CollectionEvent):void{
+            if(type == "chat"){
+                var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+
+                for each(var member:Object in members) {
+                    member['level'] = 0;
+                    member['unread'] = 0;
+                }
+                userMember=members;
+                userMember.refresh();
+            }
+        }
+
+
+
+
 
         private function showDepartChildren_handler(depart:Object):void {
             var index:int = 0;
@@ -200,7 +180,7 @@
         }
 
         private function chatliyu():void{
-            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",liyu);
+            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",ChatManager.liyu);
             dispatchEvent(listclickevent);
         }
 
@@ -270,7 +250,7 @@
                 addressList.dataProvider = userMember;
             }
             if(showModel.selectedItem.mod=="group"){
-                addressList.dataProvider = groupMember;
+                addressList.dataProvider =  ToolUtil.groupList;
             }
         }
         ]]></fx:Script>
@@ -279,11 +259,11 @@
     <s:HGroup id="liyuwangBtn" click="chatliyu()"  verticalAlign="middle"   width="100%" height="50" buttonMode="true"  >
         <s:Image id="head" width="45" height="45"></s:Image>
         <s:Label id="nameLabel" ></s:Label>
-        <s:BorderContainer id="num" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
+        <s:BorderContainer id="num" visible="{ChatManager.liyuShow}" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
             <s:layout>
                 <s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"></s:HorizontalLayout>
             </s:layout>
-            <s:Label id="numLabel" text="10" fontSize="12" color="#ffffff" ></s:Label>
+            <s:Label id="numLabel" text="{ChatManager.liyuunread}" fontSize="12" color="#ffffff" ></s:Label>
         </s:BorderContainer>
 
     </s:HGroup>

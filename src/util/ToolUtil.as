@@ -151,6 +151,14 @@ public class ToolUtil
         if(result.success==true){
             departMentList.removeAll();
             departMentList.addAll(new ArrayCollection(result.result as Array));
+            for each(var item2:Object in departMentList) {
+                for each(var group:Object in ToolUtil.groupList){
+                    if(group.id==item2.id){
+                        group.members=item2.members;
+                    }
+                }
+
+            }
 
 
         }
@@ -159,30 +167,7 @@ public class ToolUtil
 
     [Bindable]
     public static var groupList:ArrayCollection=new ArrayCollection();
-    [Bindable]
-    public static var groupColor:Object=new Object();
 
-    public static function groupRefresh(fun:Function=null):void{
-
-        if(fun==null){
-//            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST").send();
-        }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getMyGroup",resultAllGroup,"POST");
-            http.resultFunArr.addItem(fun);
-//            http.send();
-
-        }
-
-    }
-    public static function resultAllGroup(result:Object,e:ResultEvent):void{
-        if(result.success==true){
-            groupList.removeAll();
-            groupList.addAll(new ArrayCollection(result.result as Array));
-            for each(var item:Object in groupList){
-                groupColor[""+item.id]=item.color;
-            }
-        }
-    }
 
     [Bindable]
     public static var memberList:ArrayCollection=new ArrayCollection();
@@ -219,9 +204,6 @@ public class ToolUtil
 
         }
     }
-
-    [Bindable]
-    public static var groupsList:ArrayCollection=new ArrayCollection();
 
     [Bindable]
     public static var contactsList:ArrayCollection=new ArrayCollection();

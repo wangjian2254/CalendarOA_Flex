@@ -4,9 +4,12 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
+        import control.window.GroupPanel;
+        import control.window.GroupPanel;
         import control.window.PersonPanel;
 
         import events.ChangeUserEvent;
+        import events.ChatTimelineEvent;
         import events.CloseEvent;
         import events.ListClickEvent;
 
@@ -76,8 +79,19 @@
             return channel;
         }
 
+        private function flagTimeline():void{
+            if(this.visible){
+                var event:ChatTimelineEvent=new ChatTimelineEvent(ChatTimelineEvent.Channel,true);
+                event.channel =  getChannel(new Array());
+                event.flag = this.flag;
+                dispatchEvent(event);
+            }
+        }
+
+        private var channel:String;
 
         override public function init(e:FlexEvent):void {
+
 //            chatsArr.addEventListener(CollectionEvent.COLLECTION_CHANGE, showLastMsg);
             if(members==null){
                 horGroup.validateNow();
@@ -90,10 +104,10 @@
                 head.source = chatUser.icon;
                 nameLabel.text = chatUser.name;
             }
-
+            var pids:Array=new Array();
+            channel = getChannel(pids);
             if(type=="p"){
-                var pids:Array=new Array();
-                var channel:String = getChannel(pids);
+
 
                 Pomelo.getIns().request("connector.entryHandler.createChannel",{channel:channel,users:pids},function(data:Object):void{
                     if(data.code==200){
@@ -107,6 +121,7 @@
 //            Pomelo.getIns().addEventListener("onLine",changeMember);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
             getHistoryChat();
+            flagTimeline();
         }
 
         public function getHistoryChat():void{
@@ -188,7 +203,8 @@
         }
 
         private function chatHandler(event:PomeloEvent):void{
-//            if(event.message.msg.o==chatUser.id || event.message.msg.t == chatUser.id){
+            if(event.message.msg.channel!=channel){
+                return;
 //                if(event.message.msg.f==ToolUtil.sessionUser.pid){
 ////                    for each(var chat:Object in chatsArr){
 ////                        if(event.message.msg.id==chat.id){
@@ -200,10 +216,11 @@
 //
 //                }
 //
-//            }
+            }
             chatsArr.addItem(event.message.msg);
             setPreDate(chatsArr);
             showLastMsg();
+            flagTimeline();
 
         }
 
@@ -306,6 +323,25 @@
 
         }
 
+        private function createGroup():void{
+            var gp:GroupPanel = PopUpManager.createPopUp(this,GroupPanel, true) as GroupPanel;
+            if(members==null){
+                var m:ArrayCollection=new ArrayCollection();
+                for each(var p:Object in ToolUtil.memberList){
+                    if(ToolUtil.sessionUser.pid == p.id||chatUser.id== p.id){
+                        m.addItem(p);
+                    }
+                }
+                gp.chatmember = m;
+            }else{
+                gp.chatmember =members;
+            }
+            gp.addEventListener("ChatUser",function(e:ListClickEvent):void{
+                dispatchEvent(e);
+            });
+
+        }
+
         protected function sendBTN_clickHandler(event:MouseEvent=null):void
         {
             trace("//****TextInputer.sendBTN_clickHandler 执行****//");
@@ -345,11 +381,6 @@
 
             }
 
-//            chat['status']="loading";
-//            chatsArr.addItem(chat);
-//            showLastMsg();
-
-
 
             ti.text = '';
             ti.setFocus();
@@ -358,22 +389,17 @@
         private function al(data:Object,chat:Object):void{
             trace("chat:"+JParser.encode(data));
 
-//                for each(var c:Object in chatsArr){
-//                    if(c.id==chat.id){
-//                        if(data.code==200){
-//                            c.status="success";
-//                        }else{
-//                            c.status="failue";
-//                        }
-//                        chatsArr.refresh();
-//                    }
-//                }
-//            showLastMsg();
-//            Alert.show(JParser.encode(data),chat['text']);
         }
 
         private function pressEnter(event:FlexEvent):void{
                 sendBTN_clickHandler();
+        }
+
+
+
+
+        private function quiteGroup():void{
+           //todo:主动退出讨论组
         }
 
 
@@ -398,7 +424,8 @@
                 <s:Label id="nameLabel" textDecoration="underline"  ></s:Label>
 
                 <mx:Spacer width="100%" height="10"/>
-                <s:Button id="usersButton" label="成员管理" width="150" height="25" click="getHistoryChat()"  />
+                <s:Button id="quiteButton" label="退出讨论组" width="100" height="25" click="quiteGroup()"  />
+                <s:Button id="usersButton" label="创建讨论组" width="100" height="25" click="createGroup()"  />
                 <s:Button id="historyButton" label="加载历史记录" width="150" height="25" click="getHistoryChat()"  />
             </s:BorderContainer>
             <uicontrol:AddressList id="chatList"  dataProvider="{chatsArr}"
