@@ -122,7 +122,7 @@
             var c:CBorderContainer;
             c = cbar.getView(event.message.channel);
             if (c != null) {
-                var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, c, null, true);
+                var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, c, true);
                 c.closeContainer(evt);
             }
         }

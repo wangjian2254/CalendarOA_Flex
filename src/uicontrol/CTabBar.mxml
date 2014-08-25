@@ -75,7 +75,7 @@
         private function close(e:CloseTabButtonEvent):void {
 
             var view:CBorderContainer = e.getView() as CBorderContainer;
-            var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, e.getView(), e.getBtn(), true);
+            var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, e.getView(), true);
             view.closeContainer(evt);
         }
 

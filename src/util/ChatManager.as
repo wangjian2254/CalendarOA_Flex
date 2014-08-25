@@ -182,7 +182,7 @@ public class ChatManager {
                     }
                 }else{
                     if ('d' == channel.channel.substr(0, 1)) {
-                        for each(var p:Object in ToolUtil.departMentList) {
+                        for each(p in ToolUtil.departMentList) {
                             if (p.id == g['id']) {
                                 g['icon']= p.icon;
                                 g['name']= p.name;
@@ -380,7 +380,7 @@ public class ChatManager {
                     }
                 }
                 if(!f){
-                    for each(var person:Object in ToolUtil.memberList){
+                    for each(person in ToolUtil.memberList){
                         if(person.id==event.message.pid){
                             org.members.push(person);
                             return;

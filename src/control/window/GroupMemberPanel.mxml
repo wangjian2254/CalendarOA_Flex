@@ -67,7 +67,7 @@
         private function createGroup():void{
             var pids:Array = new Array();
             var pci:PersonChatItem;
-            for(var i=0;i<memebers.numElements;i++){
+            for(var i:int=0;i<memebers.numElements;i++){
                 pci=memebers.getElementAt(i) as PersonChatItem;
                 if(pci.selected){
                     pids.push(pci.person.id);

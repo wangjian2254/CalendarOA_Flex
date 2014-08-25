@@ -13,7 +13,6 @@
             import mx.rpc.events.ResultEvent;
 			import util.ToolUtil;
 
-            [Bindable]
             public function get getWindowHeight():Number{
                 if(userType.selectedValue == 2){
                     return loginForm.height;
