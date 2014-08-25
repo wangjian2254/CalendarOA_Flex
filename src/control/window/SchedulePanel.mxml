@@ -57,6 +57,9 @@
 
 			
 			public function init():void{
+                if(schedulData==null){
+                    windowGroup.removeElement(chatControl);
+                }
 
 				//审核者 有资格修改任务
 				dopanel.visible = (schedulData==null||schedulData.checker==ToolUtil.sessionUser.username)?true:false;
@@ -477,7 +480,7 @@
 		</mx:DateFormatter>
 	</fx:Declarations>
 	<s:HGroup id="windowGroup" width="100%" height="100%">
-        <s:Form width="450" height="100%" id="schedulePanel">
+        <s:Form width="500" height="100%" id="schedulePanel">
             <s:layout>
                 <s:FormLayout gap="0"  ></s:FormLayout>
             </s:layout>
@@ -616,9 +619,6 @@
             </mx:ControlBar>
         </s:Form>
 
-        <s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%"  visible="{schedulData}">
-
-        </s:BorderContainer>
         <control:ChatControl id="chatControl" width="100%" height="100%"   visible="{schedulData}">
 
         </control:ChatControl>

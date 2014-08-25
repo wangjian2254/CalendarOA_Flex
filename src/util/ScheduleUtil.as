@@ -18,10 +18,7 @@ package util
 		private static var showSchedule:Object=new Object();
 		
 		public static function createSchedule(startdate:Date=null,enddate:Date=null):void{
-			if(newSchedule==null){
 				newSchedule  = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
-				
-			}
 			newSchedule.schedulData=null;
 			if(startdate!=null&&enddate!=null){
 				newSchedule.startDateValue = startdate;

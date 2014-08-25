@@ -84,8 +84,10 @@
         private var channel:String;
 
         override public function init(e:FlexEvent):void {
+            if(chatUser==null){
+                return;
+            }
 
-//            chatsArr.addEventListener(CollectionEvent.COLLECTION_CHANGE, showLastMsg);
             if (members == null) {
                 horGroup.validateNow();
                 addressList.visible = false;
