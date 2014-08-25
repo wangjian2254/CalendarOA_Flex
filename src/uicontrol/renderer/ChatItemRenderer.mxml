@@ -40,64 +40,64 @@
             if(value==null){
                 return;
             }
-            if(!data.predate||(data.predate.substr(0,16)!=data.d.substr(0,16))){
+            if(!data.hasOwnProperty('f')||!data.predate||(data.predate.substr(0,16)!=data.d.substr(0,16))){
                 dateGroup.height=30;
                 dateGroup.visible=true;
             }else{
                 dateGroup.height=0;
                 dateGroup.visible=false;
             }
-            var person:Object = ToolUtil.getPersonById(data.f);
-            if(person.id==ToolUtil.sessionUser.pid){
-                head2.source = person.icon;
-                nameLabel2.text = person.name;
+            dateLabel.text = data.d;
+            if(!data.hasOwnProperty('f')){
                 head.source = null;
-                nameLabel.text = "";
-                horizontalLayout.horizontalAlign="right";
-                chatstatus.horizontalAlign="right";
-//                heaGroup.horizontalAlign = "right";
-
-            }else{
-                 head.source = person.icon;
                 head2.source = null;
-                nameLabel.text = person.name;
+                nameLabel.text = "";
                 nameLabel2.text = "";
-                horizontalLayout.horizontalAlign="left";
-                chatstatus.horizontalAlign="left";
-//                heaGroup.horizontalAlign="left";
-
+                horizontalLayout.horizontalAlign="center";
+                chatstatus.horizontalAlign="center";
+            }else{
+                var person:Object = ToolUtil.getPersonById(data.f);
+                if(person.id==ToolUtil.sessionUser.pid){
+                    head2.source = person.icon;
+                    nameLabel2.text = person.name;
+                    head.source = null;
+                    nameLabel.text = "";
+                    horizontalLayout.horizontalAlign="right";
+                    chatstatus.horizontalAlign="right";
+                }else{
+                    head.source = person.icon;
+                    head2.source = null;
+                    nameLabel.text = person.name;
+                    nameLabel2.text = "";
+                    horizontalLayout.horizontalAlign="left";
+                    chatstatus.horizontalAlign="left";
+                }
             }
-
             contentLabel.text = data.te;
             contentLabel.setStyle("fontFamily","simsun,MINGLIU");
             contentLabel.setStyle("alignmentBaseline","ideographicCenter");
             contentLabel.setStyle("color",data.co);
-//            contentLabel.setStyle("fontWeight",data.we);
-//            contentLabel.setStyle("fontStyle",data.st);
-//            contentLabel.setStyle("textDecoration",data.de);
-//            contentLabel.setStyle("fontSize",data.si);
-            dateLabel.text = data.d;
-
-            if(data.hasOwnProperty("status")){
-//                statusLabel.text = data.status;
-            }else{
-                statusLabel.text = null;
-
-            }
             contentLabel.validateNow();
             back1.validateNow();
             showChatImg();
+
 
 
         }
 
         private function showChatImg():void{
             var person:Object = ToolUtil.getPersonById(data.f);
-            if(person.id==ToolUtil.sessionUser.pid){
+            if(!data.hasOwnProperty("f")){
+                back1.setStyle("borderColor",0xB5D0EB);
+                back10.color=0xB5D0EB;
+                back2.setStyle("borderColor",0xB5D0EB);
+                back20.color=0xB5D0EB;
+                back1.graphics.clear();
+            }else if(person.id==ToolUtil.sessionUser.pid){
                 back1.setStyle("borderColor",0xb0e861);
                 back10.color=0xb0e861;
                 back2.setStyle("borderColor",0xb0e861);
-                back10.color=0xb0e861;
+                back20.color=0xb0e861;
 
                 var vertices:Vector.<Number> = new Vector.<Number>();
 
@@ -145,7 +145,10 @@
         }
 
         protected function m_over():void{
-            chatstatus.visible = true;
+            if(data.hasOwnProperty('f')){
+                chatstatus.visible = true;
+            }
+
 //            solidColor.color = 0x7ae7bf;
         }
 
@@ -192,7 +195,6 @@
                     </s:BorderContainer>
                     <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
                     <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
-                        <s:Label id="statusLabel" color="#000000"></s:Label>
                         <mx:LinkButton id="myFZRButton" label="我负责" textDecoration="underline" ></mx:LinkButton>
                         <mx:LinkButton id="selectFZRButton" label="指派"  textDecoration="underline" ></mx:LinkButton>
                     </s:HGroup>

@@ -24,12 +24,14 @@
 
         [Bindable]
         public var chatmember:ArrayCollection=new ArrayCollection();
-
         [Bindable]
         private var newmember:ArrayCollection=new ArrayCollection();
 
+        public var channel:String;
+
+
         public function init(e:mx.events.FlexEvent):void{
-             newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
+            newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
 
             var pc:PersonChatItem;
             for each(var p:Object in newmember){
@@ -45,11 +47,6 @@
 
         }
 
-
-
-        private function sendMessageResult(result:Object,e:ResultEvent):void{
-            closeWin();
-        }
         private function addMember():void{
             if(memberBox.selectedItem==null){
                 return;
@@ -70,62 +67,37 @@
         private function createGroup():void{
             var pids:Array = new Array();
             var pci:PersonChatItem;
-            var person:Object;
             for(var i=0;i<memebers.numElements;i++){
                 pci=memebers.getElementAt(i) as PersonChatItem;
                 if(pci.selected){
                     pids.push(pci.person.id);
-                    if(pci.person.id!=ToolUtil.sessionUser.pid){
-                        person = pci.person;
-                    }
                 }
             }
-            if(pids.length<2){
-                Alert.show("少于两个人，不可以创建讨论组");
-                return;
-            }
-            var org:Object=new Object();
-            if(pids.length==2){
-                var chatevent:ListClickEvent=new ListClickEvent("ChatUser",person);
-                dispatchEvent(chatevent);
-                closeWin();
-                return;
-            }else{
-                org.channel = "g"+UUIDUtil.create();
-                org.name = groupName.text;
-            }
-            org.users=pids;
-            org.author=ToolUtil.sessionUser.pid;
-            if(groupName.text.length<1){
-                Alert.show("请填写讨论组名称。")
-                return;
-            }
-            Pomelo.getIns().request("connector.entryHandler.createChannel",org,function(data:Object):void{
-                if(data.code==200){
-                    var chatUser:Object=new Object();
-                    chatUser.id=org.channel.substr(1,org.channel.length-1);
-                    chatUser.channel = org.channel;
-                    chatUser.name = org.name;
-                    chatUser.author = org.author;
-                    chatUser.icon="/static/smalloaicon/group.png";
-                    chatUser['members']=new Array();
-                    for each(var u:int in pids){
-                        for each(var item:Object in ToolUtil.memberList){
-                            if(u==item.id){
-                                item['level'] = 0;
-                                item['unread'] = 0;
-                                chatUser["members"].push(item);
-                                break;
-                            }
-                        }
+
+            var f:Boolean;
+            for each(var person:Object in chatmember){
+                f=false;
+                for each(var op:Number in pids){
+                    if(op==person.id){
+                        f=true;
                     }
-                    var chatevent:ListClickEvent=new ListClickEvent("ChatUser",chatUser);
-                    dispatchEvent(chatevent);
-                    closeWin();
-                }else{
-                    Alert.show("讨论组创建失败");
                 }
-            });
+                if(!f){
+                    Pomelo.getIns().notify("connector.entryHandler.quiteChannel",{channel:channel,pid:person.id});
+                }
+            }
+            for each(op in pids){
+                f=false;
+                for each(person in chatmember){
+                    if(op==person.id){
+                        f=true;
+                    }
+                }
+                if(!f){
+                    Pomelo.getIns().notify("connector.entryHandler.joinChannel",{channel:channel,pid:op});
+                }
+            }
+
         }
 		]]>
 	</fx:Script>
@@ -133,10 +105,6 @@
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
     <s:VGroup width="100%" height="100%" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5">
-        <s:HGroup width="100%" height="30" paddingRight="5" paddingLeft="5">
-            <s:Label text="讨论组名称："/>
-            <s:TextInput id="groupName" width="100%" />
-        </s:HGroup>
         <s:HGroup width="100%" height="30" paddingRight="5" paddingLeft="5">
             <s:Label text="讨论组成员："/>
             <s:ComboBox id="memberBox" prompt="筛选成员" dataProvider="{ToolUtil.memberList}" labelField="name" width="100%" change="addMember()"  />
@@ -151,7 +119,7 @@
             </s:Group>
         </s:Scroller>
         <s:HGroup width="100%" height="30" paddingRight="5" paddingLeft="5" gap="10">
-            <s:Button label="创建讨论组" height="25" chromeColor="#ff0000" color="#ffffff" click="createGroup()"/>
+            <s:Button label="确定" height="25" chromeColor="#ff0000" color="#ffffff" click="createGroup()"/>
             <s:Button label="放弃" height="25"  click="closeWin()"/>
         </s:HGroup>
     </s:VGroup>

@@ -136,13 +136,16 @@ public class ChatManager {
 //            Pomelo.getIns().addEventListener('onLine', onlineHandler);
             Pomelo.getIns().addEventListener('sys', systemMessageHandler);
             Pomelo.getIns().addEventListener('createChannel', createChannelHandler);
+            Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
+            Pomelo.getIns().addEventListener('quiteChannel', quiteChannelHandler);
+            Pomelo.getIns().addEventListener('joinChannel', joinChannelHandler);
 //            clearUser();
 
             var groups:ArrayCollection=new ArrayCollection();
             var channels:Array = new Array();
             var g:Object;
             for each(var channel:Object in data.channels){
-                if ('o' == channel.channel.substr(0, 1)) {
+                if ('o' == channel.channel.substr(0, 1)||'t' == channel.channel.substr(0, 1)) {
                     continue;
                 }
                 if ('0' == channel.channel.substr(0, 1)) {
@@ -152,11 +155,13 @@ public class ChatManager {
                 g=new Object();
                 if(channel.channel.substr(0,1)=="g"){
                     g['id']=channel.channel.substr(1, channel.channel.length - 1);
+                    g['icon']='/static/smalloaicon/group.png';
                 }
                 if(isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!="g"){
                     g['id']=Number(channel.channel.substr(1, channel.channel.length - 1));
                 }
                 g['channel']=channel.channel;
+                g['author']=channel.author;
                 g['father']=null;
                 channels.push({channel:channel.channel, timeline:""+channel.timeline});
                 g['name']=channel.name;
@@ -302,8 +307,10 @@ public class ChatManager {
         var g:Object=new Object();
         g['channel']=event.message.group.channel;
         g['name']=event.message.group.name;
+        g['author']=event.message.group.author;
         if(event.message.group.channel.substr(0,1)=="g"){
             g['id']=event.message.group.channel.substr(1, event.message.group.channel.length - 1);
+            g['icon']='/static/smalloaicon/group.png';
         }
         if(event.message.group.channel.substr(0,1)=="0"){
             return;
@@ -339,6 +346,50 @@ public class ChatManager {
         ToolUtil.groupList.addItem(g);
 
 
+    }
+    static public function removeChannelHandler(event:PomeloEvent):void{
+        for each(var org:Object in ToolUtil.groupList){
+            if(org.channel==event.message.channel){
+                ToolUtil.groupList.removeItemAt(ToolUtil.groupList.getItemIndex(org));
+                return;
+            }
+        }
+    }
+    static public function quiteChannelHandler(event:PomeloEvent):void{
+        for each(var org:Object in ToolUtil.groupList){
+            if(org.channel==event.message.channel){
+                for each(var person:Object in org.members){
+                    if(person.id==event.message.pid){
+
+                        var i:int=org.members.indexOf(person);
+                        org.members.slice(i,1);
+                        return;
+                    }
+                }
+                return;
+            }
+        }
+    }
+    static public function joinChannelHandler(event:PomeloEvent):void{
+        for each(var org:Object in ToolUtil.groupList){
+            if(org.channel==event.message.channel){
+                var f:Boolean = false;
+                for each(var person:Object in org.members){
+                    if(person.id==event.message.pid){
+                        f=true;
+                    }
+                }
+                if(!f){
+                    for each(var person:Object in ToolUtil.memberList){
+                        if(person.id==event.message.pid){
+                            org.members.push(person);
+                            return;
+                        }
+                    }
+                }
+                return;
+            }
+        }
     }
 
     static public function sendMessageToChannel(t:String,content:Object,callback:Function):void{

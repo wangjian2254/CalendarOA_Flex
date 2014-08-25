@@ -14,13 +14,7 @@
         import events.CloseEvent;
         import events.CloseTabButtonEvent;
 
-        import mx.collections.IList;
         import mx.containers.ViewStack;
-        import mx.events.ChildExistenceChangedEvent;
-        import mx.events.FlexEvent;
-        import mx.events.PropertyChangeEvent;
-
-        import spark.components.Button;
 
         private var _dataProvider:ViewStack;
 
@@ -45,6 +39,7 @@
         }
 
         public function addView(view:CBorderContainer):void {
+            view.addEventListener(CloseEvent.Close_EventStr, closeView);
             view.percentWidth = 100;
             view.percentHeight = 100;
             _dataProvider.addElement(view);
@@ -80,16 +75,22 @@
         private function close(e:CloseTabButtonEvent):void {
 
             var view:CBorderContainer = e.getView() as CBorderContainer;
-            view.addEventListener(CloseEvent.Close_EventStr, closeView);
             var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, e.getView(), e.getBtn(), true);
             view.closeContainer(evt);
         }
 
         private function closeView(e:CloseEvent):void {
-            dataProvider.removeElement(e.getView());
-            this.removeElement(e.getBtn());
-            showList = dataProvider.getChildren();
-            refrash();
+            for each(var view:Object in dataProvider.getChildren()){
+                if(view==e.getView()){
+                    dataProvider.removeElement(e.getView());
+                    showList = dataProvider.getChildren();
+                    tabinit(null);
+                    return;
+                }
+            }
+
+//            this.removeElement(e.getBtn());
+
         }
 
         private var showList:Array;

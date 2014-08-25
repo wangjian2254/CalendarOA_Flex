@@ -12,13 +12,11 @@
 
 
         import mx.collections.ArrayCollection;
-        import mx.controls.Alert;
-        import mx.events.CollectionEvent;
         import mx.events.FlexEvent;
 
         import org.idream.pomelo.Pomelo;
+        import org.idream.pomelo.PomeloEvent;
 
-        import util.ChatManager;
         import util.ToolUtil;
 
         override public function init(e:FlexEvent):void {
@@ -27,6 +25,7 @@
 
             this.addEventListener(ListClickEvent.CHATUSER,listItemClick_handler);
             this.addEventListener(ChatTimelineEvent.Channel,flagTimeline);
+            Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
 
 
         }
@@ -37,6 +36,9 @@
 
         override public function closeContainer(e:CloseEvent):void {
             dispatchEvent(e);
+            this.removeEventListener(ListClickEvent.CHATUSER,listItemClick_handler);
+            this.removeEventListener(ChatTimelineEvent.Channel,flagTimeline);
+            Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
         }
 
         // 重新进入时执行
@@ -116,7 +118,14 @@
 
 
         }
-
+        public function removeChannelHandler(event:PomeloEvent):void{
+            var c:CBorderContainer;
+            c = cbar.getView(event.message.channel);
+            if (c != null) {
+                var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, c, null, true);
+                c.closeContainer(evt);
+            }
+        }
 
         ]]>
 	</fx:Script>
