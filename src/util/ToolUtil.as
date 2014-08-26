@@ -27,6 +27,7 @@ import mx.managers.PopUpManager;
 import mx.rpc.AbstractOperation;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
+import mx.utils.ObjectUtil;
 
 import spark.components.Application;
 
@@ -132,6 +133,8 @@ public class ToolUtil
 
     [Bindable]
     public static var departMentList:ArrayCollection=new ArrayCollection();
+    [Bindable]
+    public static var myDepartmentList:ArrayCollection=new ArrayCollection();;
 
 
 
@@ -149,8 +152,9 @@ public class ToolUtil
     }
     public static function resultAllDepartMent(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            departMentList.removeAll();
-            departMentList.addAll(new ArrayCollection(result.result as Array));
+            departMentList=new ArrayCollection(result.result as Array);
+
+            var dobj:Object=new Object();
             for each(var item2:Object in departMentList) {
                 for each(var group:Object in ToolUtil.groupList){
                     if(group.id==item2.id){
@@ -160,13 +164,62 @@ public class ToolUtil
 
             }
 
+//            myDepartmentList.removeAll();
+            var mydepartlist:ArrayCollection = new ArrayCollection();
+            var f:Boolean = false;
+            for each(var item2:Object in departMentList) {
+                f = false;
+                for each(var p:Object in item2.members) {
+                    if (p.id == ToolUtil.sessionUser.pid) {
+                        f = true;
+                    }
+                }
+                if (f) {
+                    mydepartlist.addItem(item2);
+                }
+            }
+            var l2:ArrayCollection=getMemberlistByMy(mydepartlist);
+            if(l2.length>0){
+                mydepartlist.addAll(l2);
+            }
+            myDepartmentList=mydepartlist;
+
 
         }
+    }
+
+    private static function getMemberlistByMy (mydepartlist:ArrayCollection):ArrayCollection{
+        var l:ArrayCollection=new ArrayCollection();
+        var f:Boolean=false;
+        for each(var d:Object in departMentList){
+            f=true;
+            for each(var m:Object in mydepartlist){
+                if(d.father==m.id){
+                    for each(var m2:Object in mydepartlist){
+                        if(m2.id==d.id){
+                            f=false;
+                        }
+                    }
+                    if(f){
+                        l.addItem(d);
+                    }
+
+                }
+            }
+        }
+        if(l.length>0){
+            var l2:ArrayCollection=getMemberlistByMy(l);
+            l.addAll(l2);
+        }
+        return l;
     }
 
 
     [Bindable]
     public static var groupList:ArrayCollection=new ArrayCollection();
+
+    [Bindable]
+    public static var projectList:ArrayCollection=new ArrayCollection();
 
 
     [Bindable]

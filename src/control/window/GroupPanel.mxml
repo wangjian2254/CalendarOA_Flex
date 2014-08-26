@@ -32,14 +32,21 @@
              newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
 
             var pc:PersonChatItem;
-            for each(var p:Object in newmember){
+            for each(var p:Object in ToolUtil.memberList){
                 pc=new PersonChatItem();
                 pc.person = p;
+                pc.selected = false;
                 if(ToolUtil.sessionUser.pid== p.id){
                    pc.enUnselected = true;
                    pc.toolTip = "不可以将自己排除在讨论组之外!";
+                    pc.selected = true;
                 }
-                pc.selected = true;
+                for each(var m:Object in newmember){
+                    if(m.id==p.id){
+                        pc.selected = true;
+                    }
+                }
+
                 memebers.addElement(pc);
             }
 
@@ -54,17 +61,18 @@
             if(memberBox.selectedItem==null){
                 return;
             }
+            var pc:PersonChatItem=new PersonChatItem();
             for(var i:int=0;i<memebers.numElements;i++){
                 pc = memebers.getElementAt(i) as PersonChatItem;
                 if(pc.person.id == memberBox.selectedItem.id){
-                    Alert.show("用户已经存在列表里了");
+                    pc.selected = true;
                     return;
                 }
             }
-            var pc:PersonChatItem=new PersonChatItem();
-            pc.person = memberBox.selectedItem;
-            pc.selected = true;
-            memebers.addElement(pc);
+//            var pc:PersonChatItem=new PersonChatItem();
+//            pc.person = memberBox.selectedItem;
+//            pc.selected = true;
+//            memebers.addElement(pc);
         }
 
         private function createGroup():void{

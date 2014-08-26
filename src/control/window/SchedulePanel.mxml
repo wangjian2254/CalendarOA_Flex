@@ -29,7 +29,7 @@
                 return windowGroup.width;
             }
 			[Bindable]
-			public var titlestr:String="创建日程";
+			public var titlestr:String="创建任务";
 			
 			[Bindable]
 			public var startDateValue:Date=new Date();
@@ -51,6 +51,9 @@
             [Bindable]
             private var taxklist:ArrayCollection = new ArrayCollection();
 
+            [Bindable]
+            private var departmentList:ArrayCollection = new ArrayCollection();
+
 			
 			private var selectColor:Number =0x00CCFF;
 
@@ -60,6 +63,7 @@
                 if(schedulData==null){
                     windowGroup.removeElement(chatControl);
                 }
+
 
 				//审核者 有资格修改任务
 				dopanel.visible = (schedulData==null||schedulData.checker==ToolUtil.sessionUser.username)?true:false;
@@ -210,7 +214,7 @@
 					}
 				}
 				obj.color = selectColor;
-				obj.groupid = group.selectedItem.id;
+				obj.projectid = projectDownList.selectedItem.id;
 				obj.users = new Array();
 
 				
@@ -218,9 +222,9 @@
 			}
 			
 			public function save():void{
-				if(this.scheduleTitle.text==""||this.scheduleTitle.text=="日程标题"){
+				if(this.scheduleTitle.text==""||this.scheduleTitle.text=="任务标题"){
 					scheduleTitle.selectAll();
-					Alert.show("请填写日程标题。","提示");
+					Alert.show("请填写任务标题。","提示");
 					return;
 				}
 				if(startDate.selectedDate==null){
@@ -262,7 +266,7 @@
 			}
 			
 			private function repeatChange():void{
-				if(repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
+				if(repeatType.selectedValue=="none"||repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
 					dayTile.visible = false;
                     dayPanel.visible=false;
                     dayPanel.height=0;
@@ -420,13 +424,13 @@
 			private function delAsk():void{
 				if(schedulData!=null &&schedulData.id){
 				
-					Alert.show("确认删除当前日程?", "提示", Alert.YES | Alert.NO, null, del);
+					Alert.show("确认删除当前任务?", "提示", Alert.YES | Alert.NO, null, del);
 				}else{
 					closeWin();
 				}
 				
 			}
-			//删除日程
+			//删除任务
 			private function del(e:mx.events.CloseEvent):void
 			{
 				if (e.detail == Alert.YES){
@@ -484,9 +488,9 @@
             <s:layout>
                 <s:FormLayout gap="0"  ></s:FormLayout>
             </s:layout>
-            <s:FormItem label="标题：" id="titleItem" height="25">
-                <s:TextInput id="scheduleTitle" width="100%" prompt="日程标题">
-                </s:TextInput>
+            <s:FormItem label="标题：" id="titleItem" height="50">
+                <s:TextArea id="scheduleTitle" width="100%" height="45" prompt="任务标题">
+                </s:TextArea>
             </s:FormItem>
             <s:FormItem label="时间段："  height="25">
                 <s:layout>
@@ -497,13 +501,22 @@
                 <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
                 <s:CheckBox label="设置具体时间" id="is_all_day">
                 </s:CheckBox>
-                <mx:ComboBox id="startTime" visible="{!is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
+                <mx:ComboBox id="startTime" visible="{is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
 
                 </mx:ComboBox>
-                <s:Label text="到" height="100%" verticalAlign="middle" visible="{!is_all_day.selected}" />
-                <mx:ComboBox id="endTime"  visible="{!is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90"   >
+                <s:Label text="到" height="100%" verticalAlign="middle" visible="{is_all_day.selected}" />
+                <mx:ComboBox id="endTime"  visible="{is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90"   >
 
                 </mx:ComboBox>
+            </s:FormItem>
+            <s:FormItem label="结束时间：" height="25">
+                <s:layout>
+                    <s:HorizontalLayout gap="5">
+
+                    </s:HorizontalLayout>
+                </s:layout>
+                <mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+
             </s:FormItem>
             <s:FormItem label="重复" height="25">
                 <s:layout>
@@ -533,17 +546,9 @@
                     <s:CheckBox label="日" />
                 </s:TileGroup>
             </s:FormItem>
-            <s:FormItem label="结束时间：" height="25">
-                <s:layout>
-                    <s:HorizontalLayout gap="5">
 
-                    </s:HorizontalLayout>
-                </s:layout>
-                <mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-
-            </s:FormItem>
             <s:FormItem label="分解任务：" height="115">
-                <uicontrol:AddressList id="childAddressList" dataProvider="{taxklist}" itemRenderer="uicontrol.renderer.ChildrenTaskRenderer" width="100%" height="100%">
+                <uicontrol:AddressList id="childAddressList" dataProvider="{taxklist}" itemRenderer="uicontrol.renderer.ChildrenTaskRenderer" width="100%" height="100">
                 </uicontrol:AddressList>
             </s:FormItem>
             <s:FormItem label="颜色：" height="25">
@@ -581,19 +586,30 @@
                 </mx:ColorPicker>
             </s:FormItem>
             <s:FormItem label="项目：" height="25">
-                <mx:ComboBox id="group"  labelField="name" width="190" >
-
-                </mx:ComboBox>
+                <s:layout>
+                    <s:HorizontalLayout gap="10">
+                    </s:HorizontalLayout>
+                </s:layout>
+                <s:DropDownList id="departmentDownList" labelField="name" dataProvider="{ToolUtil.departMentList}"></s:DropDownList>
+                <s:DropDownList id="projectDownList" labelField="name" dataProvider="{ToolUtil.projectList}"></s:DropDownList>
             </s:FormItem>
-            <s:FormItem label="责任人：" height="25">
+            <s:FormItem label="责任人：" height="35">
+                <s:Scroller width="100%"  height="100%" >
+                    <s:HGroup id="usersGroup" width="100%" height="100%">
 
-
-
+                    </s:HGroup>
+                </s:Scroller>
             </s:FormItem>
-            <s:FormItem id="authorpanel" label="审核人：" height="25">
+            <s:FormItem id="authorpanel" label="审核人：" height="25" >
+                <s:layout>
+                    <s:HorizontalLayout gap="10">
+                    </s:HorizontalLayout>
+                </s:layout>
                 <s:DropDownList id="checkerDownList" labelField="name" dataProvider="{ToolUtil.memberList}"></s:DropDownList>
+                <s:CheckBox label="无需审核" id="need_check">
+                </s:CheckBox>
             </s:FormItem>
-            <s:FormItem label="提醒：" height="25">
+            <s:FormItem label="提醒：" height="75">
                 <s:layout>
                     <s:TileLayout columnAlign="justifyUsingGap">
                     </s:TileLayout>

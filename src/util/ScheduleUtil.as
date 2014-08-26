@@ -72,14 +72,14 @@ package util
 //				PopUpManager.centerPopUp(showSchedule[scheduleId]);
 			}else{
 				var b:Boolean=false;
-				for each(var obj:Object in ToolUtil.groupList){
-					if(obj.id==scheduleData.group){
-						if(obj.pem!="look"){
-							b=true;
-						}
-						break;
-					}
-				}
+//				for each(var obj:Object in ToolUtil.groupList){
+//					if(obj.id==scheduleData.group){
+//						if(obj.pem!="look"){
+//							b=true;
+//						}
+//						break;
+//					}
+//				}
 				if(b){
 					var s:SchedulePanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
 					showSchedule[scheduleId]=s;
