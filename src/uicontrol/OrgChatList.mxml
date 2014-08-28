@@ -110,6 +110,10 @@
                     item.children = new ArrayCollection();
                     item.hideicon=false;
                 }
+                if(rootDepart!=null){
+                    ToolUtil.findDepartByFather(rootDepart,l);
+                }
+
                 for each(item in l) {
                     if (item.father) {
                         item.level = depart['d' + item.father].level + 1;

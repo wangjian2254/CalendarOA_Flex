@@ -134,7 +134,7 @@ public class ToolUtil
     [Bindable]
     public static var departMentList:ArrayCollection=new ArrayCollection();
     [Bindable]
-    public static var myDepartmentList:ArrayCollection=new ArrayCollection();;
+    public static var myDepartmentList:ArrayCollection=new ArrayCollection([{id:0,name:"我自己的",label:"我自己的"}]);;
 
 
 
@@ -165,9 +165,10 @@ public class ToolUtil
             }
 
 //            myDepartmentList.removeAll();
+            var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
             var mydepartlist:ArrayCollection = new ArrayCollection();
             var f:Boolean = false;
-            for each(var item2:Object in departMentList) {
+            for each(var item2:Object in l) {
                 f = false;
                 for each(var p:Object in item2.members) {
                     if (p.id == ToolUtil.sessionUser.pid) {
@@ -178,20 +179,99 @@ public class ToolUtil
                     mydepartlist.addItem(item2);
                 }
             }
-            var l2:ArrayCollection=getMemberlistByMy(mydepartlist);
+            var l2:ArrayCollection=getMemberlistByMy(mydepartlist,l);
             if(l2.length>0){
                 mydepartlist.addAll(l2);
             }
-            myDepartmentList=mydepartlist;
-
+            // 将有包含关系的部门，排序，形成缩进效果
+            if(mydepartlist.length>0){
+                var departmentlist:ArrayCollection = initMyDepart(mydepartlist);
+            }
+            departmentlist.addItemAt({id:0,name:"我自己的",label:"我自己的"},0);
+            myDepartmentList=departmentlist;
 
         }
     }
 
-    private static function getMemberlistByMy (mydepartlist:ArrayCollection):ArrayCollection{
+    public static function initMyDepart(mydepartlist:ArrayCollection):ArrayCollection{
+        // 将有包含关系的部门，排序，形成缩进效果
+
+        var departmentlist:ArrayCollection=new ArrayCollection();
+        var depart:Object = new Object();
+        var rootDepart:Object = null;
+        for each(var item:Object in mydepartlist) {
+            depart['d' + item.id] = item;
+            if (!item.father) {
+                rootDepart = item;
+                item.level = 0;
+                item.space ="";
+                item.label = item.space+item.name;
+            }
+            item.children = new ArrayCollection();
+        }
+        findDepartByFather(rootDepart,mydepartlist);
+        for each(item in mydepartlist) {
+            if (item.father) {
+//                item.level = depart['d' + item.father].level + 1;
+                if (!depart['d' + item.father].hasOwnProperty('dep_children')) {
+                    depart['d' + item.father].dep_children = new ArrayCollection();
+                }
+                depart['d' + item.father].dep_children.addItem(item);
+            }
+            item.children.addAll(new ArrayCollection(item.members as Array));
+        }
+        for each(item in mydepartlist) {
+            if (item.flag == 'free') {
+                depart['d' + item.father].dep_children.removeItemAt(depart['d' + item.father].dep_children.getItemIndex(item));
+                depart['d' + item.father].dep_children.addItem(item);
+            }
+        }
+
+        if(rootDepart!=null){
+            departmentlist.addItem(rootDepart);
+            showDepartChildren_handler(rootDepart,departmentlist);
+        }
+        return departmentlist;
+    }
+
+    public static function findDepartByFather(father:Object,mydepartlist:ArrayCollection):void{
+        for each(var item:Object in mydepartlist){
+            if(item.father==father.id){
+                item.level = father.level+1;
+                item.space = father.space+" ";
+                item.label = item.space+item.name;
+                findDepartByFather(item,mydepartlist);
+            }
+        }
+    }
+
+    private static function showDepartChildren_handler(depart:Object,departmentlist:ArrayCollection):void {
+        var index:int = 0;
+        for (var i:int = 0; i < departmentlist.length; i++) {
+            if (depart.id == departmentlist.getItemAt(i).id) {
+                index = i;
+                break;
+            }
+        }
+        if (depart.hasOwnProperty('dep_children')){
+            if (index == departmentlist.length - 1 && departmentlist.length != 1) {
+                departmentlist.addAll(depart.dep_children);
+            } else {
+                departmentlist.addAllAt(depart.dep_children, index + 1);
+            }
+            for each(var d:Object in depart.dep_children){
+                showDepartChildren_handler(d,departmentlist);
+            }
+        }
+
+
+
+    }
+
+    private static function getMemberlistByMy (mydepartlist:ArrayCollection,l0:ArrayCollection):ArrayCollection{
         var l:ArrayCollection=new ArrayCollection();
         var f:Boolean=false;
-        for each(var d:Object in departMentList){
+        for each(var d:Object in l0){
             f=true;
             for each(var m:Object in mydepartlist){
                 if(d.father==m.id){
@@ -208,7 +288,7 @@ public class ToolUtil
             }
         }
         if(l.length>0){
-            var l2:ArrayCollection=getMemberlistByMy(l);
+            var l2:ArrayCollection=getMemberlistByMy(l,l0);
             l.addAll(l2);
         }
         return l;

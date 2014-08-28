@@ -38,7 +38,10 @@
 			
 			[Bindable]
 			public var schedulData:Object=null;
-			
+
+            [Bindable]
+            private var myproject:ArrayCollection = new ArrayCollection();
+
 			[Bindable]
 			private var timelist:ArrayCollection = new ArrayCollection([{"value":"0000","text":"凌晨 00:00"}]);
 			[Bindable]
@@ -49,7 +52,7 @@
 			private var endtimelist:ArrayCollection = new ArrayCollection();
 
             [Bindable]
-            private var taxklist:ArrayCollection = new ArrayCollection();
+            private var tasklist:ArrayCollection = new ArrayCollection();
 
             [Bindable]
             private var departmentList:ArrayCollection = new ArrayCollection();
@@ -174,6 +177,7 @@
                 repeatChange();
 
 
+                tasklist.addItem({});
 
 			}
 			
@@ -470,6 +474,17 @@
 					return;
 				}
 			}
+
+        private function changeProjectByDepart():void{
+            myproject.removeAll();
+            myproject.addItem({id:0,name:"无项目"});
+            for each(var item:Object in ToolUtil.projectList){
+                if(item.department=departmentDownList.selectedItem.id){
+                    myproject.addItem(item);
+                }
+            }
+            // todo:责任人范围，修改。只能在部门内之间选择
+        }
 			
 		]]>
 	</fx:Script>
@@ -548,7 +563,7 @@
             </s:FormItem>
 
             <s:FormItem label="分解任务：" height="115">
-                <uicontrol:AddressList id="childAddressList" dataProvider="{taxklist}" itemRenderer="uicontrol.renderer.ChildrenTaskRenderer" width="100%" height="100">
+                <uicontrol:AddressList id="childAddressList" dataProvider="{tasklist}" itemRenderer="uicontrol.renderer.ChildrenTaskRenderer" width="100%" height="100">
                 </uicontrol:AddressList>
             </s:FormItem>
             <s:FormItem label="颜色：" height="25">
@@ -590,8 +605,8 @@
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="departmentDownList" labelField="name" dataProvider="{ToolUtil.departMentList}"></s:DropDownList>
-                <s:DropDownList id="projectDownList" labelField="name" dataProvider="{ToolUtil.projectList}"></s:DropDownList>
+                <s:DropDownList id="departmentDownList" labelField="lable" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
+                <s:DropDownList id="projectDownList" labelField="name" dataProvider="{myproject}"></s:DropDownList>
             </s:FormItem>
             <s:FormItem label="责任人：" height="35">
                 <s:Scroller width="100%"  height="100%" >
