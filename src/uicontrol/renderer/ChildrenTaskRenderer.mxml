@@ -61,28 +61,28 @@
             dispatchEvent(listclickevent);
         }
 
-        protected function getColor():uint {
-            if (itemIndex % 2 == 1) {
-                return 0xf5f6f6;
-            }
-
-            return 0xffffff;
-        }
+//        protected function getColor():uint {
+//            if (itemIndex % 2 == 1) {
+//                return 0xf5f6f6;
+//            }
+//
+//            return 0xffffff;
+//        }
 
         protected function m_over():void {
-            solidColor.color = 0x7ae7bf;
+//            solidColor.color = 0x7ae7bf;
             taskInput.setStyle("borderVisible",true);
         }
 
         protected function m_out():void {
-            solidColor.color = getColor();
+//            solidColor.color = getColor();
             taskInput.setStyle("borderVisible",false);
         }
         ]]></fx:Script>
     <fx:Declarations>
     </fx:Declarations>
 
-    <s:BorderContainer width="100%" height="25"  buttonMode="true" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()">
+    <s:BorderContainer width="100%" height="25"  buttonMode="true" borderVisible="false" >
         <s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">
             <s:fill>
                 <s:SolidColor color="0xdbdbdb" />
@@ -90,12 +90,12 @@
         </s:Rect>
         <s:Rect left="1" right="1" top="0" bottom="1">
             <s:fill>
-                <s:SolidColor id="solidColor"   />
+                <s:SolidColor color="0xffffff" />
             </s:fill>
         </s:Rect>
-        <s:HGroup id="horizontalLayout" verticalAlign="middle" height="100%" gap="5" paddingRight="5" paddingLeft="5">
+        <s:HGroup id="horizontalLayout" verticalAlign="middle" width="100%" height="25" gap="5" paddingRight="5" paddingLeft="5">
             <s:CheckBox id="finishBox" change="selectTask()" ></s:CheckBox>
-            <s:TextInput id="taskInput" width="100%" change="selectTask()" ></s:TextInput>
+            <s:TextInput id="taskInput" width="100%" change="selectTask()" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()"></s:TextInput>
             <uicontrol:BtnDel id="delBtn" clickFun="{delTask}" ></uicontrol:BtnDel>
         </s:HGroup>
     </s:BorderContainer>

@@ -152,7 +152,8 @@ public class ToolUtil
     }
     public static function resultAllDepartMent(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            departMentList=new ArrayCollection(result.result as Array);
+            departMentList.removeAll();
+            departMentList.addAll(new ArrayCollection(result.result as Array));
 
             var dobj:Object=new Object();
             for each(var item2:Object in departMentList) {
