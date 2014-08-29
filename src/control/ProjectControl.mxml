@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						  xmlns:s="library://ns.adobe.com/flex/spark" 
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
+	<fx:Script>
+		<![CDATA[
+        import control.window.GroupMemberPanel;
+        import control.window.GroupPanel;
+        import control.window.PersonPanel;
+
+        import events.ChangeUserEvent;
+        import events.ChatTimelineEvent;
+        import events.CloseEvent;
+        import events.ListClickEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+        import json.JParser;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Menu;
+        import mx.core.FlexGlobals;
+        import mx.events.FlexEvent;
+        import mx.events.ItemClickEvent;
+        import mx.events.MenuEvent;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+
+        import org.idream.pomelo.Pomelo;
+        import org.idream.pomelo.PomeloEvent;
+
+        import util.ChatManager;
+        import util.DateUtil;
+        import util.RightClickManager;
+        import util.ToolUtil;
+
+        [Bindable]
+        private var btnlist:ArrayCollection = new ArrayCollection([{label:"新建项目",icon:addimg,mod:"add"},{label:"修改项目",icon:saveimg,mod:"update"},{label:"删除",icon:delimg,mod:"del"}]);
+
+        override public function init(e:FlexEvent):void {
+
+        }
+
+        private function btnHandler(e:ItemClickEvent):void{
+
+        }
+
+
+        private function setPreDate(list:ArrayCollection):void {
+            var pre:Object;
+            for each(var item:Object in list) {
+                if (pre != null) {
+                    item.predate = pre.d;
+                }
+                pre = item;
+            }
+        }
+
+
+        override public function changeCurrentUser(e:ChangeUserEvent):void {
+        }
+
+        override public function closeContainer(e:CloseEvent):void {
+            dispatchEvent(e);
+        }
+
+
+        // 重新进入时执行
+        override public function reloadParamData(e:FlexEvent):void {
+            if (param) {
+                if (param.hasOwnProperty("messageType")) {
+
+                }
+
+            }
+            super.reloadParamData(e);
+        }
+
+        private var contextMenuItems:ArrayCollection;
+
+        private function listItemClick_handler(e:ListClickEvent):void {
+            contextMenuItems = new ArrayCollection([
+                {"icon": CBorderContainer.wximg, "text": "发送消息", "mode": "chat", "selectedUser": e.data},
+                {"icon": CBorderContainer.wximg, "text": "把'" + e.data.name + "'加入常用联系人", "mode": "addcontact", "selectedUser": e.data},
+                {"icon": CBorderContainer.saveimg, "text": "查看'" + e.data.name + "'的信息", "mode": "show", "selectedUser": e.data}
+            ]);
+            for each(var contact:Object in ToolUtil.contactsList) {
+                if (e.data.id == contact.id) {
+                    contextMenuItems = new ArrayCollection([
+                        {"icon": CBorderContainer.wximg, "text": "发送消息", "mode": "chat", "selectedUser": e.data},
+                        {"icon": CBorderContainer.saveimg, "text": "查看'" + e.data.name + "'信息", "mode": "show", "selectedUser": e.data}
+                    ]);
+                }
+            }
+            if (e.data.id == ToolUtil.sessionUser.pid) {
+                contextMenuItems = new ArrayCollection([
+                    {"icon": CBorderContainer.saveimg, "text": "查看'" + e.data.name + "'信息", "mode": "show", "selectedUser": e.data}
+                ]);
+            }
+
+
+            var menu:Menu = RightClickManager.getMenu(this, contextMenuItems, false);
+
+            menu.labelField = "text";
+            menu.iconField = "icon";
+            menu.variableRowHeight = true;
+            menu.rowHeight = 35;
+            menu.addEventListener(MenuEvent.ITEM_CLICK, menuItemClickHandler);
+
+//              var point:Point = new Point(mouseX,mouseY);
+//              point = localToGlobal(point);
+            menu.show(stage.mouseX - 120, stage.mouseY);
+        }
+
+        private function menuItemClickHandler(e:MenuEvent):void {
+            var item:Object = e.item;
+            var mod:String = item.mode;
+            switch (mod) {
+                case 'chat':
+                    var chatevent:ListClickEvent = new ListClickEvent("ChatUser", e.item.selectedUser);
+                    dispatchEvent(chatevent);
+                    break;
+                case 'addcontact':
+                    var param:Object = new Object();
+                    param["pid"] = e.item.selectedUser.id;
+                    HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addPersonContact", function (result:Object, event:ResultEvent):void {
+                        ToolUtil.contactsRefresh();
+                    }, "POST").send(param);
+                    break;
+                case 'show':
+                    var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel, true) as PersonPanel;
+                    p.personData = e.item.selectedUser;
+                    break;
+
+            }
+
+        }
+
+        ]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<control:layout>
+		<s:VerticalLayout gap="0" >
+			
+		</s:VerticalLayout>
+	</control:layout>
+
+        <s:VGroup  width="100%" height="100%">
+            <s:BorderContainer width="100%" height="45" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+                <s:layout>
+                    <s:HorizontalLayout verticalAlign="middle"></s:HorizontalLayout>
+                </s:layout>
+                <mx:ButtonBar id="showModel" itemClick="btnHandler(event)" dataProvider="{btnlist}" height="25" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
+            </s:BorderContainer>
+            <s:DataGrid width="100%" height="200">
+                <s:columns>
+                    <s:ArrayList>
+                        <s:GridColumn dataField="name" headerText="项目名称" dataTipField="desc"  minWidth="100"></s:GridColumn>
+                        <s:GridColumn dataField="manager" headerText="负责人" minWidth="80"></s:GridColumn>
+                        <s:GridColumn dataField="fproject" headerText="父级项目" minWidth="100"></s:GridColumn>
+                        <s:GridColumn dataField="department" headerText="隶属部门" minWidth="80"></s:GridColumn>
+                        <s:GridColumn dataField="start_date" headerText="开始日期" minWidth="60"></s:GridColumn>
+                        <s:GridColumn dataField="end_date" headerText="结束日期" minWidth="60"></s:GridColumn>
+                        <s:GridColumn dataField="status" headerText="状态" minWidth="60"></s:GridColumn>
+                    </s:ArrayList>
+                </s:columns>
+            </s:DataGrid>
+            <s:DataGrid width="100%" height="100%">
+                <s:columns>
+                    <s:ArrayList>
+                        <s:GridColumn dataField="name" headerText="责任人" minWidth="100"></s:GridColumn>
+                        <s:GridColumn dataField="tasknum" headerText="任务数量" minWidth="80"></s:GridColumn>
+                        <s:GridColumn dataField="status_1" headerText="未开始" minWidth="100"></s:GridColumn>
+                        <s:GridColumn dataField="status_2" headerText="进行中" minWidth="80"></s:GridColumn>
+                        <s:GridColumn dataField="status_3" headerText="待审核" minWidth="60"></s:GridColumn>
+                        <s:GridColumn dataField="status_4" headerText="完成" minWidth="60"></s:GridColumn>
+                        <s:GridColumn dataField="level" headerText="总权重" minWidth="60"></s:GridColumn>
+                    </s:ArrayList>
+                </s:columns>
+            </s:DataGrid>
+        </s:VGroup>
+
+</control:CBorderContainer>

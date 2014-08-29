@@ -4,7 +4,7 @@
                              xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
                              xmlns:conobj="uicontrol.conobj.*"
                              width="450" height="250" creationComplete="init()"
-                             title="创建组织" xmlns:window="control.window.*">
+                             title="创建项目" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
         import httpcontrol.HttpServiceUtil;
@@ -13,6 +13,8 @@
         import mx.core.FlexGlobals;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
+
+        import util.DateUtil;
 
         import util.ToolUtil;
 
@@ -66,33 +68,41 @@
 	<s:Form width="100%" id="form" >
 
 
-		<s:FormItem id="orgNameItem" label="组织名称:" textAlign="right">
+		<s:FormItem  label="项目名称:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="orgname"  width="200"  tabIndex="5" enter="save()">
+			<s:TextInput id="projectname"  width="200"  tabIndex="5" >
 				
 			</s:TextInput>
-			<s:Label text="公司或团队名称" color="red" />
 		</s:FormItem>
-
-		<s:FormItem id="orgIconItem" label="组织图标:" textAlign="right">
-            <s:layout>
-                <s:HorizontalLayout gap="5"/>
-            </s:layout>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/5.png" selected="true" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/12.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/15.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/26.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/34.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/36.png" headSelectArray="{orgHeadSelectArray}"></uicontrol:IconButton>
-		</s:FormItem>
+        <s:FormItem  label="项目描述:" textAlign="right">
+            <s:TextArea width="200" height="60"></s:TextArea>
+        </s:FormItem>
+        <s:FormItem  label="父级项目:" textAlign="right">
+            <s:DropDownList id="fatherDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.projectList}"  ></s:DropDownList>
+        </s:FormItem>
+        <s:FormItem  label="隶属部门:" textAlign="right">
+            <s:DropDownList id="departmentDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}"  ></s:DropDownList>
+        </s:FormItem>
+        <s:FormItem  label="负责人:" textAlign="right">
+            <s:DropDownList id="managerDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}"  ></s:DropDownList>
+        </s:FormItem>
+        <s:FormItem  label="开始日期:" textAlign="right">
+            <mx:DateField id="startDate" width="100"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+        </s:FormItem>
+        <s:FormItem  label="结束日期:" textAlign="right">
+            <mx:DateField id="endDate" width="100"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+        </s:FormItem>
+        <s:FormItem  label="项目状态:" textAlign="right">
+            <s:DropDownList id="statusDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}"  ></s:DropDownList>
+        </s:FormItem>
 
 		<s:FormItem>
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
-				<s:Button label="创建" click="save()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
+				<s:Button label="保存" click="save()" chromeColor="red" color="#ffffff" height="25"  tabIndex="10">
 					
 				</s:Button>
 				<s:Button label="放弃" click="closeWin()" chromeColor="#ffffff" color="#000000" height="25">

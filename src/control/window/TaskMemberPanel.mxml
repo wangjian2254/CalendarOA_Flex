@@ -7,6 +7,7 @@
     <fx:Script>
 		<![CDATA[
         import events.ListClickEvent;
+        import events.MembersEvent;
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
@@ -25,7 +26,7 @@
         [Bindable]
         public var allmember:ArrayCollection=new ArrayCollection();
         [Bindable]
-        private var usermember:ArrayCollection=new ArrayCollection();
+        public var usermember:ArrayCollection=new ArrayCollection();
 
         public var channel:String;
 
@@ -53,17 +54,18 @@
 
 
         private function createGroup():void{
-            var pids:Array = new Array();
+            var pids:ArrayCollection = new ArrayCollection();
             var pci:PersonChatItem;
             for(var i:int=0;i<memebers.numElements;i++){
                 pci=memebers.getElementAt(i) as PersonChatItem;
                 if(pci.selected){
-                    pids.push(pci.person.id);
+                    pids.addItem(pci.person);
                 }
             }
 
-
-
+            var chatevent:MembersEvent=new MembersEvent(MembersEvent.MEMBERS,pids);
+            dispatchEvent(chatevent);
+            closeWin();
         }
 		]]>
 	</fx:Script>

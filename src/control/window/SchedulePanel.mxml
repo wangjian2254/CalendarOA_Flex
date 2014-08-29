@@ -1,415 +1,435 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*"  width="{getWindowWidth}"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" x="-1000" y="100" width="{getWindowWidth}"
                              height="{getWindowHeight}"  title="{titlestr}" creationComplete="init()"
                              xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
-			import events.ChangeJoinUserEvent;
-			import events.ChangeMenuEvent;
-			import events.ChangeUserEvent;
-			
-			import httpcontrol.HttpServiceUtil;
+        import events.ChangeJoinUserEvent;
+        import events.ChangeMenuEvent;
+        import events.ChangeUserEvent;
+        import events.MembersEvent;
 
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.events.CloseEvent;
-			import mx.rpc.events.ResultEvent;
+        import httpcontrol.HttpServiceUtil;
 
-			import util.DateUtil;
-			import util.ScheduleUtil;
-			import util.ToolUtil;
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
 
-            public function get getWindowHeight():Number{
-                return windowGroup.height;
+        import uicontrol.MemberItem;
+
+        import util.DateUtil;
+        import util.ScheduleUtil;
+        import util.ToolUtil;
+
+        public function get getWindowHeight():Number{
+            return windowGroup.height;
+        }
+        public function get getWindowWidth():Number{
+            return windowGroup.width;
+        }
+        [Bindable]
+        public var titlestr:String="创建任务";
+
+        [Bindable]
+        public var startDateValue:Date=new Date();
+        [Bindable]
+        public var endDateValue:Date=new Date();
+
+        [Bindable]
+        public var schedulData:Object=null;
+
+        [Bindable]
+        private var myproject:ArrayCollection = new ArrayCollection();
+
+        [Bindable]
+        private var departmentMembers:ArrayCollection = new ArrayCollection();
+
+        [Bindable]
+        private var timelist:ArrayCollection = new ArrayCollection([{"value":"0000","text":"凌晨 00:00"}]);
+        [Bindable]
+        private var warninglist:ArrayCollection = new ArrayCollection([{"value":1,"text":"分钟"},{"value":60,"text":"小时"},{"value":60*24,"text":"天"},{"value":60*24*7,"text":"周"}]);
+        //			[Bindable]
+        //			private var warninglist2:ArrayCollection = new ArrayCollection([{"value":0,"text":"当天"},{"value":24*60,"text":"提前一天"},{"value":24*60*2,"text":"提前二天"},{"value":24*60*3,"text":"提前三天"},{"value":24*60*4,"text":"提前四天"},{"value":24*60*7,"text":"提前一星期"}]);
+        [Bindable]
+        private var endtimelist:ArrayCollection = new ArrayCollection();
+
+        [Bindable]
+        private var tasklist:ArrayCollection = new ArrayCollection();
+
+        [Bindable]
+        private var departmentList:ArrayCollection = new ArrayCollection();
+
+
+        private var selectColor:Number =0x00CCFF;
+
+
+
+        public function init():void{
+            usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS,removeUsersHandler);
+            if(schedulData==null){
+                windowGroup.removeElement(chatControl);
+            }else{
+                chatControl.width=500;
             }
-            public function get getWindowWidth():Number{
-                return windowGroup.width;
-            }
-			[Bindable]
-			public var titlestr:String="创建任务";
-			
-			[Bindable]
-			public var startDateValue:Date=new Date();
-			[Bindable]
-			public var endDateValue:Date=new Date();
-			
-			[Bindable]
-			public var schedulData:Object=null;
-
-            [Bindable]
-            private var myproject:ArrayCollection = new ArrayCollection();
-
-			[Bindable]
-			private var timelist:ArrayCollection = new ArrayCollection([{"value":"0000","text":"凌晨 00:00"}]);
-			[Bindable]
-			private var warninglist:ArrayCollection = new ArrayCollection([{"value":1,"text":"分钟"},{"value":60,"text":"小时"},{"value":60*24,"text":"天"},{"value":60*24*7,"text":"周"}]);
-//			[Bindable]
-//			private var warninglist2:ArrayCollection = new ArrayCollection([{"value":0,"text":"当天"},{"value":24*60,"text":"提前一天"},{"value":24*60*2,"text":"提前二天"},{"value":24*60*3,"text":"提前三天"},{"value":24*60*4,"text":"提前四天"},{"value":24*60*7,"text":"提前一星期"}]);
-			[Bindable]
-			private var endtimelist:ArrayCollection = new ArrayCollection();
-
-            [Bindable]
-            private var tasklist:ArrayCollection = new ArrayCollection();
-
-            [Bindable]
-            private var departmentList:ArrayCollection = new ArrayCollection();
-
-			
-			private var selectColor:Number =0x00CCFF;
 
 
-			
-			public function init():void{
-                if(schedulData==null){
-                    windowGroup.removeElement(chatControl);
+            //审核者 有资格修改任务
+            dopanel.visible = (schedulData==null||schedulData.checker==ToolUtil.sessionUser.username)?true:false;
+            // 负责人有资格修改任务
+
+            //设置 按钮可见性
+
+            // 设置 负责人
+            // 设置 审核人
+            //标题
+            //子任务
+            //颜色
+            //开始时间
+            //截止时间
+            //重复方式
+            //隶属项目
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+            //
+
+
+
+
+
+            btnDel.visible=false;
+            if(schedulData!=null){
+
+
+                if(schedulData.is_all_day){
+                    is_all_day.selected = schedulData.is_all_day;
+                    startDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
+                    endDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
                 }else{
-                    chatControl.width=500;
+                    startDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_start);
+                    endDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_end);
+
+                }
+                startDate.selectedDate = startDateValue;
+                if(schedulData.enddate){
+                    endDate.selectedDate = DateField.stringToDate(schedulData.enddate,"YYYYMMDD")
+
+                }else{
+
                 }
 
-
-				//审核者 有资格修改任务
-				dopanel.visible = (schedulData==null||schedulData.checker==ToolUtil.sessionUser.username)?true:false;
-				// 负责人有资格修改任务
-
-                //设置 按钮可见性
-
-				// 设置 负责人
-                // 设置 审核人
-                //标题
-                //子任务
-                //颜色
-                //开始时间
-                //截止时间
-                //重复方式
-                //隶属项目
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-                //
-
-
-
-
-				
-				btnDel.visible=false;
-				if(schedulData!=null){
-
-
-					if(schedulData.is_all_day){
-						is_all_day.selected = schedulData.is_all_day;
-						startDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
-						endDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
-					}else{
-						startDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_start);
-						endDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_end);
-						
-					}
-					startDate.selectedDate = startDateValue;
-					if(schedulData.enddate){
-						endDate.selectedDate = DateField.stringToDate(schedulData.enddate,"YYYYMMDD")
-						
-					}else{
-
-					}
-					
-					scheduleTitle.text = schedulData.title;
-					repeatType.selectedValue = schedulData.repeat_type;
-					repeatChange();
-
-					
-					colorClick(schedulData.color);
-
-					changeUsers();
-					titlestr = schedulData.title;
-
-					
-				}
-				
-				
-				
-				timelist.removeAll();
-				for(var i:Number=0;i<24;i++){
-					var h:String ="0"+i;
-					var s:String = "凌晨 ";
-					if(i>=5&&i<9){
-						s="上午 ";
-					}
-					if(i>=9&&i<15){
-						s="中午 ";
-					}
-					if(i>=15&&i<18){
-						s="下午 ";
-					}
-					if(i>=18){
-						s="晚上 ";
-					}
-					
-					timelist.addItem({"value":h.substring(h.length-2)+"00","text":s+h.substring(h.length-2)+":00"});
-					timelist.addItem({"value":h.substring(h.length-2)+"30","text":s+h.substring(h.length-2)+":30"});
-				}
-				
-				try{
-					var index:Number=startDateValue.hours*2;
-					if(startDateValue.minutes>=30){
-						index+=1;
-					}
-					startTime.selectedItem = timelist.getItemAt(index);	
-					endtimelist.removeAll();
-					for(index+=1;index<timelist.length;index++){
-						endtimelist.addItem(timelist.getItemAt(index));
-						if(timeStr.format(endDateValue)>=timelist.getItemAt(index).value){
-							endTime.selectedItem = timelist.getItemAt(index);
-						}
-					}
-					endtimelist.addItem({"value":"2359","text":"24:00"});
-					if(endtimelist.length==1){
-						endTime.selectedIndex=0;
-					}
-				}catch(error:Error){
-					
-				}
-
+                scheduleTitle.text = schedulData.title;
+                repeatType.selectedValue = schedulData.repeat_type;
                 repeatChange();
 
 
-                tasklist.addItem({haspower:true});
+                colorClick(schedulData.color);
 
-			}
-			
-			private function getData():Object{
-				var obj:Object=new Object();
-				if(schedulData!=null&&schedulData.hasOwnProperty("id")){
-					obj.id = schedulData["id"];
-				}
-				obj.title=scheduleTitle.text;
-                //子任务
-				obj.startdate = datestr.format(startDate.selectedDate);
+                changeUsers();
+                titlestr = schedulData.title;
 
-					obj.enddate = datestr.format(endDate.selectedDate);
 
-				obj.is_all_day = is_all_day.selected;
-				if(!is_all_day.selected){
-					obj.time_start = startTime.selectedItem.value;
-					obj.time_end = endTime.selectedItem.value;
-				}
-				obj.repeat_type = repeatType.selectedValue;
-				
-				obj.repeat_date = new Array();
-				if(repeatType.selectedValue=="weekly"){
-					for(var m:Number=0;m<dayTile.numElements;m++){
-						if((dayTile.getElementAt(m) as CheckBox).selected){
-							if(m==0){
-								obj.repeat_date.push(6);
-							}
-								obj.repeat_date.push(m-1);
-						}
-					}
-				}
-				if(repeatType.selectedValue=="monthly"){
-					for(m=0;m<dayTile.numElements;m++){
-						if((dayTile.getElementAt(m) as CheckBox).selected){
-							obj.repeat_date.push(m+1);
-						}
-					}
-				}
-				obj.color = selectColor;
-				obj.projectid = projectDownList.selectedItem.id;
-				obj.users = new Array();
+            }
 
-				
-				return obj;
-			}
-			
-			public function save():void{
-				if(this.scheduleTitle.text==""||this.scheduleTitle.text=="任务标题"){
-					scheduleTitle.selectAll();
-					Alert.show("请填写任务标题。","提示");
-					return;
-				}
-				if(startDate.selectedDate==null){
-					Alert.show("请选择开始时间。","提示");
-					startDate.open();
-					return;
-				}
 
-				
-				
-				
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(getData());
-					
-				
-			}
-			
-			private function saveResult(result:Object,e:ResultEvent):void{
-				if(result.success){
+
+            timelist.removeAll();
+            for(var i:Number=0;i<24;i++){
+                var h:String ="0"+i;
+                var s:String = "凌晨 ";
+                if(i>=5&&i<9){
+                    s="上午 ";
+                }
+                if(i>=9&&i<15){
+                    s="中午 ";
+                }
+                if(i>=15&&i<18){
+                    s="下午 ";
+                }
+                if(i>=18){
+                    s="晚上 ";
+                }
+
+                timelist.addItem({"value":h.substring(h.length-2)+"00","text":s+h.substring(h.length-2)+":00"});
+                timelist.addItem({"value":h.substring(h.length-2)+"30","text":s+h.substring(h.length-2)+":30"});
+            }
+
+            try{
+                var index:Number=startDateValue.hours*2;
+                if(startDateValue.minutes>=30){
+                    index+=1;
+                }
+                startTime.selectedItem = timelist.getItemAt(index);
+                endtimelist.removeAll();
+                for(index+=1;index<timelist.length;index++){
+                    endtimelist.addItem(timelist.getItemAt(index));
+                    if(timeStr.format(endDateValue)>=timelist.getItemAt(index).value){
+                        endTime.selectedItem = timelist.getItemAt(index);
+                    }
+                }
+                endtimelist.addItem({"value":"2359","text":"24:00"});
+                if(endtimelist.length==1){
+                    endTime.selectedIndex=0;
+                }
+            }catch(error:Error){
+
+            }
+
+            repeatChange();
+            changeTiXing();
+            changeProjectByDepart();
+
+
+            tasklist.addItem({haspower:true});
+
+        }
+
+        private function getData():Object{
+            var obj:Object=new Object();
+            if(schedulData!=null&&schedulData.hasOwnProperty("id")){
+                obj.id = schedulData["id"];
+            }
+            obj.title=scheduleTitle.text;
+            //子任务
+            obj.startdate = datestr.format(startDate.selectedDate);
+
+            obj.enddate = datestr.format(endDate.selectedDate);
+
+            obj.is_all_day = is_all_day.selected;
+            if(!is_all_day.selected){
+                obj.time_start = startTime.selectedItem.value;
+                obj.time_end = endTime.selectedItem.value;
+            }
+            obj.repeat_type = repeatType.selectedValue;
+
+            obj.repeat_date = new Array();
+            if(repeatType.selectedValue=="weekly"){
+                for(var m:Number=0;m<dayTile.numElements;m++){
+                    if((dayTile.getElementAt(m) as CheckBox).selected){
+                        if(m==0){
+                            obj.repeat_date.push(6);
+                        }
+                        obj.repeat_date.push(m-1);
+                    }
+                }
+            }
+            if(repeatType.selectedValue=="monthly"){
+                for(m=0;m<dayTile.numElements;m++){
+                    if((dayTile.getElementAt(m) as CheckBox).selected){
+                        obj.repeat_date.push(m+1);
+                    }
+                }
+            }
+            obj.color = selectColor;
+            obj.projectid = projectDownList.selectedItem.id;
+            obj.users = new Array();
+
+
+            return obj;
+        }
+
+        public function save():void{
+            if(this.scheduleTitle.text==""||this.scheduleTitle.text=="任务标题"){
+                scheduleTitle.selectAll();
+                Alert.show("请填写任务标题。","提示");
+                return;
+            }
+            if(startDate.selectedDate==null){
+                Alert.show("请选择开始时间。","提示");
+                startDate.open();
+                return;
+            }
+
+
+
+
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(getData());
+
+
+        }
+
+        private function saveResult(result:Object,e:ResultEvent):void{
+            if(result.success){
 //					if(schedulData==null){
 //						schedulData = getData();
 //					}
-					schedulData = result.result;
-					titlestr = schedulData.title;
-					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-					ScheduleUtil.clearNewSchedule();
-					init();
-				}
-			}
-			
-			public function refresh():void{
-				var start:Number=timelist.getItemIndex(startTime.selectedItem);
-				endtimelist.removeAll();
-				for(var i:Number = start+1;i<timelist.length;i++){
-					endtimelist.addItem(timelist.getItemAt(i));
-					if(timeStr.format(endDateValue)>=timelist.getItemAt(i).value){
-						endTime.selectedItem = timelist.getItemAt(i);
-					}
-				}
-			}
-			
-			private function repeatChange():void{
-				if(repeatType.selectedValue=="none"||repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
-					dayTile.visible = false;
-                    dayPanel.visible=false;
-                    dayPanel.height=0;
-				}else{
-					dayTile.visible = true;
-					if(repeatType.selectedValue=="weekly"){
-                        dayPanel.visible=true;
-                        dayPanel.height=25;
-						dayTile.removeAllElements();
-						for(var i:Number=0;i<7;i++){
-							var cb:CheckBox = new CheckBox();
-							switch(i){
-								case 0:
-									cb.label = "日";
-									break;
-								case 1:
-									cb.label = "一";
-									break;
-								case 2:
-									cb.label = "二";
-									break;
-								case 3:
-									cb.label = "三";
-									break;
-								case 4:
-									cb.label = "四";
-									break;
-								case 5:
-									cb.label = "五";
-									break;
-								case 6:
-									cb.label = "六";
-									break;
-							}
-							
-							cb.selected=false;
-							cb.height = 25;
-							dayTile.addElement(cb);
-						}
-						for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
-							try{
-								if(schedulData.repeat_date[index]==6){
-									
-									(dayTile.getElementAt(0) as CheckBox).selected = true;
-								}else{
-									(dayTile.getElementAt(Number( schedulData.repeat_date[index])+1) as CheckBox).selected = true;
-								}
-							}catch(e:Error){
-							}
-						}
-						
-					}
-					
-					if(repeatType.selectedValue=="monthly"){
-						dayTile.removeAllElements();
-                        dayPanel.visible=true;
-						dayPanel.height = 130;
-						for( i=0;i<31;i++){
-							cb = new CheckBox();
-							
-							cb.label = ""+(i+1);
-							cb.height = 25;
-							cb.selected=false;
-							dayTile.addElement(cb);
-						}
-						for (index= 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
-							try{
-								(dayTile.getElementAt(Number( schedulData.repeat_date[index])-1) as CheckBox).selected = true;
-							}catch(e:Error){
-							}
-						}
-					}
-				}
-				this.invalidateDisplayList();
-			}
-			
-			private function colorChange():void{
-				colorClick(colorPicker.selectedColor);
-			}
-			
-			private function colorClick(c:Number):void{
-				selectColor = c;
-				color0.setStyle("backgroundColor",c);
-				color1.setStyle("borderColor",0xffffff);
-				color2.setStyle("borderColor",0xffffff);
-				color3.setStyle("borderColor",0xffffff);
-				color4.setStyle("borderColor",0xffffff);
-				color5.setStyle("borderColor",0xffffff);
-				color6.setStyle("borderColor",0xffffff);
-				color7.setStyle("borderColor",0xffffff);
-				color8.setStyle("borderColor",0xffffff);
-				color9.setStyle("borderColor",0xffffff);
-				color10.setStyle("borderColor",0xffffff);
-				switch(c){
-					case 0xaecfea:
-						color1.setStyle("borderColor",0x000000);
-						break;
-					case 0x5484ed:
-						color2.setStyle("borderColor",0x000000);
-						break;
-					case 0xa4bdfc:
-						color3.setStyle("borderColor",0x000000);
-						break;
-					case 0x46d6db:
-						color4.setStyle("borderColor",0x000000);
-						break;
-					case 0x7ae7bf:
-						color5.setStyle("borderColor",0x000000);
-						break;
-					case 0x51b749:
-						color6.setStyle("borderColor",0x000000);
-						break;
-					case 0xfbd75b:
-						color6.setStyle("borderColor",0x000000);
-						break;
-					case 0xffb878:
-						color6.setStyle("borderColor",0x000000);
-						break;
-					case 0xff887c:
-						color6.setStyle("borderColor",0x000000);
-						break;
-					case 0xdbadff:
-						color6.setStyle("borderColor",0x000000);
-						break;
-					default:
-						if(colorPicker.selectedColor!=c){
-							colorPicker.selectedColor=c;
-						}
-					
-				}
-			}
-			
-			private function delJoin(e:ChangeJoinUserEvent):void{
+                schedulData = result.result;
+                titlestr = schedulData.title;
+                FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+                ScheduleUtil.clearNewSchedule();
+                init();
+            }
+        }
+
+        public function refresh():void{
+            var start:Number=timelist.getItemIndex(startTime.selectedItem);
+            endtimelist.removeAll();
+            for(var i:Number = start+1;i<timelist.length;i++){
+                endtimelist.addItem(timelist.getItemAt(i));
+                if(timeStr.format(endDateValue)>=timelist.getItemAt(i).value){
+                    endTime.selectedItem = timelist.getItemAt(i);
+                }
+            }
+        }
+
+        private function changeTiXing():void{
+            if(boxTiXing.selected){
+                itemTixing.visible=false;
+                itemTixing.height=0;
+            }else{
+                itemTixing.visible=true;
+                itemTixing.height=75;
+            }
+        }
+        private function repeatChange():void{
+            if(repeatType.selectedValue=="none"||repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
+                dayTile.visible = false;
+                dayPanel.visible=false;
+                dayPanel.height=0;
+            }else{
+                dayTile.visible = true;
+                if(repeatType.selectedValue=="weekly"){
+                    dayPanel.visible=true;
+                    dayPanel.height=25;
+                    dayTile.removeAllElements();
+                    for(var i:Number=0;i<7;i++){
+                        var cb:CheckBox = new CheckBox();
+                        switch(i){
+                            case 0:
+                                cb.label = "日";
+                                break;
+                            case 1:
+                                cb.label = "一";
+                                break;
+                            case 2:
+                                cb.label = "二";
+                                break;
+                            case 3:
+                                cb.label = "三";
+                                break;
+                            case 4:
+                                cb.label = "四";
+                                break;
+                            case 5:
+                                cb.label = "五";
+                                break;
+                            case 6:
+                                cb.label = "六";
+                                break;
+                        }
+
+                        cb.selected=false;
+                        cb.height = 25;
+                        dayTile.addElement(cb);
+                    }
+                    for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
+                        try{
+                            if(schedulData.repeat_date[index]==6){
+
+                                (dayTile.getElementAt(0) as CheckBox).selected = true;
+                            }else{
+                                (dayTile.getElementAt(Number( schedulData.repeat_date[index])+1) as CheckBox).selected = true;
+                            }
+                        }catch(e:Error){
+                        }
+                    }
+
+                }
+
+                if(repeatType.selectedValue=="monthly"){
+                    dayTile.removeAllElements();
+                    dayPanel.visible=true;
+                    dayPanel.height = 130;
+                    for( i=0;i<31;i++){
+                        cb = new CheckBox();
+
+                        cb.label = ""+(i+1);
+                        cb.height = 25;
+                        cb.selected=false;
+                        dayTile.addElement(cb);
+                    }
+                    for (index= 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
+                        try{
+                            (dayTile.getElementAt(Number( schedulData.repeat_date[index])-1) as CheckBox).selected = true;
+                        }catch(e:Error){
+                        }
+                    }
+                }
+            }
+            this.invalidateDisplayList();
+        }
+
+        private function colorChange():void{
+            colorClick(colorPicker.selectedColor);
+        }
+
+        private function colorClick(c:Number):void{
+            selectColor = c;
+            color0.setStyle("backgroundColor",c);
+            color1.setStyle("borderColor",0xffffff);
+            color2.setStyle("borderColor",0xffffff);
+            color3.setStyle("borderColor",0xffffff);
+            color4.setStyle("borderColor",0xffffff);
+            color5.setStyle("borderColor",0xffffff);
+            color6.setStyle("borderColor",0xffffff);
+            color7.setStyle("borderColor",0xffffff);
+            color8.setStyle("borderColor",0xffffff);
+            color9.setStyle("borderColor",0xffffff);
+            color10.setStyle("borderColor",0xffffff);
+            switch(c){
+                case 0xaecfea:
+                    color1.setStyle("borderColor",0x000000);
+                    break;
+                case 0x5484ed:
+                    color2.setStyle("borderColor",0x000000);
+                    break;
+                case 0xa4bdfc:
+                    color3.setStyle("borderColor",0x000000);
+                    break;
+                case 0x46d6db:
+                    color4.setStyle("borderColor",0x000000);
+                    break;
+                case 0x7ae7bf:
+                    color5.setStyle("borderColor",0x000000);
+                    break;
+                case 0x51b749:
+                    color6.setStyle("borderColor",0x000000);
+                    break;
+                case 0xfbd75b:
+                    color6.setStyle("borderColor",0x000000);
+                    break;
+                case 0xffb878:
+                    color6.setStyle("borderColor",0x000000);
+                    break;
+                case 0xff887c:
+                    color6.setStyle("borderColor",0x000000);
+                    break;
+                case 0xdbadff:
+                    color6.setStyle("borderColor",0x000000);
+                    break;
+                default:
+                    if(colorPicker.selectedColor!=c){
+                        colorPicker.selectedColor=c;
+                    }
+
+            }
+        }
+
+        private function delJoin(e:ChangeJoinUserEvent):void{
 //				joinUserGrid.invalidateList();
-			}
-			
-			public function changeUsers():void{
+        }
+
+        public function changeUsers():void{
 //				users.removeAllElements();
 //				var address:ContactItem = null;
 //				for each(var obj:Object in contactsList){
@@ -422,60 +442,60 @@
 //						users.addElement(address);
 //					}
 //				}
-			}
-			
+        }
 
-			
-			
-			private function delAsk():void{
-				if(schedulData!=null &&schedulData.id){
-				
-					Alert.show("确认删除当前任务?", "提示", Alert.YES | Alert.NO, null, del);
-				}else{
-					closeWin();
-				}
-				
-			}
-			//删除任务
-			private function del(e:mx.events.CloseEvent):void
-			{
-				if (e.detail == Alert.YES){
-					var data:Object = new Object();
-					data["id"] = schedulData.id;
-					HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
-					
-					
-				}
-			}
-			
-			private function delResult(result:Object,e:ResultEvent):void{
-				if(result.success){
-					
-					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-					closeWin();
-				}
-			}
-			
-			
-			private function openAddress():void{
-				var obj:Object=new Object();
-				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
-				FlexGlobals.topLevelApplication.dispatchEvent(evt);
-			}
-			
-			private function refreshAddress(result:Object,e:ResultEvent):void{
 
-				
-				changeUsers();
-			}
-			
-			private function gotoZentao():void{
-				if(schedulData.zentaourl){
-					var request:URLRequest=new URLRequest(schedulData.zentaourl);  
-					navigateToURL(request,"_blank");
-					return;
-				}
-			}
+
+
+        private function delAsk():void{
+            if(schedulData!=null &&schedulData.id){
+
+                Alert.show("确认删除当前任务?", "提示", Alert.YES | Alert.NO, null, del);
+            }else{
+                closeWin();
+            }
+
+        }
+        //删除任务
+        private function del(e:mx.events.CloseEvent):void
+        {
+            if (e.detail == Alert.YES){
+                var data:Object = new Object();
+                data["id"] = schedulData.id;
+                HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
+
+
+            }
+        }
+
+        private function delResult(result:Object,e:ResultEvent):void{
+            if(result.success){
+
+                FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+                closeWin();
+            }
+        }
+
+
+        private function openAddress():void{
+            var obj:Object=new Object();
+            var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
+            FlexGlobals.topLevelApplication.dispatchEvent(evt);
+        }
+
+        private function refreshAddress(result:Object,e:ResultEvent):void{
+
+
+            changeUsers();
+        }
+
+        private function gotoZentao():void{
+            if(schedulData.zentaourl){
+                var request:URLRequest=new URLRequest(schedulData.zentaourl);
+                navigateToURL(request,"_blank");
+                return;
+            }
+        }
 
         private function changeProjectByDepart():void{
             myproject.removeAll();
@@ -485,22 +505,110 @@
                     myproject.addItem(item);
                 }
             }
+
+
+
+            //todo:审核人 范围验证
+            var checker:Object = checkerDownList.selectedItem;
+            departmentMembers.removeAll();
+            if(departmentDownList.selectedItem.hasOwnProperty("children")){
+                departmentMembers.addAll(departmentDownList.selectedItem.children);
+            }else{
+                departmentMembers.addAll( ObjectUtil.copy(ToolUtil.memberList) as ArrayCollection);
+            }
+
+            if(checker!=null){
+                var index:int = departmentMembers.getItemIndex(checker);
+                if(index>=0){
+                    checkerDownList.selectedIndex=index;
+                }else{
+                    checkerDownList.selectedIndex=-1;
+                }
+            }
+            if(checkerDownList.selectedIndex==-1){
+                for each(var item:Object in departmentMembers){
+                    if(item.id==ToolUtil.sessionUser.pid){
+                        checkerDownList.selectedItem=item;
+                        break;
+                    }
+                }
+            }
+
             // todo:责任人范围，修改。只能在部门内之间选择
+            var p:MemberItem=null;
+            var f:Boolean=false;
+            for(var i:int=usersGroup.numElements-1;i>=0;i--){
+                p=usersGroup.getElementAt(i) as MemberItem;
+                f=false;
+                for each(var person:Object in departmentMembers){
+                    if(person.id==p.person.id){
+                        f=true;
+                    }
+                }
+                if(!f){
+                    usersGroup.removeElement(p);
+                }
+            }
         }
-			
-		]]>
+
+        private function  openUserChoice():void{
+            var gp:TaskMemberPanel = PopUpManager.createPopUp(this, TaskMemberPanel, true) as TaskMemberPanel;
+            gp.allmember = departmentMembers;
+            var m:ArrayCollection = new ArrayCollection();
+            var p:MemberItem=null;
+            for(var i:int=0;i<usersGroup.numElements;i++){
+                p=usersGroup.getElementAt(i) as MemberItem;
+                m.addItem(p.person);
+            }
+            gp.usermember=m;
+            gp.addEventListener(MembersEvent.MEMBERS, function (e:MembersEvent):void {
+                var members:ArrayCollection = e.data as ArrayCollection;
+                usersGroup.removeAllElements();
+
+                for each(var person:Object in members){
+                    p=new MemberItem();
+                    p.person = person;
+                    p.showBtn = true;
+                    usersGroup.addElement(p);
+                    usersGroup.validateNow();
+                }
+
+            });
+
+        }
+
+        private function removeUsersHandler(e:MembersEvent):void{
+            var person:Object = e.data;
+            var p:MemberItem=null;
+            var f:Boolean=false;
+            for(var i:int=usersGroup.numElements-1;i>=0;i--){
+                p=usersGroup.getElementAt(i) as MemberItem;
+                f=false;
+                if(person.id==p.person.id){
+                    f=true;
+                }
+                if(f){
+                    usersGroup.removeElement(p);
+                }
+            }
+        }
+
+        private function addProject():void{
+            var gp:TaskMemberPanel = PopUpManager.createPopUp(this, TaskMemberPanel, true) as TaskMemberPanel;
+        }
+        ]]>
 	</fx:Script>
-	<fx:Declarations>
-		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-		<s:RadioButtonGroup id="repeatType" change="repeatChange()"/>
-		<mx:DateFormatter id="datestr" formatString="YYYYMMDD" >
-			
-		</mx:DateFormatter>
-		<mx:DateFormatter id="timeStr" formatString="JJNN" >
-			
-		</mx:DateFormatter>
-	</fx:Declarations>
-	<s:HGroup id="windowGroup" >
+    <fx:Declarations>
+        <!-- 将非可视元素（例如服务、值对象）放在此处 -->
+        <s:RadioButtonGroup id="repeatType" change="repeatChange()"/>
+        <mx:DateFormatter id="datestr" formatString="YYYYMMDD" >
+
+        </mx:DateFormatter>
+        <mx:DateFormatter id="timeStr" formatString="JJNN" >
+
+        </mx:DateFormatter>
+    </fx:Declarations>
+    <s:HGroup id="windowGroup" width="500" height="100%" >
         <s:Form width="500" height="100%" id="schedulePanel">
             <s:layout>
                 <s:FormLayout gap="0"  ></s:FormLayout>
@@ -512,6 +620,8 @@
                 </s:layout>
                 <s:DropDownList id="departmentDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
                 <s:DropDownList id="projectDownList" labelField="name" dataProvider="{myproject}"></s:DropDownList>
+                <s:Spacer width="100%"></s:Spacer>
+                <uicontrol:BtnAdd clickFun="{addProject}" />
             </s:FormItem>
             <s:FormItem label="标题：" id="titleItem" height="50">
                 <s:TextArea id="scheduleTitle" width="100%" height="45" prompt="任务标题">
@@ -572,34 +682,9 @@
                 </s:TileGroup>
             </s:FormItem>
 
-            <s:FormItem label="分解任务：" height="155">
-                <s:DataGrid id="taskGrid" width="100%" height="100%" dataProvider="{tasklist}" initialize="{taskGrid.columnHeaderGroup.height = 0}">
-                   <s:columns>
-                       <s:ArrayList>
-                           <s:GridColumn width="60" dataField="selected">
-                               <s:itemRenderer>
-                                   <fx:Component>
-                                       <mx:HBox horizontalAlign="center">
-                                           <fx:Script>
-															<![CDATA[
-                                               private function changeValue():void{
-                                                   if(data.selected!=cb.selected){
-                                                       data.selected = cb.selected;
-                                                   }
-                                               }
-                                               ]]>
-														</fx:Script>
-
-                                           <mx:CheckBox id="cb" selected="{data.selected}" change="changeValue()" >
-
-                                           </mx:CheckBox>
-                                       </mx:HBox>
-                                   </fx:Component>
-                               </s:itemRenderer>
-                           </s:GridColumn>
-                       </s:ArrayList>
-                   </s:columns>
-                </s:DataGrid>
+            <s:FormItem label="任务详细描述：" height="100">
+                <s:TextArea id="scheduleDesc" width="100%" height="85" prompt="任务详细描述">
+                </s:TextArea>
             </s:FormItem>
             <s:FormItem label="颜色：" height="25">
                 <s:layout>
@@ -636,32 +721,31 @@
                 </mx:ColorPicker>
             </s:FormItem>
 
-            <s:FormItem label="责任人：" height="40">
+            <s:FormItem label="责任人：" height="60">
                 <s:layout>
-                    <s:HorizontalLayout gap="10">
+                    <s:HorizontalLayout gap="10" verticalAlign="top">
                     </s:HorizontalLayout>
                 </s:layout>
                 <s:Scroller width="100%"  height="100%" >
-                    <s:HGroup id="usersGroup" width="100%" height="100%">
-
-                    </s:HGroup>
+                    <s:TileGroup id="usersGroup" width="100%"  columnAlign="justifyUsingGap" >
+                    </s:TileGroup>
                 </s:Scroller>
-                <uicontrol:BtnAdd />
+                <uicontrol:BtnAdd clickFun="{openUserChoice}" />
             </s:FormItem>
             <s:FormItem id="authorpanel" label="审核人：" height="25" >
                 <s:layout>
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="checkerDownList" labelField="name" dataProvider="{ToolUtil.memberList}"></s:DropDownList>
-                <s:CheckBox label="无需审核" id="need_check">
+                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" labelField="name" dataProvider="{departmentMembers}"></s:DropDownList>
+                <s:CheckBox label="无需审核" selected="true" id="need_check">
                 </s:CheckBox>
             </s:FormItem>
-            <s:FormItem label="提醒：" height="75">
-                <s:layout>
-                    <s:TileLayout columnAlign="justifyUsingGap">
-                    </s:TileLayout>
-                </s:layout>
+            <s:FormItem  label="提醒：" height="25">
+                <s:CheckBox id="boxTiXing" change="changeTiXing()" selected="true" label="无需提醒" />
+            </s:FormItem>
+            <s:FormItem id="itemTixing" label="提醒：" height="75">
+                <s:TileGroup id="tixingTile" width="100%" height="75"  columnAlign="justifyUsingGap" >
                 <s:CheckBox id="alertBox0" label="到点提醒" ></s:CheckBox>
                 <s:CheckBox id="alertBox1" label="提前5分钟"></s:CheckBox>
                 <s:CheckBox id="alertBox2" label="提前10分钟"></s:CheckBox>
@@ -674,6 +758,7 @@
                 <s:CheckBox id="alertBox9" label="提前1天"></s:CheckBox>
                 <s:CheckBox id="alertBox10" label="提前2天"></s:CheckBox>
                 <s:CheckBox id="alertBox11" label="提前1周"></s:CheckBox>
+                </s:TileGroup>
             </s:FormItem>
 
 
@@ -683,9 +768,9 @@
             </mx:ControlBar>
         </s:Form>
 
-        <control:ChatControl id="chatControl" width="0" height="100%"   visible="{schedulData}">
+        <control:ChatControl id="chatControl"  width="100%" height="100%"    visible="{schedulData}">
 
         </control:ChatControl>
-	</s:HGroup>
+    </s:HGroup>
 
 </window:EfficientTitleWindow>

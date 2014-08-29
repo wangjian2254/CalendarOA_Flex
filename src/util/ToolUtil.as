@@ -170,6 +170,9 @@ public class ToolUtil
             var mydepartlist:ArrayCollection = new ArrayCollection();
             var f:Boolean = false;
             for each(var item2:Object in l) {
+                if(item2.flag=='free'){
+                    continue;
+                }
                 f = false;
                 for each(var p:Object in item2.members) {
                     if (p.id == ToolUtil.sessionUser.pid) {
@@ -273,6 +276,9 @@ public class ToolUtil
         var l:ArrayCollection=new ArrayCollection();
         var f:Boolean=false;
         for each(var d:Object in l0){
+            if(d.flag=='free'){
+                continue;
+            }
             f=true;
             for each(var m:Object in mydepartlist){
                 if(d.father==m.id){

@@ -1,4 +1,5 @@
 import control.ChatDemoContol;
+import control.ProjectControl;
 import control.window.AddPersonPanel;
 import control.CBorderContainer;
 import control.CalendarControl;
@@ -226,6 +227,9 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 			case 'subjectkind':
 				c = new SubjectKindControl();
 				break;
+            case 'project':
+                c = new ProjectControl();
+                break;
             case 'addPerson':
                 PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,AddPersonPanel,true);
 				break;
