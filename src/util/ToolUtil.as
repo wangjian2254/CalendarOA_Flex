@@ -48,6 +48,10 @@ public class ToolUtil
     public static var selectOrg:SelectOrgPanel= new SelectOrgPanel();
     public static var searchOrg:JoinOrgPanel= new JoinOrgPanel();
 
+    public static var projectstatus:ArrayCollection=new ArrayCollection([{id:"unstart",label:"未开始"},{id:"runing",label:"正在进行"},{id:"finished",label:"已完成"},{id:"closed",label:"已关闭"}]);
+    public static var taskstatuslist:ArrayCollection=new ArrayCollection([{id:1,label:"未开始"},{id:2,label:"正在进行"},{id:3,label:"待审核"},{id:4,label:"完成"}]);
+    public static var taskurgentlist:ArrayCollection=new ArrayCollection([{id:1,label:"普通"},{id:2,label:"优先"},{id:3,label:"紧急"}]);
+
     private static var time:Timer = new Timer(1000*60*5,0);
 
     public static function init():void{
@@ -61,6 +65,8 @@ public class ToolUtil
         currentOrgRefresh();
         departMentListRefresh();
         contactsRefresh();
+        allProjectListRefresh();
+        projectListRefresh();
 //			taskRefresh();
 //        taskUnRefresh();
 
@@ -307,6 +313,49 @@ public class ToolUtil
 
     [Bindable]
     public static var projectList:ArrayCollection=new ArrayCollection();
+
+    public static function projectListRefresh(fun:Function=null):void{
+
+        if(fun==null){
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_my_project",resultProjectList,"POST").send();
+        }else{
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_my_project",resultProjectList,"POST");
+            http.resultFunArr.addItem(fun);
+            http.send();
+
+        }
+
+    }
+    public static function resultProjectList(result:Object,e:ResultEvent):void{
+        if(result.success==true){
+            projectList.removeAll();
+            projectList.addAll(new ArrayCollection(result.result as Array));
+
+        }
+    }
+
+    [Bindable]
+    public static var allProjectList:ArrayCollection=new ArrayCollection();
+
+    public static function allProjectListRefresh(fun:Function=null):void{
+
+        if(fun==null){
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_all_project",resultAllProjectList,"POST").send();
+        }else{
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_all_project",resultAllProjectList,"POST");
+            http.resultFunArr.addItem(fun);
+            http.send();
+
+        }
+
+    }
+    public static function resultAllProjectList(result:Object,e:ResultEvent):void{
+        if(result.success==true){
+            allProjectList.removeAll();
+            allProjectList.addAll(new ArrayCollection(result.result as Array));
+
+        }
+    }
 
 
     [Bindable]

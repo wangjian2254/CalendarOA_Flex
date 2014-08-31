@@ -4,6 +4,7 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
+        import control.window.CreateProjectPanel;
         import control.window.GroupMemberPanel;
         import control.window.GroupPanel;
         import control.window.PersonPanel;
@@ -18,6 +19,7 @@
         import json.JParser;
 
         import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
         import mx.controls.Menu;
         import mx.core.FlexGlobals;
         import mx.events.FlexEvent;
@@ -42,7 +44,20 @@
         }
 
         private function btnHandler(e:ItemClickEvent):void{
+            switch (e.item.mod){
+                case "add":
+                    PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
+                    break;
+                case "update":
+                    if(projectGrid.selectedItem!=null){
+                        var p:CreateProjectPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
+                        p.projectData = projectGrid.selectedItem;
+                    }else{
+                        Alert.show("请选择一个项目","提醒");
+                    }
 
+                    break;
+            }
         }
 
 
@@ -136,6 +151,45 @@
 
         }
 
+        private function managerLabel(item:Object,column:GridColumn):String{
+            for each(var person:Object in ToolUtil.memberList){
+                if(person.id==item.manager){
+                    return person.name;
+                }
+
+            }
+            return "";
+        }
+
+        private function fatherProjectLabel(item:Object,column:GridColumn):String{
+            for each(var person:Object in ToolUtil.allProjectList){
+                if(person.id==item.fproject){
+                    return person.name;
+                }
+
+            }
+            return "";
+        }
+
+        private function departmentLabel(item:Object, column:GridColumn):String{
+            for each(var person:Object in ToolUtil.departMentList){
+                if(person.id==item.department){
+                    return person.name;
+                }
+
+            }
+            return "";
+        }
+        private function statusLabel(item:Object, column:GridColumn):String{
+            for each(var person:Object in ToolUtil.projectstatus){
+                if(person.id==item.status){
+                    return person.label;
+                }
+
+            }
+            return "";
+        }
+
         ]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -154,16 +208,16 @@
                 </s:layout>
                 <mx:ButtonBar id="showModel" itemClick="btnHandler(event)" dataProvider="{btnlist}" height="25" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
             </s:BorderContainer>
-            <s:DataGrid width="100%" height="200">
+            <s:DataGrid id="projectGrid" dataProvider="{ToolUtil.projectList}" width="100%" height="200">
                 <s:columns>
                     <s:ArrayList>
                         <s:GridColumn dataField="name" headerText="项目名称" dataTipField="desc"  minWidth="100"></s:GridColumn>
-                        <s:GridColumn dataField="manager" headerText="负责人" minWidth="80"></s:GridColumn>
-                        <s:GridColumn dataField="fproject" headerText="父级项目" minWidth="100"></s:GridColumn>
-                        <s:GridColumn dataField="department" headerText="隶属部门" minWidth="80"></s:GridColumn>
+                        <s:GridColumn dataField="manager" headerText="负责人" labelFunction="managerLabel" minWidth="80"></s:GridColumn>
+                        <s:GridColumn dataField="fproject" headerText="父级项目" labelFunction="fatherProjectLabel" minWidth="100"></s:GridColumn>
+                        <s:GridColumn dataField="department" headerText="隶属部门" labelFunction="departmentLabel" minWidth="80"></s:GridColumn>
                         <s:GridColumn dataField="start_date" headerText="开始日期" minWidth="60"></s:GridColumn>
                         <s:GridColumn dataField="end_date" headerText="结束日期" minWidth="60"></s:GridColumn>
-                        <s:GridColumn dataField="status" headerText="状态" minWidth="60"></s:GridColumn>
+                        <s:GridColumn dataField="status" headerText="状态" labelFunction="statusLabel" minWidth="60"></s:GridColumn>
                     </s:ArrayList>
                 </s:columns>
             </s:DataGrid>

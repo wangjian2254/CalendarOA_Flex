@@ -15,6 +15,8 @@ package util
 	
 		public static var myDateFormatter:DateFormatter=new DateFormatter();
 		myDateFormatter.formatString="YYYY/MM/DD";
+        public static var myDateFormatter1:DateFormatter=new DateFormatter();
+		myDateFormatter1.formatString="YYYYMMDD";
         public static var myDateFormatter2:DateFormatter=new DateFormatter();
         myDateFormatter2.formatString="YYYY/MM/DD HH:NN:SS";
 		public static function dateLblChat(currentDate:Date):String{
@@ -23,6 +25,9 @@ package util
 
         public static function dateLbl(currentDate:Date):String{
             return myDateFormatter.format(currentDate);
+        }
+        public static function dateLbl1(currentDate:Date):String{
+            return myDateFormatter1.format(currentDate);
         }
         public static function parseLblDate(value:String):Date{
             if (!value){
@@ -42,7 +47,7 @@ package util
 
             var ms:Number = 0;
 
-            if(!isNaN(Number(value)) && value.length >19){
+            if(isNaN(Number(value)) && value.length <=19){
 
                 year = Number(value.substr(0, 4));
 

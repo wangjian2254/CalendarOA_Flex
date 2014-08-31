@@ -3,23 +3,110 @@
                              xmlns:s="library://ns.adobe.com/flex/spark"
                              xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
                              xmlns:conobj="uicontrol.conobj.*"
-                             width="450" height="250" creationComplete="init()"
+                             width="430" height="{getWindowHeight}" creationComplete="init()"
                              title="创建项目" xmlns:window="control.window.*">
 	<fx:Script>
 		<![CDATA[
         import httpcontrol.HttpServiceUtil;
 
+        import mx.collections.ArrayCollection;
+
         import mx.controls.Alert;
-        import mx.core.FlexGlobals;
-        import mx.managers.PopUpManager;
+        import mx.events.CollectionEvent;
         import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
 
         import util.DateUtil;
 
         import util.ToolUtil;
 
-        private function init():void {
+        public function get getWindowHeight():Number{
+            return form.height;
+        }
 
+
+
+        [Bindable]
+        private var myprojectList:ArrayCollection=new ArrayCollection();
+        [Bindable]
+        private var managerList:ArrayCollection=new ArrayCollection();
+
+        public var projectData:Object;
+
+        private function projectRefresh(e:CollectionEvent):void{
+            myprojectList.addItem({id:0,label:"无"});
+            myprojectList.addAll(ObjectUtil.copy(ToolUtil.allProjectList) as ArrayCollection)
+        }
+
+        private function init():void {
+            ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, projectRefresh);
+            projectRefresh(null);
+
+            if(projectData==null){
+                fatherDownList.selectedIndex=0;
+
+                refreshManager();
+
+            }else{
+                projectname.text = projectData.name;
+                projectdesc.text = projectData.desc;
+                startDate.selectedDate = DateUtil.parseLblDate(projectData.start_date);
+                if(projectData.hasOwnProperty("end_date")){
+                    endDate.selectedDate = DateUtil.parseLblDate(projectData.end_date);
+                }
+                fatherDownList.selectedIndex=0;
+                for each(var p:Object in myprojectList){
+                    if(p.id==projectData.father){
+                        fatherDownList.selectedItem=p;
+                    }
+                }
+                fatherDownList.selectedIndex=0;
+                for each(var d:Object in ToolUtil.myDepartmentList){
+                    if(d.id==projectData.department){
+                        departmentDownList.selectedItem=d;
+                    }
+                }
+                refreshManager();
+                for each(var p in managerList){
+                    if(p.id==projectData.manager){
+                        managerDownList.selectedItem=p;
+                    }
+                }
+
+
+            }
+
+        }
+
+        private function refreshManager():void{
+            var manager:Object = managerDownList.selectedItem;
+            managerList = ObjectUtil.copy(departmentDownList.selectedItem.children) as ArrayCollection;
+            if(managerList==null){
+                managerList=new ArrayCollection();
+            }
+            var f:Boolean=false;
+            for each(var person:Object in managerList){
+                if(person.id==ToolUtil.sessionUser.pid){
+                    f=true;
+                    managerDownList.selectedItem=person;
+                }
+            }
+            if(!f){
+                for each(var p:Object in ToolUtil.memberList){
+                    if(p.id==ToolUtil.sessionUser.pid){
+                        managerList.addItem(p);
+                        managerDownList.selectedItem=p;
+                    }
+                }
+            }
+            if(manager!=null){
+                managerDownList.selectedIndex=-1;
+                for each(var p in managerList){
+                    if(p.id==manager.id){
+                        managerDownList.selectedItem=p;
+                    }
+                }
+            }
         }
 
 
@@ -28,30 +115,43 @@
         }
 
         public function save():void {
-            if (orgname.text == "") {
-                Alert.show("组织名称必须填写", "提示");
+            if (projectname.text == "") {
+                Alert.show("项目名称必须填写", "提示");
+                return;
+            }
+            if (projectdesc.text == "") {
+                Alert.show("项目描述必须填写", "提示");
                 return;
             }
 
             var obj:Object = new Object();
 
-            obj.name = orgname.text;
+            if(projectData!=null){
+                obj.id=projectData.id;
+            }
+            obj.name = projectname.text;
+            obj.desc = projectdesc.text;
+            obj.manager = managerDownList.selectedItem.id;
+            obj.father = fatherDownList.selectedItem.id;
+            obj.department = departmentDownList.selectedItem.id;
+            obj.status = statusDownList.selectedItem.id;
+            obj.start_date = DateUtil.dateLbl1(startDate.selectedDate);
+            if(endDate.selectedDate!=null){
+                obj.end_date=DateUtil.dateLbl1(endDate.selectedDate);
+            }
 
-            obj.icon = orgHeadSelectArray.selectedIcon();
 
 
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regOrganization", refresh, "POST").send(obj);
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/update_project", refresh, "POST").send(obj);
 
 
         }
 
         public function refresh(r:Object, e:ResultEvent):void {
+            ToolUtil.allProjectListRefresh();
+            ToolUtil.projectListRefresh();
             closeWin();
-            ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
-            if (ToolUtil.selectOrg != null && ToolUtil.selectOrg.parent != null) {
-                PopUpManager.removePopUp(ToolUtil.selectOrg);
-                ToolUtil.selectOrg = new SelectOrgPanel();
-            }
+
         }
 
         public function foucePass(obj:Object):void {
@@ -61,41 +161,40 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
-        <conobj:HeadSelectArray id="orgHeadSelectArray"></conobj:HeadSelectArray>
 	</fx:Declarations>
 
 
-	<s:Form width="100%" id="form" >
+	<s:Form width="400" id="form" >
 
 
 		<s:FormItem  label="项目名称:" textAlign="right">
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="projectname"  width="200"  tabIndex="5" >
+			<s:TextInput id="projectname"  width="100%"  tabIndex="5" >
 				
 			</s:TextInput>
 		</s:FormItem>
         <s:FormItem  label="项目描述:" textAlign="right">
-            <s:TextArea width="200" height="60"></s:TextArea>
+            <s:TextArea id="projectdesc" width="100%" height="60"></s:TextArea>
         </s:FormItem>
         <s:FormItem  label="父级项目:" textAlign="right">
-            <s:DropDownList id="fatherDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.projectList}"  ></s:DropDownList>
+            <s:DropDownList id="fatherDownList" width="100%" labelField="name" selectedIndex="0" dataProvider="{myprojectList}" ></s:DropDownList>
         </s:FormItem>
         <s:FormItem  label="隶属部门:" textAlign="right">
-            <s:DropDownList id="departmentDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}"  ></s:DropDownList>
+            <s:DropDownList id="departmentDownList" width="100%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="refreshManager()"  ></s:DropDownList>
         </s:FormItem>
         <s:FormItem  label="负责人:" textAlign="right">
-            <s:DropDownList id="managerDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}"  ></s:DropDownList>
+            <s:DropDownList id="managerDownList" width="100%" labelField="name"  dataProvider="{managerList}"  ></s:DropDownList>
         </s:FormItem>
         <s:FormItem  label="开始日期:" textAlign="right">
-            <mx:DateField id="startDate" width="100"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+            <mx:DateField id="startDate" width="150"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
         </s:FormItem>
         <s:FormItem  label="结束日期:" textAlign="right">
-            <mx:DateField id="endDate" width="100"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+            <mx:DateField id="endDate" width="150"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
         </s:FormItem>
         <s:FormItem  label="项目状态:" textAlign="right">
-            <s:DropDownList id="statusDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}"  ></s:DropDownList>
+            <s:DropDownList id="statusDownList" width="100%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.projectstatus}"  ></s:DropDownList>
         </s:FormItem>
 
 		<s:FormItem>

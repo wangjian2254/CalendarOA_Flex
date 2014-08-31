@@ -44,6 +44,11 @@
         [Bindable]
         public var schedulData:Object=null;
 
+        public var checker:Object;
+        public var zeren:Object;
+        public var department:Object;
+        public var project:Object;
+
         [Bindable]
         private var myproject:ArrayCollection = new ArrayCollection();
 
@@ -59,8 +64,6 @@
         [Bindable]
         private var endtimelist:ArrayCollection = new ArrayCollection();
 
-        [Bindable]
-        private var tasklist:ArrayCollection = new ArrayCollection();
 
         [Bindable]
         private var departmentList:ArrayCollection = new ArrayCollection();
@@ -74,6 +77,7 @@
             usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS,removeUsersHandler);
             if(schedulData==null){
                 windowGroup.removeElement(chatControl);
+
             }else{
                 chatControl.width=500;
             }
@@ -189,8 +193,42 @@
             changeTiXing();
             changeProjectByDepart();
 
+            if(schedulData==null){
+                if(checker!=null){
+                    for each(var p:Object in checkerDownList.dataProvider){
+                        if(p.id==checker.id){
+                            checkerDownList.selectedItem=p;
+                            need_check.selected=false;
+                            break;
+                        }
+                    }
+                }
+                if(zeren!=null){
+                    var m:MemberItem=new MemberItem();
+                    m.person = zeren;
+                    m.showBtn = true;
+                    usersGroup.addElement(m);
+                }
+                if(department!=null){
+                    for each(var d:Object in departmentDownList.dataProvider){
+                        if(d.id==department.id){
+                            departmentDownList.selectedItem=d;
+                            changeProjectByDepart();
+                            break;
+                        }
+                    }
+                }
+                if(project!=null){
+                    for each(var p:Object in projectDownList.dataProvider){
+                        if(p.id==project.id){
+                            projectDownList.selectedItem=p;
+                            break;
+                        }
+                    }
+                }
+            }
 
-            tasklist.addItem({haspower:true});
+
 
         }
 
@@ -200,6 +238,7 @@
                 obj.id = schedulData["id"];
             }
             obj.title=scheduleTitle.text;
+            obj.desc = scheduleDesc.text;
             //子任务
             obj.startdate = datestr.format(startDate.selectedDate);
 
@@ -231,8 +270,25 @@
                 }
             }
             obj.color = selectColor;
-            obj.projectid = projectDownList.selectedItem.id;
+            obj.project = projectDownList.selectedItem.id;
+            if(obj.project==0){
+                obj.project=null;
+            }
             obj.users = new Array();
+            var p:MemberItem=null;
+            for(var i:int=0;i<usersGroup.numElements;i++){
+                p=usersGroup.getElementAt(i) as MemberItem;
+                obj.users.push(p.person.id);
+            }
+            obj.need_check=need_check.selected;
+            if(!need_check.selected){
+                obj.checker=checkerDownList.selectedItem.id;
+            }else{
+                obj.checker=null;
+            }
+            obj.level=levleStepper.value;
+            obj.urgent = urgentDownList.selectedItem.id;
+            obj.status = statusDownList.selectedItem.id;
 
 
             return obj;
@@ -247,6 +303,16 @@
             if(startDate.selectedDate==null){
                 Alert.show("请选择开始时间。","提示");
                 startDate.open();
+                return;
+            }
+            if(endDate.selectedDate==null){
+                Alert.show("请选择结束时间。","提示");
+                startDate.open();
+                return;
+            }
+            if(usersGroup.numElements==0){
+                Alert.show("请选择责任人。","提示");
+                openUserChoice();
                 return;
             }
 
@@ -499,13 +565,14 @@
 
         private function changeProjectByDepart():void{
             myproject.removeAll();
-            myproject.addItem({id:0,name:"无项目"});
+
             for each(var item:Object in ToolUtil.projectList){
-                if(item.department=departmentDownList.selectedItem.id){
+                if((item.department==departmentDownList.selectedItem.id)||(item.department==null&&departmentDownList.selectedItem.id==0)){
                     myproject.addItem(item);
                 }
             }
-
+            myproject.addItem({id:0,name:"无项目"});
+            projectDownList.selectedIndex=0;
 
 
             //todo:审核人 范围验证
@@ -570,7 +637,7 @@
                     p.person = person;
                     p.showBtn = true;
                     usersGroup.addElement(p);
-                    usersGroup.validateNow();
+//                    usersGroup.validateNow();
                 }
 
             });
@@ -634,7 +701,7 @@
                     </s:HorizontalLayout>
                 </s:layout>
                 <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-                <s:CheckBox label="设置具体时间" id="is_all_day">
+                <s:CheckBox label="设置具体时刻" id="is_all_day">
                 </s:CheckBox>
                 <mx:ComboBox id="startTime" visible="{is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
 
@@ -653,7 +720,7 @@
                 <mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 
             </s:FormItem>
-            <s:FormItem label="重复" height="25">
+            <s:FormItem label="重复" height="25" toolTip="重复：周期性任务，的循环条件">
                 <s:layout>
                     <s:HorizontalLayout gap="5">
 
@@ -670,7 +737,7 @@
                 <s:RadioButton group="{repeatType}" label="每年" value="yearly">
                 </s:RadioButton>
             </s:FormItem>
-            <s:FormItem id="dayPanel"  label="重复时间：" height="25">
+            <s:FormItem id="dayPanel"  label="重复时间：" height="25" toolTip="重复时间：在任务周期中，按条件循环任务">
                 <s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
                     <s:CheckBox label="一"  />
                     <s:CheckBox label="二" />
@@ -682,11 +749,11 @@
                 </s:TileGroup>
             </s:FormItem>
 
-            <s:FormItem label="任务详细描述：" height="100">
-                <s:TextArea id="scheduleDesc" width="100%" height="85" prompt="任务详细描述">
+            <s:FormItem label="任务描述：" height="100">
+                <s:TextArea id="scheduleDesc" width="100%" height="85" toolTip="任务描述：描述任务的具体要求" prompt="任务详细描述">
                 </s:TextArea>
             </s:FormItem>
-            <s:FormItem label="颜色：" height="25">
+            <s:FormItem label="颜色：" height="25" toolTip="区分任务">
                 <s:layout>
                     <s:HorizontalLayout gap="3">
 
@@ -727,7 +794,7 @@
                     </s:HorizontalLayout>
                 </s:layout>
                 <s:Scroller width="100%"  height="100%" >
-                    <s:TileGroup id="usersGroup" width="100%"  columnAlign="justifyUsingGap" >
+                    <s:TileGroup id="usersGroup" width="100%" toolTip="责任人：参与完成任务的员工" columnAlign="justifyUsingGap" >
                     </s:TileGroup>
                 </s:Scroller>
                 <uicontrol:BtnAdd clickFun="{openUserChoice}" />
@@ -737,7 +804,7 @@
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" labelField="name" dataProvider="{departmentMembers}"></s:DropDownList>
+                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" toolTip="审核人：任务完成后，审核人进行确认。" labelField="name" dataProvider="{departmentMembers}"></s:DropDownList>
                 <s:CheckBox label="无需审核" selected="true" id="need_check">
                 </s:CheckBox>
             </s:FormItem>
@@ -760,7 +827,23 @@
                 <s:CheckBox id="alertBox11" label="提前1周"></s:CheckBox>
                 </s:TileGroup>
             </s:FormItem>
+            <s:FormItem label="优先级：" height="25" >
+                <s:layout>
+                    <s:HorizontalLayout gap="10">
+                    </s:HorizontalLayout>
+                </s:layout>
+                <s:DropDownList id="urgentDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskurgentlist}" toolTip="任务的完成优先级"></s:DropDownList>
+                <s:Label text="权重："/>
+                <s:NumericStepper id="levleStepper" minimum="0" value="1" maximum="100" width="100" toolTip="权重：完成所需要的工时，或者本任务的重要性" />
+            </s:FormItem>
+            <s:FormItem label="任务状态：" height="25" >
+                <s:layout>
+                    <s:HorizontalLayout gap="10">
+                    </s:HorizontalLayout>
+                </s:layout>
+                <s:DropDownList id="statusDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskstatuslist}" toolTip="任务的状态"></s:DropDownList>
 
+            </s:FormItem>
 
             <mx:ControlBar  id="dopanel">
                 <s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
