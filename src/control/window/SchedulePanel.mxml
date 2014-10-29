@@ -73,8 +73,6 @@
 
         private var selectColor:Number =0x00CCFF;
 
-        [Bindable]
-        private var modefyPower:Boolean=false;
 
 
         override public function  releaseListener(e:CloseEvent):void{
@@ -126,11 +124,7 @@
 
             btnDel.visible=false;
             if(schedulData!=null){
-                if(schedulData.status==4){
-                    modefyPower = false;
-                }else{
-                    modefyPower = true;
-                }
+
                 is_all_day.selected = !schedulData.is_all_day;
                 if(!is_all_day.selected){
 
@@ -172,7 +166,7 @@
                 for each(var pid:int in schedulData.users){
                     var m:MemberItem=new MemberItem();
                     m.person = ToolUtil.getPersonById(pid);
-                    m.showBtn = modefyPower;
+                    m.showBtn = dopanel.visible;
                     if(m.person.hasOwnProperty("id")){
                         usersGroup.addElement(m);
                     }
@@ -182,10 +176,9 @@
 
 
             }else{
-                modefyPower = true;
                 var m:MemberItem=new MemberItem();
                 m.person = ToolUtil.getPersonById(ToolUtil.sessionUser.pid);
-                m.showBtn = modefyPower;
+                m.showBtn = dopanel.visible;
                 if(m.person.hasOwnProperty("id")){
                     usersGroup.addElement(m);
                 }
