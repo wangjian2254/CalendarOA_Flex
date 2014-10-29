@@ -158,8 +158,8 @@ public class ToolUtil
     }
     public static function resultAllDepartMent(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            departMentList.removeAll();
-            departMentList.addAll(new ArrayCollection(result.result as Array));
+            ArrayTools.createArray(departMentList,result.result);
+
 
             var dobj:Object=new Object();
             for each(var item2:Object in departMentList) {
@@ -328,8 +328,8 @@ public class ToolUtil
     }
     public static function resultProjectList(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            projectList.removeAll();
-            projectList.addAll(new ArrayCollection(result.result as Array));
+            ArrayTools.createArray(projectList,result.result);
+
 
         }
     }
@@ -351,8 +351,7 @@ public class ToolUtil
     }
     public static function resultAllProjectList(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            allProjectList.removeAll();
-            allProjectList.addAll(new ArrayCollection(result.result as Array));
+            ArrayTools.createArray(allProjectList,result.result);
 
         }
     }
@@ -388,8 +387,7 @@ public class ToolUtil
     public static function resultCurrentOrg(result:Object,e:ResultEvent):void{
         if(result.success==true){
             org = result.result.org
-            memberList.removeAll();
-            memberList.addAll(new ArrayCollection(result.result.members as Array));
+            ArrayTools.createArray(memberList,result.result.members);
 
         }
     }
@@ -411,10 +409,8 @@ public class ToolUtil
     }
     public static function resultAllContacts(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            contactsList.removeAll();
-            if(result.result){
-                contactsList.addAll(new ArrayCollection(result.result as Array));
-            }
+            ArrayTools.createArray(contactsList,result.result);
+
 
         }
     }

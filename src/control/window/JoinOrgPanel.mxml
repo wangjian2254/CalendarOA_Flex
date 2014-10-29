@@ -16,6 +16,7 @@
         import mx.controls.Alert;
 
         import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.events.FlexEvent;
         import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
@@ -25,6 +26,8 @@
             [Bindable]
             private var orglist:ArrayCollection=new ArrayCollection();
 
+        override public function  releaseListener(e:CloseEvent):void{
+        }
             private function init():void{
                 this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
                 this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;

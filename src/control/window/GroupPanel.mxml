@@ -28,6 +28,8 @@
         [Bindable]
         private var newmember:ArrayCollection=new ArrayCollection();
 
+        override public function  releaseListener(e:CloseEvent):void{
+        }
         public function init(e:mx.events.FlexEvent):void{
              newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
 

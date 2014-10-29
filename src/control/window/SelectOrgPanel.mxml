@@ -15,6 +15,7 @@
         import mx.collections.ArrayCollection;
 
         import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
 
@@ -24,7 +25,8 @@
         public var orglist:ArrayCollection;
 
         public var loginNickname:String;
-
+        override public function  releaseListener(e:CloseEvent):void{
+        }
         private function init():void {
 
             //getOrgByFlag

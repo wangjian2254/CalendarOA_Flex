@@ -17,6 +17,7 @@
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
+        import mx.events.CollectionEvent;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
@@ -27,6 +28,7 @@
         import util.ScheduleUtil;
         import util.ToolUtil;
 
+        [Bindable]
         public function get getWindowHeight():Number{
             return windowGroup.height;
         }
@@ -71,9 +73,20 @@
 
         private var selectColor:Number =0x00CCFF;
 
+        [Bindable]
+        private var modefyPower:Boolean=false;
 
+
+        override public function  releaseListener(e:CloseEvent):void{
+            ToolUtil.projectList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
+        }
+
+        private function refreshMyProject(e:CollectionEvent):void{
+            changeProjectByDepart();
+        }
 
         public function init():void{
+            ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
             usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS,removeUsersHandler);
             if(schedulData==null){
                 windowGroup.removeElement(chatControl);
@@ -113,10 +126,14 @@
 
             btnDel.visible=false;
             if(schedulData!=null){
+                if(schedulData.status==4){
+                    modefyPower = false;
+                }else{
+                    modefyPower = true;
+                }
+                is_all_day.selected = !schedulData.is_all_day;
+                if(!is_all_day.selected){
 
-
-                if(schedulData.is_all_day){
-                    is_all_day.selected = schedulData.is_all_day;
                     startDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
                     endDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
                 }else{
@@ -125,24 +142,53 @@
 
                 }
                 startDate.selectedDate = startDateValue;
-                if(schedulData.enddate){
-                    endDate.selectedDate = DateField.stringToDate(schedulData.enddate,"YYYYMMDD")
-
-                }else{
-
-                }
+                endDate.selectedDate = DateField.stringToDate(schedulData.enddate,"YYYYMMDD")
 
                 scheduleTitle.text = schedulData.title;
                 repeatType.selectedValue = schedulData.repeat_type;
+
                 repeatChange();
-
-
                 colorClick(schedulData.color);
+                for each(var department:Object in ToolUtil.myDepartmentList){
+                    if(schedulData.department == department.id){
+                        departmentDownList.selectedItem = department;
+                        break;
+                    }
+                }
+                changeProjectByDepart();
+                for each(var project:Object in myproject){
+                    if(schedulData.project == project.id){
+                        projectDownList.selectedItem = department;
+                        break;
+                    }
+                }
+                for each(var checker:Object in departmentMembers){
+                    if(schedulData.checker == checker.id){
+                        checkerDownList.selectedItem = checker;
+                        break;
+                    }
+                }
 
-                changeUsers();
+                for each(var pid:int in schedulData.users){
+                    var m:MemberItem=new MemberItem();
+                    m.person = ToolUtil.getPersonById(pid);
+                    m.showBtn = modefyPower;
+                    if(m.person.hasOwnProperty("id")){
+                        usersGroup.addElement(m);
+                    }
+                }
+
                 titlestr = schedulData.title;
 
 
+            }else{
+                modefyPower = true;
+                var m:MemberItem=new MemberItem();
+                m.person = ToolUtil.getPersonById(ToolUtil.sessionUser.pid);
+                m.showBtn = modefyPower;
+                if(m.person.hasOwnProperty("id")){
+                    usersGroup.addElement(m);
+                }
             }
 
 
@@ -238,14 +284,13 @@
                 obj.id = schedulData["id"];
             }
             obj.title=scheduleTitle.text;
-            obj.desc = scheduleDesc.text;
             //子任务
             obj.startdate = datestr.format(startDate.selectedDate);
 
             obj.enddate = datestr.format(endDate.selectedDate);
 
-            obj.is_all_day = is_all_day.selected;
-            if(!is_all_day.selected){
+            obj.is_all_day = !is_all_day.selected;
+            if(is_all_day.selected){
                 obj.time_start = startTime.selectedItem.value;
                 obj.time_end = endTime.selectedItem.value;
             }
@@ -270,17 +315,15 @@
                 }
             }
             obj.color = selectColor;
+            obj.department = departmentDownList.selectedItem.id;
             obj.project = projectDownList.selectedItem.id;
-            if(obj.project==0){
-                obj.project=null;
-            }
             obj.users = new Array();
             var p:MemberItem=null;
             for(var i:int=0;i<usersGroup.numElements;i++){
                 p=usersGroup.getElementAt(i) as MemberItem;
                 obj.users.push(p.person.id);
             }
-            obj.need_check=need_check.selected;
+            obj.need_check=!need_check.selected;
             if(!need_check.selected){
                 obj.checker=checkerDownList.selectedItem.id;
             }else{
@@ -332,7 +375,6 @@
                 schedulData = result.result;
                 titlestr = schedulData.title;
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-                ScheduleUtil.clearNewSchedule();
                 init();
             }
         }
@@ -661,7 +703,7 @@
         }
 
         private function addProject():void{
-            var gp:TaskMemberPanel = PopUpManager.createPopUp(this, TaskMemberPanel, true) as TaskMemberPanel;
+            PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
         }
         ]]>
 	</fx:Script>
@@ -690,18 +732,21 @@
                 <s:Spacer width="100%"></s:Spacer>
                 <uicontrol:BtnAdd clickFun="{addProject}" />
             </s:FormItem>
-            <s:FormItem label="标题：" id="titleItem" height="50">
-                <s:TextArea id="scheduleTitle" width="100%" height="45" prompt="任务标题">
+            <s:FormItem label="任务描述：" height="100">
+                <s:layout>
+                    <s:HorizontalLayout gap="5" verticalAlign="middle" />
+                </s:layout>
+                <s:TextArea id="scheduleTitle" width="100%" height="85" toolTip="任务内容：描述任务的具体工作" prompt="任务内容">
                 </s:TextArea>
+                <s:Label text="*" color="red"/>
             </s:FormItem>
             <s:FormItem label="时间段："  height="25">
                 <s:layout>
                     <s:HorizontalLayout gap="5">
-
                     </s:HorizontalLayout>
                 </s:layout>
                 <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-                <s:CheckBox label="设置具体时刻" id="is_all_day">
+                <s:CheckBox label="设置具体时刻" id="is_all_day" selected="true">
                 </s:CheckBox>
                 <mx:ComboBox id="startTime" visible="{is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
 
@@ -749,10 +794,7 @@
                 </s:TileGroup>
             </s:FormItem>
 
-            <s:FormItem label="任务描述：" height="100">
-                <s:TextArea id="scheduleDesc" width="100%" height="85" toolTip="任务描述：描述任务的具体要求" prompt="任务详细描述">
-                </s:TextArea>
-            </s:FormItem>
+
             <s:FormItem label="颜色：" height="25" toolTip="区分任务">
                 <s:layout>
                     <s:HorizontalLayout gap="3">
@@ -799,12 +841,12 @@
                 </s:Scroller>
                 <uicontrol:BtnAdd clickFun="{openUserChoice}" />
             </s:FormItem>
-            <s:FormItem id="authorpanel" label="审核人：" height="25" >
+            <s:FormItem id="authorpanel" label="审核人：" height="25"  toolTip="审核人：任务完成后，审核人进行确认。" >
                 <s:layout>
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" toolTip="审核人：任务完成后，审核人进行确认。" labelField="name" dataProvider="{departmentMembers}"></s:DropDownList>
+                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" labelField="name" dataProvider="{departmentMembers}"></s:DropDownList>
                 <s:CheckBox label="无需审核" selected="true" id="need_check">
                 </s:CheckBox>
             </s:FormItem>

@@ -10,6 +10,7 @@
 
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.managers.PopUpManager;
         import mx.rpc.AbstractOperation;
         import mx.rpc.events.ResultEvent;
@@ -17,6 +18,8 @@
         import util.ToolUtil;
         import util.UserUtil;
 
+        override public function  releaseListener(e:CloseEvent):void{
+        }
         private function init():void {
             this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
             this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;

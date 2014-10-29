@@ -11,7 +11,7 @@
 
         import events.ChangeUserEvent;
         import events.ChatTimelineEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
         import events.ListClickEvent;
 
         import httpcontrol.HttpServiceUtil;
@@ -37,23 +37,29 @@
         import util.ToolUtil;
 
         [Bindable]
-        private var btnlist:ArrayCollection = new ArrayCollection([{label:"新建项目",icon:addimg,mod:"add"},{label:"修改项目",icon:saveimg,mod:"update"},{label:"删除",icon:delimg,mod:"del"}]);
+        private var btnlist:ArrayCollection = new ArrayCollection([
+            {label: "新建项目", icon: addimg, mod: "add"},
+            {label: "修改项目", icon: saveimg, mod: "update"},
+            {label: "删除", icon: delimg, mod: "del"}
+        ]);
 
+        override public function releaseListener():void{
+        }
         override public function init(e:FlexEvent):void {
 
         }
 
-        private function btnHandler(e:ItemClickEvent):void{
-            switch (e.item.mod){
+        private function btnHandler(e:ItemClickEvent):void {
+            switch (e.item.mod) {
                 case "add":
-                    PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
+                    PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, CreateProjectPanel, true) as CreateProjectPanel;
                     break;
                 case "update":
-                    if(projectGrid.selectedItem!=null){
-                        var p:CreateProjectPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
+                    if (projectGrid.selectedItem != null) {
+                        var p:CreateProjectPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, CreateProjectPanel, true) as CreateProjectPanel;
                         p.projectData = projectGrid.selectedItem;
-                    }else{
-                        Alert.show("请选择一个项目","提醒");
+                    } else {
+                        Alert.show("请选择一个项目", "提醒");
                     }
 
                     break;
@@ -75,7 +81,7 @@
         override public function changeCurrentUser(e:ChangeUserEvent):void {
         }
 
-        override public function closeContainer(e:CloseEvent):void {
+        override public function closeContainer(e:CloseContainerEvent):void {
             dispatchEvent(e);
         }
 
@@ -151,9 +157,9 @@
 
         }
 
-        private function managerLabel(item:Object,column:GridColumn):String{
-            for each(var person:Object in ToolUtil.memberList){
-                if(person.id==item.manager){
+        private function managerLabel(item:Object, column:GridColumn):String {
+            for each(var person:Object in ToolUtil.memberList) {
+                if (person.id == item.manager) {
                     return person.name;
                 }
 
@@ -161,9 +167,9 @@
             return "";
         }
 
-        private function fatherProjectLabel(item:Object,column:GridColumn):String{
-            for each(var person:Object in ToolUtil.allProjectList){
-                if(person.id==item.fproject){
+        private function fatherProjectLabel(item:Object, column:GridColumn):String {
+            for each(var person:Object in ToolUtil.allProjectList) {
+                if (person.id == item.fproject) {
                     return person.name;
                 }
 
@@ -171,25 +177,25 @@
             return "";
         }
 
-        private function departmentLabel(item:Object, column:GridColumn):String{
-            for each(var person:Object in ToolUtil.departMentList){
-                if(person.id==item.department){
+        private function departmentLabel(item:Object, column:GridColumn):String {
+            for each(var person:Object in ToolUtil.departMentList) {
+                if (person.id == item.department) {
                     return person.name;
                 }
 
             }
             return "";
         }
-        private function statusLabel(item:Object, column:GridColumn):String{
-            for each(var person:Object in ToolUtil.projectstatus){
-                if(person.id==item.status){
+
+        private function statusLabel(item:Object, column:GridColumn):String {
+            for each(var person:Object in ToolUtil.projectstatus) {
+                if (person.id == item.status) {
                     return person.label;
                 }
 
             }
             return "";
         }
-
         ]]>
 	</fx:Script>
 	<fx:Declarations>

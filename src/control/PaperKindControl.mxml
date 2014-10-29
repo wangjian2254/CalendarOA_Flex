@@ -17,7 +17,7 @@
         import control.window.MessagePanel;
 
         import events.ChangeUserEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
 
         import httpcontrol.HttpServiceUtil;
 
@@ -41,6 +41,9 @@
         private var papKindArr:ArrayCollection = new ArrayCollection();
         ;
         private var state:String = "refresh";//refresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态)
+
+        override public function releaseListener():void{
+        }
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander():void {
@@ -191,7 +194,7 @@
             loadPagKindData();
         }
 
-        override public function closeContainer(e:CloseEvent):void {
+        override public function closeContainer(e:CloseContainerEvent):void {
 
         }
 

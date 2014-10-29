@@ -11,11 +11,14 @@
 
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
 
         import util.ToolUtil;
 
+        override public function  releaseListener(e:CloseEvent):void{
+        }
         private function init():void {
 
         }

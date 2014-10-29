@@ -6,523 +6,522 @@
 						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
 	<fx:Script>
 		<![CDATA[
-			import events.ChangeMenuEvent;
-			import events.ChangeUserEvent;
-			import events.CloseEvent;
-            import events.ListClickEvent;
-            import events.PageChangeEvent;
-			
-			import httpcontrol.CHTTPService;
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.events.CollectionEvent;
-			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
-			import mx.events.ResizeEvent;
-			import mx.formatters.DateFormatter;
-			import mx.managers.PopUpManager;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
-			
-			import uicontrol.DayItem;
-			import uicontrol.GroupItem;
-			import uicontrol.TaskItem;
-			
-			import util.DateUtil;
-			import util.ScheduleUtil;
-			import util.TaskUtil;
-			import util.ToolUtil;
-			
-			[Bindable]
-			private var list:ArrayCollection=new ArrayCollection();
-			[Bindable]
-			private var btnlist:ArrayCollection=new ArrayCollection([{"label":"日","value":"daily"},{"label":"周","value":"weekly"},{"label":"月","value":"monthly"}]);
-			
-			
-			override public   function  init(e:FlexEvent):void{
-				dateChooser.selectedDate = new Date();
-				
+        import events.ChangeMenuEvent;
+        import events.ChangeUserEvent;
+        import events.CloseContainerEvent;
+        import events.ListClickEvent;
+        import events.PageChangeEvent;
 
-					changeShowModel();
+        import httpcontrol.CHTTPService;
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CollectionEvent;
+        import mx.events.FlexEvent;
+        import mx.events.ItemClickEvent;
+        import mx.events.ResizeEvent;
+        import mx.formatters.DateFormatter;
+        import mx.managers.PopUpManager;
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+
+        import uicontrol.DayItem;
+        import uicontrol.GroupItem;
+        import uicontrol.TaskItem;
+
+        import util.DateUtil;
+        import util.ScheduleUtil;
+        import util.TaskUtil;
+        import util.ToolUtil;
+
+        [Bindable]
+        private var list:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        private var btnlist:ArrayCollection = new ArrayCollection([
+            {"label": "日", "value": "daily"},
+            {"label": "周", "value": "weekly"},
+            {"label": "月", "value": "monthly"}
+        ]);
+
+
+        override public function init(e:FlexEvent):void {
+            dateChooser.selectedDate = new Date();
+
+
+            changeShowModel();
 //				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
-				taskChange(null);
-			}
-			
-			override public function changeCurrentUser(e:ChangeUserEvent):void{
-				regetSchedule();
-			}
-			override public function closeContainer(e:CloseEvent):void{
-				dispatchEvent(e);
-				
-			}
+            taskChange(null);
+        }
 
-            override public function resizeContainer(e:ResizeEvent):void{
-                resize(null,false);
+        override public function changeCurrentUser(e:ChangeUserEvent):void {
+            regetSchedule();
+        }
+
+        override public function closeContainer(e:CloseContainerEvent):void {
+            dispatchEvent(e);
+
+        }
+        override public function releaseListener():void{
+        }
+
+        override public function resizeContainer(e:ResizeEvent):void {
+            resize(null, false);
+        }
+
+        private function listItemClick_handler(e:ListClickEvent):void {
+
+        }
+
+
+        private function changeShowModel():void {
+            currentMonth = -1;
+            currentWeek = -1;
+            currentDaily = -1;
+            showCalendar(dateChooser.selectedDate);
+        }
+
+
+        public function regetSchedule():void {
+            var dayItem:DayItem = null;
+            for (var i:Number = 0; i < 100; i++) {
+                if (calendarPanel.numElements - 1 < i) {
+                    break;
+                } else {
+                    dayItem = calendarPanel.getElementAt(i) as DayItem;
+
+                    dayItem.init();
+                }
             }
+            if (showModel.selectedItem.value == "monthly") {
 
-            private function listItemClick_handler(e:ListClickEvent):void{
+                if (calendarPanel.numElements > 0) {
+                    ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date, (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date);
+                }
+            } else {
+                if (calendarBorder.numElements > 1) {
+                    ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+                }
 
             }
-
-			
-			private function changeShowModel():void{
-				currentMonth=-1;
-				currentWeek=-1;
-				currentDaily=-1;
-				showCalendar(dateChooser.selectedDate);
-			}
-			
-			
-			public function regetSchedule():void{
-				var dayItem:DayItem=null;
-				for(var  i:Number=0;i<100;i++){
-					if(calendarPanel.numElements-1<i){
-						break;
-					}else{
-						dayItem = calendarPanel.getElementAt(i) as DayItem;
-						
-						dayItem.init();
-					}
-				}
-				if(showModel.selectedItem.value=="monthly"){
-					
-					if(calendarPanel.numElements>0){
-						ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
-					}
-				}else{
-					if(calendarBorder.numElements>1){
-						ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date,(calendarBorder.getElementAt(calendarBorder.numElements-1) as DayItem).date);
-					}
-					
-				}
 //				ToolUtil.taskUnRefresh(showTaskList);
-			}
-			
-
-			
-//			public function showGroup(group:GroupItem,g:Object):void{
-//				if(group.isshow){
-//					group.color = 0xffffff;
-//					group.isshow = false;
-//				}else{
-//					group.color = g.color;
-//					group.isshow = true;
-//				}
-//
-//				var dayItem:DayItem=null;
-//				for(var  i:Number=1;i<50;i++){
-//					if(calendarPanel.numElements-1>=i){
-//
-//						dayItem = calendarPanel.getElementAt(i-1) as DayItem;
-//
-//						dayItem.showSchedule(g.id,group.isshow);
-//
-//					}
-//					if(calendarBorder.numElements-1>=i){
-//						dayItem = calendarBorder.getElementAt(i) as DayItem;
-//
-//						dayItem.showSchedule(g.id,group.isshow);
-//
-//					}
-//					if(daySchedule.numElements-1>=i){
-//						dayItem = daySchedule.getElementAt(i) as DayItem;
-//
-//						dayItem.showSchedule(g.id,group.isshow);
-//
-//					}
-//
-//				}
-//			}
-			
-			
-			private var currentMonth:Number=-1;
-			private var currentWeek:Number=-1;
-			private var currentDaily:Number=-1;
-			
-			private function showCalendar_Monthly(date:Date=null):void{
-				var fr:DateFormatter=new DateFormatter();
-				fr.formatString="YYYYMMDD";
-				//				calendarPanel.removeAllElements();
-				var dayItem:DayItem=null;
-				var newDayItem:DayItem=null;
-				var f:Boolean=true;
-				var count:Number=0;
-				for(var i:Number=0;i<100;i++){
-					if(calendarPanel.numElements-1<i){
-						dayItem = new DayItem();
-						dayItem.is_all_day = 1;
-						newDayItem = dayItem;
-						calendarPanel.addElement(dayItem);
-						f = true;
-					}else{
-						dayItem = calendarPanel.getElementAt(i) as DayItem;
-						dayItem.is_all_day = 1;
-						f = false;
-					}
-					dayItem.date = fr.format(date);
-					dayItem.nowdate = fr.format(dateChooser.selectedDate);
-					if(!f){
-						dayItem.init();
-					}
-					date.date+=1;
-					if(showModel.selectedItem.value=="monthly"){
-						if(currentMonth<date.month&&date.day==0){
-							count=i+1;
-							break;
-						}
-					}
-				}
-				
-				for(i=calendarPanel.numElements-1;i>=count;i--){
-					calendarPanel.removeElementAt(i);
-				}
-				if(calendarPanel.numElements>0){
-					ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date,(calendarPanel.getElementAt(calendarPanel.numElements-1) as DayItem).date);
-				}
-				resize();
-				if (newDayItem!=null){
-					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
-				}
-			}
-			private function showCalendar_Weekly(date:Date=null):void{
-				
-				var fr:DateFormatter=new DateFormatter();
-				fr.formatString="YYYYMMDD";
-				//				calendarPanel.removeAllElements();
-				var dayItem:DayItem=null;
-				var newDayItem:DayItem=null;
-				var f:Boolean=true;
-				var count:Number=0;
-				var weekDate:Array=new Array();
-				for(var i:Number=1;i<100;i++){
-					if(calendarBorder.numElements-1<i){
-						dayItem = new DayItem();
-						newDayItem = dayItem;
-						dayItem.is_all_day = 2;
-						calendarBorder.addElement(dayItem);
-						f = true;
-					}else{
-						dayItem = calendarBorder.getElementAt(i) as DayItem;
-						dayItem.is_all_day = 2;
-						f = false;
-					}
-					dayItem.date = fr.format(date);
-					dayItem.nowdate = fr.format(dateChooser.selectedDate);
-					
-					if(!f){
-						dayItem.init();
-					}
-					dayItem = new DayItem();
-					dayItem.is_all_day = 3;
-					dayItem.date = fr.format(date);
-					dayItem.nowdate = fr.format(dateChooser.selectedDate);
-					daySchedule.addElement(dayItem);
-					weekDate.push(date.date);
-					date.date+=1;
-					
-					if(date.day==0){
-						count=i+1;
-						break;
-					}
-				
-					
-				}
-				
-				
-				for(i=calendarBorder.numElements-1;i>=count;i--){
-					calendarBorder.removeElementAt(i);
-				}
-				if(calendarBorder.numElements>0){
-					ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date,(calendarBorder.getElementAt(calendarBorder.numElements-1) as DayItem).date);
-				}
-				resize();
-				if (newDayItem!=null){
-					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
-				}
-			}
-			private function showCalendar_Daily(date:Date=null):void{
-				var fr:DateFormatter=new DateFormatter();
-				fr.formatString="YYYYMMDD";
-				//				calendarPanel.removeAllElements();
-				var dayItem:DayItem=null;
-				var newDayItem:DayItem=null;
-				var f:Boolean=true;
-				var count:Number=0;
-				for(var i:Number=1;i<100;i++){
-					if(calendarBorder.numElements-1<i){
-						dayItem = new DayItem();
-						newDayItem = dayItem;
-						dayItem.is_all_day = 2;
-						calendarBorder.addElement(dayItem);
-						f = true;
-					}else{
-						dayItem = calendarBorder.getElementAt(i) as DayItem;
-						dayItem.is_all_day = 2;
-						f = false;
-					}
-					dayItem.date = fr.format(date);
-					dayItem.nowdate = fr.format(dateChooser.selectedDate);
-					
-					if(!f){
-						dayItem.init();
-					}
-					dayItem = new DayItem();
-					dayItem.is_all_day = 3;
-					dayItem.date = fr.format(date);
-					dayItem.nowdate = fr.format(dateChooser.selectedDate);
-					daySchedule.addElement(dayItem);
-					date.date+=1;
-					
-					count=i+1;
-					if(count==6){
-						break;
-					}
-					
-				}
-				
-				
-				for(i=calendarBorder.numElements-1;i>=count;i--){
-					calendarBorder.removeElementAt(i);
-				}
-				if(calendarBorder.numElements>0){
-					ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date,(calendarBorder.getElementAt(calendarBorder.numElements-1) as DayItem).date);
-				}
-				resize();
-				if (newDayItem!=null){
-					newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE,resize);
-				}
-			}
-			
-			private function showCalendar(date:Date=null):void{
-				if(date==null){
-					date = new Date();
-				}else{
-					date = new Date(date.fullYear,date.month,date.date);
-					
-				}
-				
-				if(showModel.selectedItem.value=="monthly"){
-					
-					if(currentMonth==date.month){
-						return;
-					}
-					currentMonth=date.month;
-					if(date.date!=1){
-						date.date=1;
-					}
-					if(date.day!=0){
-						date.date -= date.day;
-					}
-				}
-				if(showModel.selectedItem.value=="weekly"){
-					
-					if(date.day!=0){
-						date.date -= date.day;
-					}
-					if(currentMonth==date.month&&currentWeek==date.date){
-						return;
-					}
-					
-				}
-				if(showModel.selectedItem.value=="daily"){
-					date.date -= date.day;
-					date.date+=1;
-					if(currentMonth==date.month&&currentDaily==date.date){
-						return;
-					}
-					
-				}
-				
-				currentWeek=date.date;
-				currentDaily=date.date;
-				daySchedule.removeAllElements();
-				if(showModel.selectedItem.value=="monthly"){
-					daySchedule.height = 0;
-					daySchedule.visible = false;
-					calendarBorder.visible = false;
-					calendarBorder.removeAllElements();
-					calendarPanel.visible = true;
-					
-					showCalendar_Monthly(date);
-				}else{
-					if(calendarBorder.numElements==0){
-						var timeline:DayItem=new DayItem();
-						timeline.width = 50;
-						timeline.is_all_day=2;
-						timeline.height =80*24;
-						calendarBorder.addElement(timeline);
-					}
-					if(daySchedule.numElements==0){
-						var timeline2:DayItem=new DayItem();
-						timeline2.width = 50;
-						timeline2.height = 100;
-						timeline2.blank=true;
-						daySchedule.addElement(timeline2);
-					}
-				}
-				if(showModel.selectedItem.value=="weekly"){
-					daySchedule.height = 100;
-					daySchedule.visible = true;
-					calendarBorder.visible = true;
-					calendarPanel.visible = false;
-					
-					showCalendar_Weekly(date);
-				}
-				if(showModel.selectedItem.value=="daily"){
-					daySchedule.height = 100;
-					daySchedule.visible = true;
-					calendarBorder.visible = true;
-					calendarPanel.visible = false;
-					showCalendar_Daily(date);
-				}
-				
-				
-				
-				
-			}
-			[Bindable]
-			private var dayWidth:Number=0;
-			private function resize(e:FlexEvent=null,flag:Boolean=true):void{
-				var dayItem:DayItem=null;
-				var row:Number = 0;
-				var dayHeight:Number;
-				dayHeight=80*24;
-				dayWidth = (this.width - 12-taskPanel.width-190-7+1)/7;
-				weekHead.height=0;
-				dayHead.height=25;
-				if(showModel.selectedItem.value=="monthly"){
-					row=calendarPanel.numElements/7;
-					dayHeight =(this.height - 27-row+1-2-11)/row;
-					
-					calendarPanel.requestedColumnCount = 7;
-					
-					weekHead.height=25;
-					dayHead.height=0;
-					
-				}
-				if(showModel.selectedItem.value=="weekly"){
-					dayWidth = (this.width - 12-taskPanel.width-190-7+1-15-51)/7;
-					weekHead.height=25;
-					dayHead.height=0;
-					calendarBorder.width = dayWidth*7+6+51;
-					
-				}
-				if(showModel.selectedItem.value=="daily"){
-					dayWidth = (this.width - 12-taskPanel.width-190-15-4-51)/5;
-					calendarBorder.width = dayWidth*5+4+51;
-					
-				}
-				
-				
-				
-				
-				
-				if(showModel.selectedItem.value=="monthly"){
-					for(var  i:Number=0;i<100;i++){
-						if(calendarPanel.numElements-1<i){
-							break;
-						}else{
-							dayItem = calendarPanel.getElementAt(i) as DayItem;
-							dayItem.height = dayHeight;
-							dayItem.width = dayWidth;
-							dayItem.invalidateSize();
-							dayItem.invalidateDisplayList();
-							
-						}
-					}
-					
-				}else{
-					for(i=0;i<100;i++){
-						if(calendarPanel.numElements-1<i){
-							break;
-						}else{
-							dayItem = calendarPanel.getElementAt(i) as DayItem;
-							dayItem.height = 10;
-							dayItem.width = 10;
-							dayItem.invalidateSize();
-							
-						}
-					}
-					for( i=1;i<100;i++){
-						if(calendarBorder.numElements-1<i){
-							break;
-						}else{
-							dayItem = calendarBorder.getElementAt(i) as DayItem;
-							dayItem.height = dayHeight;
-							dayItem.width = dayWidth;
-							dayItem.invalidateSize();
-							dayItem.showTimeLine(dayWidth,row==0?true:false);
-							dayItem.invalidateDisplayList();
-							
-						}
-					}
-					for( i=1;i<9;i++){
-						if(daySchedule.numElements-1<i){
-							break;
-						}else{
-							dayItem = daySchedule.getElementAt(i) as DayItem;
-							dayItem.height = 100;
-							dayItem.width = dayWidth;
-							dayItem.invalidateSize();
-							dayItem.invalidateDisplayList();
-							
-						}
-					}
-					if(flag){
-						var now:Date=new Date();
-						var y:Number=(now.hours-3)*80;
-						calendarScroller.viewport.verticalScrollPosition=y;
-					}
-				}
-				calendarPanel.invalidateSize();
-				calendarPanel.invalidateDisplayList();
-				calendayGroup.invalidateSize();
-				calendayGroup.invalidateDisplayList();
-				calendarScroller.invalidateSize();
-				calendarScroller.invalidateDisplayList();
-				
-				
-			}
-			
+        }
 
 
+        //			public function showGroup(group:GroupItem,g:Object):void{
+        //				if(group.isshow){
+        //					group.color = 0xffffff;
+        //					group.isshow = false;
+        //				}else{
+        //					group.color = g.color;
+        //					group.isshow = true;
+        //				}
+        //
+        //				var dayItem:DayItem=null;
+        //				for(var  i:Number=1;i<50;i++){
+        //					if(calendarPanel.numElements-1>=i){
+        //
+        //						dayItem = calendarPanel.getElementAt(i-1) as DayItem;
+        //
+        //						dayItem.showSchedule(g.id,group.isshow);
+        //
+        //					}
+        //					if(calendarBorder.numElements-1>=i){
+        //						dayItem = calendarBorder.getElementAt(i) as DayItem;
+        //
+        //						dayItem.showSchedule(g.id,group.isshow);
+        //
+        //					}
+        //					if(daySchedule.numElements-1>=i){
+        //						dayItem = daySchedule.getElementAt(i) as DayItem;
+        //
+        //						dayItem.showSchedule(g.id,group.isshow);
+        //
+        //					}
+        //
+        //				}
+        //			}
 
-			
-	
-			
-	
-			
-			public function createSchedule():void{
-				ScheduleUtil.createSchedule();
-			}
-			
-			private function changeDate():void{
-				showCalendar(dateChooser.selectedDate);
-			}
-			
-			private function showTask():void{
-				if(taskPanel.width>100){
-					taskPanel.width=0;
-					mytask.color = 0xffffff;
-				}else{
-					mytask.color = 0xfad165;
-					taskPanel.width=250;
-					
-				}
-				resize(null,false);
-				this.invalidateSize();
-			}
-			
-			private function showTaskList(result:Object,e:ResultEvent):void{
-				
-			}
-			private function taskChange(e:CollectionEvent):void{
-				
-				taskunpanel.removeAllElements();
-				var taskItem:TaskItem=null;
+
+        private var currentMonth:Number = -1;
+        private var currentWeek:Number = -1;
+        private var currentDaily:Number = -1;
+
+        private function showCalendar_Monthly(date:Date = null):void {
+            var fr:DateFormatter = new DateFormatter();
+            fr.formatString = "YYYYMMDD";
+            //				calendarPanel.removeAllElements();
+            var dayItem:DayItem = null;
+            var newDayItem:DayItem = null;
+            var f:Boolean = true;
+            var count:Number = 0;
+            for (var i:Number = 0; i < 100; i++) {
+                if (calendarPanel.numElements - 1 < i) {
+                    dayItem = new DayItem();
+                    dayItem.is_all_day = 1;
+                    newDayItem = dayItem;
+                    calendarPanel.addElement(dayItem);
+                    f = true;
+                } else {
+                    dayItem = calendarPanel.getElementAt(i) as DayItem;
+                    dayItem.is_all_day = 1;
+                    f = false;
+                }
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+                if (!f) {
+                    dayItem.init();
+                }
+                date.date += 1;
+                if (showModel.selectedItem.value == "monthly") {
+                    if (currentMonth < date.month && date.day == 0) {
+                        count = i + 1;
+                        break;
+                    }
+                }
+            }
+
+            for (i = calendarPanel.numElements - 1; i >= count; i--) {
+                calendarPanel.removeElementAt(i);
+            }
+            if (calendarPanel.numElements > 0) {
+                ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date, (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date);
+            }
+            resize();
+            if (newDayItem != null) {
+                newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE, resize);
+            }
+        }
+
+        private function showCalendar_Weekly(date:Date = null):void {
+
+            var fr:DateFormatter = new DateFormatter();
+            fr.formatString = "YYYYMMDD";
+            //				calendarPanel.removeAllElements();
+            var dayItem:DayItem = null;
+            var newDayItem:DayItem = null;
+            var f:Boolean = true;
+            var count:Number = 0;
+            var weekDate:Array = new Array();
+            for (var i:Number = 1; i < 100; i++) {
+                if (calendarBorder.numElements - 1 < i) {
+                    dayItem = new DayItem();
+                    newDayItem = dayItem;
+                    dayItem.is_all_day = 2;
+                    calendarBorder.addElement(dayItem);
+                    f = true;
+                } else {
+                    dayItem = calendarBorder.getElementAt(i) as DayItem;
+                    dayItem.is_all_day = 2;
+                    f = false;
+                }
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+
+                if (!f) {
+                    dayItem.init();
+                }
+                dayItem = new DayItem();
+                dayItem.is_all_day = 3;
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+                daySchedule.addElement(dayItem);
+                weekDate.push(date.date);
+                date.date += 1;
+
+                if (date.day == 0) {
+                    count = i + 1;
+                    break;
+                }
+
+
+            }
+
+
+            for (i = calendarBorder.numElements - 1; i >= count; i--) {
+                calendarBorder.removeElementAt(i);
+            }
+            if (calendarBorder.numElements > 0) {
+                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+            }
+            resize();
+            if (newDayItem != null) {
+                newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE, resize);
+            }
+        }
+
+        private function showCalendar_Daily(date:Date = null):void {
+            var fr:DateFormatter = new DateFormatter();
+            fr.formatString = "YYYYMMDD";
+            //				calendarPanel.removeAllElements();
+            var dayItem:DayItem = null;
+            var newDayItem:DayItem = null;
+            var f:Boolean = true;
+            var count:Number = 0;
+            for (var i:Number = 1; i < 100; i++) {
+                if (calendarBorder.numElements - 1 < i) {
+                    dayItem = new DayItem();
+                    newDayItem = dayItem;
+                    dayItem.is_all_day = 2;
+                    calendarBorder.addElement(dayItem);
+                    f = true;
+                } else {
+                    dayItem = calendarBorder.getElementAt(i) as DayItem;
+                    dayItem.is_all_day = 2;
+                    f = false;
+                }
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+
+                if (!f) {
+                    dayItem.init();
+                }
+                dayItem = new DayItem();
+                dayItem.is_all_day = 3;
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+                daySchedule.addElement(dayItem);
+                date.date += 1;
+
+                count = i + 1;
+                if (count == 6) {
+                    break;
+                }
+
+            }
+
+
+            for (i = calendarBorder.numElements - 1; i >= count; i--) {
+                calendarBorder.removeElementAt(i);
+            }
+            if (calendarBorder.numElements > 0) {
+                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+            }
+            resize();
+            if (newDayItem != null) {
+                newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE, resize);
+            }
+        }
+
+        private function showCalendar(date:Date = null):void {
+            if (date == null) {
+                date = new Date();
+            } else {
+                date = new Date(date.fullYear, date.month, date.date);
+
+            }
+
+            if (showModel.selectedItem.value == "monthly") {
+
+                if (currentMonth == date.month) {
+                    return;
+                }
+                currentMonth = date.month;
+                if (date.date != 1) {
+                    date.date = 1;
+                }
+                if (date.day != 0) {
+                    date.date -= date.day;
+                }
+            }
+            if (showModel.selectedItem.value == "weekly") {
+
+                if (date.day != 0) {
+                    date.date -= date.day;
+                }
+                if (currentMonth == date.month && currentWeek == date.date) {
+                    return;
+                }
+
+            }
+            if (showModel.selectedItem.value == "daily") {
+                date.date -= date.day;
+                date.date += 1;
+                if (currentMonth == date.month && currentDaily == date.date) {
+                    return;
+                }
+
+            }
+
+            currentWeek = date.date;
+            currentDaily = date.date;
+            daySchedule.removeAllElements();
+            if (showModel.selectedItem.value == "monthly") {
+                daySchedule.height = 0;
+                daySchedule.visible = false;
+                calendarBorder.visible = false;
+                calendarBorder.removeAllElements();
+                calendarPanel.visible = true;
+
+                showCalendar_Monthly(date);
+            } else {
+                if (calendarBorder.numElements == 0) {
+                    var timeline:DayItem = new DayItem();
+                    timeline.width = 50;
+                    timeline.is_all_day = 2;
+                    timeline.height = 80 * 24;
+                    calendarBorder.addElement(timeline);
+                }
+                if (daySchedule.numElements == 0) {
+                    var timeline2:DayItem = new DayItem();
+                    timeline2.width = 50;
+                    timeline2.height = 100;
+                    timeline2.blank = true;
+                    daySchedule.addElement(timeline2);
+                }
+            }
+            if (showModel.selectedItem.value == "weekly") {
+                daySchedule.height = 100;
+                daySchedule.visible = true;
+                calendarBorder.visible = true;
+                calendarPanel.visible = false;
+
+                showCalendar_Weekly(date);
+            }
+            if (showModel.selectedItem.value == "daily") {
+                daySchedule.height = 100;
+                daySchedule.visible = true;
+                calendarBorder.visible = true;
+                calendarPanel.visible = false;
+                showCalendar_Daily(date);
+            }
+
+
+        }
+
+        [Bindable]
+        private var dayWidth:Number = 0;
+
+        private function resize(e:FlexEvent = null, flag:Boolean = true):void {
+            var dayItem:DayItem = null;
+            var row:Number = 0;
+            var dayHeight:Number;
+            dayHeight = 80 * 24;
+            dayWidth = (this.width - 12 - taskPanel.width - 190 - 7 + 1) / 7;
+            weekHead.height = 0;
+            dayHead.height = 25;
+            if (showModel.selectedItem.value == "monthly") {
+                row = calendarPanel.numElements / 7;
+                dayHeight = (this.height - 27 - row + 1 - 2 - 11) / row;
+
+                calendarPanel.requestedColumnCount = 7;
+
+                weekHead.height = 25;
+                dayHead.height = 0;
+
+            }
+            if (showModel.selectedItem.value == "weekly") {
+                dayWidth = (this.width - 12 - taskPanel.width - 190 - 7 + 1 - 15 - 51) / 7;
+                weekHead.height = 25;
+                dayHead.height = 0;
+                calendarBorder.width = dayWidth * 7 + 6 + 51;
+
+            }
+            if (showModel.selectedItem.value == "daily") {
+                dayWidth = (this.width - 12 - taskPanel.width - 190 - 15 - 4 - 51) / 5;
+                calendarBorder.width = dayWidth * 5 + 4 + 51;
+
+            }
+
+
+            if (showModel.selectedItem.value == "monthly") {
+                for (var i:Number = 0; i < 100; i++) {
+                    if (calendarPanel.numElements - 1 < i) {
+                        break;
+                    } else {
+                        dayItem = calendarPanel.getElementAt(i) as DayItem;
+                        dayItem.height = dayHeight;
+                        dayItem.width = dayWidth;
+                        dayItem.invalidateSize();
+                        dayItem.invalidateDisplayList();
+
+                    }
+                }
+
+            } else {
+                for (i = 0; i < 100; i++) {
+                    if (calendarPanel.numElements - 1 < i) {
+                        break;
+                    } else {
+                        dayItem = calendarPanel.getElementAt(i) as DayItem;
+                        dayItem.height = 10;
+                        dayItem.width = 10;
+                        dayItem.invalidateSize();
+
+                    }
+                }
+                for (i = 1; i < 100; i++) {
+                    if (calendarBorder.numElements - 1 < i) {
+                        break;
+                    } else {
+                        dayItem = calendarBorder.getElementAt(i) as DayItem;
+                        dayItem.height = dayHeight;
+                        dayItem.width = dayWidth;
+                        dayItem.invalidateSize();
+                        dayItem.showTimeLine(dayWidth, row == 0 ? true : false);
+                        dayItem.invalidateDisplayList();
+
+                    }
+                }
+                for (i = 1; i < 9; i++) {
+                    if (daySchedule.numElements - 1 < i) {
+                        break;
+                    } else {
+                        dayItem = daySchedule.getElementAt(i) as DayItem;
+                        dayItem.height = 100;
+                        dayItem.width = dayWidth;
+                        dayItem.invalidateSize();
+                        dayItem.invalidateDisplayList();
+
+                    }
+                }
+                if (flag) {
+                    var now:Date = new Date();
+                    var y:Number = (now.hours - 3) * 80;
+                    calendarScroller.viewport.verticalScrollPosition = y;
+                }
+            }
+            calendarPanel.invalidateSize();
+            calendarPanel.invalidateDisplayList();
+            calendayGroup.invalidateSize();
+            calendayGroup.invalidateDisplayList();
+            calendarScroller.invalidateSize();
+            calendarScroller.invalidateDisplayList();
+
+
+        }
+
+
+        public function createSchedule():void {
+            ScheduleUtil.createSchedule();
+        }
+
+        private function changeDate():void {
+            showCalendar(dateChooser.selectedDate);
+        }
+
+        private function showTask():void {
+            if (taskPanel.width > 100) {
+                taskPanel.width = 0;
+                mytask.color = 0xffffff;
+            } else {
+                mytask.color = 0xfad165;
+                taskPanel.width = 250;
+
+            }
+            resize(null, false);
+            this.invalidateSize();
+        }
+
+        private function showTaskList(result:Object, e:ResultEvent):void {
+
+        }
+
+        private function taskChange(e:CollectionEvent):void {
+
+            taskunpanel.removeAllElements();
+            var taskItem:TaskItem = null;
 //				for each(var obj:Object in ToolUtil.taskUnList){
 //					taskItem=new TaskItem();
 //					taskItem.taskData = obj;
@@ -532,21 +531,20 @@
 //					taskunpanel.addElement(taskItem);
 //
 //				}
-				
-			}
-			
-			private function createTask():void{
-				TaskUtil.createTask();
-				
-			}
-			
-			private function createGroup():void{
-				var obj:Object=new Object();
-				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"group",obj,true)
-				FlexGlobals.topLevelApplication.dispatchEvent(evt);
-			}
-			
-		]]>
+
+        }
+
+        private function createTask():void {
+            TaskUtil.createTask();
+
+        }
+
+        private function createGroup():void {
+            var obj:Object = new Object();
+            var evt:ChangeMenuEvent = new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr, "group", obj, true)
+            FlexGlobals.topLevelApplication.dispatchEvent(evt);
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
@@ -572,7 +570,7 @@
 
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:Button chromeColor="red" label="创建日程" color="#ffffff"   height="25" click="createSchedule()" />
+                <s:Button chromeColor="red" label="创建任务" color="#ffffff"   height="25" click="createSchedule()" />
                 <s:BorderContainer width="100%" height="30" borderVisible="false">
                     <s:layout>
                         <s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="3">

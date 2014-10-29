@@ -4,309 +4,328 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-			import events.ChangeUserEvent;
-			import events.CloseEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.events.FlexEvent;
-			import mx.events.ListEvent;
-			import mx.rpc.events.ResultEvent;
-			
-			import uicontrol.MessAlert;
-			
-			[Bindable]
-			private var buttonArr1:ArrayCollection = new ArrayCollection([
-				{'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'}
-			]);
-			private var state:String="refresh";//refresh(查询状态),mod(修改状态)
-			[Bindable]
-			private var paperArr:ArrayCollection = new ArrayCollection([//这是一个试卷
-				{
-					"title":'java试题',
-					"is_replay":true,
-					"subjects":[//这是试卷的题目
-						{
-							"title":"关于java三个基本特征",
-							"options":[//这是题目的选项
-								{
-									"content":"继承"
-								},
-								{
-									"content":"封装"
-								},
-								{
-									"content":"多态"
-								},
-								{
-									"content":"指针调用"
-								}
-							]
-						},
-						{
-							"title":"关于java继承",
-							"options":[
-								{
-									"content":"子类可以继承父类所有属性和方法"
-								},
-								{
-									"content":"子类可以继承父类的公共和私有属性和方法"
-								},
-								{
-									"content":"子类可以继承父类的私有和保护属性和方法"
-								},
-								{
-									"content":"子类可以继承父类的公共和保护属性和方法"
-								}
-							]
-						}
-					]
-				},
-				{
-					"title":'项目管理PMP试题',
-					"is_replay":false,
-					"subjects":[
-						{
-							"title":"项目管理办公室分几类",
-							"options":[
-								{
-									"content":"支持型"
-								},
-								{
-									"content":"控制型"
-								},
-								{
-									"content":"指令型"
-								}
-							]
-						},
-						{
-							"title":"项目管理过程组分几大过程组",
-							"options":[
-								{
-									"content":"启动"
-								},
-								{
-									"content":"规划"
-								},
-								{
-									"content":"执行"
-								},
-								{
-									"content":"监控"
-								},
-								{
-									"content":"结束"
-								}
-							]
-						}
-					]
-				}
-			]);
-			[Bindable]
-			public var subjectArr:ArrayCollection = new ArrayCollection([]);
-			[Bindable]
-			private var optionArr:ArrayCollection = new ArrayCollection([]);
-			//新增，保存，删除,回复，转发的处理函数
-			//多个按钮点击事件的处理函数
-			private function clickHander(e:MouseEvent):void {
-				ba1.requireSelection=true;
-				var item:Object=ba1.selectedItem;
-				if (item.mode == 'refresh') {
-					state="refresh";
-					loadPager();
-				}
-				
-			}
-			private var isPaging:Boolean;
-			private function loadPager():void{
-				var o:Object={};//如果需要补齐查询参数
-				o["kind"]=kindKey.text;
-				var url:String= o["kind"]||o["kind"]==""? "/kaoshi/getSubjectAll":"/kaoshi/getSubjectByKind";//?????????配置查询所有和带有关键字的url
-				isPaging= !o["kind"]||o["kind"]==""?true:false;
-				HttpServiceUtil.getCHTTPServiceAndResult(url, loadPagerDataResult, "POST").send(o);
-			}
-			private function loadPagerDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					resetFormData();
-					var arr:Array;
-					if(isPaging){
-						pagebar1.mPageSize = result.result.limit;
-						pagebar1.RecordCount = result.result.total;
-						pagebar1.initPage();
-						arr= result.result.result is Array ?  result.result.result : [];
-					}else{
-						arr= result.result.result is Array ?  result.result.result : [];
-					}
-					paperArr.removeAll();
-					paperArr.addAll(new ArrayCollection(arr));
-				}
-			}
-			private function savPager():void{
-				if(!isValid()){
-					return;
-				}
-				var o:Object=getFormData();
-				var url:String="";//???????????????这里配置保存试卷答案url
-				HttpServiceUtil.getCHTTPServiceAndResult(url, savPagerDataResult, "POST").send(o);
-			}
-			private function savPagerDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					loadPager();
-				}
-			}
-			private function getFormData():Object{
-				var o:Object={};
-				var n:Object=pagerGrid.selectedItem;
-				o["id"]=n["id"];
-				o["userid"]="";//?????????根据实际需要改写属性名称
-				o["subjects"]=n["subjects"];//?????????根据实际需要改写属性名称
-				return o;
-			}
-			private function resetFormData():void{
-				title.text="";
-				repaly.text=""
-				bz.text="";
-				optionArr.removeAll();
-				subjectArr.removeAll();
-			}
-			private function setPaperFormData(o:Object):void{
-				title.text=o["title"];//?????????根据实际需要改写属性名称
-				repaly.text=o["repaly"];//?????????根据实际需要改写属性名称 
-				if(o["is_replay"]===true){//?????????根据实际需要改写属性名称 
-					repaly.editable=true;
-					repaly.setStyle("borderColor","#000000");
-				}else{
-					repaly.editable=false;
-					repaly.setStyle("borderColor","#cccccc");
-				}
-				var subjects:Array = o["subjects"] is Array?o["subjects"]:[];//?????????根据实际需要改写属性名称
-				bz.text="";
-				optionArr.removeAll();
-				subjectArr.removeAll();
-				subjectArr.addAll(new ArrayCollection(subjects));
-			}
-			private function setSubjectFormData(o:Object):void{
-				bz.text=o["title"];//?????????根据实际需要改写属性名称
-				var options:Array = o["options"] is Array?o["options"]:[];//?????????根据实际需要改写属性名称
-				optionArr.removeAll();
-				optionArr.addAll(new ArrayCollection(options));
-			}
-			private function isValid():Boolean{
-				var n:Object=pagerGrid.selectedItem;
-				if(!n){
-					Alert.show("请选择试卷","提示");
-					return false;
-				}
-				var o:Object=getFormData();
-				var isFind:Boolean=false;
-				var i:int=0;
-				var j:int=0;
-				var options:Array;
-				for(;i<o["subjects"].length;i++){
-					isFind=false;
-					j=0;
-					options=o["subjects"][i]["options"];
-					for(;j<options.length;j++){
-						if(options[j].is_right===true){//?????????根据实际需要改写属性名称
-							isFind=true;
-							break;
-						}
-					}
-					if(!isFind){
-						Alert.show("当前试卷第"+(i+1)+"题没有答案","提示");
-						return false;
-					}
-				}
-				return true;
-			}
-			private function seletPaper():void{
-				ba1.requireSelection=false;
-				ba1.selectedIndex=-1;
-				var o:Object=pagerGrid.selectedItem;
-				state="mod";
-				setPaperFormData(o);
-			}
-			private function seletSubjec():void{
-				var o:Object=subjectGrid.selectedItem;
-				setSubjectFormData(o);
-			}
-			protected function optionGrid_focusInHandler(event:FocusEvent):void
-			{	
-				if(event.currentTarget==optionGrid){
-					var msgWin:MessAlert=new MessAlert();
-					msgWin.alertT("<font size='14'>1.你可以按大键盘上方区域的<font color='#ff0000'>+</font>切换下一试卷或<font color='#ff0000'>shift</font>+<font color='#ff0000'>+</font>切换上一试卷<p></p>2.你可以按<font color='#ff0000'>回车</font>切换下一题或<font color='#ff0000'>shift</font>+<font color='#ff0000'>回车</font>切换上一题</font>");
-				}
-			}
-			protected function switchRow(event:KeyboardEvent):void
-			{	
-				event.preventDefault();
-				var keyCode:int=event.keyCode;
-				switch(true){
-					case keyCode==13:{
-						if(subjectArr.length>=1){
-							processKeyHander(subjectGrid,subjectArr,event);
-						}
-						break;
-					}
-					case keyCode==187:{
-						if(paperArr.length>=1){
-							processKeyHander(pagerGrid,paperArr,event);
-						}
-						break;
-					}
-						
-				}
-			}
-			private function processKeyHander(grid:DataGrid,arr:ArrayCollection,event:KeyboardEvent):void{
-				var index:int;
-				if(arr.length>1){
-					index=arr.getItemIndex(grid.selectedItem);
-					var data:Object;
-					if(index!=-1){
-						if(!event.shiftKey){
-							if(++index>=arr.length){
-								index=0;
-							}
-						}
-						if(event.shiftKey){
-							if(--index<0){
-								index=arr.length-1;
-							}
-						}
-						data=arr.getItemAt(index);
-						grid.selectedItem=data;
-					}else{
-						index=0;
-						data=arr.getItemAt(index);
-						grid.selectedItem=data;
-					}
-				}
-				if(arr.length==1){
-					index=0;
-					data=arr.getItemAt(index);
-					grid.selectedItem=data;
-				}
-				grid.dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,index));
-			}
-			override public function init(e:FlexEvent):void {
-				//				loadPager();//?????????如果业务都已经完成放开这个方法里的代码
-			}
-			
-			override public function changeCurrentUser(e:ChangeUserEvent):void {
-				
-			}
-			
-			override public function closeContainer(e:CloseEvent):void {
-				
-			}
-			
-			// 重新进入时执行
-			override public function reloadParamData(e:FlexEvent):void {
-			}
-		]]>
+        import events.ChangeUserEvent;
+        import events.CloseContainerEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.events.FlexEvent;
+        import mx.events.ListEvent;
+        import mx.rpc.events.ResultEvent;
+
+        import uicontrol.MessAlert;
+
+        [Bindable]
+        private var buttonArr1:ArrayCollection = new ArrayCollection([
+            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'}
+        ]);
+        private var state:String = "refresh";//refresh(查询状态),mod(修改状态)
+        [Bindable]
+        private var paperArr:ArrayCollection = new ArrayCollection([//这是一个试卷
+            {
+                "title": 'java试题',
+                "is_replay": true,
+                "subjects": [//这是试卷的题目
+                    {
+                        "title": "关于java三个基本特征",
+                        "options": [//这是题目的选项
+                            {
+                                "content": "继承"
+                            },
+                            {
+                                "content": "封装"
+                            },
+                            {
+                                "content": "多态"
+                            },
+                            {
+                                "content": "指针调用"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "关于java继承",
+                        "options": [
+                            {
+                                "content": "子类可以继承父类所有属性和方法"
+                            },
+                            {
+                                "content": "子类可以继承父类的公共和私有属性和方法"
+                            },
+                            {
+                                "content": "子类可以继承父类的私有和保护属性和方法"
+                            },
+                            {
+                                "content": "子类可以继承父类的公共和保护属性和方法"
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "title": '项目管理PMP试题',
+                "is_replay": false,
+                "subjects": [
+                    {
+                        "title": "项目管理办公室分几类",
+                        "options": [
+                            {
+                                "content": "支持型"
+                            },
+                            {
+                                "content": "控制型"
+                            },
+                            {
+                                "content": "指令型"
+                            }
+                        ]
+                    },
+                    {
+                        "title": "项目管理过程组分几大过程组",
+                        "options": [
+                            {
+                                "content": "启动"
+                            },
+                            {
+                                "content": "规划"
+                            },
+                            {
+                                "content": "执行"
+                            },
+                            {
+                                "content": "监控"
+                            },
+                            {
+                                "content": "结束"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]);
+        [Bindable]
+        public var subjectArr:ArrayCollection = new ArrayCollection([]);
+        [Bindable]
+        private var optionArr:ArrayCollection = new ArrayCollection([]);
+
+        override public function releaseListener():void{
+        }
+        //新增，保存，删除,回复，转发的处理函数
+        //多个按钮点击事件的处理函数
+        private function clickHander(e:MouseEvent):void {
+            ba1.requireSelection = true;
+            var item:Object = ba1.selectedItem;
+            if (item.mode == 'refresh') {
+                state = "refresh";
+                loadPager();
+            }
+
+        }
+
+        private var isPaging:Boolean;
+
+        private function loadPager():void {
+            var o:Object = {};//如果需要补齐查询参数
+            o["kind"] = kindKey.text;
+            var url:String = o["kind"] || o["kind"] == "" ? "/kaoshi/getSubjectAll" : "/kaoshi/getSubjectByKind";//?????????配置查询所有和带有关键字的url
+            isPaging = !o["kind"] || o["kind"] == "" ? true : false;
+            HttpServiceUtil.getCHTTPServiceAndResult(url, loadPagerDataResult, "POST").send(o);
+        }
+
+        private function loadPagerDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                resetFormData();
+                var arr:Array;
+                if (isPaging) {
+                    pagebar1.mPageSize = result.result.limit;
+                    pagebar1.RecordCount = result.result.total;
+                    pagebar1.initPage();
+                    arr = result.result.result is Array ? result.result.result : [];
+                } else {
+                    arr = result.result.result is Array ? result.result.result : [];
+                }
+                paperArr.removeAll();
+                paperArr.addAll(new ArrayCollection(arr));
+            }
+        }
+
+        private function savPager():void {
+            if (!isValid()) {
+                return;
+            }
+            var o:Object = getFormData();
+            var url:String = "";//???????????????这里配置保存试卷答案url
+            HttpServiceUtil.getCHTTPServiceAndResult(url, savPagerDataResult, "POST").send(o);
+        }
+
+        private function savPagerDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadPager();
+            }
+        }
+
+        private function getFormData():Object {
+            var o:Object = {};
+            var n:Object = pagerGrid.selectedItem;
+            o["id"] = n["id"];
+            o["userid"] = "";//?????????根据实际需要改写属性名称
+            o["subjects"] = n["subjects"];//?????????根据实际需要改写属性名称
+            return o;
+        }
+
+        private function resetFormData():void {
+            title.text = "";
+            repaly.text = ""
+            bz.text = "";
+            optionArr.removeAll();
+            subjectArr.removeAll();
+        }
+
+        private function setPaperFormData(o:Object):void {
+            title.text = o["title"];//?????????根据实际需要改写属性名称
+            repaly.text = o["repaly"];//?????????根据实际需要改写属性名称
+            if (o["is_replay"] === true) {//?????????根据实际需要改写属性名称
+                repaly.editable = true;
+                repaly.setStyle("borderColor", "#000000");
+            } else {
+                repaly.editable = false;
+                repaly.setStyle("borderColor", "#cccccc");
+            }
+            var subjects:Array = o["subjects"] is Array ? o["subjects"] : [];//?????????根据实际需要改写属性名称
+            bz.text = "";
+            optionArr.removeAll();
+            subjectArr.removeAll();
+            subjectArr.addAll(new ArrayCollection(subjects));
+        }
+
+        private function setSubjectFormData(o:Object):void {
+            bz.text = o["title"];//?????????根据实际需要改写属性名称
+            var options:Array = o["options"] is Array ? o["options"] : [];//?????????根据实际需要改写属性名称
+            optionArr.removeAll();
+            optionArr.addAll(new ArrayCollection(options));
+        }
+
+        private function isValid():Boolean {
+            var n:Object = pagerGrid.selectedItem;
+            if (!n) {
+                Alert.show("请选择试卷", "提示");
+                return false;
+            }
+            var o:Object = getFormData();
+            var isFind:Boolean = false;
+            var i:int = 0;
+            var j:int = 0;
+            var options:Array;
+            for (; i < o["subjects"].length; i++) {
+                isFind = false;
+                j = 0;
+                options = o["subjects"][i]["options"];
+                for (; j < options.length; j++) {
+                    if (options[j].is_right === true) {//?????????根据实际需要改写属性名称
+                        isFind = true;
+                        break;
+                    }
+                }
+                if (!isFind) {
+                    Alert.show("当前试卷第" + (i + 1) + "题没有答案", "提示");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private function seletPaper():void {
+            ba1.requireSelection = false;
+            ba1.selectedIndex = -1;
+            var o:Object = pagerGrid.selectedItem;
+            state = "mod";
+            setPaperFormData(o);
+        }
+
+        private function seletSubjec():void {
+            var o:Object = subjectGrid.selectedItem;
+            setSubjectFormData(o);
+        }
+
+        protected function optionGrid_focusInHandler(event:FocusEvent):void {
+            if (event.currentTarget == optionGrid) {
+                var msgWin:MessAlert = new MessAlert();
+                msgWin.alertT("<font size='14'>1.你可以按大键盘上方区域的<font color='#ff0000'>+</font>切换下一试卷或<font color='#ff0000'>shift</font>+<font color='#ff0000'>+</font>切换上一试卷<p></p>2.你可以按<font color='#ff0000'>回车</font>切换下一题或<font color='#ff0000'>shift</font>+<font color='#ff0000'>回车</font>切换上一题</font>");
+            }
+        }
+
+        protected function switchRow(event:KeyboardEvent):void {
+            event.preventDefault();
+            var keyCode:int = event.keyCode;
+            switch (true) {
+                case keyCode == 13:
+                {
+                    if (subjectArr.length >= 1) {
+                        processKeyHander(subjectGrid, subjectArr, event);
+                    }
+                    break;
+                }
+                case keyCode == 187:
+                {
+                    if (paperArr.length >= 1) {
+                        processKeyHander(pagerGrid, paperArr, event);
+                    }
+                    break;
+                }
+
+            }
+        }
+
+        private function processKeyHander(grid:DataGrid, arr:ArrayCollection, event:KeyboardEvent):void {
+            var index:int;
+            if (arr.length > 1) {
+                index = arr.getItemIndex(grid.selectedItem);
+                var data:Object;
+                if (index != -1) {
+                    if (!event.shiftKey) {
+                        if (++index >= arr.length) {
+                            index = 0;
+                        }
+                    }
+                    if (event.shiftKey) {
+                        if (--index < 0) {
+                            index = arr.length - 1;
+                        }
+                    }
+                    data = arr.getItemAt(index);
+                    grid.selectedItem = data;
+                } else {
+                    index = 0;
+                    data = arr.getItemAt(index);
+                    grid.selectedItem = data;
+                }
+            }
+            if (arr.length == 1) {
+                index = 0;
+                data = arr.getItemAt(index);
+                grid.selectedItem = data;
+            }
+            grid.dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK, false, false, -1, index));
+        }
+
+        override public function init(e:FlexEvent):void {
+            //				loadPager();//?????????如果业务都已经完成放开这个方法里的代码
+        }
+
+        override public function changeCurrentUser(e:ChangeUserEvent):void {
+
+        }
+
+        override public function closeContainer(e:CloseContainerEvent):void {
+
+        }
+
+        // 重新进入时执行
+        override public function reloadParamData(e:FlexEvent):void {
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

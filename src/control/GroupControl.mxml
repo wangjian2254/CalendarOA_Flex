@@ -7,238 +7,240 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import events.ChangeMenuEvent;
-			import events.ChangeUserEvent;
-			import events.CloseEvent;
-			import events.PageChangeEvent;
-			
-			import httpcontrol.CHTTPService;
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
-			
-			import util.ToolUtil;
-			
-			
-			
-			[Bindable]
-			private var joinlist:ArrayCollection=new ArrayCollection();
-			[Bindable]
-			private var observerlist:ArrayCollection=new ArrayCollection();
-			
-			private var groupData:Object=null;
-			
-			override public   function  init(e:FlexEvent):void{
-				
-				add();
-				
-				
-			}
-			override public function closeContainer(e:CloseEvent):void{
-				dispatchEvent(e);
-				
-			}
-			
-			
-			
-			
-			
-			public function add():void{
-				groupData=null;
-				groupTitle.text="";
-				colorPicker.selectedColor = Math.random()*0xffffff;
-				joinlist.removeAll();
-				observerlist.removeAll();
-				btnSave.visible=true;
-				btnDel.visible=false;
-				btnQuit.visible=false;
-			}
-			
-			
-			public function show():void{
-				if(groupGrid.selectedItem){
-					groupData = groupGrid.selectedItem;
-					groupTitle.text = groupData.name;
-					colorPicker.selectedColor = groupData.color;
-					joinlist.removeAll();
-					joinlist.addAll( new ArrayCollection(groupData.userlist as Array));
-					observerlist.removeAll();
-					observerlist.addAll( new ArrayCollection(groupData.observerlist as Array));
-					
-					if(groupData.pem=="create"){
-						btnDel.visible=true;
-						btnSave.visible=true;
-						btnQuit.visible=false;
-					}else{
-						btnDel.visible=false;
-						btnSave.visible=false;
-						btnQuit.visible=true;
-						
-					}
-					
-				}else{
-					add();
-				}
-			}
-			
-			
-			
-			public function refresh(result:Object,e:ResultEvent):void{
-				if(result.success){
-					add();
-					init(null);
-				}
-			}
-			
-			private function group_pem(item:Object, column:AdvancedDataGridColumn):String{
-				var str:String="";
-				if(item.pem=="create"){
-					str="创建";
-				}else if(item.pem=="join"){
-					str="参与";
-				}else if(item.pem=="look"){
-					str="共享";
-				}
-				return str;
-			}
-			
-			
-			private function joinuser(b:Boolean):void{
-				var obj:Object=null;
-				if(b){
-					if(allContactGrid.selectedItem){
-						for each(obj in joinlist){
-							if(obj.username==allContactGrid.selectedItem.username){
-								return;
-							}
-						}
-						joinlist.addItem(allContactGrid.selectedItem);
-						for each(obj in observerlist){
-							if(obj.username==allContactGrid.selectedItem.username){
-								observerlist.removeItemAt(observerlist.getItemIndex(obj));
-								return ;
-							}
-						}
-					}
-				}else{
-					joinlist.removeItemAt(joinlist.getItemIndex(joingrid.selectedItem));
-				}
-			}
-			private function joinuser2(b:Boolean):void{
-				var obj:Object=null;
-				if(b){
-					if(allContactGrid2.selectedItem){
-						for each(obj in observerlist){
-							if(obj.username==allContactGrid2.selectedItem.username){
-								return;
-							}
-						}
-						observerlist.addItem(allContactGrid2.selectedItem);
-						for each(obj in joinlist){
-							if(obj.username==allContactGrid2.selectedItem.username){
-								joinlist.removeItemAt(joinlist.getItemIndex(obj));
-								return ;
-							}
-						}
-					}
-				}else{
-					observerlist.removeItemAt(observerlist.getItemIndex(observergrid.selectedItem));
-				}
-				
-			}
-			private function openAddress():void{
-				var obj:Object=new Object();
-				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
-				FlexGlobals.topLevelApplication.dispatchEvent(evt);
-			}
-			
-			private function askdel():void{
-				if(groupData!=null &&groupData.id){
-					
-					Alert.show("确认删除当前分组? 分组内的日程会被全部删除", "提示", Alert.YES | Alert.NO, null, del);
-				}
-				
-			}
-			//删除日程
-			private function del(e:mx.events.CloseEvent):void
-			{
-				if (e.detail == Alert.YES){
-					var data:Object = new Object();
-					data["id"] = groupData.id;
-					HttpServiceUtil.getCHTTPServiceAndResult("/ca/delGroup",delResult,"POST").send(data);
-					
-					
-				}
-			}
-			private function delResult(result:Object,e:ResultEvent):void{
-				if(result.success){
-					ToolUtil.groupRefresh();
-					add();
-					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-					
-				}
-			}
-			//删除日程
-			private function quit(e:mx.events.CloseEvent):void
-			{
-				if (e.detail == Alert.YES){
-					var data:Object = new Object();
-					data["id"] = groupData.id;
-					data["do"] = "out";
-					HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinGroup",delResult,"POST").send(data);
-					
-					
-				}
-			}
-			private function askquit():void{
-				if(groupData!=null &&groupData.id){
-					
-					Alert.show("确认退出当前分组? 分组内的日程不会再看到", "提示", Alert.YES | Alert.NO, null, quit);
-				}
-			}
-			private function save():void{
-				if(groupTitle.text==""){
-					Alert.show("分组名称不能为空","警告");
-					return;
-				}
-				var obj:Object=null;
-				var data:Object=new Object();
-				if(groupData!=null){
-					data["id"]=groupData.id;
-				}
-				data["name"]=groupTitle.text;
-				data["color"]=colorPicker.selectedColor;
-				data["joins"]=new Array();
-				for each(obj in joinlist){
-					data["joins"].push(obj.username);
-				}
-				data["observers"]=new Array();
-				for each(obj in observerlist){
-					data["observers"].push(obj.username);
-				}
-				HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateGroup",saveResult,"POST").send(data);
-			}
-			private function saveResult(result:Object,e:ResultEvent):void{
-				if(result.success){
-					ToolUtil.groupRefresh();
-					if(groupData==null){
-						groupData=new Object();
-						groupData.id=result.result;
-					}
-					
-					btnSave.visible=true;
-					btnDel.visible=true;
-					btnQuit.visible=false;
-				}
-			}
-			
-		]]>
+        import events.ChangeMenuEvent;
+        import events.ChangeUserEvent;
+        import events.CloseContainerEvent;
+        import events.PageChangeEvent;
+
+        import httpcontrol.CHTTPService;
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.FlexEvent;
+        import mx.events.ItemClickEvent;
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+
+        import util.ToolUtil;
+
+
+        [Bindable]
+        private var joinlist:ArrayCollection = new ArrayCollection();
+        [Bindable]
+        private var observerlist:ArrayCollection = new ArrayCollection();
+
+        private var groupData:Object = null;
+        override public function releaseListener():void{
+        }
+        override public function init(e:FlexEvent):void {
+
+            add();
+
+
+        }
+
+        override public function closeContainer(e:CloseContainerEvent):void {
+            dispatchEvent(e);
+
+        }
+
+
+        public function add():void {
+            groupData = null;
+            groupTitle.text = "";
+            colorPicker.selectedColor = Math.random() * 0xffffff;
+            joinlist.removeAll();
+            observerlist.removeAll();
+            btnSave.visible = true;
+            btnDel.visible = false;
+            btnQuit.visible = false;
+        }
+
+
+        public function show():void {
+            if (groupGrid.selectedItem) {
+                groupData = groupGrid.selectedItem;
+                groupTitle.text = groupData.name;
+                colorPicker.selectedColor = groupData.color;
+                joinlist.removeAll();
+                joinlist.addAll(new ArrayCollection(groupData.userlist as Array));
+                observerlist.removeAll();
+                observerlist.addAll(new ArrayCollection(groupData.observerlist as Array));
+
+                if (groupData.pem == "create") {
+                    btnDel.visible = true;
+                    btnSave.visible = true;
+                    btnQuit.visible = false;
+                } else {
+                    btnDel.visible = false;
+                    btnSave.visible = false;
+                    btnQuit.visible = true;
+
+                }
+
+            } else {
+                add();
+            }
+        }
+
+
+        public function refresh(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                add();
+                init(null);
+            }
+        }
+
+        private function group_pem(item:Object, column:AdvancedDataGridColumn):String {
+            var str:String = "";
+            if (item.pem == "create") {
+                str = "创建";
+            } else if (item.pem == "join") {
+                str = "参与";
+            } else if (item.pem == "look") {
+                str = "共享";
+            }
+            return str;
+        }
+
+
+        private function joinuser(b:Boolean):void {
+            var obj:Object = null;
+            if (b) {
+                if (allContactGrid.selectedItem) {
+                    for each(obj in joinlist) {
+                        if (obj.username == allContactGrid.selectedItem.username) {
+                            return;
+                        }
+                    }
+                    joinlist.addItem(allContactGrid.selectedItem);
+                    for each(obj in observerlist) {
+                        if (obj.username == allContactGrid.selectedItem.username) {
+                            observerlist.removeItemAt(observerlist.getItemIndex(obj));
+                            return;
+                        }
+                    }
+                }
+            } else {
+                joinlist.removeItemAt(joinlist.getItemIndex(joingrid.selectedItem));
+            }
+        }
+
+        private function joinuser2(b:Boolean):void {
+            var obj:Object = null;
+            if (b) {
+                if (allContactGrid2.selectedItem) {
+                    for each(obj in observerlist) {
+                        if (obj.username == allContactGrid2.selectedItem.username) {
+                            return;
+                        }
+                    }
+                    observerlist.addItem(allContactGrid2.selectedItem);
+                    for each(obj in joinlist) {
+                        if (obj.username == allContactGrid2.selectedItem.username) {
+                            joinlist.removeItemAt(joinlist.getItemIndex(obj));
+                            return;
+                        }
+                    }
+                }
+            } else {
+                observerlist.removeItemAt(observerlist.getItemIndex(observergrid.selectedItem));
+            }
+
+        }
+
+        private function openAddress():void {
+            var obj:Object = new Object();
+            var evt:ChangeMenuEvent = new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr, "contact", obj, true)
+            FlexGlobals.topLevelApplication.dispatchEvent(evt);
+        }
+
+        private function askdel():void {
+            if (groupData != null && groupData.id) {
+
+                Alert.show("确认删除当前分组? 分组内的日程会被全部删除", "提示", Alert.YES | Alert.NO, null, del);
+            }
+
+        }
+
+        //删除日程
+        private function del(e:mx.events.CloseEvent):void {
+            if (e.detail == Alert.YES) {
+                var data:Object = new Object();
+                data["id"] = groupData.id;
+                HttpServiceUtil.getCHTTPServiceAndResult("/ca/delGroup", delResult, "POST").send(data);
+
+
+            }
+        }
+
+        private function delResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.groupRefresh();
+                add();
+                FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr, ToolUtil.sessionUser, true));
+
+            }
+        }
+
+        //删除日程
+        private function quit(e:mx.events.CloseEvent):void {
+            if (e.detail == Alert.YES) {
+                var data:Object = new Object();
+                data["id"] = groupData.id;
+                data["do"] = "out";
+                HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinGroup", delResult, "POST").send(data);
+
+
+            }
+        }
+
+        private function askquit():void {
+            if (groupData != null && groupData.id) {
+
+                Alert.show("确认退出当前分组? 分组内的日程不会再看到", "提示", Alert.YES | Alert.NO, null, quit);
+            }
+        }
+
+        private function save():void {
+            if (groupTitle.text == "") {
+                Alert.show("分组名称不能为空", "警告");
+                return;
+            }
+            var obj:Object = null;
+            var data:Object = new Object();
+            if (groupData != null) {
+                data["id"] = groupData.id;
+            }
+            data["name"] = groupTitle.text;
+            data["color"] = colorPicker.selectedColor;
+            data["joins"] = new Array();
+            for each(obj in joinlist) {
+                data["joins"].push(obj.username);
+            }
+            data["observers"] = new Array();
+            for each(obj in observerlist) {
+                data["observers"].push(obj.username);
+            }
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateGroup", saveResult, "POST").send(data);
+        }
+
+        private function saveResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.groupRefresh();
+                if (groupData == null) {
+                    groupData = new Object();
+                    groupData.id = result.result;
+                }
+
+                btnSave.visible = true;
+                btnDel.visible = true;
+                btnQuit.visible = false;
+            }
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

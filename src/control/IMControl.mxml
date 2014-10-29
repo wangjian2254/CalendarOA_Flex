@@ -4,10 +4,9 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-
         import events.ChangeUserEvent;
         import events.ChatTimelineEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
         import events.ListClickEvent;
 
 
@@ -18,13 +17,15 @@
         import org.idream.pomelo.PomeloEvent;
 
         import util.ToolUtil;
-
+        override public function releaseListener():void{
+            Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
+        }
         override public function init(e:FlexEvent):void {
-            if(!param){
+            if (!param) {
             }
 
-            this.addEventListener(ListClickEvent.CHATUSER,listItemClick_handler);
-            this.addEventListener(ChatTimelineEvent.Channel,flagTimeline);
+            this.addEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
+            this.addEventListener(ChatTimelineEvent.Channel, flagTimeline);
             Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
 
 
@@ -34,11 +35,10 @@
 
         }
 
-        override public function closeContainer(e:CloseEvent):void {
+        override public function closeContainer(e:CloseContainerEvent):void {
             dispatchEvent(e);
-            this.removeEventListener(ListClickEvent.CHATUSER,listItemClick_handler);
-            this.removeEventListener(ChatTimelineEvent.Channel,flagTimeline);
-            Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
+            this.removeEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
+            this.removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
         }
 
         // 重新进入时执行
@@ -52,14 +52,14 @@
             super.reloadParamData(e);
         }
 
-        private function flagTimeline(e:ChatTimelineEvent):void{
-            if(e.flag!=cbar.getCurrentView().flag){
+        private function flagTimeline(e:ChatTimelineEvent):void {
+            if (e.flag != cbar.getCurrentView().flag) {
 
-            }else{
-                for each(var c:Object in ToolUtil.groupList){
-                    if(c.channel==e.channel){
-                        c.unread=0;
-                        Pomelo.getIns().notify("connector.entryHandler.updatetimeline",{channel: e.channel,pid: ToolUtil.sessionUser.pid});
+            } else {
+                for each(var c:Object in ToolUtil.groupList) {
+                    if (c.channel == e.channel) {
+                        c.unread = 0;
+                        Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {channel: e.channel, pid: ToolUtil.sessionUser.pid});
                     }
                 }
                 ToolUtil.groupList.refresh();
@@ -68,28 +68,28 @@
         }
 
 
-        private function listItemClick_handler(e:ListClickEvent):void{
+        private function listItemClick_handler(e:ListClickEvent):void {
             var chat:Object = e.data;
             var mod:String = '';
             var type:String = '';
-            if(chat.hasOwnProperty('flag')){
-                type="d";
-            }else if(!chat.hasOwnProperty("channel")){
-                type="p";
-            }else{
-                if(chat.channel.substr(0,1)=='g'){
-                    type="g";
+            if (chat.hasOwnProperty('flag')) {
+                type = "d";
+            } else if (!chat.hasOwnProperty("channel")) {
+                type = "p";
+            } else {
+                if (chat.channel.substr(0, 1) == 'g') {
+                    type = "g";
                 }
-                if(chat.channel.substr(0,1)=='d'){
-                    type="d";
+                if (chat.channel.substr(0, 1) == 'd') {
+                    type = "d";
                 }
-                if(!isNaN(chat.channel.substr(0,1))){
-                    type="p";
+                if (!isNaN(chat.channel.substr(0, 1))) {
+                    type = "p";
                 }
 
 
             }
-            mod = type+chat.id;
+            mod = type + chat.id;
 
             var c:CBorderContainer;
             c = cbar.getView(mod);
@@ -97,9 +97,9 @@
                 var chatControl:ChatControl = new ChatControl();
                 chatControl.chatUser = chat;
                 chatControl.type = type;
-                if(chat.hasOwnProperty("members")){
+                if (chat.hasOwnProperty("members")) {
                     chatControl.members = new ArrayCollection(chat.members as Array);
-                    for each(var m:Object in chatControl.members){
+                    for each(var m:Object in chatControl.members) {
                         m.level = 0;
                     }
                 }
@@ -116,17 +116,16 @@
             }
 
 
-
         }
-        public function removeChannelHandler(event:PomeloEvent):void{
+
+        public function removeChannelHandler(event:PomeloEvent):void {
             var c:CBorderContainer;
             c = cbar.getView(event.message.channel);
             if (c != null) {
-                var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, c, true);
+                var evt:CloseContainerEvent = new CloseContainerEvent(CloseContainerEvent.Close_EventStr, c, true);
                 c.closeContainer(evt);
             }
         }
-
         ]]>
 	</fx:Script>
 	<fx:Declarations>

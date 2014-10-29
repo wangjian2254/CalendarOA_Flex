@@ -70,7 +70,7 @@
 				if(taskData!=null){
 					ScheduleUtil.closeSchedulePanel(taskData.id+"");
 				}else{
-					ScheduleUtil.clearNewSchedule();
+//					ScheduleUtil.clearNewSchedule();
 				}
 				
 				mve.xFrom = this.x;
@@ -282,7 +282,6 @@
 					taskData.id = result.result;
 					titlestr = taskData.title;
 					FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-					ScheduleUtil.clearNewSchedule();
 					init(false);
 				}
 			}

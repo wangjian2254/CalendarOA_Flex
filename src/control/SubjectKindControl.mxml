@@ -17,7 +17,7 @@
         import control.window.MessagePanel;
 
         import events.ChangeUserEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
 
         import httpcontrol.HttpServiceUtil;
 
@@ -44,6 +44,8 @@
         [Bindable]
         private var subKindArr:ArrayCollection = new ArrayCollection();
         private var state:String = "refresh";//refresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态),del(删除)
+        override public function releaseListener():void{
+        }
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:MouseEvent):void {
@@ -194,7 +196,7 @@
             loadSubKindData();
         }
 
-        override public function closeContainer(e:events.CloseEvent):void {
+        override public function closeContainer(e:events.CloseContainerEvent):void {
 
         }
 

@@ -29,7 +29,8 @@
         public var usermember:ArrayCollection=new ArrayCollection();
 
         public var channel:String;
-
+        override public function  releaseListener(e:CloseEvent):void{
+        }
 
         public function init(e:mx.events.FlexEvent):void{
 

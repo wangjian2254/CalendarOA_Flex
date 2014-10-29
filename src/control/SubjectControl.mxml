@@ -4,288 +4,304 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-			import events.AutoGridEvent;
-			import events.ChangeUserEvent;
-			import events.CloseEvent;
-			import events.DelItemEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.events.FlexEvent;
-			import mx.events.ListEvent;
-			import mx.rpc.events.ResultEvent;
-			
-			import uicontrol.DelItem;
-			
-			import util.DataUtil;
+        import events.AutoGridEvent;
+        import events.ChangeUserEvent;
+        import events.CloseContainerEvent;
+        import events.DelItemEvent;
 
-	        [Bindable]
-	        private var buttonArr1:ArrayCollection = new ArrayCollection([
-	            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
-	            {'label': '新增', 'ico': wximg, 'mode': 'add'}
-	        ]);
-			private var state:String="refresh";//refresh(查询状态),add(新增状态),mod(修改状态)del(删除状态)
-	        [Bindable]
-	        private var subjectArr:ArrayCollection = new ArrayCollection([]);
-			[Bindable]
-			private var subKindArr:ArrayCollection=new ArrayCollection([]);
-	        //新增，保存，删除,回复，转发的处理函数
-	        //多个按钮点击事件的处理函数
-	        private function clickHander(e:MouseEvent):void {
-				ba1.requireSelection=true;
-				var item:Object=ba1.selectedItem;
-	            if (item.mode == 'refresh') {
-					state="refresh";
-					loadSubject();
-	            }
-				if (item.mode == 'add') {
-					state="add";
-					resetFormData();
-					delBtn.enabled=false;
-				}
-	
-	        }
-			//查询分类
-			private function loadSubKindData():void{
-				var o:Object={};//如果需要补齐查询参数
-				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllKind", loadSubKindDataResult, "POST").send(o);
-			};
-			private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					var arr:Array= result.result is Array ?  result.result : [];
-					subKindArr.removeAll();
-					subKindArr.addAll(new ArrayCollection(arr));
-				}
-			}
-			private var isPaging:Boolean;
-			private function loadSubject():void{
-				var o:Object={};//如果需要补齐查询参数
-				o["kind"]=kindKey.text;
-				var url:String= o["kind"]||o["kind"]==""? "/kaoshi/getSubjectAll":"/kaoshi/getSubjectByKind";
-				isPaging= !o["kind"]||o["kind"]==""?true:false;
-				HttpServiceUtil.getCHTTPServiceAndResult(url, loadSubDataResult, "POST").send(o);
-			}
-			private function loadSubDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					resetFormData();
-					delBtn.enabled=false;
-					var arr:Array;
-					if(isPaging){
-						pagebar1.mPageSize = result.result.limit;
-						pagebar1.RecordCount = result.result.total;
-						pagebar1.initPage();
-						arr= result.result.result is Array ?  result.result.result : [];
-					}else{
-						arr= result.result.result is Array ?  result.result.result : [];
-					}
-					subjectArr.removeAll();
-					subjectArr.addAll(new ArrayCollection(arr));
-				}
-			}
-			private function savSubject():void{
-				if(!isValid()){
-					return;
-				}
-				var o:Object=getFormData();
-				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/updateSubject", savSubjectDataResult, "POST").send(o);
-			}
-			private function savSubjectDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					loadSubject();
-				}
-			}
-			private function delSubject():void{
-				state="del";
-				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
-					if(e.detail==Alert.YES){
-						var o:Object=getFormData();
-						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delSubject", delSubjectDataResult, "POST").send(o);
-					}
-				});
-			}
-			private function delSubjectDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					loadSubject();
-				}
-			}
-			private function delOption():void{
-				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
-					if(e.detail==Alert.YES){
-						var o:Object={};
-						o["id"]=optionGrid.selectedItem["id"];
-						HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delOption", delOptionDataResult, "POST").send(o);
-					}
-				});
-			}
-			private function delOptionDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
-					dp.removeItemAt(optionGrid.selectedIndex);
-				}
-			}
-			private function resetFormData():void{
-				title.text="";
-				subKind.selectedIndex=-1;
-				for(var j:int;j<subKindArr.length;j++){
-						subKindArr[j].selected=false;
-				}
-				changeSubKind();
-				subKind.invalidateList();
-				if(optionGrid.dataProvider==null){
-					optionGrid.dataProvider=new ArrayCollection();
-				}else{
-					optionGrid.dataProvider.removeAll();
-				}
-				bz.text="";
-			}
-			private function getFormData():Object{
-				var o:Object={};
-				var n:Object=subjectGrid.selectedItem;
-				if((state=="mod"||state=="del")&&n){
-					o["id"]=n["id"];
-				}
-				if(state=="add"){
-					o["id"]=null;
-				}
-				if((state=="add"||state=="del"||state=="refresh"||state=="mod")&&!n){
-					o["id"]=null;
-				}
-				o["title"]=title.text;
-				var kinds:Array = [];
-				for(var i:int;i<subKindArr.length;i++){
-					if(subKindArr[i].selected===true){
-						kinds.push(subKindArr[i].id);
-					}
-				}
-				o["kinds"]=kinds;
-				o["bz"]=bz.text;
-				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
-				var arr:Array=(dp.toArray()).slice(0,dp.length-1);
-				DataUtil.serializationArr("mx_internal","option_",o,arr);
-				return o;
-			}
-			private function setFormData(o:Object):void{
-				title.text=o["title"];
-				bz.text=o["bz"];
-				subKind.selectedIndex=-1;
-				var dp:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
-				dp.removeAll();
-				var optiosArr:Array= o["options"] is Array?o["options"]:[];
-				dp.addAll(new ArrayCollection(o["options"]));
-				var subKinds:Array = o["kinds"] is Array?o["kinds"]:[];
-				var isFind:Boolean=false;
-				for(var j:int;j<subKindArr.length;j++){
-					isFind=false;
-					for(var i:int;i<subKinds.length;i++){
-						if(subKinds[i]==subKindArr[j]["id"]){
-							subKindArr[j].selected=true;
-							isFind=true;
-							break;
-						}
-					}
-					if(!isFind){
-						subKindArr[j].selected=false;
-					}
-				}
-				changeSubKind();
-				subKind.invalidateList();
-			}
-			private function isValid():Boolean{
-				var o:Object=getFormData();
-				if(o["title"]==""){
-					Alert.show("题目不能为空","提示");
-					return false;
-				}
-				var isFind:Boolean=false;
-				for(var j:int=0;j<subKindArr.length;j++){
-					if(subKindArr[j].selected===true){
-						isFind=true;
-						break;
-					}
-				}
-				if(!isFind){
-					Alert.show("分类不能为空","提示");
-					return false;
-				}
-				if(optionGrid.dataProvider.length<=1){
-					Alert.show("选项不能为空","提示");
-					return false;
-				}
-				var arr:Array=optionGrid.dataProvider.toArray();
-				for(var i:int;i<(arr.length-2);i++){
-					if(arr[i]["content"]==""){
-						Alert.show("选项内容不能为空","提示");
-						return false;
-					}
-					if(arr[i]["is_right"]!=true){
-						arr[i]["is_right"]=false;
-					}
-				}
-				if(o["bz"]==""){
-					Alert.show("备注不能为空","提示");
-					return false;
-				}
-				return true;
-			}
-			private function seletSubjec():void{
-				ba1.requireSelection=false;
-				ba1.selectedIndex=-1;
-				var o:Object=subjectGrid.selectedItem;
-				state="mod";
-				setFormData(o);
-				delBtn.enabled=true;
-			}
-			public function changeSubKind():void{
-				subkinds.removeAllElements();
-				var address:DelItem = null;
-				for each(var obj:Object in subKindArr){
-					if(obj.selected){
-						address = new DelItem();
-						address.modifyEnable = true;
-						address.data = obj;
-						address.labelField="name";
-						subkinds.addElement(address);
-						address.addEventListener(DelItemEvent.Delelte,delSubkin);
-					}
-				}
-			}
-			private function delSubkin(e:DelItemEvent):void{
-				subKind.invalidateList();
-			}
-	        override public function init(e:FlexEvent):void {
-				optionGrid.dataProvider=new ArrayCollection();
-				loadSubject();
-				loadSubKindData();
-	        }
-	
-	        override public function changeCurrentUser(e:ChangeUserEvent):void {
-	
-	        }
-	
-	        override public function closeContainer(e:CloseEvent):void {
-	
-	        }
-	
-	        // 重新进入时执行
-	        override public function reloadParamData(e:FlexEvent):void {
-	        }
-	
-	
-			protected function optionGrid_optionHandler(event:AutoGridEvent):void
-			{	
-				var data:Object=event.data;
-				if(event.type==AutoGridEvent.DELETE){
-					if(!data["id"]||data["id"]==""){
-						var dataProvider:ArrayCollection=optionGrid.dataProvider as ArrayCollection;
-						dataProvider.removeItemAt(data.rowIndex);
-					}else{
-						delOption();
-					}
-				}
-			}
+        import httpcontrol.HttpServiceUtil;
 
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.events.FlexEvent;
+        import mx.events.ListEvent;
+        import mx.rpc.events.ResultEvent;
+
+        import uicontrol.DelItem;
+
+        import util.DataUtil;
+
+        [Bindable]
+        private var buttonArr1:ArrayCollection = new ArrayCollection([
+            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
+            {'label': '新增', 'ico': wximg, 'mode': 'add'}
+        ]);
+        private var state:String = "refresh";//refresh(查询状态),add(新增状态),mod(修改状态)del(删除状态)
+        [Bindable]
+        private var subjectArr:ArrayCollection = new ArrayCollection([]);
+        [Bindable]
+        private var subKindArr:ArrayCollection = new ArrayCollection([]);
+        //新增，保存，删除,回复，转发的处理函数
+        //多个按钮点击事件的处理函数
+        private function clickHander(e:MouseEvent):void {
+            ba1.requireSelection = true;
+            var item:Object = ba1.selectedItem;
+            if (item.mode == 'refresh') {
+                state = "refresh";
+                loadSubject();
+            }
+            if (item.mode == 'add') {
+                state = "add";
+                resetFormData();
+                delBtn.enabled = false;
+            }
+
+        }
+
+        //查询分类
+        private function loadSubKindData():void {
+            var o:Object = {};//如果需要补齐查询参数
+            HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllKind", loadSubKindDataResult, "POST").send(o);
+        };
+        private function loadSubKindDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                var arr:Array = result.result is Array ? result.result : [];
+                subKindArr.removeAll();
+                subKindArr.addAll(new ArrayCollection(arr));
+            }
+        }
+
+        private var isPaging:Boolean;
+
+        private function loadSubject():void {
+            var o:Object = {};//如果需要补齐查询参数
+            o["kind"] = kindKey.text;
+            var url:String = o["kind"] || o["kind"] == "" ? "/kaoshi/getSubjectAll" : "/kaoshi/getSubjectByKind";
+            isPaging = !o["kind"] || o["kind"] == "" ? true : false;
+            HttpServiceUtil.getCHTTPServiceAndResult(url, loadSubDataResult, "POST").send(o);
+        }
+
+        private function loadSubDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                resetFormData();
+                delBtn.enabled = false;
+                var arr:Array;
+                if (isPaging) {
+                    pagebar1.mPageSize = result.result.limit;
+                    pagebar1.RecordCount = result.result.total;
+                    pagebar1.initPage();
+                    arr = result.result.result is Array ? result.result.result : [];
+                } else {
+                    arr = result.result.result is Array ? result.result.result : [];
+                }
+                subjectArr.removeAll();
+                subjectArr.addAll(new ArrayCollection(arr));
+            }
+        }
+
+        private function savSubject():void {
+            if (!isValid()) {
+                return;
+            }
+            var o:Object = getFormData();
+            HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/updateSubject", savSubjectDataResult, "POST").send(o);
+        }
+
+        private function savSubjectDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadSubject();
+            }
+        }
+
+        private function delSubject():void {
+            state = "del";
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+                if (e.detail == Alert.YES) {
+                    var o:Object = getFormData();
+                    HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delSubject", delSubjectDataResult, "POST").send(o);
+                }
+            });
+        }
+
+        private function delSubjectDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadSubject();
+            }
+        }
+
+        private function delOption():void {
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+                if (e.detail == Alert.YES) {
+                    var o:Object = {};
+                    o["id"] = optionGrid.selectedItem["id"];
+                    HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delOption", delOptionDataResult, "POST").send(o);
+                }
+            });
+        }
+
+        private function delOptionDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                var dp:ArrayCollection = optionGrid.dataProvider as ArrayCollection;
+                dp.removeItemAt(optionGrid.selectedIndex);
+            }
+        }
+
+        private function resetFormData():void {
+            title.text = "";
+            subKind.selectedIndex = -1;
+            for (var j:int; j < subKindArr.length; j++) {
+                subKindArr[j].selected = false;
+            }
+            changeSubKind();
+            subKind.invalidateList();
+            if (optionGrid.dataProvider == null) {
+                optionGrid.dataProvider = new ArrayCollection();
+            } else {
+                optionGrid.dataProvider.removeAll();
+            }
+            bz.text = "";
+        }
+
+        private function getFormData():Object {
+            var o:Object = {};
+            var n:Object = subjectGrid.selectedItem;
+            if ((state == "mod" || state == "del") && n) {
+                o["id"] = n["id"];
+            }
+            if (state == "add") {
+                o["id"] = null;
+            }
+            if ((state == "add" || state == "del" || state == "refresh" || state == "mod") && !n) {
+                o["id"] = null;
+            }
+            o["title"] = title.text;
+            var kinds:Array = [];
+            for (var i:int; i < subKindArr.length; i++) {
+                if (subKindArr[i].selected === true) {
+                    kinds.push(subKindArr[i].id);
+                }
+            }
+            o["kinds"] = kinds;
+            o["bz"] = bz.text;
+            var dp:ArrayCollection = optionGrid.dataProvider as ArrayCollection;
+            var arr:Array = (dp.toArray()).slice(0, dp.length - 1);
+            DataUtil.serializationArr("mx_internal", "option_", o, arr);
+            return o;
+        }
+
+        private function setFormData(o:Object):void {
+            title.text = o["title"];
+            bz.text = o["bz"];
+            subKind.selectedIndex = -1;
+            var dp:ArrayCollection = optionGrid.dataProvider as ArrayCollection;
+            dp.removeAll();
+            var optiosArr:Array = o["options"] is Array ? o["options"] : [];
+            dp.addAll(new ArrayCollection(o["options"]));
+            var subKinds:Array = o["kinds"] is Array ? o["kinds"] : [];
+            var isFind:Boolean = false;
+            for (var j:int; j < subKindArr.length; j++) {
+                isFind = false;
+                for (var i:int; i < subKinds.length; i++) {
+                    if (subKinds[i] == subKindArr[j]["id"]) {
+                        subKindArr[j].selected = true;
+                        isFind = true;
+                        break;
+                    }
+                }
+                if (!isFind) {
+                    subKindArr[j].selected = false;
+                }
+            }
+            changeSubKind();
+            subKind.invalidateList();
+        }
+
+        private function isValid():Boolean {
+            var o:Object = getFormData();
+            if (o["title"] == "") {
+                Alert.show("题目不能为空", "提示");
+                return false;
+            }
+            var isFind:Boolean = false;
+            for (var j:int = 0; j < subKindArr.length; j++) {
+                if (subKindArr[j].selected === true) {
+                    isFind = true;
+                    break;
+                }
+            }
+            if (!isFind) {
+                Alert.show("分类不能为空", "提示");
+                return false;
+            }
+            if (optionGrid.dataProvider.length <= 1) {
+                Alert.show("选项不能为空", "提示");
+                return false;
+            }
+            var arr:Array = optionGrid.dataProvider.toArray();
+            for (var i:int; i < (arr.length - 2); i++) {
+                if (arr[i]["content"] == "") {
+                    Alert.show("选项内容不能为空", "提示");
+                    return false;
+                }
+                if (arr[i]["is_right"] != true) {
+                    arr[i]["is_right"] = false;
+                }
+            }
+            if (o["bz"] == "") {
+                Alert.show("备注不能为空", "提示");
+                return false;
+            }
+            return true;
+        }
+
+        private function seletSubjec():void {
+            ba1.requireSelection = false;
+            ba1.selectedIndex = -1;
+            var o:Object = subjectGrid.selectedItem;
+            state = "mod";
+            setFormData(o);
+            delBtn.enabled = true;
+        }
+
+        public function changeSubKind():void {
+            subkinds.removeAllElements();
+            var address:DelItem = null;
+            for each(var obj:Object in subKindArr) {
+                if (obj.selected) {
+                    address = new DelItem();
+                    address.modifyEnable = true;
+                    address.data = obj;
+                    address.labelField = "name";
+                    subkinds.addElement(address);
+                    address.addEventListener(DelItemEvent.Delelte, delSubkin);
+                }
+            }
+        }
+
+        private function delSubkin(e:DelItemEvent):void {
+            subKind.invalidateList();
+        }
+
+        override public function init(e:FlexEvent):void {
+            optionGrid.dataProvider = new ArrayCollection();
+            loadSubject();
+            loadSubKindData();
+        }
+
+        override public function changeCurrentUser(e:ChangeUserEvent):void {
+
+        }
+
+        override public function closeContainer(e:CloseContainerEvent):void {
+
+        }
+
+        // 重新进入时执行
+        override public function reloadParamData(e:FlexEvent):void {
+        }
+
+
+        protected function optionGrid_optionHandler(event:AutoGridEvent):void {
+            var data:Object = event.data;
+            if (event.type == AutoGridEvent.DELETE) {
+                if (!data["id"] || data["id"] == "") {
+                    var dataProvider:ArrayCollection = optionGrid.dataProvider as ArrayCollection;
+                    dataProvider.removeItemAt(data.rowIndex);
+                } else {
+                    delOption();
+                }
+            }
+        }
         ]]>
 	</fx:Script>
 	<fx:Declarations>

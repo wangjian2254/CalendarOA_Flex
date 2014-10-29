@@ -4,396 +4,417 @@
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-			import events.ChangeJoinUserEvent;
-			import events.ChangeUserEvent;
-			import events.CloseEvent;
-			import events.DelItemEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.events.FlexEvent;
-			import mx.rpc.events.ResultEvent;
-			import mx.utils.ObjectUtil;
-			
-			import uicontrol.ContactItem;
-			import uicontrol.DelItem;
-			
-			import util.DateUtil;
-			import util.ToolUtil;
-			
-			[Bindable]
-			private var buttonArr1:ArrayCollection = new ArrayCollection([
-				{'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
-				{'label': '新增', 'ico': wximg, 'mode': 'add'}
-			]);
-			private var state:String="refresh";//refresh(查询状态),add(新增状态),mod(修改状态)del(删除状态)
-			[Bindable]
-			private var paperArr:ArrayCollection = new ArrayCollection([]);
-			[Bindable]
-			private var subjectArr:ArrayCollection = new ArrayCollection([]);
-			[Bindable]
-			private var papKindArr:ArrayCollection=new ArrayCollection([]);
-			[Bindable]
-			private var ryArr:ArrayCollection=new ArrayCollection([]);
-			//新增，保存，删除,回复，转发的处理函数
-			//多个按钮点击事件的处理函数
-			private function clickHander(e:MouseEvent):void {
-				ba1.requireSelection=true;
-				var item:Object=ba1.selectedItem;
-				if (item.mode == 'refresh') {
-					state="refresh";
-					loadPager();
-				}
-				if (item.mode == 'add') {
-					state="add";
-					resetFormData();
-					delBtn.enabled=false;
-				}
-				
-			}
-			//查询分类
-			private function loadPagKindData():void{
-				var o:Object={};//如果需要补齐查询参数
-				HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllPaperKind", loadPagKindDataResult, "POST").send(o);
-			};
-			private function loadPagKindDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					var arr:Array= result.result is Array ?  result.result : [];
-					papKindArr.removeAll();
-					papKindArr.addAll(new ArrayCollection(arr));
-				}
-			}
-			private var isPaging:Boolean;
-			private function loadPager():void{
-				var o:Object={};//如果需要补齐查询参数
-				o["kind"]=kindKey.text;
-				var url:String= o["kind"]||o["kind"]==""? "/kaoshi/getSubjectAll":"/kaoshi/getSubjectByKind";//?????????配置查询所有和带有关键字的url
-				isPaging= !o["kind"]||o["kind"]==""?true:false;
-				HttpServiceUtil.getCHTTPServiceAndResult(url, loadPagerDataResult, "POST").send(o);
-			}
-			private function loadPagerDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					resetFormData();
-					delBtn.enabled=false;
-					var arr:Array;
-					if(isPaging){
-						pagebar1.mPageSize = result.result.limit;
-						pagebar1.RecordCount = result.result.total;
-						pagebar1.initPage();
-						arr= result.result.result is Array ?  result.result.result : [];
-					}else{
-						arr= result.result.result is Array ?  result.result.result : [];
-					}
-					paperArr.removeAll();
-					paperArr.addAll(new ArrayCollection(arr));
-				}
-			}
-			private function savPager():void{
-				if(!isValid()){
-					return;
-				}
-				var o:Object=getFormData();
-				var url:String="";//???????????????这里配置保存试卷url
-				HttpServiceUtil.getCHTTPServiceAndResult(url, savPagerDataResult, "POST").send(o);
-			}
-			private function savPagerDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					loadPager();
-				}
-			}
-			private function delPager():void{
-				Alert.show("是否删除","提示",Alert.YES|Alert.NO,null,function(e:mx.events.CloseEvent):void{
-					if(e.detail==Alert.YES){
-						var o:Object={};
-						o["id"]=pagerGrid.selectedItem["id"];
-						var url:String="";//???????????????这里配置删除试卷url
-						HttpServiceUtil.getCHTTPServiceAndResult(url, delPagerDataResult, "POST").send(o);
-					}
-				});
-			}
-			private function delPagerDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					loadPager();
-				}
-			}
-			private function loadSubject():void{
-				var url:String= "/kaoshi/getSubjectAll";
-				HttpServiceUtil.getCHTTPServiceAndResult(url, loadSubDataResult, "POST").send(null);
-			}
-			private function loadSubDataResult(result:Object, e:ResultEvent):void {
-				if (result.success) {
-					var arr:Array;
-					arr= result.result.result is Array ?  result.result.result : [];
-					subjectArr.removeAll();
-					subjectArr.addAll(new ArrayCollection(arr));
-				}
-			}
-			private function resetFormData():void{
-				title.text="";
-				paperKind.selectedIndex=-1;
-				var j:int=0;
-				for(;j<papKindArr.length;j++){
-					papKindArr[j].selected=false;
-				}
-				changePaperKind();
-				paperKind.invalidateList();
-				j=0;
-				for(;j<subjectArr.length;j++){
-					subjectArr[j].selected=false;
-				}
-				changeSubject();
-				subjectGrid.invalidateList();
-				bz.text="";
-				j=0;
-				for(;j<ryArr.length;j++){
-					ryArr[j].selected=false;
-				}
-				changeUsers();
-				ryGrid.invalidateList();
-				ryfw.selected=false;
-				publish.selected=false;
-				replay.selected=false;
-				startdate.text="";
-				enddate.text="";
-			}
-			private function getFormData():Object{
-				var o:Object={};
-				var n:Object=pagerGrid.selectedItem;
-				if((state=="mod"||state=="del")&&n){
-					o["id"]=n["id"];
-				}
-				if(state=="add"){
-					o["id"]=null;
-				}
-				if((state=="add"||state=="del"||state=="refresh"||state=="mod")&&!n){
-					o["id"]=null;
-				}
-				o["title"]=title.text;//?????????根据实际需要改写属性名称
-				var kinds:Array = [];
-				var i:int=0;
-				for(;i<papKindArr.length;i++){
-					if(papKindArr[i].selected===true){
-						kinds.push(papKindArr[i].id);
-					}
-				}
-				o["kinds"]=kinds;//?????????根据实际需要改写属性名称
-				o["bz"]=bz.text;//?????????根据实际需要改写属性名称
-				var subjects:Array = [];
-				i=0;
-				for(;i<subjectArr.length;i++){
-					if(subjectArr[i].selected===true){
-						subjects.push(subjectArr[i].id);
-					}
-				}
-				o["subjects"]=subjects;//?????????根据实际需要改写属性名称
-				var joins:Array = [];
-				i=0;
-				for(;i<ryArr.length;i++){
-					if(ryArr[i].selected===true){
-						joins.push(ryArr[i].id);
-					}
-				}
-				o["joins"]=joins;//?????????根据实际需要改写属性名称
-				o["is_user"]=ryfw.selected;//?????????根据实际需要改写属性名称
-				o["publish"]=publish.selected;//?????????根据实际需要改写属性名称
-				o["replay"]=replay.selected;//?????????根据实际需要改写属性名称
-				o["startdate"]=startdate.text;//?????????根据实际需要改写属性名称
-				o["enddate"]=enddate.text;//?????????根据实际需要改写属性名称
-				return o;
-			}
-			private function setFormData(o:Object):void{
-				title.text=o["title"];//?????????根据实际需要改写属性名称
-				bz.text=o["bz"];//?????????根据实际需要改写属性名称
-				paperKind.selectedIndex=-1;
-				var paperKinds:Array = o["kinds"] is Array?o["kinds"]:[];//?????????根据实际需要改写属性名称
-				var subjects:Array = o["subjects"] is Array?o["subjects"]:[];//?????????根据实际需要改写属性名称
-				var joins:Array = o["joins"] is Array?o["joins"]:[];//?????????根据实际需要改写属性名称
-				var isFind:Boolean=false;
-				var j:int=0;
-				var i:int=0;
-				for(;j<papKindArr.length;j++){
-					isFind=false;
-					i=0;
-					for(;i<paperKinds.length;i++){
-						if(paperKinds[i]==papKindArr[j]["id"]){
-							papKindArr[j].selected=true;
-							isFind=true;
-							break;
-						}
-					}
-					if(!isFind){
-						papKindArr[j].selected=false;
-					}
-				}
-				changePaperKind();
-				paperKind.invalidateList();
-				j=0;
-				for(;j<subjectArr.length;j++){
-					isFind=false;
-					i=0;
-					for(;i<subjects.length;i++){
-						if(subjects[i]==subjectArr[j]["id"]){
-							subjectArr[j].selected=true;
-							isFind=true;
-							break;
-						}
-					}
-					if(!isFind){
-						subjectArr[j].selected=false;
-					}
-				}
-				changeSubject();
-				subjectGrid.invalidateList();
-				j=0;
-				for(;j<ryArr.length;j++){
-					isFind=false;
-					i=0;
-					for(;i<joins.length;i++){
-						if(joins[i]==ryArr[j]["id"]){
-							ryArr[j].selected=true;
-							isFind=true;
-							break;
-						}
-					}
-					if(!isFind){
-						subjectArr[j].selected=false;
-					}
-				}
-				changeUsers();
-				ryGrid.invalidateList();
-				ryfw.selected=o["is_user"];//?????????根据实际需要改写属性名称
-				publish.selected=o["is_pub"];//?????????根据实际需要改写属性名称
-				replay.selected=o["is_replay"];//?????????根据实际需要改写属性名称
-				startdate.text= o["startDate"] is String?o["startDate"]:"";//?????????根据实际需要改写属性名称
-				enddate.text=o["endDate"] is String?o["endDate"]:"";//?????????根据实际需要改写属性名称
-			}
-			private function isValid():Boolean{
-				var o:Object=getFormData();
-				if(o["title"]==""){//?????????根据实际需要改写属性名称
-					Alert.show("考卷名字不能为空","提示");
-					return false;
-				}
-				if(o["bz"]==""){//?????????根据实际需要改写属性名称
-					Alert.show("内容不能为空","提示");
-					return false;
-				}
-				var isFind:Boolean=false;
-				var j:int=0;
-				for(;j<papKindArr.length;j++){
-					if(papKindArr[j].selected===true){
-						isFind=true;
-						break;
-					}
-				}
-				if(!isFind){
-					Alert.show("分类不能为空","提示");
-					return false;
-				}
-				isFind=false;
-				j=0;
-				for(;j<subjectArr.length;j++){
-					if(subjectArr[j].selected===true){
-						isFind=true;
-						break;
-					}
-				}
-				if(!isFind){
-					Alert.show("题目不能为空","提示");
-					return false;
-				}
-				if(o["startdate"]==""){
-					Alert.show("开始时间不能为空","提示");
-					return false;
-				}
-				if(o["endDate"]==""){
-					Alert.show("结束时间不能为空","提示");
-					return false;
-				}
-				return true;
-			}
-			private function seletPaper():void{
-				ba1.requireSelection=false;
-				ba1.selectedIndex=-1;
-				var o:Object=pagerGrid.selectedItem;
-				state="mod";
-				setFormData(o);
-				delBtn.enabled=true;
-			}
-			public function changePaperKind():void{
-				paperkinds.removeAllElements();
-				var address:DelItem = null;
-				for each(var obj:Object in papKindArr){
-					if(obj.selected){
-						address = new DelItem();
-						address.modifyEnable = true;
-						address.data = obj;
-						address.labelField="name";
-						paperkinds.addElement(address);
-						address.addEventListener(DelItemEvent.Delelte,delPaperkin);
-					}
-				}
-			}
-			private function delPaperkin(e:DelItemEvent):void{
-				paperKind.invalidateList();
-			}
-			public function changeSubject():void{
-				subjects.removeAllElements();
-				var address:DelItem = null;
-				for each(var obj:Object in subjectArr){
-					if(obj.selected){
-						address = new DelItem();
-						address.modifyEnable = true;
-						address.data = obj;
-						address.labelField="title";
-						subjects.addElement(address);
-						address.addEventListener(DelItemEvent.Delelte,delSubject);
-					}
-				}
-			}
-			private function delSubject(e:DelItemEvent):void{
-				subjectGrid.invalidateList();
-			}
-			public function changeUsers():void{
-				users.removeAllElements();
-				var address:ContactItem = null;
-				for each(var obj:Object in ryArr){
-					if(obj.selected){
-						address = new ContactItem();
-						address.tileGroup = users;
-						address.modifyEnable = true;
-						address.userData = obj;
-						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
-						users.addElement(address);
-					}
-				}
-			}
-			private function delJoin(e:ChangeJoinUserEvent):void{
-				ryGrid.invalidateList();
-			}
-			override public function init(e:FlexEvent):void {
+        import events.ChangeJoinUserEvent;
+        import events.ChangeUserEvent;
+        import events.CloseContainerEvent;
+        import events.DelItemEvent;
+
+        import httpcontrol.HttpServiceUtil;
+
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.events.FlexEvent;
+        import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
+
+        import uicontrol.ContactItem;
+        import uicontrol.DelItem;
+
+        import util.DateUtil;
+        import util.ToolUtil;
+
+        [Bindable]
+        private var buttonArr1:ArrayCollection = new ArrayCollection([
+            {'label': '刷新', 'ico': refreshimg, 'mode': 'refresh'},
+            {'label': '新增', 'ico': wximg, 'mode': 'add'}
+        ]);
+        private var state:String = "refresh";//refresh(查询状态),add(新增状态),mod(修改状态)del(删除状态)
+        [Bindable]
+        private var paperArr:ArrayCollection = new ArrayCollection([]);
+        [Bindable]
+        private var subjectArr:ArrayCollection = new ArrayCollection([]);
+        [Bindable]
+        private var papKindArr:ArrayCollection = new ArrayCollection([]);
+        [Bindable]
+        private var ryArr:ArrayCollection = new ArrayCollection([]);
+        override public function releaseListener():void{
+        }
+        //新增，保存，删除,回复，转发的处理函数
+        //多个按钮点击事件的处理函数
+        private function clickHander(e:MouseEvent):void {
+            ba1.requireSelection = true;
+            var item:Object = ba1.selectedItem;
+            if (item.mode == 'refresh') {
+                state = "refresh";
+                loadPager();
+            }
+            if (item.mode == 'add') {
+                state = "add";
+                resetFormData();
+                delBtn.enabled = false;
+            }
+
+        }
+
+        //查询分类
+        private function loadPagKindData():void {
+            var o:Object = {};//如果需要补齐查询参数
+            HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/getAllPaperKind", loadPagKindDataResult, "POST").send(o);
+        };
+        private function loadPagKindDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                var arr:Array = result.result is Array ? result.result : [];
+                papKindArr.removeAll();
+                papKindArr.addAll(new ArrayCollection(arr));
+            }
+        }
+
+        private var isPaging:Boolean;
+
+        private function loadPager():void {
+            var o:Object = {};//如果需要补齐查询参数
+            o["kind"] = kindKey.text;
+            var url:String = o["kind"] || o["kind"] == "" ? "/kaoshi/getSubjectAll" : "/kaoshi/getSubjectByKind";//?????????配置查询所有和带有关键字的url
+            isPaging = !o["kind"] || o["kind"] == "" ? true : false;
+            HttpServiceUtil.getCHTTPServiceAndResult(url, loadPagerDataResult, "POST").send(o);
+        }
+
+        private function loadPagerDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                resetFormData();
+                delBtn.enabled = false;
+                var arr:Array;
+                if (isPaging) {
+                    pagebar1.mPageSize = result.result.limit;
+                    pagebar1.RecordCount = result.result.total;
+                    pagebar1.initPage();
+                    arr = result.result.result is Array ? result.result.result : [];
+                } else {
+                    arr = result.result.result is Array ? result.result.result : [];
+                }
+                paperArr.removeAll();
+                paperArr.addAll(new ArrayCollection(arr));
+            }
+        }
+
+        private function savPager():void {
+            if (!isValid()) {
+                return;
+            }
+            var o:Object = getFormData();
+            var url:String = "";//???????????????这里配置保存试卷url
+            HttpServiceUtil.getCHTTPServiceAndResult(url, savPagerDataResult, "POST").send(o);
+        }
+
+        private function savPagerDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadPager();
+            }
+        }
+
+        private function delPager():void {
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+                if (e.detail == Alert.YES) {
+                    var o:Object = {};
+                    o["id"] = pagerGrid.selectedItem["id"];
+                    var url:String = "";//???????????????这里配置删除试卷url
+                    HttpServiceUtil.getCHTTPServiceAndResult(url, delPagerDataResult, "POST").send(o);
+                }
+            });
+        }
+
+        private function delPagerDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                loadPager();
+            }
+        }
+
+        private function loadSubject():void {
+            var url:String = "/kaoshi/getSubjectAll";
+            HttpServiceUtil.getCHTTPServiceAndResult(url, loadSubDataResult, "POST").send(null);
+        }
+
+        private function loadSubDataResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                var arr:Array;
+                arr = result.result.result is Array ? result.result.result : [];
+                subjectArr.removeAll();
+                subjectArr.addAll(new ArrayCollection(arr));
+            }
+        }
+
+        private function resetFormData():void {
+            title.text = "";
+            paperKind.selectedIndex = -1;
+            var j:int = 0;
+            for (; j < papKindArr.length; j++) {
+                papKindArr[j].selected = false;
+            }
+            changePaperKind();
+            paperKind.invalidateList();
+            j = 0;
+            for (; j < subjectArr.length; j++) {
+                subjectArr[j].selected = false;
+            }
+            changeSubject();
+            subjectGrid.invalidateList();
+            bz.text = "";
+            j = 0;
+            for (; j < ryArr.length; j++) {
+                ryArr[j].selected = false;
+            }
+            changeUsers();
+            ryGrid.invalidateList();
+            ryfw.selected = false;
+            publish.selected = false;
+            replay.selected = false;
+            startdate.text = "";
+            enddate.text = "";
+        }
+
+        private function getFormData():Object {
+            var o:Object = {};
+            var n:Object = pagerGrid.selectedItem;
+            if ((state == "mod" || state == "del") && n) {
+                o["id"] = n["id"];
+            }
+            if (state == "add") {
+                o["id"] = null;
+            }
+            if ((state == "add" || state == "del" || state == "refresh" || state == "mod") && !n) {
+                o["id"] = null;
+            }
+            o["title"] = title.text;//?????????根据实际需要改写属性名称
+            var kinds:Array = [];
+            var i:int = 0;
+            for (; i < papKindArr.length; i++) {
+                if (papKindArr[i].selected === true) {
+                    kinds.push(papKindArr[i].id);
+                }
+            }
+            o["kinds"] = kinds;//?????????根据实际需要改写属性名称
+            o["bz"] = bz.text;//?????????根据实际需要改写属性名称
+            var subjects:Array = [];
+            i = 0;
+            for (; i < subjectArr.length; i++) {
+                if (subjectArr[i].selected === true) {
+                    subjects.push(subjectArr[i].id);
+                }
+            }
+            o["subjects"] = subjects;//?????????根据实际需要改写属性名称
+            var joins:Array = [];
+            i = 0;
+            for (; i < ryArr.length; i++) {
+                if (ryArr[i].selected === true) {
+                    joins.push(ryArr[i].id);
+                }
+            }
+            o["joins"] = joins;//?????????根据实际需要改写属性名称
+            o["is_user"] = ryfw.selected;//?????????根据实际需要改写属性名称
+            o["publish"] = publish.selected;//?????????根据实际需要改写属性名称
+            o["replay"] = replay.selected;//?????????根据实际需要改写属性名称
+            o["startdate"] = startdate.text;//?????????根据实际需要改写属性名称
+            o["enddate"] = enddate.text;//?????????根据实际需要改写属性名称
+            return o;
+        }
+
+        private function setFormData(o:Object):void {
+            title.text = o["title"];//?????????根据实际需要改写属性名称
+            bz.text = o["bz"];//?????????根据实际需要改写属性名称
+            paperKind.selectedIndex = -1;
+            var paperKinds:Array = o["kinds"] is Array ? o["kinds"] : [];//?????????根据实际需要改写属性名称
+            var subjects:Array = o["subjects"] is Array ? o["subjects"] : [];//?????????根据实际需要改写属性名称
+            var joins:Array = o["joins"] is Array ? o["joins"] : [];//?????????根据实际需要改写属性名称
+            var isFind:Boolean = false;
+            var j:int = 0;
+            var i:int = 0;
+            for (; j < papKindArr.length; j++) {
+                isFind = false;
+                i = 0;
+                for (; i < paperKinds.length; i++) {
+                    if (paperKinds[i] == papKindArr[j]["id"]) {
+                        papKindArr[j].selected = true;
+                        isFind = true;
+                        break;
+                    }
+                }
+                if (!isFind) {
+                    papKindArr[j].selected = false;
+                }
+            }
+            changePaperKind();
+            paperKind.invalidateList();
+            j = 0;
+            for (; j < subjectArr.length; j++) {
+                isFind = false;
+                i = 0;
+                for (; i < subjects.length; i++) {
+                    if (subjects[i] == subjectArr[j]["id"]) {
+                        subjectArr[j].selected = true;
+                        isFind = true;
+                        break;
+                    }
+                }
+                if (!isFind) {
+                    subjectArr[j].selected = false;
+                }
+            }
+            changeSubject();
+            subjectGrid.invalidateList();
+            j = 0;
+            for (; j < ryArr.length; j++) {
+                isFind = false;
+                i = 0;
+                for (; i < joins.length; i++) {
+                    if (joins[i] == ryArr[j]["id"]) {
+                        ryArr[j].selected = true;
+                        isFind = true;
+                        break;
+                    }
+                }
+                if (!isFind) {
+                    subjectArr[j].selected = false;
+                }
+            }
+            changeUsers();
+            ryGrid.invalidateList();
+            ryfw.selected = o["is_user"];//?????????根据实际需要改写属性名称
+            publish.selected = o["is_pub"];//?????????根据实际需要改写属性名称
+            replay.selected = o["is_replay"];//?????????根据实际需要改写属性名称
+            startdate.text = o["startDate"] is String ? o["startDate"] : "";//?????????根据实际需要改写属性名称
+            enddate.text = o["endDate"] is String ? o["endDate"] : "";//?????????根据实际需要改写属性名称
+        }
+
+        private function isValid():Boolean {
+            var o:Object = getFormData();
+            if (o["title"] == "") {//?????????根据实际需要改写属性名称
+                Alert.show("考卷名字不能为空", "提示");
+                return false;
+            }
+            if (o["bz"] == "") {//?????????根据实际需要改写属性名称
+                Alert.show("内容不能为空", "提示");
+                return false;
+            }
+            var isFind:Boolean = false;
+            var j:int = 0;
+            for (; j < papKindArr.length; j++) {
+                if (papKindArr[j].selected === true) {
+                    isFind = true;
+                    break;
+                }
+            }
+            if (!isFind) {
+                Alert.show("分类不能为空", "提示");
+                return false;
+            }
+            isFind = false;
+            j = 0;
+            for (; j < subjectArr.length; j++) {
+                if (subjectArr[j].selected === true) {
+                    isFind = true;
+                    break;
+                }
+            }
+            if (!isFind) {
+                Alert.show("题目不能为空", "提示");
+                return false;
+            }
+            if (o["startdate"] == "") {
+                Alert.show("开始时间不能为空", "提示");
+                return false;
+            }
+            if (o["endDate"] == "") {
+                Alert.show("结束时间不能为空", "提示");
+                return false;
+            }
+            return true;
+        }
+
+        private function seletPaper():void {
+            ba1.requireSelection = false;
+            ba1.selectedIndex = -1;
+            var o:Object = pagerGrid.selectedItem;
+            state = "mod";
+            setFormData(o);
+            delBtn.enabled = true;
+        }
+
+        public function changePaperKind():void {
+            paperkinds.removeAllElements();
+            var address:DelItem = null;
+            for each(var obj:Object in papKindArr) {
+                if (obj.selected) {
+                    address = new DelItem();
+                    address.modifyEnable = true;
+                    address.data = obj;
+                    address.labelField = "name";
+                    paperkinds.addElement(address);
+                    address.addEventListener(DelItemEvent.Delelte, delPaperkin);
+                }
+            }
+        }
+
+        private function delPaperkin(e:DelItemEvent):void {
+            paperKind.invalidateList();
+        }
+
+        public function changeSubject():void {
+            subjects.removeAllElements();
+            var address:DelItem = null;
+            for each(var obj:Object in subjectArr) {
+                if (obj.selected) {
+                    address = new DelItem();
+                    address.modifyEnable = true;
+                    address.data = obj;
+                    address.labelField = "title";
+                    subjects.addElement(address);
+                    address.addEventListener(DelItemEvent.Delelte, delSubject);
+                }
+            }
+        }
+
+        private function delSubject(e:DelItemEvent):void {
+            subjectGrid.invalidateList();
+        }
+
+        public function changeUsers():void {
+            users.removeAllElements();
+            var address:ContactItem = null;
+            for each(var obj:Object in ryArr) {
+                if (obj.selected) {
+                    address = new ContactItem();
+                    address.tileGroup = users;
+                    address.modifyEnable = true;
+                    address.userData = obj;
+                    address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr, delJoin);
+                    users.addElement(address);
+                }
+            }
+        }
+
+        private function delJoin(e:ChangeJoinUserEvent):void {
+            ryGrid.invalidateList();
+        }
+
+        override public function init(e:FlexEvent):void {
 //				loadPager();//?????????如果业务都已经完成放开这个方法里的代码
-				loadPagKindData();
+            loadPagKindData();
 //				loadSubject();
-				ryArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
-			}
-			
-			override public function changeCurrentUser(e:ChangeUserEvent):void {
-				
-			}
-			
-			override public function closeContainer(e:CloseEvent):void {
-				
-			}
-			
-			// 重新进入时执行
-			override public function reloadParamData(e:FlexEvent):void {
-			}
-			
-			
-			
-		]]>
+            ryArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+        }
+
+        override public function changeCurrentUser(e:ChangeUserEvent):void {
+
+        }
+
+        override public function closeContainer(e:CloseContainerEvent):void {
+
+        }
+
+        // 重新进入时执行
+        override public function reloadParamData(e:FlexEvent):void {
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

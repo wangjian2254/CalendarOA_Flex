@@ -27,9 +27,16 @@ public class EfficientTitleWindow extends TitleWindow{
     private function preinit():void {
         addEventListener(FlexEvent.CREATION_COMPLETE, showAnimation);
         addEventListener(FlexEvent.SHOW, showAnimation);
+        addEventListener(CloseEvent.CLOSE, releaseListener);
         addEventListener(CloseEvent.CLOSE, closeAnimation);
 
+
     }
+
+    public function releaseListener(e:CloseEvent):void{
+        throw new Error("EfficientTitleWindow 的子类必须重写 releaseListener(e:CloseEvent) 方法。在方法中移除监听外界对象的事件。");
+    }
+
     public function closeWin():void {
         var e:CloseEvent = new CloseEvent(CloseEvent.CLOSE);
         dispatchEvent(e);

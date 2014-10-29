@@ -15,6 +15,7 @@
             import mx.collections.ArrayCollection;
 
             import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.events.EffectEvent;
         import mx.managers.PopUpManager;
 			import mx.rpc.events.ResultEvent;
@@ -24,9 +25,8 @@
             [Bindable]
             private var orglist:ArrayCollection;
 
-
-
-
+        override public function  releaseListener(e:CloseEvent):void{
+        }
             private function init():void{
 
 

@@ -12,6 +12,7 @@
         import mx.collections.ArrayCollection;
 
         import mx.controls.Alert;
+        import mx.events.CloseEvent;
         import mx.events.CollectionEvent;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
@@ -20,6 +21,7 @@
 
         import util.ToolUtil;
 
+        [Bindable]
         public function get getWindowHeight():Number{
             return form.height;
         }
@@ -33,8 +35,12 @@
 
         public var projectData:Object;
 
+        override public function  releaseListener(e:CloseEvent):void{
+            ToolUtil.projectList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, projectRefresh);
+        }
+
         private function projectRefresh(e:CollectionEvent):void{
-            myprojectList.addItem({id:0,label:"无"});
+            myprojectList.addItem({id:0,name:"无"});
             myprojectList.addAll(ObjectUtil.copy(ToolUtil.allProjectList) as ArrayCollection)
         }
 

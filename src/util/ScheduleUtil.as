@@ -14,11 +14,11 @@ package util
 		{
 		}
 		
-		private static var newSchedule:SchedulePanel=null;
+//		private static var newSchedule:SchedulePanel=null;
 		private static var showSchedule:Object=new Object();
 		
 		public static function createSchedule(startdate:Date=null,enddate:Date=null):void{
-				newSchedule  = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
+            var newSchedule:SchedulePanel  = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
 			newSchedule.schedulData=null;
 			if(startdate!=null&&enddate!=null){
 				newSchedule.startDateValue = startdate;
@@ -34,9 +34,9 @@ package util
 //			PopUpManager.centerPopUp(newSchedule);
 		}
 		
-		public static function clearNewSchedule():void{
-			newSchedule=null;
-		}
+//		public static function clearNewSchedule():void{
+//			newSchedule=null;
+//		}
 		
 		public static function closeSchedulePanel(scheduleId:String):void{
 			if(showSchedule.hasOwnProperty(scheduleId)){

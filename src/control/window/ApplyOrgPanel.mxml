@@ -29,6 +29,8 @@
         public var orgData:Object = null;
         public var type:String = null;
 
+        override public function  releaseListener(e:CloseEvent):void{
+        }
         public function init(e:mx.events.FlexEvent):void {
 
             this.height = form.height + 10;
@@ -38,17 +40,6 @@
 
         }
 
-        //			public  function sendAnimation():void{
-        //				mve.xFrom=this.width;
-        //				mve.yFrom=this.height;
-        //				mve.xTo=FlexGlobals.topLevelApplication.width;
-        //				mve.yTo =0;
-        //				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-        //				var pb:Point=new Point(mve.xTo,mve.yTo);
-        //				mve.duration = int(Point.distance(pa,pb))/100*70;
-        //				mve.addEventListener(EffectEvent.EFFECT_END,sendAnimationEnd);
-        //				mve.play();
-        //			}
 
 
         private function sendMessageResult(result:Object, e:ResultEvent):void {

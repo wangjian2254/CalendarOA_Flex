@@ -18,6 +18,8 @@
             public var personData:Object=null;
 //            public var departmentData:Object=null;
 
+            override public function  releaseListener(e:CloseEvent):void{
+            }
 			public function init(e:mx.events.FlexEvent):void{
 
                 this.height = hGroup.height+20;

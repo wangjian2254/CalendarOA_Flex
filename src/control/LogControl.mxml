@@ -9,204 +9,208 @@
 		<![CDATA[
         import control.*;
 
-        import events.CloseEvent;
-			import events.PageChangeEvent;
-			
-			import httpcontrol.CHTTPService;
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.events.FlexEvent;
-			import mx.events.ItemClickEvent;
-			import mx.rpc.events.FaultEvent;
-			import mx.rpc.events.ResultEvent;
-            import mx.utils.StringUtil;
+        import events.CloseContainerEvent;
+        import events.PageChangeEvent;
 
-            import util.DateUtil;
-			import util.ToolUtil;
-			
-			[Bindable]
-			private var timelist:ArrayCollection=new ArrayCollection([{'label':'今天','mode':'today'},
-				{'label':'昨天','mode':'yesterday'},
-				{'label':'前天','mode':'beforeyesterday'},
-				{'label':'本周','mode':'week'},
-				{'label':'上周','mode':'beforeweek'},
-				{'label':'本月','mode':'monthly'},
-				{'label':'上月','mode':'beforemonthly'}]);
-			
-			[Bindable]
-			private var list:ArrayCollection=new ArrayCollection();
-			
-			override public   function  init(e:FlexEvent):void{
-                showLog();
-                queryLog();
-			}
-			override public function closeContainer(e:CloseEvent):void{
-				dispatchEvent(e);
-			}
-			
-			private function showLog():void{
-				
-				if(logQZ.selectedItem==null){
-					return;
-				}
-				var end:Date=new Date();
-				var start:Date=new Date();
-				
-				switch(logQZ.selectedItem.mode){
-					case "today":
-						break;
-					case "yesterday":
-						start.date-=1;
-						end.date-=1;
-						break;
-					case "beforeyesterday":
-						start.date-=2;
-						end.date-=2;
-						break;
-					case "week":
-						if (start.day>0){
-                            start.date-=(end.day-1);
-						}else{
-                            start.date-=6;
-						}
-							
-						break;
-					case "beforeweek":
-						if (start.day>0){
-							start.date-=(end.day-1);
-						}else{
-							start.date-=6;
-						}
-						if (end.day>0){
-							end.date-=(end.day-1);
-						}else{
-							end.date-=6;
-						}
-                        start.date-=7;
-						break;
-					case "monthly":
-                        start.date=1;
-						break;
-					case "beforemonthly":
-						start.date-=start.date;
-						end.date-=end.date;
-                        start.date-=start.date;
-						break;
-					
-				}
-				startdate.selectedDate=start;
-				enddate.selectedDate=end;
-				queryLog();
-				
-			}
-			
-			private function queryparamchange():void{
-				logQZ.selectedIndex=-1;
-			}
-			
-			private function queryLog():void{
-				var data:Object=new Object();
-				data["start"] = DateUtil.dateLbl(startdate.selectedDate);
-				data["end"] = DateUtil.dateLbl(enddate.selectedDate);
-				HttpServiceUtil.getCHTTPServiceAndResult("/log/getMyHistory",queryLogResult,"POST").send(data);
-			}
-			
-			private function queryLogResult(result:Object,e:ResultEvent):void{
-				if(result.result){
-					list.removeAll();
-					list.addAll(new ArrayCollection(result.result as Array));
-				}
-				
-			}
+        import httpcontrol.CHTTPService;
+        import httpcontrol.HttpServiceUtil;
 
-            private function click_logItem():void{
-                if(cBoxModelHistory.selected){
-                    if(logGrid.selectedItem){
-                        if(object_id==logGrid.selectedItem.object_id&&object_type==logGrid.selectedItem.object_type_id){
-                            Alert.show("对象历史记录显示的就是选中对象，是否改为显示所选记录?", "提示", Alert.YES | Alert.NO, null, showLogItem);
-                        }else{
-                            showModelHistory();
-                        }
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.events.FlexEvent;
+        import mx.events.ItemClickEvent;
+        import mx.rpc.events.FaultEvent;
+        import mx.rpc.events.ResultEvent;
+        import mx.utils.StringUtil;
+
+        import util.DateUtil;
+        import util.ToolUtil;
+
+        [Bindable]
+        private var timelist:ArrayCollection = new ArrayCollection([
+            {'label': '今天', 'mode': 'today'},
+            {'label': '昨天', 'mode': 'yesterday'},
+            {'label': '前天', 'mode': 'beforeyesterday'},
+            {'label': '本周', 'mode': 'week'},
+            {'label': '上周', 'mode': 'beforeweek'},
+            {'label': '本月', 'mode': 'monthly'},
+            {'label': '上月', 'mode': 'beforemonthly'}
+        ]);
+
+        [Bindable]
+        private var list:ArrayCollection = new ArrayCollection();
+
+        override public function releaseListener():void{
+        }
+        override public function init(e:FlexEvent):void {
+            showLog();
+            queryLog();
+        }
+
+        override public function closeContainer(e:CloseContainerEvent):void {
+            dispatchEvent(e);
+        }
+
+        private function showLog():void {
+
+            if (logQZ.selectedItem == null) {
+                return;
+            }
+            var end:Date = new Date();
+            var start:Date = new Date();
+
+            switch (logQZ.selectedItem.mode) {
+                case "today":
+                    break;
+                case "yesterday":
+                    start.date -= 1;
+                    end.date -= 1;
+                    break;
+                case "beforeyesterday":
+                    start.date -= 2;
+                    end.date -= 2;
+                    break;
+                case "week":
+                    if (start.day > 0) {
+                        start.date -= (end.day - 1);
+                    } else {
+                        start.date -= 6;
                     }
-                }else{
-                    showChangeMessage();
+
+                    break;
+                case "beforeweek":
+                    if (start.day > 0) {
+                        start.date -= (end.day - 1);
+                    } else {
+                        start.date -= 6;
+                    }
+                    if (end.day > 0) {
+                        end.date -= (end.day - 1);
+                    } else {
+                        end.date -= 6;
+                    }
+                    start.date -= 7;
+                    break;
+                case "monthly":
+                    start.date = 1;
+                    break;
+                case "beforemonthly":
+                    start.date -= start.date;
+                    end.date -= end.date;
+                    start.date -= start.date;
+                    break;
+
+            }
+            startdate.selectedDate = start;
+            enddate.selectedDate = end;
+            queryLog();
+
+        }
+
+        private function queryparamchange():void {
+            logQZ.selectedIndex = -1;
+        }
+
+        private function queryLog():void {
+            var data:Object = new Object();
+            data["start"] = DateUtil.dateLbl(startdate.selectedDate);
+            data["end"] = DateUtil.dateLbl(enddate.selectedDate);
+            HttpServiceUtil.getCHTTPServiceAndResult("/log/getMyHistory", queryLogResult, "POST").send(data);
+        }
+
+        private function queryLogResult(result:Object, e:ResultEvent):void {
+            if (result.result) {
+                list.removeAll();
+                list.addAll(new ArrayCollection(result.result as Array));
+            }
+
+        }
+
+        private function click_logItem():void {
+            if (cBoxModelHistory.selected) {
+                if (logGrid.selectedItem) {
+                    if (object_id == logGrid.selectedItem.object_id && object_type == logGrid.selectedItem.object_type_id) {
+                        Alert.show("对象历史记录显示的就是选中对象，是否改为显示所选记录?", "提示", Alert.YES | Alert.NO, null, showLogItem);
+                    } else {
+                        showModelHistory();
+                    }
                 }
+            } else {
+                showChangeMessage();
             }
+        }
 
-            private function showLogItem(e:mx.events.CloseEvent):void{
-                if (e.detail == Alert.YES){
-                    cBoxModelHistory.selected=false;
-                    showChangeMessage();
-                }
+        private function showLogItem(e:mx.events.CloseEvent):void {
+            if (e.detail == Alert.YES) {
+                cBoxModelHistory.selected = false;
+                showChangeMessage();
             }
+        }
 
-            private function showChangeMessage():void{
-                if(logGrid.selectedItem==null){
-                     logArea.text="";
-                }else{
-                    logArea.text=logGrid.selectedItem.change_message;
-                }
-            }
-
-            private var object_type:int=0;
-            private var object_id:int=0;
-
-            private function showModelHistory():void{
-                 if(cBoxModelHistory.selected){
-                     if(logGrid.selectedItem==null){
-                        logArea.text = "";
-                     }else{
-                         var data:Object=new Object();
-                         data["object_type"] = logGrid.selectedItem.object_type_id;
-                         data["object_id"] = logGrid.selectedItem.object_id;
-                         object_id=logGrid.selectedItem.object_id;
-                         object_type=logGrid.selectedItem.object_type_id;
-                         HttpServiceUtil.getCHTTPServiceAndResultAndFault("/log/getMyHistory",queryLogHistoryResult,queryLogHistoryFault,"POST").send(data);
-                     }
-                 }else{
-                     showChangeMessage();
-                 }
-            }
-
-            private function queryLogHistoryFault(e:FaultEvent):void{
-                object_id=0;
-                object_type=0;
-            }
-
-            private function queryLogHistoryResult(result:Object,e:ResultEvent):void{
-                var list:ArrayCollection = new ArrayCollection(result.result as Array);
+        private function showChangeMessage():void {
+            if (logGrid.selectedItem == null) {
                 logArea.text = "";
-                for each(var obj:Object in list){
-                    logArea.text+="时间："+obj.action_time+'  \n操作人：'+personNameById(obj)+' \n动作：'+obj.action_flag;
-                    logArea.text+="\n\n";
-                    logArea.text+=obj.change_message;
-                    logArea.text+="\n\n\n";
-                }
+            } else {
+                logArea.text = logGrid.selectedItem.change_message;
             }
+        }
 
-            private function personShow(item:Object, column:GridColumn):String{
-                var str:String="";
-                for(var i:int=0;i<ToolUtil.memberList.length;i++){
-                    if(item.pid==ToolUtil.memberList.getItemAt(i).id){
-                        return ToolUtil.memberList.getItemAt(i).name;
-                    }
-                }
-                return str;
-            }
-            private function personNameById(item:Object):String{
-                var str:String="";
-                for(var i:int=0;i<ToolUtil.memberList.length;i++){
-                    if(item.pid==ToolUtil.memberList.getItemAt(i).id){
-                        return ToolUtil.memberList.getItemAt(i).name;
-                    }
-                }
-                return str;
-            }
+        private var object_type:int = 0;
+        private var object_id:int = 0;
 
-				
-		]]>
+        private function showModelHistory():void {
+            if (cBoxModelHistory.selected) {
+                if (logGrid.selectedItem == null) {
+                    logArea.text = "";
+                } else {
+                    var data:Object = new Object();
+                    data["object_type"] = logGrid.selectedItem.object_type_id;
+                    data["object_id"] = logGrid.selectedItem.object_id;
+                    object_id = logGrid.selectedItem.object_id;
+                    object_type = logGrid.selectedItem.object_type_id;
+                    HttpServiceUtil.getCHTTPServiceAndResultAndFault("/log/getMyHistory", queryLogHistoryResult, queryLogHistoryFault, "POST").send(data);
+                }
+            } else {
+                showChangeMessage();
+            }
+        }
+
+        private function queryLogHistoryFault(e:FaultEvent):void {
+            object_id = 0;
+            object_type = 0;
+        }
+
+        private function queryLogHistoryResult(result:Object, e:ResultEvent):void {
+            var list:ArrayCollection = new ArrayCollection(result.result as Array);
+            logArea.text = "";
+            for each(var obj:Object in list) {
+                logArea.text += "时间：" + obj.action_time + '  \n操作人：' + personNameById(obj) + ' \n动作：' + obj.action_flag;
+                logArea.text += "\n\n";
+                logArea.text += obj.change_message;
+                logArea.text += "\n\n\n";
+            }
+        }
+
+        private function personShow(item:Object, column:GridColumn):String {
+            var str:String = "";
+            for (var i:int = 0; i < ToolUtil.memberList.length; i++) {
+                if (item.pid == ToolUtil.memberList.getItemAt(i).id) {
+                    return ToolUtil.memberList.getItemAt(i).name;
+                }
+            }
+            return str;
+        }
+
+        private function personNameById(item:Object):String {
+            var str:String = "";
+            for (var i:int = 0; i < ToolUtil.memberList.length; i++) {
+                if (item.pid == ToolUtil.memberList.getItemAt(i).id) {
+                    return ToolUtil.memberList.getItemAt(i).name;
+                }
+            }
+            return str;
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

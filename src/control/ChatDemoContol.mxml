@@ -10,7 +10,7 @@
     <fx:Script>
 		<![CDATA[
         import events.ChangeUserEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
@@ -21,7 +21,11 @@
         import org.idream.pomelo.PomeloEvent;
 
         private var pomelo:Pomelo;
-
+        override public function releaseListener():void{
+            pomelo.removeEventListener('onAdd', addUserHandler);
+            pomelo.removeEventListener('onLeave', removeUserHandler);
+            pomelo.removeEventListener('onChat', chatHandler);
+        }
         override public function init(e:FlexEvent):void {
             if (!param) {
             }
@@ -34,7 +38,7 @@
 
         }
 
-        override public function closeContainer(e:CloseEvent):void {
+        override public function closeContainer(e:CloseContainerEvent):void {
             dispatchEvent(e);
         }
 

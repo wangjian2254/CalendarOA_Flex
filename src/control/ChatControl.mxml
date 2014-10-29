@@ -10,7 +10,7 @@
 
         import events.ChangeUserEvent;
         import events.ChatTimelineEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
         import events.ListClickEvent;
 
         import httpcontrol.HttpServiceUtil;
@@ -46,7 +46,11 @@
 
         [Bindable]
         public var type:String = "d";//部门 为“d” 任务为 “t” 讨论组为：“g”
-
+        override public function releaseListener():void{
+            Pomelo.getIns().removeEventListener('onChat', chatHandler);
+            Pomelo.getIns().removeEventListener('quiteChannel', quiteChannelHandler);
+            Pomelo.getIns().removeEventListener('joinChannel', joinChannelHandler);
+        }
 
         private function getChannel(pids:Array):String {
             var channel:String;
@@ -84,7 +88,7 @@
         private var channel:String;
 
         override public function init(e:FlexEvent):void {
-            if(chatUser==null){
+            if (chatUser == null) {
                 return;
             }
 
@@ -187,13 +191,13 @@
             Pomelo.getIns().addEventListener('onChat', chatHandler);
         }
 
-        override public function closeContainer(e:CloseEvent):void {
+        override public function closeContainer(e:CloseContainerEvent):void {
             Pomelo.getIns().removeEventListener('onChat', chatHandler);
             dispatchEvent(e);
         }
 
         public function quiteChannelHandler(event:PomeloEvent):void {
-            if(channel!=event.message.channel){
+            if (channel != event.message.channel) {
                 return;
             }
             members.refresh();
@@ -210,7 +214,7 @@
         }
 
         public function joinChannelHandler(event:PomeloEvent):void {
-            if(channel!=event.message.channel){
+            if (channel != event.message.channel) {
                 return;
             }
             members.refresh();

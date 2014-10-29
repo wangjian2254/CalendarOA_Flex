@@ -22,7 +22,9 @@
 
             public var message:Object=null;
             public var type:String=null;
-			
+
+            override public function  releaseListener(e:CloseEvent):void{
+            }
 			private function init(e:mx.events.FlexEvent):void{
 
                 this.height = form.height+10;

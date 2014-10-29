@@ -10,9 +10,11 @@
 			import httpcontrol.HttpServiceUtil;
             import mx.controls.Alert;
             import mx.core.FlexGlobals;
+            import mx.events.CloseEvent;
             import mx.rpc.events.ResultEvent;
 			import util.ToolUtil;
-
+            override public function  releaseListener(e:CloseEvent):void{
+            }
             public function get getWindowHeight():Number{
                 if(userType.selectedValue == 2){
                     return loginForm.height;

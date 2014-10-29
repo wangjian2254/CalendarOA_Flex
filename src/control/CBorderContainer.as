@@ -2,7 +2,7 @@ package control
 {
 	import events.ChangeTabButtonEvent;
 	import events.ChangeUserEvent;
-	import events.CloseEvent;
+	import events.CloseContainerEvent;
 	
 	import mx.core.FlexGlobals;
 	import mx.core.INavigatorContent;
@@ -111,9 +111,16 @@ import spark.components.BorderContainer;
 		}
 		
 		
-		public function closeContainer(e:CloseEvent):void{
-			throw new Error("CBorderContainer 的子类必须重写 closeContainer(e:CloseEvent) 方法。在方法中触发 CloseEvent 事件。");
+		public function closeContainer(e:CloseContainerEvent):void{
+			throw new Error("CBorderContainer 的子类必须重写 closeContainer(e:CloseContainerEvent) 方法。在方法中触发 CloseEvent 事件。");
 		}
+
+        /**
+         * 本方法 专用于 移除对外界对象的监听。 防止内存溢出。
+         */
+        public function releaseListener():void{
+            throw new Error("CBorderContainer 的子类必须重写 releaseListener() 方法。在方法中移除监听外界对象的事件。");
+        }
 
 		public function get param():Object
 		{

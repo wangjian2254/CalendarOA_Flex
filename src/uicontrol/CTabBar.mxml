@@ -11,7 +11,7 @@
         import control.ChatControl;
 
         import events.ChangeTabButtonEvent;
-        import events.CloseEvent;
+        import events.CloseContainerEvent;
         import events.CloseTabButtonEvent;
 
         import mx.containers.ViewStack;
@@ -39,7 +39,7 @@
         }
 
         public function addView(view:CBorderContainer):void {
-            view.addEventListener(CloseEvent.Close_EventStr, closeView);
+            view.addEventListener(CloseContainerEvent.Close_EventStr, closeView);
             view.percentWidth = 100;
             view.percentHeight = 100;
             _dataProvider.addElement(view);
@@ -68,20 +68,21 @@
             return null;
         }
 
-        public function getCurrentView():CBorderContainer{
+        public function getCurrentView():CBorderContainer {
             return dataProvider.selectedChild as CBorderContainer;
         }
 
         private function close(e:CloseTabButtonEvent):void {
 
             var view:CBorderContainer = e.getView() as CBorderContainer;
-            var evt:CloseEvent = new CloseEvent(CloseEvent.Close_EventStr, e.getView(), true);
+            var evt:CloseContainerEvent = new CloseContainerEvent(CloseContainerEvent.Close_EventStr, e.getView(), true);
             view.closeContainer(evt);
+            view.releaseListener();
         }
 
-        private function closeView(e:CloseEvent):void {
-            for each(var view:Object in dataProvider.getChildren()){
-                if(view==e.getView()){
+        private function closeView(e:CloseContainerEvent):void {
+            for each(var view:Object in dataProvider.getChildren()) {
+                if (view == e.getView()) {
                     dataProvider.removeElement(e.getView());
                     showList = dataProvider.getChildren();
                     tabinit(null);
@@ -103,9 +104,9 @@
             this.removeAllElements();
             var cbtn:CTabButton;
             for each(var o:CBorderContainer in showList) {
-                if(o is ChatControl){
+                if (o is ChatControl) {
                     cbtn = new CIMTabButton();
-                }else{
+                } else {
                     cbtn = new CTabButton();
                 }
 
@@ -122,9 +123,9 @@
         }
 
         public function click_TabButton(e:ChangeTabButtonEvent):void {
-            try{
+            try {
                 dataProvider.getItemIndex(e.getViewBorderContainer());
-            }catch (err:Error){
+            } catch (err:Error) {
                 return;
             }
             dataProvider.selectedChild = e.getViewBorderContainer();
