@@ -4,8 +4,10 @@ package util
 	import control.ScheduleShow;
 	
 	import flash.display.DisplayObject;
-	
-	import mx.core.FlexGlobals;
+
+import model.Schedule;
+
+import mx.core.FlexGlobals;
 	import mx.managers.PopUpManager;
 
 	public class ScheduleUtil
@@ -48,30 +50,28 @@ package util
 		
 		
 		public static function updateSchedulePanel(scheduleId:String):void{
-			var scheduleData:Object = ToolUtil.getSchedule(scheduleId);
+			var scheduleData:Schedule = ToolUtil.getSchedule(scheduleId);
 			
 			if(showSchedule.hasOwnProperty(scheduleId)){
 				showSchedule[scheduleId].schedulData = scheduleData;
-				if(showSchedule[scheduleId].isinit){
-					showSchedule[scheduleId].init(false);
-				}
+                showSchedule[scheduleId].init();
 //				PopUpManager.bringToFront(showSchedule[scheduleId]);
 //				PopUpManager.centerPopUp(showSchedule[scheduleId]);
 			}
 		}
 		
 		public static function showSchedulePanel(scheduleId:String):void{
-			var scheduleData:Object = ToolUtil.getSchedule(scheduleId);
+			var scheduleData:Schedule = ToolUtil.getSchedule(scheduleId);
 				
 			if(showSchedule.hasOwnProperty(scheduleId)){
 				showSchedule[scheduleId].schedulData = scheduleData;
-				if(showSchedule[scheduleId].isinit){
+//				if(showSchedule[scheduleId].isinit){
 					showSchedule[scheduleId].init();
-				}
+//				}
 				PopUpManager.bringToFront(showSchedule[scheduleId]);
 //				PopUpManager.centerPopUp(showSchedule[scheduleId]);
 			}else{
-				var b:Boolean=false;
+				var b:Boolean=true;
 //				for each(var obj:Object in ToolUtil.groupList){
 //					if(obj.id==scheduleData.group){
 //						if(obj.pem!="look"){

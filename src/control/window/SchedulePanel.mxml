@@ -13,13 +13,17 @@
 
         import httpcontrol.HttpServiceUtil;
 
+        import model.Schedule;
+
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
+        import mx.controls.ToolTip;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.events.CollectionEvent;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
+        import mx.utils.ObjectUtil;
         import mx.utils.ObjectUtil;
 
         import uicontrol.MemberItem;
@@ -32,6 +36,8 @@
         public function get getWindowHeight():Number{
             return windowGroup.height;
         }
+
+        [Bindable]
         public function get getWindowWidth():Number{
             return windowGroup.width;
         }
@@ -44,7 +50,7 @@
         public var endDateValue:Date=new Date();
 
         [Bindable]
-        public var schedulData:Object=null;
+        public var schedulData:Schedule=null;
 
         public var checker:Object;
         public var zeren:Object;
@@ -77,6 +83,14 @@
 
         override public function  releaseListener(e:CloseEvent):void{
             ToolUtil.projectList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
+
+
+        }
+
+        private function closeSchedule(e:CloseEvent):void{
+            if(schedulData!=null){
+                ScheduleUtil.closeSchedulePanel(schedulData.id);
+            }
         }
 
         private function refreshMyProject(e:CollectionEvent):void{
@@ -84,45 +98,29 @@
         }
 
         public function init():void{
+            addEventListener(CloseEvent.CLOSE, closeSchedule);
             ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
             usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS,removeUsersHandler);
-            if(schedulData==null){
-                windowGroup.removeElement(chatControl);
 
+            btnSave.visible = true;
+            btnStart.visible = false;
+            btnCheck.visible = false;
+            btnDel.visible = false;
+            btnRestart.visible = false;
+            btnFinish.visible = false;
+            if(schedulData==null){
+                if(chatControl!=null&&windowGroup.getElementIndex(chatControl)>=0){
+                    windowGroup.removeElement(chatControl);
+                }
+                btnDel.visible = false;
             }else{
                 chatControl.width=500;
             }
 
 
             //审核者 有资格修改任务
-            dopanel.visible = (schedulData==null||schedulData.checker==ToolUtil.sessionUser.username)?true:false;
-            // 负责人有资格修改任务
+            dopanel.visible = (schedulData==null||schedulData.isDelPower(ToolUtil.sessionUser.pid)||schedulData.isUser(ToolUtil.sessionUser.pid))?true:false;
 
-            //设置 按钮可见性
-
-            // 设置 负责人
-            // 设置 审核人
-            //标题
-            //子任务
-            //颜色
-            //开始时间
-            //截止时间
-            //重复方式
-            //隶属项目
-            //
-            //
-            //
-            //
-            //
-            //
-            //
-            //
-
-
-
-
-
-            btnDel.visible=false;
             if(schedulData!=null){
 
                 is_all_day.selected = !schedulData.is_all_day;
@@ -152,17 +150,13 @@
                 changeProjectByDepart();
                 for each(var project:Object in myproject){
                     if(schedulData.project == project.id){
-                        projectDownList.selectedItem = department;
-                        break;
-                    }
-                }
-                for each(var checker:Object in departmentMembers){
-                    if(schedulData.checker == checker.id){
-                        checkerDownList.selectedItem = checker;
+                        projectDownList.selectedItem = project;
                         break;
                     }
                 }
 
+
+                usersGroup.removeAllElements();
                 for each(var pid:int in schedulData.users){
                     var m:MemberItem=new MemberItem();
                     m.person = ToolUtil.getPersonById(pid);
@@ -171,8 +165,36 @@
                         usersGroup.addElement(m);
                     }
                 }
+                need_check.selected=!schedulData['need_check'];
+                if(!need_check.selected){
+                    for each(var checker:Object in departmentMembers){
+                        if(schedulData.checker == checker.id){
+                            checkerDownList.selectedItem = checker;
+                            break;
+                        }
+                    }
+                }
+                levleStepper.value = schedulData.level;
+                urgentDownList.selectedIndex = schedulData.urgent-1;
+                statusDownList.selectedIndex = schedulData.status-1;
+                titlestr = schedulData.title + "";
 
-                titlestr = schedulData.title;
+                if(schedulData.status==1&&schedulData.isUser(ToolUtil.sessionUser.pid)){
+                    btnStart.visible = true;
+                }
+                if(schedulData.status==2&&schedulData.isUser(ToolUtil.sessionUser.pid)){
+                    btnFinish.visible = true;
+                }
+                if(schedulData.status==3 && schedulData.isCheck(ToolUtil.sessionUser.pid)){
+                    btnCheck.visible = true;
+                    btnRestart.visible = true;
+                }
+                if(schedulData.status==4 &&(schedulData.isUser(ToolUtil.sessionUser.pid)||schedulData.isCheck(ToolUtil.sessionUser.pid))){
+                    btnRestart.visible = true;
+                }
+                if(schedulData.status==4 ){
+                    btnSave.visible = false;
+                }
 
 
             }else{
@@ -268,13 +290,13 @@
             }
 
 
-
+            this.invalidateDisplayList();
         }
 
         private function getData():Object{
             var obj:Object=new Object();
-            if(schedulData!=null&&schedulData.hasOwnProperty("id")){
-                obj.id = schedulData["id"];
+            if(schedulData!=null&&schedulData.id){
+                obj.id = schedulData.id;
             }
             obj.title=scheduleTitle.text;
             //子任务
@@ -287,7 +309,7 @@
                 obj.time_start = startTime.selectedItem.value;
                 obj.time_end = endTime.selectedItem.value;
             }
-            obj.repeat_type = repeatType.selectedValue;
+            obj.repeat_type = repeatType.selectedValue.toString();
 
             obj.repeat_date = new Array();
             if(repeatType.selectedValue=="weekly"){
@@ -331,7 +353,7 @@
         }
 
         public function save():void{
-            if(this.scheduleTitle.text==""||this.scheduleTitle.text=="任务标题"){
+            if(this.scheduleTitle.text==""){
                 scheduleTitle.selectAll();
                 Alert.show("请填写任务标题。","提示");
                 return;
@@ -351,13 +373,16 @@
                 openUserChoice();
                 return;
             }
-
-
-
-
             HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(getData());
+        }
 
-
+        private function changeSchedule(status:int):void{
+            var obj:Object=new Object();
+            if(schedulData!=null&&schedulData.id){
+                obj.id = schedulData.id;
+            }
+            obj.status = status;
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus",saveResult,"POST").send(obj);
         }
 
         private function saveResult(result:Object,e:ResultEvent):void{
@@ -365,7 +390,7 @@
 //					if(schedulData==null){
 //						schedulData = getData();
 //					}
-                schedulData = result.result;
+                schedulData = new Schedule(result.result);
                 titlestr = schedulData.title;
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
                 init();
@@ -551,7 +576,7 @@
         private function delAsk():void{
             if(schedulData!=null &&schedulData.id){
 
-                Alert.show("确认删除当前任务?", "提示", Alert.YES | Alert.NO, null, del);
+//                Alert.show("确认删除当前任务?", "提示", Alert.YES | Alert.NO, null, del);
             }else{
                 closeWin();
             }
@@ -563,7 +588,7 @@
             if (e.detail == Alert.YES){
                 var data:Object = new Object();
                 data["id"] = schedulData.id;
-                HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
+//                HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
 
 
             }
@@ -590,13 +615,13 @@
             changeUsers();
         }
 
-        private function gotoZentao():void{
-            if(schedulData.zentaourl){
-                var request:URLRequest=new URLRequest(schedulData.zentaourl);
-                navigateToURL(request,"_blank");
-                return;
-            }
-        }
+//        private function gotoZentao():void{
+//            if(schedulData.zentaourl){
+//                var request:URLRequest=new URLRequest(schedulData.zentaourl);
+//                navigateToURL(request,"_blank");
+//                return;
+//            }
+//        }
 
         private function changeProjectByDepart():void{
             myproject.removeAll();
@@ -698,6 +723,12 @@
         private function addProject():void{
             PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
         }
+
+        private function setEndDate(n:int):void{
+            var d:Date = ObjectUtil.clone(startDate.selectedDate) as Date;
+            d.date+=n;
+            endDate.selectedDate=d;
+        }
         ]]>
 	</fx:Script>
     <fx:Declarations>
@@ -710,7 +741,7 @@
 
         </mx:DateFormatter>
     </fx:Declarations>
-    <s:HGroup id="windowGroup" width="500" height="100%" >
+    <s:HGroup id="windowGroup" width="100%" height="100%" >
         <s:Form width="500" height="100%" id="schedulePanel">
             <s:layout>
                 <s:FormLayout gap="0"  ></s:FormLayout>
@@ -720,9 +751,9 @@
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="departmentDownList" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
-                <s:DropDownList id="projectDownList" labelField="name" dataProvider="{myproject}"></s:DropDownList>
-                <s:Spacer width="100%"></s:Spacer>
+                <s:DropDownList id="departmentDownList" width="40%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
+                <s:DropDownList id="projectDownList" width="60%" labelField="name" dataProvider="{myproject}"></s:DropDownList>
+                <s:Spacer width="30"></s:Spacer>
                 <uicontrol:BtnAdd clickFun="{addProject}" />
             </s:FormItem>
             <s:FormItem label="任务描述：" height="100">
@@ -756,7 +787,11 @@
                     </s:HorizontalLayout>
                 </s:layout>
                 <mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-
+                <mx:LinkButton label="当天" click="setEndDate(0)" color="0x9f9f9f" textDecoration="underline" />
+                <mx:LinkButton label="两天" click="setEndDate(1)"  color="0x9f9f9f" textDecoration="underline" />
+                <mx:LinkButton label="三天" click="setEndDate(2)" color="0x9f9f9f" textDecoration="underline" />
+                <mx:LinkButton label="四天" click="setEndDate(3)" color="0x9f9f9f" textDecoration="underline" />
+                <mx:LinkButton label="一星期" click="setEndDate(6)" color="0x9f9f9f" textDecoration="underline" />
             </s:FormItem>
             <s:FormItem label="重复" height="25" toolTip="重复：周期性任务，的循环条件">
                 <s:layout>
@@ -788,7 +823,7 @@
             </s:FormItem>
 
 
-            <s:FormItem label="颜色：" height="25" toolTip="区分任务">
+            <s:FormItem label="颜色：" height="33" toolTip="区分任务">
                 <s:layout>
                     <s:HorizontalLayout gap="3">
 
@@ -823,7 +858,7 @@
                 </mx:ColorPicker>
             </s:FormItem>
 
-            <s:FormItem label="责任人：" height="60">
+            <s:FormItem label="责任人：" height="60" backgroundColor="0xf1f1f1" >
                 <s:layout>
                     <s:HorizontalLayout gap="10" verticalAlign="top">
                     </s:HorizontalLayout>
@@ -880,9 +915,15 @@
 
             </s:FormItem>
 
-            <mx:ControlBar  id="dopanel">
-                <s:Button chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
+            <mx:ControlBar  id="dopanel" width="100%" paddingTop="10" >
+                <s:Button id="btnSave" chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
                 <s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
+                <s:Spacer width="100%"></s:Spacer>
+                <s:Button id="btnStart" includeInLayout="{btnStart.visible}" chromeColor="red" label="开始" height="25" color="#ffffff" click="changeSchedule(2)" />
+                <s:Button id="btnFinish" includeInLayout="{btnFinish.visible}"  chromeColor="red" label="完成" height="25" color="#ffffff" click="changeSchedule(3)" />
+                <s:Button id="btnCheck" includeInLayout="{btnCheck.visible}"  chromeColor="red" label="审核通过" height="25" color="#ffffff" click="changeSchedule(4)" />
+                <s:Button id="btnRestart" includeInLayout="{btnRestart.visible}" chromeColor="#cccccc" label="重新开启" height="25" color="#000000" click="changeSchedule(1)" />
+                <s:Spacer width="30"></s:Spacer>
             </mx:ControlBar>
         </s:Form>
 

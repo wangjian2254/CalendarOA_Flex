@@ -7,6 +7,7 @@
 	<fx:Script>
 		<![CDATA[
         import events.ChangeMenuEvent;
+        import events.ChangeScheduleEvent;
         import events.ChangeUserEvent;
         import events.CloseContainerEvent;
         import events.ListClickEvent;
@@ -48,7 +49,7 @@
 
         override public function init(e:FlexEvent):void {
             dateChooser.selectedDate = new Date();
-
+            FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr,showSchedule);
 
             changeShowModel();
 //				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
@@ -64,6 +65,7 @@
 
         }
         override public function releaseListener():void{
+            FlexGlobals.topLevelApplication.removeEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr,showSchedule);
         }
 
         override public function resizeContainer(e:ResizeEvent):void {
@@ -74,6 +76,33 @@
 
         }
 
+        public function showSchedule(e:ChangeScheduleEvent):void{
+
+
+            var dayItem:DayItem=null;
+            for(var  i:Number=1;i<50;i++){
+                if(calendarPanel.numElements-1>=i){
+
+                    dayItem = calendarPanel.getElementAt(i-1) as DayItem;
+
+                    dayItem.showSchedule();
+
+                }
+                if(calendarBorder.numElements-1>=i){
+                    dayItem = calendarBorder.getElementAt(i) as DayItem;
+
+                    dayItem.showSchedule();
+
+                }
+                if(daySchedule.numElements-1>=i){
+                    dayItem = daySchedule.getElementAt(i) as DayItem;
+
+                    dayItem.showSchedule();
+
+                }
+
+            }
+        }
 
         private function changeShowModel():void {
             currentMonth = -1;
@@ -109,39 +138,39 @@
         }
 
 
-        //			public function showGroup(group:GroupItem,g:Object):void{
-        //				if(group.isshow){
-        //					group.color = 0xffffff;
-        //					group.isshow = false;
-        //				}else{
-        //					group.color = g.color;
-        //					group.isshow = true;
-        //				}
-        //
-        //				var dayItem:DayItem=null;
-        //				for(var  i:Number=1;i<50;i++){
-        //					if(calendarPanel.numElements-1>=i){
-        //
-        //						dayItem = calendarPanel.getElementAt(i-1) as DayItem;
-        //
-        //						dayItem.showSchedule(g.id,group.isshow);
-        //
-        //					}
-        //					if(calendarBorder.numElements-1>=i){
-        //						dayItem = calendarBorder.getElementAt(i) as DayItem;
-        //
-        //						dayItem.showSchedule(g.id,group.isshow);
-        //
-        //					}
-        //					if(daySchedule.numElements-1>=i){
-        //						dayItem = daySchedule.getElementAt(i) as DayItem;
-        //
-        //						dayItem.showSchedule(g.id,group.isshow);
-        //
-        //					}
-        //
-        //				}
-        //			}
+//        public function showGroup(group:GroupItem,g:Object):void{
+//            if(group.isshow){
+//                group.color = 0xffffff;
+//                group.isshow = false;
+//            }else{
+//                group.color = g.color;
+//                group.isshow = true;
+//            }
+//
+//            var dayItem:DayItem=null;
+//            for(var  i:Number=1;i<50;i++){
+//                if(calendarPanel.numElements-1>=i){
+//
+//                    dayItem = calendarPanel.getElementAt(i-1) as DayItem;
+//
+//                    dayItem.showSchedule(g.id,group.isshow);
+//
+//                }
+//                if(calendarBorder.numElements-1>=i){
+//                    dayItem = calendarBorder.getElementAt(i) as DayItem;
+//
+//                    dayItem.showSchedule(g.id,group.isshow);
+//
+//                }
+//                if(daySchedule.numElements-1>=i){
+//                    dayItem = daySchedule.getElementAt(i) as DayItem;
+//
+//                    dayItem.showSchedule(g.id,group.isshow);
+//
+//                }
+//
+//            }
+//        }
 
 
         private var currentMonth:Number = -1;
@@ -398,7 +427,7 @@
             var row:Number = 0;
             var dayHeight:Number;
             dayHeight = 80 * 24;
-            dayWidth = (this.width - 12 - taskPanel.width - 190 - 7 + 1) / 7;
+            dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1) / 7;
             weekHead.height = 0;
             dayHead.height = 25;
             if (showModel.selectedItem.value == "monthly") {
@@ -412,14 +441,14 @@
 
             }
             if (showModel.selectedItem.value == "weekly") {
-                dayWidth = (this.width - 12 - taskPanel.width - 190 - 7 + 1 - 15 - 51) / 7;
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 15 - 51) / 7;
                 weekHead.height = 25;
                 dayHead.height = 0;
                 calendarBorder.width = dayWidth * 7 + 6 + 51;
 
             }
             if (showModel.selectedItem.value == "daily") {
-                dayWidth = (this.width - 12 - taskPanel.width - 190 - 15 - 4 - 51) / 5;
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 51) / 5;
                 calendarBorder.width = dayWidth * 5 + 4 + 51;
 
             }
@@ -571,14 +600,10 @@
                     </s:HorizontalLayout>
                 </s:layout>
                 <s:Button chromeColor="red" label="创建任务" color="#ffffff"   height="25" click="createSchedule()" />
-                <s:BorderContainer width="100%" height="30" borderVisible="false">
-                    <s:layout>
-                        <s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="3">
+                <s:Spacer width="100%" />
 
-                        </s:HorizontalLayout>
-                    </s:layout>
                     <s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
-                </s:BorderContainer>
+
             </s:BorderContainer>
 
             <s:Label text="{monthstr.format(dateChooser.selectedDate)}" fontSize="18" fontWeight="bold" paddingTop="10" >
@@ -666,7 +691,7 @@
 				
 		</s:BorderContainer>
 		<s:Scroller id="taskPanel"  width="250" height="100%">
-			<s:Group>
+			<s:Group width="100%" height="100%">
 				<s:BorderContainer width="100%" borderVisible="false" >
 					<s:layout>
 						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
@@ -678,17 +703,12 @@
 								
 							</s:HorizontalLayout>
 						</s:layout>
-						<s:Label text="我的备忘" fontSize="18"  paddingTop="10" >
+						<s:Label text="我的备忘"  fontSize="18"  paddingTop="10" >
 						</s:Label>
-						<s:BorderContainer   width="100%" height="25" borderVisible="false" backgroundAlpha="0">
-							<s:layout>
-								<s:HorizontalLayout gap="5" horizontalAlign="right" verticalAlign="middle" paddingRight="15">
-									
-								</s:HorizontalLayout>
-							</s:layout>
-							<uicontrol:BtnAdd clickFun="createTask" />
-							<uicontrol:BtnDel clickFun="showTask" />
-						</s:BorderContainer>
+                        <s:Spacer width="100%"></s:Spacer>
+                        <uicontrol:BtnAdd clickFun="createTask" />
+                        <uicontrol:BtnDel clickFun="showTask" />
+                        <s:Spacer width="20"></s:Spacer>
 					</s:BorderContainer>
 					
 					<s:BorderContainer id="taskunpanel" width="100%" borderVisible="false"  >

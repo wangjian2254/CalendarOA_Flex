@@ -13,6 +13,8 @@
 
         import httpcontrol.HttpServiceUtil;
 
+        import model.Schedule;
+
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
         import mx.events.FlexEvent;
@@ -148,13 +150,13 @@
             }
             scheduleList.removeAllElements();
             var scheduleItem:ScheduleItem = null;
-            for each(var obj:Object in scheduleArr) {
+            for each(var obj:Schedule in scheduleArr) {
                 scheduleItem = new ScheduleItem();
                 scheduleItem.scheduleData = obj;
                 scheduleItem.scheduleName = obj.title;
                 scheduleItem.color = obj.color;
                 scheduleItem.scheduleId = obj.id;
-                if (!groupShowData.hasOwnProperty("" + obj.group) || groupShowData["" + obj.group]) {
+                if (!groupShowData.hasOwnProperty("" + obj.department) || groupShowData["" + obj.department]) {
 
                     if (is_all_day == 2 && !obj.is_all_day) {
                         var x:Number = 2;

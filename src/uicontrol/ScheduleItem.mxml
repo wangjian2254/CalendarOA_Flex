@@ -10,6 +10,8 @@
         import control.window.SchedulePanel;
         import control.ScheduleShow;
 
+        import model.Schedule;
+
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.managers.PopUpManager;
@@ -25,9 +27,8 @@
         [Bindable]
         public var scheduleId:String = "21";
 
-        [Bindable]
-        public var scheduleData:Object = null;
-        [Bindable]
+        public var scheduleData:Schedule = null;
+
         public var descShow:Boolean = false;
 
 
@@ -35,13 +36,17 @@
 
         private function init():void {
             if (!descShow) {
-                lbldesc.height = 0;
-                lbldesc.visible = false;
+                lbldesc.maxDisplayedLines = 1;
+            }else{
+                lbldesc.maxDisplayedLines = -1;
+            }
+            if(scheduleData!=null){
+                lbldesc.toolTip = scheduleData.getDesc();
             }
         }
 
         private function openSchedule(e:MouseEvent):void {
-            if (!(e.target is LinkButton)) {
+            if (!(e.target is Label)) {
                 return;
             }
             if (fun != null) {
@@ -57,21 +62,5 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	
-	
-	<s:BorderContainer  width="100%" height="18" borderVisible="false"  backgroundAlpha="0">
-		<s:layout>
-			<s:HorizontalLayout  gap="3" verticalAlign="middle" >
-				
-			</s:HorizontalLayout>
-		</s:layout>
-		<s:BorderContainer id="colorBorder"  width="10" height="10"   backgroundColor="{color}" borderVisible="true" borderStyle="solid" borderColor="#CCCCCC" >
-			
-		</s:BorderContainer>
-		<mx:LinkButton id="linkScheduleItem" label="{scheduleName}" click="openSchedule(event)" >
-			
-		</mx:LinkButton>
-	</s:BorderContainer>
-		<s:Label id="lbldesc" width="100%" height="100%" text="{scheduleData.desc}" visible="{descShow}" />
-	
+		<s:Label id="lbldesc" width="100%" height="100%" text="{scheduleName}"   buttonMode="true" click="openSchedule(event)"  />
 </s:BorderContainer>

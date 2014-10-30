@@ -20,6 +20,8 @@ import httpcontrol.CHTTPService;
 import httpcontrol.HttpServiceUtil;
 import httpcontrol.RemoteUtil;
 
+import model.Schedule;
+
 import mx.collections.ArrayCollection;
 import mx.controls.Alert;
 import mx.core.FlexGlobals;
@@ -483,7 +485,7 @@ public class ToolUtil
 
 
 
-    public static function getSchedule(id:String):Object{
+    public static function getSchedule(id:String):Schedule{
         if(ToolUtil.scheduleMap.hasOwnProperty("schedulemap")&&ToolUtil.scheduleMap.schedulemap.hasOwnProperty(id)){
             return ToolUtil.scheduleMap.schedulemap[id];
         }
@@ -510,13 +512,23 @@ public class ToolUtil
 
     public static function queryResult(result:Object,e:ResultEvent):void{
         if(result.success){
+            scheduleMap = new Object();
+            scheduleMap['scheduleall']=new Array();
+            scheduleMap['schedulemap']=new Object();
+            scheduleMap['schedulelist']=new Object();
             if(result.result){
-                scheduleMap=result.result;
-
-                if(ToolUtil.scheduleMap.hasOwnProperty("schedulemap")){
-                    for(var sid:String in scheduleMap.schedulemap){
-                        ScheduleUtil.updateSchedulePanel(sid);
+//                scheduleMap['scheduleall'] = result.result;
+                var schedule:Schedule;
+                for each(var obj:Object in result.result){
+                    //schedulelist schedulemap
+                    schedule = new Schedule(obj);
+                    scheduleMap['scheduleall'].push(schedule);
+                    scheduleMap['schedulemap'][schedule.id] = schedule;
+                    if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.startdate)){
+                        scheduleMap['schedulelist'][schedule.startdate]=new Array();
                     }
+                    scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
+                    ScheduleUtil.updateSchedulePanel(schedule.id);
                 }
             }
 
