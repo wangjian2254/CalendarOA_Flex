@@ -156,6 +156,14 @@
                 scheduleItem.scheduleName = obj.title;
                 scheduleItem.color = obj.color;
                 scheduleItem.scheduleId = obj.id;
+                scheduleItem.width = this.width - 5;
+
+                scheduleItem.setStyle("borderVisible", true);
+                scheduleItem.setStyle("borderWeight", 4);
+                scheduleItem.setStyle("cornerRadius", 7);
+                scheduleItem.setStyle("backgroundAlpha", 1);
+                scheduleItem.setStyle("backgroundColor", obj.color);
+
                 if (!groupShowData.hasOwnProperty("" + obj.department) || groupShowData["" + obj.department]) {
 
                     if (is_all_day == 2 && !obj.is_all_day) {
@@ -180,11 +188,8 @@
                         scheduleItem.y = y;
                         scheduleItem.width = this.width - 1 - x;
                         scheduleItem.height = Number(obj.time_end.substr(0, 2)) * this.height / 24 + (Number(obj.time_end.substr(2, 2)) / 60 * this.height / 24) - y - 1;
-                        scheduleItem.setStyle("borderVisible", true);
-                        scheduleItem.setStyle("borderWeight", 4);
-                        scheduleItem.setStyle("cornerRadius", 7);
-                        scheduleItem.setStyle("backgroundAlpha", 1);
-                        scheduleItem.setStyle("backgroundColor", obj.color);
+
+
                         scheduleItem.descShow = true;
 
                         scheduleList.addElement(scheduleItem);

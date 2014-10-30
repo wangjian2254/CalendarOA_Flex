@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="18" borderVisible="false" backgroundAlpha="0" creationComplete="init()" >
+				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="25" borderVisible="false" backgroundAlpha="0" creationComplete="init()" >
 	<s:layout>
 		<s:VerticalLayout gap="2" paddingLeft="10" verticalAlign="top" paddingTop="0" horizontalAlign="left"/>
 	</s:layout>
@@ -36,7 +36,7 @@
 
         private function init():void {
             if (!descShow) {
-                lbldesc.maxDisplayedLines = 1;
+                lbldesc.maxDisplayedLines = 0;
             }else{
                 lbldesc.maxDisplayedLines = -1;
             }

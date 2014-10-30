@@ -17,13 +17,11 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
-        import mx.controls.ToolTip;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.events.CollectionEvent;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
-        import mx.utils.ObjectUtil;
         import mx.utils.ObjectUtil;
 
         import uicontrol.MemberItem;
@@ -105,7 +103,7 @@
             btnSave.visible = true;
             btnStart.visible = false;
             btnCheck.visible = false;
-            btnDel.visible = false;
+            btnDel.visible = true;
             btnRestart.visible = false;
             btnFinish.visible = false;
             if(schedulData==null){
@@ -365,7 +363,17 @@
             }
             if(endDate.selectedDate==null){
                 Alert.show("请选择结束时间。","提示");
-                startDate.open();
+                endDate.open();
+                return;
+            }
+            if(endDate.selectedDate.getTime()<startDate.selectedDate.getTime()){
+                Alert.show("结束时间不能早于开始时间。","提示");
+                endDate.open();
+                return;
+            }
+            if(repeatType.selectedValue!='none'&&(endDate.selectedDate.getTime()-startDate.selectedDate.getTime())/(1000*24*60*60)>366){
+                Alert.show("循环任务，时间跨度不能超过1年。","提示");
+                endDate.open();
                 return;
             }
             if(usersGroup.numElements==0){
@@ -742,7 +750,7 @@
         </mx:DateFormatter>
     </fx:Declarations>
     <s:HGroup id="windowGroup" width="100%" height="100%" >
-        <s:Form width="500" height="100%" id="schedulePanel">
+        <s:Form width="510" height="100%" id="schedulePanel">
             <s:layout>
                 <s:FormLayout gap="0"  ></s:FormLayout>
             </s:layout>
@@ -806,8 +814,6 @@
                 <s:RadioButton group="{repeatType}" label="每周" value="weekly">
                 </s:RadioButton>
                 <s:RadioButton group="{repeatType}" label="每月" value="monthly">
-                </s:RadioButton>
-                <s:RadioButton group="{repeatType}" label="每年" value="yearly">
                 </s:RadioButton>
             </s:FormItem>
             <s:FormItem id="dayPanel"  label="重复时间：" height="25" toolTip="重复时间：在任务周期中，按条件循环任务">
@@ -897,16 +903,16 @@
                 <s:CheckBox id="alertBox11" label="提前1周"></s:CheckBox>
                 </s:TileGroup>
             </s:FormItem>
-            <s:FormItem label="优先级：" height="25" >
+            <s:FormItem label="优先级：" height="35" >
                 <s:layout>
-                    <s:HorizontalLayout gap="10">
+                    <s:HorizontalLayout gap="10" verticalAlign="middle">
                     </s:HorizontalLayout>
                 </s:layout>
                 <s:DropDownList id="urgentDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskurgentlist}" toolTip="任务的完成优先级"></s:DropDownList>
                 <s:Label text="权重："/>
                 <s:NumericStepper id="levleStepper" minimum="0" value="1" maximum="100" width="100" toolTip="权重：完成所需要的工时，或者本任务的重要性" />
             </s:FormItem>
-            <s:FormItem label="任务状态：" height="25" >
+            <s:FormItem label="任务状态：" height="35" >
                 <s:layout>
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
@@ -915,7 +921,7 @@
 
             </s:FormItem>
 
-            <mx:ControlBar  id="dopanel" width="100%" paddingTop="10" >
+            <mx:ControlBar  id="dopanel" width="100%" height="40">
                 <s:Button id="btnSave" chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
                 <s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
                 <s:Spacer width="100%"></s:Spacer>
@@ -927,7 +933,7 @@
             </mx:ControlBar>
         </s:Form>
 
-        <control:ChatControl id="chatControl"  width="100%" height="100%"    visible="{schedulData}">
+        <control:ChatControl id="chatControl"  width="0" height="100%"    visible="{schedulData}">
 
         </control:ChatControl>
     </s:HGroup>

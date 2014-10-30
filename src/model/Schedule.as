@@ -26,6 +26,7 @@ public class Schedule {
     private var _status:int;
     private var _org:int;
     private var _group:String;
+    private var _date:String;
 
 
 
@@ -294,6 +295,14 @@ public class Schedule {
 
     public function set group(value:String):void {
         _group = value;
+    }
+
+    public function get date():String {
+        return _date;
+    }
+
+    public function set date(value:String):void {
+        _date = value;
     }
 }
 }

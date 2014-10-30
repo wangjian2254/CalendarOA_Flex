@@ -524,10 +524,19 @@ public class ToolUtil
                     schedule = new Schedule(obj);
                     scheduleMap['scheduleall'].push(schedule);
                     scheduleMap['schedulemap'][schedule.id] = schedule;
-                    if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.startdate)){
-                        scheduleMap['schedulelist'][schedule.startdate]=new Array();
+                    if(schedule.repeat_type != 'none'){
+                        if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.date)){
+                            scheduleMap['schedulelist'][schedule.date]=new Array();
+                        }
+                        scheduleMap['schedulelist'][schedule.date].push(schedule.id);
+                    }else{
+                        if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.startdate)){
+                            scheduleMap['schedulelist'][schedule.startdate]=new Array();
+                        }
+                        scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
                     }
-                    scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
+
+
                     ScheduleUtil.updateSchedulePanel(schedule.id);
                 }
             }

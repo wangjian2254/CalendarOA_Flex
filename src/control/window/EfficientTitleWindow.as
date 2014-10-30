@@ -53,6 +53,23 @@ public class EfficientTitleWindow extends TitleWindow{
         var pa:Point = new Point(mve.xFrom, mve.yFrom);
         var pb:Point = new Point(mve.xTo, mve.yTo);
         mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
+        mve.addEventListener(EffectEvent.EFFECT_END,showAnimation2);
+
+        mve.play();
+    }
+
+    private function showAnimation2(e:EffectEvent):void{
+        mve.removeEventListener(EffectEvent.EFFECT_END,showAnimation2);
+        if(mve.isPlaying){
+            return;
+        }
+        mve.xFrom = this.x;
+        mve.yFrom = this.y;
+        mve.xTo = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+        mve.yTo = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+        var pa:Point = new Point(mve.xFrom, mve.yFrom);
+        var pb:Point = new Point(mve.xTo, mve.yTo);
+        mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
         mve.play();
     }
 
