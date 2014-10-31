@@ -35,6 +35,8 @@
         import util.UUIDUtil;
 
         [Bindable]
+        public var bigPanel:Boolean = true;
+        [Bindable]
         private var chatsArr:ArrayCollection = new ArrayCollection();
 
         [Bindable]
@@ -46,7 +48,7 @@
 
         [Bindable]
         public var type:String = "d";//部门 为“d” 任务为 “t” 讨论组为：“g”
-        override public function releaseListener():void{
+        override public function releaseListener():void {
             Pomelo.getIns().removeEventListener('onChat', chatHandler);
             Pomelo.getIns().removeEventListener('quiteChannel', quiteChannelHandler);
             Pomelo.getIns().removeEventListener('joinChannel', joinChannelHandler);
@@ -417,7 +419,7 @@
 
     <s:HGroup id="horGroup" width="100%" height="100%">
         <s:VGroup   width="100%" height="100%">
-            <s:BorderContainer width="100%" height="47" backgroundImage="{CBorderContainer.toolbgimg}" borderVisible="false">
+            <s:BorderContainer width="100%" height="47" backgroundImage="{CBorderContainer.toolbgimg}" borderVisible="false" visible="{bigPanel}" includeInLayout="{bigPanel}">
                 <s:layout>
                     <s:HorizontalLayout paddingLeft="10" gap="5" paddingRight="15" verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>
@@ -457,7 +459,7 @@
 
         </s:VGroup>
 
-            <uicontrol:AddressList  id="addressList" dataProvider="{members}"
+            <uicontrol:AddressList  id="addressList" dataProvider="{members}"  visible="{bigPanel}" includeInLayout="{bigPanel}"
                                    doubleClickEnabled="true" doubleClick="chatUserPanel()" toolTip="双击发送信息"
                                    itemRenderer="uicontrol.renderer.AddressItemRenderer" width="150" height="100%">
             </uicontrol:AddressList>

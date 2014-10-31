@@ -32,6 +32,7 @@ public class Schedule {
     private var _group:String;
     private var _date:String;
     private var _used:Boolean=false;
+    private var _author:int=0;
 
 
 
@@ -350,6 +351,14 @@ public class Schedule {
 
     public function set used(value:Boolean):void {
         _used = value;
+    }
+
+    public function get author():int {
+        return _author;
+    }
+
+    public function set author(value:int):void {
+        _author = value;
     }
 }
 }

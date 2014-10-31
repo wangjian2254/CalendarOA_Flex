@@ -83,6 +83,9 @@
                 if (chat.channel.substr(0, 1) == 'd') {
                     type = "d";
                 }
+                if (chat.channel.substr(0, 1) == 't') {
+                    type = "t";
+                }
                 if (!isNaN(chat.channel.substr(0, 1))) {
                     type = "p";
                 }

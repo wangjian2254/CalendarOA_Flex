@@ -24,11 +24,14 @@
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
 
+        import org.idream.pomelo.Pomelo;
+
         import uicontrol.MemberItem;
 
         import util.DateUtil;
         import util.ScheduleUtil;
         import util.ToolUtil;
+        import util.UUIDUtil;
 
         [Bindable]
         public function get getWindowHeight():Number{
@@ -113,6 +116,7 @@
                     windowGroup.removeElement(chatControl);
                 }
                 btnDel.visible = false;
+                scheduleTitle.setFocus();
             }else{
                 chatControl.width=500;
                 if(schedulData.used){
@@ -814,6 +818,46 @@
             d.date+=n;
             endDate.selectedDate=d;
         }
+
+        //创建 任务讨论组
+        private function initTaskChat():void{
+            // 修改 pomelo 服务器的 createChannel 方法。如果存在，则变成修改。以适应任务讨论模块的情况。
+            var org:Object=new Object();
+
+            org.channel = "t"+schedulData.id;
+            org.name = "[任务]"+schedulData.title.substr(0,10)+(schedulData.title.length>10?"……":"");
+            org.users=schedulData.users;
+            org.author=schedulData.author;
+
+            Pomelo.getIns().request("connector.entryHandler.createChannel",org,function(data:Object):void{
+                if(data.code==200){
+                    var chatUser:Object=new Object();
+                    chatUser.id=org.channel.substr(1,org.channel.length-1);
+                    chatUser.channel = org.channel;
+                    chatUser.name = org.name;
+                    chatUser.author = org.author;
+                    chatUser.icon="/static/smalloaicon/group.png";
+                    chatUser['members']=new ArrayCollection();
+                    for each(var u:int in org.users){
+                        for each(var item:Object in ToolUtil.memberList){
+                            if(u==item.id){
+                                item['level'] = 0;
+                                item['unread'] = 0;
+                                chatUser["members"].addItem(item);
+                                break;
+                            }
+                        }
+                    }
+                    chatControl.chatUser = chatUser;
+                    chatControl.type = 't';
+                    chatControl.init(null);
+
+                }else{
+                    chatControl.enabled = false;
+                    chatControl.toolTip = "无法连接到通信服务器，请重新启动程序。";
+                }
+            });
+        }
         ]]>
 	</fx:Script>
     <fx:Declarations>
@@ -845,7 +889,7 @@
                 <s:layout>
                     <s:HorizontalLayout gap="5" verticalAlign="middle" />
                 </s:layout>
-                <s:TextArea id="scheduleTitle" width="100%" height="85" toolTip="任务内容：描述任务的具体工作" prompt="任务内容">
+                <s:TextArea id="scheduleTitle" width="100%" height="85" toolTip="任务内容：描述任务的具体工作" prompt="请写明任务内容、发生地点">
                 </s:TextArea>
                 <s:Label text="*" color="red"/>
             </s:FormItem>
@@ -1011,7 +1055,7 @@
             </mx:ControlBar>
         </s:Form>
 
-        <control:ChatControl id="chatControl"  width="0" height="100%"    visible="{schedulData}">
+        <control:ChatControl id="chatControl"  width="0" height="100%"  bigPanel="false"  visible="{schedulData}">
 
         </control:ChatControl>
     </s:HGroup>
