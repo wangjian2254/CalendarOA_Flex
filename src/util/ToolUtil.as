@@ -51,10 +51,29 @@ public class ToolUtil
     public static var searchOrg:JoinOrgPanel= new JoinOrgPanel();
 
     public static var projectstatus:ArrayCollection=new ArrayCollection([{id:"unstart",label:"未开始"},{id:"runing",label:"正在进行"},{id:"finished",label:"已完成"},{id:"closed",label:"已关闭"}]);
-    public static var taskstatuslist:ArrayCollection=new ArrayCollection([{id:1,label:"未开始"},{id:2,label:"正在进行"},{id:3,label:"待审核"},{id:4,label:"完成"}]);
+    public static var taskstatusmap:Object = {"1":"未开始", "2":"正在进行", "3":"待审核", "4":"完成"};
+//    public static var taskstatuslist:ArrayCollection=new ArrayCollection([{id:1,label:"未开始"},{id:2,label:"正在进行"},{id:3,label:"待审核"},{id:4,label:"完成"}]);
     public static var taskurgentlist:ArrayCollection=new ArrayCollection([{id:1,label:"普通"},{id:2,label:"优先"},{id:3,label:"紧急"}]);
 
     private static var time:Timer = new Timer(1000*60*5,0);
+
+    public static function getTaskStatus(i:int):String{
+        if(taskstatusmap.hasOwnProperty(i.toString())){
+            return taskstatusmap[i.toString()];
+        }else{
+            return "";
+        }
+    }
+
+
+    public static function getTaskUrgent(i:int):String{
+        for each(var o:Object in taskurgentlist){
+            if(o.id==i){
+                return o.label;
+            }
+        }
+        return "";
+    }
 
     public static function init():void{
 
@@ -522,7 +541,7 @@ public class ToolUtil
                 for each(var obj:Object in result.result){
                     //schedulelist schedulemap
                     schedule = new Schedule(obj);
-                    scheduleMap['scheduleall'].push(schedule);
+                    scheduleMap['scheduleall'].push(schedule.id);
                     scheduleMap['schedulemap'][schedule.id] = schedule;
                     if(schedule.repeat_type != 'none'){
                         if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.date)){
@@ -535,15 +554,37 @@ public class ToolUtil
                         }
                         scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
                     }
-
-
                     ScheduleUtil.updateSchedulePanel(schedule.id);
                 }
             }
-
             FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
         }
+    }
 
+    public static function updateSchedul(id:String, schedule:Schedule):void{
+        if(schedule){
+            scheduleMap['schedulemap'][id] = schedule;
+//            scheduleMap['scheduleall']
+
+            ScheduleUtil.updateSchedulePanel(schedule.id);
+        }else{
+            if(scheduleMap['scheduleall'].indexOf(id)>=0){
+                scheduleMap['scheduleall'].splice(scheduleMap['scheduleall'].indexOf(id),1);
+            }
+            var s:Schedule = scheduleMap['schedulemap'][id];
+            if(s.repeat_type == 'none'){
+                if(scheduleMap['schedulelist'][s.startdate].indexOf(id)>=0){
+                    scheduleMap['schedulelist'][s.startdate].splice(scheduleMap['schedulelist'][s.startdate].indexOf(id),1);
+                }
+            }else{
+                if(scheduleMap['schedulelist'][s.date].indexOf(id)>=0){
+                    scheduleMap['schedulelist'][s.date].splice(scheduleMap['schedulelist'][s.date].indexOf(id),1);
+                }
+            }
+
+            delete scheduleMap['schedulemap'][id];
+        }
+        FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
     }
 
 

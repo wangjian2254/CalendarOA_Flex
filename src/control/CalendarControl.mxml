@@ -108,6 +108,9 @@
             currentMonth = -1;
             currentWeek = -1;
             currentDaily = -1;
+            if(showModel.selectedIndex==-1){
+                return;
+            }
             showCalendar(dateChooser.selectedDate);
         }
 
@@ -204,7 +207,7 @@
                 }
                 date.date += 1;
                 if (showModel.selectedItem.value == "monthly") {
-                    if (currentMonth < date.month && date.day == 0) {
+                    if ((currentMonth<11&&currentMonth < date.month && date.day == 0)||(currentMonth==11&& 0==date.month&&date.day==0)) {
                         count = i + 1;
                         break;
                     }

@@ -14,14 +14,19 @@ import mx.managers.PopUpManager;
 import spark.components.TitleWindow;
 
 import spark.effects.Move;
+import spark.effects.Rotate;
+import spark.effects.Rotate3D;
 
 public class EfficientTitleWindow extends TitleWindow{
 
     private var mve:Move = new Move();
+    private var rotate:Rotate = new Rotate();
 
-    public function EfficientTitleWindow() {
+public function EfficientTitleWindow() {
         super();
         mve.target = this;
+        rotate.target = this;
+        rotate.autoCenterTransform = true;
         preinit();
     }
     private function preinit():void {
@@ -43,7 +48,7 @@ public class EfficientTitleWindow extends TitleWindow{
     }
 
     public function showAnimation(e:FlexEvent):void {
-        if(mve.isPlaying){
+        if(mve.isPlaying || rotate.isPlaying){
             return;
         }
         mve.xFrom = 0 - this.width;
@@ -58,23 +63,31 @@ public class EfficientTitleWindow extends TitleWindow{
         mve.play();
     }
 
-    private function showAnimation2(e:EffectEvent):void{
+    public function showAnimation2(e:EffectEvent):void{
         mve.removeEventListener(EffectEvent.EFFECT_END,showAnimation2);
-        if(mve.isPlaying){
+        if(mve.isPlaying || rotate.isPlaying){
             return;
         }
         mve.xFrom = this.x;
         mve.yFrom = this.y;
         mve.xTo = (FlexGlobals.topLevelApplication.width - this.width) / 2;
         mve.yTo = (FlexGlobals.topLevelApplication.height - this.height) / 2;
-        var pa:Point = new Point(mve.xFrom, mve.yFrom);
-        var pb:Point = new Point(mve.xTo, mve.yTo);
-        mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
-        mve.play();
+        if (Math.abs(mve.xFrom-mve.xTo) < 10 && Math.abs(mve.yFrom - mve.yTo) < 10){
+            rotate.angleFrom = 0;
+            rotate.angleTo = 360*3;
+            rotate.duration = 1000;
+            rotate.play();
+        }else{
+            var pa:Point = new Point(mve.xFrom, mve.yFrom);
+            var pb:Point = new Point(mve.xTo, mve.yTo);
+            mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
+            mve.play();
+        }
+
     }
 
     public function closeAnimation(e:*=null):void {
-        if(mve.isPlaying){
+        if(mve.isPlaying || rotate.isPlaying){
             return;
         }
         mve.xFrom = this.x;

@@ -2,6 +2,10 @@
  * Created by WangJian on 2014/10/30.
  */
 package model {
+import mx.effects.Fade;
+
+import util.DateUtil;
+
 import util.ToolUtil;
 
 public class Schedule {
@@ -27,6 +31,7 @@ public class Schedule {
     private var _org:int;
     private var _group:String;
     private var _date:String;
+    private var _used:Boolean=false;
 
 
 
@@ -42,15 +47,6 @@ public class Schedule {
 
                 }
             }
-//            id = obj._id;
-//            title = obj.title;
-//            startdate = obj.startdate;
-//            enddate = obj.enddate;
-//            is_all_day = obj.is_all_day;
-//            time_start = obj.time_start;
-//            time_end = obj.time_end;
-//            repeat_type = obj.repeat_type;
-
         }
     }
     private var _desc:String = null;
@@ -65,17 +61,22 @@ public class Schedule {
             desc +="状态：";
             switch (status){
                 case 1:
-                    desc +="未开始\n";
+                    desc +="未开始";
                     break;
                 case 2:
-                    desc +="正在进行\n";
+                    desc +="正在进行";
                     break;
                 case 3:
-                    desc +="已完成，等待审核\n";
+                    desc +="已完成，等待审核";
                     break;
                 case 4:
-                    desc +="已结束\n";
+                    desc +="已结束";
                     break;
+            }
+            if(isOutOfDate()){
+                desc += ";过期未完成\n";
+            }else{
+                desc += "。\n";
             }
             desc += "内容："+title+"\n";
 
@@ -84,6 +85,27 @@ public class Schedule {
         return _desc;
     }
 
+    private var _isoutofdate:int=0;
+    public function isOutOfDate():Boolean{
+        if(_isoutofdate>0){
+            return _isoutofdate==1?false:true;
+        }
+        if(status !=4 ){
+            if(repeat_type=='none'){
+                if(DateUtil.dateLbl1(new Date())>enddate){
+                    _isoutofdate = 2;
+                    return true
+                }
+            }else{
+                if(DateUtil.dateLbl1(new Date())>date){
+                    _isoutofdate = 2;
+                    return true
+                }
+            }
+        }
+        _isoutofdate = 1;
+        return false;
+    }
     public function showDate():String{
         if(startdate==enddate){
             return startdate.substr(0,4)+"-"+startdate.substr(4,2)+"-"+startdate.substr(6,2);
@@ -135,6 +157,23 @@ public class Schedule {
             }
         }
         return false;
+    }
+
+    public function repeatEqual(type:String, d:Array):Boolean{
+        if(type!=repeat_type){
+            return false;
+        }else{
+            if(d.length != repeat_date.length){
+                return false;
+            }else{
+                for each(var i:int in d){
+                    if(repeat_date.indexOf(i)==-1){
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public function get id():String {
@@ -303,6 +342,14 @@ public class Schedule {
 
     public function set date(value:String):void {
         _date = value;
+    }
+
+    public function get used():Boolean {
+        return _used;
+    }
+
+    public function set used(value:Boolean):void {
+        _used = value;
     }
 }
 }

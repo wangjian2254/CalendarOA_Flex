@@ -88,6 +88,8 @@
         private function closeSchedule(e:CloseEvent):void{
             if(schedulData!=null){
                 ScheduleUtil.closeSchedulePanel(schedulData.id);
+            }else{
+                ScheduleUtil.clearNewSchedule();
             }
         }
 
@@ -113,6 +115,12 @@
                 btnDel.visible = false;
             }else{
                 chatControl.width=500;
+                if(schedulData.used){
+                    btnDel.visible = false;
+                }else{
+                    btnDel.visible = true;
+                }
+                changeBorderColor();
             }
 
 
@@ -174,8 +182,12 @@
                 }
                 levleStepper.value = schedulData.level;
                 urgentDownList.selectedIndex = schedulData.urgent-1;
-                statusDownList.selectedIndex = schedulData.status-1;
-                titlestr = schedulData.title + "";
+//                statusDownList.selectedIndex = schedulData.status-1;
+                if(schedulData.repeat_type!='none'){
+                    titlestr = schedulData.title +"--"+schedulData.date.substr(0,4)+"/"+schedulData.date.substr(4,6)+"/"+schedulData.date.substr(6,8)+ " --("+ToolUtil.getTaskUrgent(schedulData.urgent)+")" + " --["+ToolUtil.getTaskStatus(schedulData.status)+"]";
+                }else{
+                    titlestr = schedulData.title + " --("+ToolUtil.getTaskUrgent(schedulData.urgent)+")" + " --["+ToolUtil.getTaskStatus(schedulData.status)+"]";
+                }
 
                 if(schedulData.status==1&&schedulData.isUser(ToolUtil.sessionUser.pid)){
                     btnStart.visible = true;
@@ -243,6 +255,8 @@
                 endtimelist.addItem({"value":"2359","text":"24:00"});
                 if(endtimelist.length==1){
                     endTime.selectedIndex=0;
+                }else{
+                    endTime.selectedIndex=1;
                 }
             }catch(error:Error){
 
@@ -289,6 +303,26 @@
 
 
             this.invalidateDisplayList();
+        }
+
+        private function changeBorderColor():void{
+            switch (schedulData.status){
+                case 1:
+                    setStyle("borderColor", 0xcccccc);
+                    break;
+                case 2:
+                    setStyle("borderColor", 0x02711D);
+                    break;
+                case 3:
+                    setStyle("borderColor", 0xdf9110);
+                    break;
+                case 4:
+                    setStyle("borderColor", 0x000000);
+                    break;
+            }
+            if(schedulData.isOutOfDate()){
+                setStyle("borderColor", 0xff0000);
+            }
         }
 
         private function getData():Object{
@@ -344,7 +378,6 @@
             }
             obj.level=levleStepper.value;
             obj.urgent = urgentDownList.selectedItem.id;
-            obj.status = statusDownList.selectedItem.id;
 
 
             return obj;
@@ -381,7 +414,26 @@
                 openUserChoice();
                 return;
             }
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(getData());
+            var obj:Object = getData();
+            if(schedulData!=null && schedulData.repeat_type != 'none'){
+                var msg:String;
+                if(schedulData.repeatEqual(repeatType.selectedValue.toString(),obj.repeat_date)){
+                    msg = "是否将信息修改，应用到后续任务？\n\n    是：对后续所有任务产生修改。\n\n    否：仅对当前任务产生修改。";
+                }else{
+                    msg = "是否将信息修改，应用到后续任务？\n\n    是：对后续所有任务产生修改。\n        (注：循环规则发生变化，后续任务将会调整，其中已执行的任务不会被删除。)\n\n    否：仅对当前任务产生修改。";
+                }
+                Alert.show(msg, "提示", Alert.YES | Alert.NO | Alert.CANCEL, null, function(e:CloseEvent):void{
+                    if (e.detail == Alert.YES){
+                        obj['single'] = false;
+                    }else{
+                        obj['single'] = true;
+                    }
+                    HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(obj);
+                });
+            }else{
+                HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(obj);
+            }
+
         }
 
         private function changeSchedule(status:int):void{
@@ -390,16 +442,21 @@
                 obj.id = schedulData.id;
             }
             obj.status = status;
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus",saveResult,"POST").send(obj);
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus",function(result:Object,e:ResultEvent):void{
+                if(result.success){
+                    schedulData = new Schedule(result.result);
+                    init();
+                    ToolUtil.updateSchedul(schedulData.id,schedulData);
+                }
+            },"POST").send(obj);
         }
 
         private function saveResult(result:Object,e:ResultEvent):void{
             if(result.success){
-//					if(schedulData==null){
-//						schedulData = getData();
-//					}
+                ScheduleUtil.clearNewSchedule();
+
                 schedulData = new Schedule(result.result);
-                titlestr = schedulData.title;
+                ScheduleUtil.rememberSchedulePanel(schedulData.id,this);
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
                 init();
             }
@@ -540,16 +597,16 @@
                     color6.setStyle("borderColor",0x000000);
                     break;
                 case 0xfbd75b:
-                    color6.setStyle("borderColor",0x000000);
+                    color7.setStyle("borderColor",0x000000);
                     break;
                 case 0xffb878:
-                    color6.setStyle("borderColor",0x000000);
+                    color8.setStyle("borderColor",0x000000);
                     break;
                 case 0xff887c:
-                    color6.setStyle("borderColor",0x000000);
+                    color9.setStyle("borderColor",0x000000);
                     break;
                 case 0xdbadff:
-                    color6.setStyle("borderColor",0x000000);
+                    color10.setStyle("borderColor",0x000000);
                     break;
                 default:
                     if(colorPicker.selectedColor!=c){
@@ -583,29 +640,49 @@
 
         private function delAsk():void{
             if(schedulData!=null &&schedulData.id){
+                if(schedulData.repeat_type=='none'){
+                    Alert.show("是否删除当前任务?", "提示", Alert.YES | Alert.CANCEL, null, function(e:CloseEvent):void{
+                        if (e.detail == Alert.YES){
+                            var data:Object = new Object();
+                            data["id"] = schedulData.id;
+                            HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
+                        }
+                    });
+                }else{
+                    Alert.show("后续任务是否一并删除？\n\n    是：删除后续任务。\n        (注：后续任务中已执行的任务不会被删除。)\n\n    否：仅删除当前任务。 ", "提示", Alert.YES | Alert.NO | Alert.CANCEL, null, function(e:CloseEvent):void{
+                        var data:Object = new Object();
+                        data["id"] = schedulData.id;
+                        if (e.detail == Alert.YES){
+                            data["single"] = false;
+                        }
+                        if (e.detail == Alert.NO){
+                            data["single"] = true;
+                        }
+                        if(e.detail==Alert.YES||e.detail==Alert.NO){
+                            HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",function delResult(result:Object,event:ResultEvent):void{
+                                if(result.success){
+                                    if(e.detail == Alert.YES){
+                                        FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+                                    }else{
+                                        ToolUtil.updateSchedul(schedulData.id,null);
+                                    }
+                                    closeWin();
+                                }
+                            },"POST").send(data);
+                        }
 
-//                Alert.show("确认删除当前任务?", "提示", Alert.YES | Alert.NO, null, del);
+                    });
+                }
+
             }else{
                 closeWin();
             }
 
         }
-        //删除任务
-        private function del(e:mx.events.CloseEvent):void
-        {
-            if (e.detail == Alert.YES){
-                var data:Object = new Object();
-                data["id"] = schedulData.id;
-//                HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
-
-
-            }
-        }
 
         private function delResult(result:Object,e:ResultEvent):void{
             if(result.success){
-
-                FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+                ToolUtil.updateSchedul(schedulData.id,null);
                 closeWin();
             }
         }
@@ -912,18 +989,19 @@
                 <s:Label text="权重："/>
                 <s:NumericStepper id="levleStepper" minimum="0" value="1" maximum="100" width="100" toolTip="权重：完成所需要的工时，或者本任务的重要性" />
             </s:FormItem>
-            <s:FormItem label="任务状态：" height="35" >
-                <s:layout>
-                    <s:HorizontalLayout gap="10">
-                    </s:HorizontalLayout>
-                </s:layout>
-                <s:DropDownList id="statusDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskstatuslist}" toolTip="任务的状态"></s:DropDownList>
-
-            </s:FormItem>
+            <!--<s:FormItem label="任务状态：" height="35" >-->
+                <!--<s:layout>-->
+                    <!--<s:HorizontalLayout gap="10">-->
+                    <!--</s:HorizontalLayout>-->
+                <!--</s:layout>-->
+                <!--<s:DropDownList id="statusDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskstatuslist}" toolTip="任务的状态"></s:DropDownList>-->
+                <!---->
+            <!--</s:FormItem>-->
 
             <mx:ControlBar  id="dopanel" width="100%" height="40">
                 <s:Button id="btnSave" chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
-                <s:Button id="btnDel" chromeColor="#cccccc" label="舍弃" height="25" color="#000000" click="delAsk()" />
+                <s:Button id="btnDel" chromeColor="#cccccc" label="删除" height="25" color="#000000" click="delAsk()" />
+                <s:Button id="btnReset"  includeInLayout="{btnReset.visible}" visible="{schedulData!=null? btnSave.visible:false}" chromeColor="#cccccc" label="恢复" height="25" color="#000000" click="init()" />
                 <s:Spacer width="100%"></s:Spacer>
                 <s:Button id="btnStart" includeInLayout="{btnStart.visible}" chromeColor="red" label="开始" height="25" color="#ffffff" click="changeSchedule(2)" />
                 <s:Button id="btnFinish" includeInLayout="{btnFinish.visible}"  chromeColor="red" label="完成" height="25" color="#ffffff" click="changeSchedule(3)" />

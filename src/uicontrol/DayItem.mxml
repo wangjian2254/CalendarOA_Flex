@@ -7,20 +7,11 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-        import control.window.SchedulePanel;
-
         import events.ChangeScheduleEvent;
-
-        import httpcontrol.HttpServiceUtil;
-
         import model.Schedule;
 
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
-        import mx.events.FlexEvent;
-        import mx.managers.PopUpManager;
-        import mx.rpc.events.ResultEvent;
-
         import spark.layouts.BasicLayout;
         import spark.skins.spark.BorderContainerSkin;
 
@@ -81,7 +72,6 @@
             }
             getScheduleByDate();
             FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr, getScheduleByDate);
-//				showTimeLine();
         }
 
         private function getScheduleByDate(e:Event = null):void {
@@ -132,15 +122,6 @@
             }
         }
 
-        //			private function queryResult(result:Object,e:ResultEvent):void{
-        //				scheduleArr.removeAll();
-        //				if(result.success){
-        //
-        //				}
-        //
-        //
-        //			}
-
         private var schedulePos:Object = null;
 
         public function showSchedule(gid:Number = 0, show:Boolean = true):void {
@@ -158,10 +139,30 @@
                 scheduleItem.scheduleId = obj.id;
                 scheduleItem.width = this.width - 5;
 
-                scheduleItem.setStyle("borderVisible", true);
-                scheduleItem.setStyle("borderWeight", 4);
-                scheduleItem.setStyle("cornerRadius", 7);
-                scheduleItem.setStyle("backgroundAlpha", 1);
+                switch (obj.status){
+                    case 1:
+                        if(!obj.isOutOfDate()){
+                            scheduleItem.setStyle("borderWeight", 1);
+                            scheduleItem.setStyle("borderColor", 0xcccccc);
+                        }
+                        break;
+                    case 2:
+                        scheduleItem.setStyle("borderColor", 0x02711D);
+                        break;
+                    case 3:
+                        scheduleItem.setStyle("borderColor", 0xdf9110);
+                        break;
+                    case 4:
+                        scheduleItem.setStyle("borderWeight", 1);
+                        scheduleItem.setStyle("cornerRadius", 0);
+                        scheduleItem.setStyle("borderColor", 0x000000);
+
+                        break;
+                }
+                if(obj.isOutOfDate()){
+                    scheduleItem.setStyle("borderColor", 0xff0000);
+                }
+
                 scheduleItem.setStyle("backgroundColor", obj.color);
 
                 if (!groupShowData.hasOwnProperty("" + obj.department) || groupShowData["" + obj.department]) {
