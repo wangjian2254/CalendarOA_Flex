@@ -13,6 +13,8 @@
 
         import httpcontrol.HttpServiceUtil;
 
+        import model.ChatChannel;
+
         import model.Schedule;
 
         import mx.collections.ArrayCollection;
@@ -118,6 +120,12 @@
                 btnDel.visible = false;
                 scheduleTitle.setFocus();
             }else{
+                if(schedulData.cv==schedulData.v && schedulData.v!=0){
+                    initChatControl();
+                }else{
+                    initTaskChat();
+                }
+
                 chatControl.width=500;
                 if(schedulData.used){
                     btnDel.visible = false;
@@ -149,7 +157,6 @@
                 scheduleTitle.text = schedulData.title;
                 repeatType.selectedValue = schedulData.repeat_type;
 
-                repeatChange();
                 colorClick(schedulData.color);
                 for each(var department:Object in ToolUtil.myDepartmentList){
                     if(schedulData.department == department.id){
@@ -440,20 +447,7 @@
 
         }
 
-        private function changeSchedule(status:int):void{
-            var obj:Object=new Object();
-            if(schedulData!=null&&schedulData.id){
-                obj.id = schedulData.id;
-            }
-            obj.status = status;
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus",function(result:Object,e:ResultEvent):void{
-                if(result.success){
-                    schedulData = new Schedule(result.result);
-                    init();
-                    ToolUtil.updateSchedul(schedulData.id,schedulData);
-                }
-            },"POST").send(obj);
-        }
+
 
         private function saveResult(result:Object,e:ResultEvent):void{
             if(result.success){
@@ -462,7 +456,22 @@
                 schedulData = new Schedule(result.result);
                 ScheduleUtil.rememberSchedulePanel(schedulData.id,this);
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-                init();
+            }
+        }
+
+        private function changeSchedule(status:int):void{
+            var obj:Object=new Object();
+            if(schedulData!=null&&schedulData.id){
+                obj.id = schedulData.id;
+            }
+            obj.status = status;
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus",updateScheduleHandler,"POST").send(obj);
+        }
+
+        private function updateScheduleHandler(result:Object, e:ResultEvent):void{
+            if(result.success){
+                schedulData = new Schedule(result.result);
+                ToolUtil.updateSchedul(schedulData.id,schedulData);
             }
         }
 
@@ -620,27 +629,6 @@
             }
         }
 
-        private function delJoin(e:ChangeJoinUserEvent):void{
-//				joinUserGrid.invalidateList();
-        }
-
-        public function changeUsers():void{
-//				users.removeAllElements();
-//				var address:ContactItem = null;
-//				for each(var obj:Object in contactsList){
-//					if(obj.selected){
-//						address = new ContactItem();
-//						address.tileGroup = users;
-//						address.modifyEnable = dopanel.visible;
-//						address.userData = obj;
-//						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
-//						users.addElement(address);
-//					}
-//				}
-        }
-
-
-
 
         private function delAsk():void{
             if(schedulData!=null &&schedulData.id){
@@ -698,19 +686,6 @@
             FlexGlobals.topLevelApplication.dispatchEvent(evt);
         }
 
-        private function refreshAddress(result:Object,e:ResultEvent):void{
-
-
-            changeUsers();
-        }
-
-//        private function gotoZentao():void{
-//            if(schedulData.zentaourl){
-//                var request:URLRequest=new URLRequest(schedulData.zentaourl);
-//                navigateToURL(request,"_blank");
-//                return;
-//            }
-//        }
 
         private function changeProjectByDepart():void{
             myproject.removeAll();
@@ -828,35 +803,38 @@
             org.name = "[任务]"+schedulData.title.substr(0,10)+(schedulData.title.length>10?"……":"");
             org.users=schedulData.users;
             org.author=schedulData.author;
+            org.v=schedulData.v;
 
             Pomelo.getIns().request("connector.entryHandler.createChannel",org,function(data:Object):void{
                 if(data.code==200){
-                    var chatUser:Object=new Object();
-                    chatUser.id=org.channel.substr(1,org.channel.length-1);
-                    chatUser.channel = org.channel;
-                    chatUser.name = org.name;
-                    chatUser.author = org.author;
-                    chatUser.icon="/static/smalloaicon/group.png";
-                    chatUser['members']=new ArrayCollection();
-                    for each(var u:int in org.users){
-                        for each(var item:Object in ToolUtil.memberList){
-                            if(u==item.id){
-                                item['level'] = 0;
-                                item['unread'] = 0;
-                                chatUser["members"].addItem(item);
-                                break;
-                            }
-                        }
+                    if(data.needupdate){
+                        var obj:Object = new Object();
+                        obj['id']=schedulData.id;
+                        HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleById",updateScheduleHandler,"POST").send(obj);
+                    }else{
+                        var obj:Object = new Object();
+                        obj['id']=schedulData.id;
+                        obj['cv']=schedulData.v;
+                        HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleChannelVersion",updateScheduleHandler,"POST").send(obj);
                     }
-                    chatControl.chatUser = chatUser;
-                    chatControl.type = 't';
-                    chatControl.init(null);
-
                 }else{
                     chatControl.enabled = false;
                     chatControl.toolTip = "无法连接到通信服务器，请重新启动程序。";
                 }
             });
+        }
+
+        private function initChatControl():void{
+            var chatUser:ChatChannel=new ChatChannel();
+            chatUser.id=schedulData.id;
+            chatUser.channel = "t"+schedulData.id;
+            chatUser.name = "[任务]"+schedulData.title.substr(0,10)+(schedulData.title.length>10?"……":"");;
+            chatUser.author = schedulData.author;
+            chatUser.icon="/static/smalloaicon/group.png";
+            chatUser.setMembers(schedulData.users);
+
+            chatControl.chatUser = chatUser;
+            chatControl.init(null);
         }
         ]]>
 	</fx:Script>
@@ -871,7 +849,7 @@
         </mx:DateFormatter>
     </fx:Declarations>
     <s:HGroup id="windowGroup" width="100%" height="100%" >
-        <s:Form width="510" height="100%" id="schedulePanel">
+        <s:Form width="510" id="schedulePanel" >
             <s:layout>
                 <s:FormLayout gap="0"  ></s:FormLayout>
             </s:layout>
@@ -937,7 +915,7 @@
                 <s:RadioButton group="{repeatType}" label="每月" value="monthly">
                 </s:RadioButton>
             </s:FormItem>
-            <s:FormItem id="dayPanel"  label="重复时间：" height="25" toolTip="重复时间：在任务周期中，按条件循环任务">
+            <s:FormItem id="dayPanel"  label="重复时间：" includeInLayout="{dayPanel.visible}" height="25" toolTip="重复时间：在任务周期中，按条件循环任务">
                 <s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
                     <s:CheckBox label="一"  />
                     <s:CheckBox label="二" />
@@ -1009,7 +987,7 @@
                 <s:CheckBox id="boxTiXing" change="changeTiXing()" selected="true" label="无需提醒" />
             </s:FormItem>
             <s:FormItem id="itemTixing" label="提醒：" height="75">
-                <s:TileGroup id="tixingTile" width="100%" height="75"  columnAlign="justifyUsingGap" >
+                <s:TileGroup id="tixingTile" includeInLayout="{tixingTile.visible}" width="100%" height="75"  columnAlign="justifyUsingGap" >
                 <s:CheckBox id="alertBox0" label="到点提醒" ></s:CheckBox>
                 <s:CheckBox id="alertBox1" label="提前5分钟"></s:CheckBox>
                 <s:CheckBox id="alertBox2" label="提前10分钟"></s:CheckBox>
@@ -1033,15 +1011,6 @@
                 <s:Label text="权重："/>
                 <s:NumericStepper id="levleStepper" minimum="0" value="1" maximum="100" width="100" toolTip="权重：完成所需要的工时，或者本任务的重要性" />
             </s:FormItem>
-            <!--<s:FormItem label="任务状态：" height="35" >-->
-                <!--<s:layout>-->
-                    <!--<s:HorizontalLayout gap="10">-->
-                    <!--</s:HorizontalLayout>-->
-                <!--</s:layout>-->
-                <!--<s:DropDownList id="statusDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskstatuslist}" toolTip="任务的状态"></s:DropDownList>-->
-                <!---->
-            <!--</s:FormItem>-->
-
             <mx:ControlBar  id="dopanel" width="100%" height="40">
                 <s:Button id="btnSave" chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />
                 <s:Button id="btnDel" chromeColor="#cccccc" label="删除" height="25" color="#000000" click="delAsk()" />
@@ -1055,7 +1024,7 @@
             </mx:ControlBar>
         </s:Form>
 
-        <control:ChatControl id="chatControl"  width="0" height="100%"  bigPanel="false"  visible="{schedulData}">
+        <control:ChatControl id="chatControl" width="0" height="{schedulePanel.height}"  bigPanel="false"  visible="{schedulData}">
 
         </control:ChatControl>
     </s:HGroup>

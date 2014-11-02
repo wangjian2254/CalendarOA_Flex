@@ -20,6 +20,8 @@ import httpcontrol.CHTTPService;
 import httpcontrol.HttpServiceUtil;
 import httpcontrol.RemoteUtil;
 
+import model.ChatChannel;
+
 import model.Schedule;
 
 import mx.collections.ArrayCollection;
@@ -184,9 +186,9 @@ public class ToolUtil
 
             var dobj:Object=new Object();
             for each(var item2:Object in departMentList) {
-                for each(var group:Object in ToolUtil.groupList){
+                for each(var group:ChatChannel in ToolUtil.groupList){
                     if(group.id==item2.id){
-                        group.members=item2.members;
+                        group.setMembers(item2.members);
                     }
                 }
 

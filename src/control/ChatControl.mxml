@@ -17,6 +17,8 @@
 
         import json.JParser;
 
+        import model.ChatChannel;
+
         import mx.collections.ArrayCollection;
         import mx.controls.Menu;
         import mx.core.FlexGlobals;
@@ -40,61 +42,35 @@
         private var chatsArr:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        public var members:ArrayCollection;
-
-        [Bindable]
-        public var chatUser:Object;
+        public var chatUser:ChatChannel;
 
 
-        [Bindable]
-        public var type:String = "d";//部门 为“d” 任务为 “t” 讨论组为：“g”
+//        [Bindable]
+//        public var type:String = "d";//部门 为“d” 任务为 “t” 讨论组为：“g”
         override public function releaseListener():void {
             Pomelo.getIns().removeEventListener('onChat', chatHandler);
             Pomelo.getIns().removeEventListener('quiteChannel', quiteChannelHandler);
             Pomelo.getIns().removeEventListener('joinChannel', joinChannelHandler);
         }
 
-        private function getChannel(pids:Array):String {
-            var channel:String;
-            if (members == null) {
-                if (ToolUtil.sessionUser.pid > chatUser.id) {
-                    channel = chatUser.id + "p" + ToolUtil.sessionUser.pid;
-                } else {
-                    channel = ToolUtil.sessionUser.pid + "p" + chatUser.id;
-                }
-                pids.push(chatUser.id);
-                pids.push(ToolUtil.sessionUser.pid);
-            } else {
-                for each(var p:Object in members) {
-                    pids.push(p.id);
-                }
-                if (chatUser.channel) {
-                    channel = chatUser.channel;
-                } else {
-                    channel = type + chatUser.id;
-                }
 
-            }
-            return channel;
-        }
 
         private function flagTimeline():void {
             if (this.visible) {
                 var event:ChatTimelineEvent = new ChatTimelineEvent(ChatTimelineEvent.Channel, true);
-                event.channel = getChannel(new Array());
+                event.channel = chatUser.channel
                 event.flag = this.flag;
                 dispatchEvent(event);
             }
         }
 
-        private var channel:String;
 
         override public function init(e:FlexEvent):void {
             if (chatUser == null) {
                 return;
             }
 
-            if (members == null) {
+            if (chatUser.members == null) {
                 horGroup.validateNow();
                 addressList.visible = false;
                 horGroup.removeElement(addressList);
@@ -105,23 +81,22 @@
                 head.source = chatUser.icon;
                 nameLabel.text = chatUser.name;
             }
-            var pids:Array = new Array();
-            channel = getChannel(pids);
-            if (type == "p") {
+            var pids:Array = chatUser.getPids();
+            if (chatUser.type == "p") {
 
 
-                Pomelo.getIns().request("connector.entryHandler.createChannel", {channel: channel, users: pids}, function (data:Object):void {
+                Pomelo.getIns().request("connector.entryHandler.createChannel", {channel: chatUser.channel, users: pids}, function (data:Object):void {
                     if (data.code == 200) {
 
                     }
                 });
             }
-            if (type != 'g') {
+            if (chatUser.type != 'g') {
                 quiteButton.visible = false;
 
             }
             memberButton.visible = false;
-            if (type == 'g' && chatUser.author == ToolUtil.sessionUser.pid) {
+            if (chatUser.type == 'g' && chatUser.author == ToolUtil.sessionUser.pid) {
                 memberButton.visible = true;
             }
 
@@ -137,10 +112,9 @@
             if (chatsArr.length > 0) {
                 timeline = chatsArr.getItemAt(0)._id;
             }
-            var pids:Array = new Array();
-            var channel:String = getChannel(pids);
-            ;
-            Pomelo.getIns().request("connector.entryHandler.history", {channel: channel, id: timeline}, function (data:Object):void {
+            var pids:Array = chatUser.getPids();
+
+            Pomelo.getIns().request("connector.entryHandler.history", {channel: chatUser.channel, id: timeline}, function (data:Object):void {
                 if (data.code == 200) {
                     var chats:ArrayCollection = new ArrayCollection(data.chats as Array);
                     if (chats.length == 0) {
@@ -199,15 +173,15 @@
         }
 
         public function quiteChannelHandler(event:PomeloEvent):void {
-            if (channel != event.message.channel) {
+            if (chatUser.channel != event.message.channel) {
                 return;
             }
-            members.refresh();
-            for each(var person:Object in members) {
+            chatUser.members.refresh();
+            for each(var person:Object in chatUser.members) {
                 if (person.id == event.message.pid) {
-                    var i:int = members.getItemIndex(person);
+                    var i:int = chatUser.members.getItemIndex(person);
                     if (i > -1) {
-                        members.removeItemAt(i);
+                        chatUser.members.removeItemAt(i);
                     }
                     return;
                 }
@@ -216,25 +190,25 @@
         }
 
         public function joinChannelHandler(event:PomeloEvent):void {
-            if (channel != event.message.channel) {
+            if (chatUser.channel != event.message.channel) {
                 return;
             }
-            members.refresh();
-            for each(var p:Object in members) {
+            chatUser.members.refresh();
+            for each(var p:Object in chatUser.members) {
                 if (p.id == event.message.pid) {
                     return;
                 }
             }
             for each(var person:Object in ToolUtil.memberList) {
                 if (person.id == event.message.pid) {
-                    members.addItem(person);
+                    chatUser.members.addItem(person);
                     return;
                 }
             }
         }
 
         private function chatHandler(event:PomeloEvent):void {
-            if (event.message.msg.channel != channel) {
+            if (event.message.msg.channel != chatUser.channel) {
                 return;
             }
             chatsArr.addItem(event.message.msg);
@@ -326,7 +300,7 @@
 
         private function createGroup():void {
             var gp:GroupPanel = PopUpManager.createPopUp(this, GroupPanel, true) as GroupPanel;
-            if (members == null) {
+            if (chatUser.members == null) {
                 var m:ArrayCollection = new ArrayCollection();
                 for each(var p:Object in ToolUtil.memberList) {
                     if (ToolUtil.sessionUser.pid == p.id || chatUser.id == p.id) {
@@ -335,7 +309,7 @@
                 }
                 gp.chatmember = m;
             } else {
-                gp.chatmember = members;
+                gp.chatmember = chatUser.members;
             }
             gp.addEventListener("ChatUser", function (e:ListClickEvent):void {
                 dispatchEvent(e);
@@ -364,8 +338,8 @@
 //            chat['si'] =ns.value ;
             chat['d'] = DateUtil.dateLblChat(new Date());
 
-            if (members == null) {
-                ChatManager.sendMessageToPerson(chatUser.id, chat, function (data:Object):void {
+            if (chatUser.members == null) {
+                ChatManager.sendMessageToPerson(Number(chatUser.id), chat, function (data:Object):void {
                     al(data, chat);
                 });
             } else {
@@ -374,7 +348,7 @@
                         al(data, chat);
                     });
                 } else {
-                    ChatManager.sendMessageToDeparment(chatUser.id, type, chat, function (data:Object):void {
+                    ChatManager.sendMessageToDeparment(Number(chatUser.id), chatUser.type, chat, function (data:Object):void {
                         al(data, chat);
                     });
                 }
@@ -397,14 +371,14 @@
 
 
         private function quiteGroup():void {
-            Pomelo.getIns().notify("connector.entryHandler.quiteChannel", {pid: ToolUtil.sessionUser.pid, channel: getChannel(new Array())});
+            Pomelo.getIns().notify("connector.entryHandler.quiteChannel", {pid: ToolUtil.sessionUser.pid, channel: chatUser.channel});
         }
 
 
         private function memberGroup():void {
             var gp:GroupMemberPanel = PopUpManager.createPopUp(this, GroupMemberPanel, true) as GroupMemberPanel;
-            gp.chatmember = members;
-            gp.channel = getChannel(new Array());
+            gp.chatmember = chatUser.members;
+            gp.channel = chatUser.channel;
         }
         ]]>
 	</fx:Script>
@@ -459,7 +433,7 @@
 
         </s:VGroup>
 
-            <uicontrol:AddressList  id="addressList" dataProvider="{members}"  visible="{bigPanel}" includeInLayout="{bigPanel}"
+            <uicontrol:AddressList  id="addressList" dataProvider="{chatUser.members}"  visible="{bigPanel}" includeInLayout="{bigPanel}"
                                    doubleClickEnabled="true" doubleClick="chatUserPanel()" toolTip="双击发送信息"
                                    itemRenderer="uicontrol.renderer.AddressItemRenderer" width="150" height="100%">
             </uicontrol:AddressList>

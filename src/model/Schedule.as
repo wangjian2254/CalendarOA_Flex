@@ -33,6 +33,8 @@ public class Schedule {
     private var _date:String;
     private var _used:Boolean=false;
     private var _author:int=0;
+    private var _v:int=0;
+    private var _cv:int=0;
 
 
 
@@ -359,6 +361,22 @@ public class Schedule {
 
     public function set author(value:int):void {
         _author = value;
+    }
+
+    public function get v():int {
+        return _v;
+    }
+
+    public function set v(value:int):void {
+        _v = value;
+    }
+
+    public function get cv():int {
+        return _cv;
+    }
+
+    public function set cv(value:int):void {
+        _cv = value;
     }
 }
 }

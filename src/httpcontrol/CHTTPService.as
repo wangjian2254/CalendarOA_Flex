@@ -43,11 +43,11 @@ package httpcontrol
                 if(this.url.indexOf(baseUrl)<0){
                     this.url=baseUrl+this.url;
                 }
-				if(this.url.indexOf("?")!=-1){
-					this.url+="&requesttimestr="+(new Date()).toString();
-				}else{
-					this.url+="?requesttimestr="+(new Date()).toString();
-				}
+//				if(this.url.indexOf("?")!=-1){
+//					this.url+="&requesttimestr="+(new Date()).toString();
+//				}else{
+//					this.url+="?requesttimestr="+(new Date()).toString();
+//				}
 				return super.send(parameters);
 			}catch(e:Error){
 				this.loading.showOut();
@@ -79,7 +79,7 @@ package httpcontrol
 					}
 				}catch(error:Error){
 					
-					Alert.show("系统错误","警告");
+					Alert.show("系统错误,请将以下错误信息提供给管理员:\n\n"+"访问路径：\n"+this.url+"\n\n错误内容：\n"+error.toString(),"警告");
 				}
 					
 				

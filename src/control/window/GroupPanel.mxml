@@ -8,6 +8,8 @@
 		<![CDATA[
         import events.ListClickEvent;
 
+        import model.ChatChannel;
+
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
 
@@ -112,23 +114,13 @@
             }
             Pomelo.getIns().request("connector.entryHandler.createChannel",org,function(data:Object):void{
                 if(data.code==200){
-                    var chatUser:Object=new Object();
+                    var chatUser:ChatChannel=new ChatChannel();
                     chatUser.id=org.channel.substr(1,org.channel.length-1);
                     chatUser.channel = org.channel;
                     chatUser.name = org.name;
                     chatUser.author = org.author;
                     chatUser.icon="/static/smalloaicon/group.png";
-                    chatUser['members']=new Array();
-                    for each(var u:int in pids){
-                        for each(var item:Object in ToolUtil.memberList){
-                            if(u==item.id){
-                                item['level'] = 0;
-                                item['unread'] = 0;
-                                chatUser["members"].push(item);
-                                break;
-                            }
-                        }
-                    }
+                    chatUser.setMembers(pids);
                     var chatevent:ListClickEvent=new ListClickEvent("ChatUser",chatUser);
                     dispatchEvent(chatevent);
                     closeWin();

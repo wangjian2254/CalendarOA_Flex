@@ -9,7 +9,11 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
+        import control.ChatControl;
+
         import events.ListClickEvent;
+
+        import model.ChatChannel;
 
         import mx.collections.ArrayCollection;
         import mx.events.CollectionEvent;
@@ -89,7 +93,7 @@
                     if (f) {
                         item2.level = 0;
                         item2.unread = 0;
-                        departMember.addItem(item2);
+                        departMember.addItem(new ChatChannel(item2));
                     }
 
                 }
@@ -145,13 +149,15 @@
         }
         private function initMember(e:CollectionEvent):void{
             if(type == "chat"){
+                userMember.removeAll();
                 var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 
                 for each(var member:Object in members) {
                     member['level'] = 0;
                     member['unread'] = 0;
+                    userMember.addItem(new ChatChannel(member));
                 }
-                userMember=members;
+
                 userMember.refresh();
             }
         }

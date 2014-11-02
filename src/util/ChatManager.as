@@ -10,6 +10,8 @@ import flash.utils.Timer;
 
 import json.JParser;
 
+import model.ChatChannel;
+
 import mx.collections.ArrayCollection;
 import mx.controls.Alert;
 import mx.core.FlexGlobals;
@@ -133,9 +135,9 @@ public class ChatManager {
 
 //            Pomelo.getIns().addEventListener('pStatus', personChangedHandler);
             Pomelo.getIns().addEventListener('onChat', chatHandler);
-//            Pomelo.getIns().addEventListener('onLine', onlineHandler);
             Pomelo.getIns().addEventListener('sys', systemMessageHandler);
             Pomelo.getIns().addEventListener('createChannel', createChannelHandler);
+            Pomelo.getIns().addEventListener('updateChannel', updateChannelHandler);
             Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
             Pomelo.getIns().addEventListener('quiteChannel', quiteChannelHandler);
             Pomelo.getIns().addEventListener('joinChannel', joinChannelHandler);
@@ -143,68 +145,68 @@ public class ChatManager {
 
             var groups:ArrayCollection=new ArrayCollection();
             var channels:Array = new Array();
-            var g:Object;
+            var g:ChatChannel;
             for each(var channel:Object in data.channels){
-                if ('o' == channel.channel.substr(0, 1)||'t' == channel.channel.substr(0, 1)) {
+                if ('o' == channel.channel.substr(0, 1)) {
                     continue;
                 }
-                if ('0' == channel.channel.substr(0, 1)) {
-                    channels.push({channel:channel.channel, timeline:""+channel.timeline});
-                    continue;
-                }
-                g=new Object();
-                if(channel.channel.substr(0,1)=="g"){
-                    g['id']=channel.channel.substr(1, channel.channel.length - 1);
-                    g['icon']='/static/smalloaicon/group.png';
-                }
-                if(isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!="g"){
-                    g['id']=Number(channel.channel.substr(1, channel.channel.length - 1));
-                }
-                g['channel']=channel.channel;
-                g['author']=channel.author;
-                g['father']=null;
                 channels.push({channel:channel.channel, timeline:""+channel.timeline});
-                g['name']=channel.name;
-                g['timeline']=channel.timeline;
-                if(!isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!='0'){
-                    var pid1:int=Number(channel.channel.split('p')[0]);
-                    var pid2:int=Number(channel.channel.split('p')[1]);
-                    if(ToolUtil.sessionUser.pid!=pid1){
-                        pid1=pid2;
-                    }
-                    for each(var p:Object in ToolUtil.memberList){
-                        if(p.id==pid1){
-                            g['id']= p.id;
-                            g['icon']= p.icon;
-                            g['name']= p.name;
-                            break;
-                        }
-                    }
-                }else{
-                    if ('d' == channel.channel.substr(0, 1)) {
-                        for each(p in ToolUtil.departMentList) {
-                            if (p.id == g['id']) {
-                                g['icon']= p.icon;
-                                g['name']= p.name;
-                                g['flag']= p.flag;
-                                break;
-                            }
-                        }
-                    }
-
-                    g['members']=new Array();
-                    for each(var u:Object in channel.members){
-                        for each(var item:Object in ToolUtil.memberList){
-                            if(u.pid==item.id){
-                                item['level'] = 0;
-                                item['unread'] = 0;
-                                g["members"].push(item);
-                                break;
-                            }
-                        }
-                    }
+                if ('0' == channel.channel.substr(0, 1)) {
+                    continue;
                 }
+                g=new ChatChannel(channel);
                 groups.addItem(g);
+//                if(channel.channel.substr(0,1)=="g"){
+//                    g['id']=channel.channel.substr(1, channel.channel.length - 1);
+//                    g['icon']='/static/smalloaicon/group.png';
+//                }
+//                if(isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!="g"){
+//                    g['id']=Number(channel.channel.substr(1, channel.channel.length - 1));
+//                }
+//                g['channel']=channel.channel;
+//                g['author']=channel.author;
+//                g['father']=null;
+//                g['name']=channel.name;
+//                g['timeline']=channel.timeline;
+//                if(!isNaN(channel.channel.substr(0,1))&&channel.channel.substr(0,1)!='0'){
+//                    var pid1:int=Number(channel.channel.split('p')[0]);
+//                    var pid2:int=Number(channel.channel.split('p')[1]);
+//                    if(ToolUtil.sessionUser.pid!=pid1){
+//                        pid1=pid2;
+//                    }
+//                    for each(var p:Object in ToolUtil.memberList){
+//                        if(p.id==pid1){
+//                            g['id']= p.id;
+//                            g['icon']= p.icon;
+//                            g['name']= p.name;
+//                            break;
+//                        }
+//                    }
+//                }else{
+//                    if ('d' == channel.channel.substr(0, 1)) {
+//                        for each(p in ToolUtil.departMentList) {
+//                            if (p.id == g['id']) {
+//                                g['icon']= p.icon;
+//                                g['name']= p.name;
+//                                g['flag']= p.flag;
+//                                break;
+//                            }
+//                        }
+//                    }
+//
+//                    g['members']=new Array();
+//                    for each(var u:Object in channel.members){
+//                        for each(var item:Object in ToolUtil.memberList){
+//                            if(u.pid==item.id){
+//                                item['level'] = 0;
+//                                item['unread'] = 0;
+//                                g["members"].push(item);
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+
 
             }
             ToolUtil.groupList = groups;
@@ -217,7 +219,7 @@ public class ChatManager {
                         liyuShow=false;
                     }
                 }
-                for each(var c:Object in ToolUtil.groupList){
+                for each(var c:ChatChannel in ToolUtil.groupList){
                     if(c.channel==msg.message.channel){
                         c.unread=msg.message.count;
                     }
@@ -304,51 +306,74 @@ public class ChatManager {
                 return;
             }
         }
-        var g:Object=new Object();
-        g['channel']=event.message.group.channel;
-        g['name']=event.message.group.name;
-        g['author']=event.message.group.author;
-        if(event.message.group.channel.substr(0,1)=="g"){
-            g['id']=event.message.group.channel.substr(1, event.message.group.channel.length - 1);
-            g['icon']='/static/smalloaicon/group.png';
-        }
-        if(event.message.group.channel.substr(0,1)=="0"){
-            return;
-        }
-        if(!isNaN(event.message.group.channel.substr(0,1))&&event.message.group.channel.substr(0,1)!='0'){
-            var pid1:int=Number(event.message.group.channel.split('p')[0]);
-            var pid2:int=Number(event.message.group.channel.split('p')[1]);
-            if(ToolUtil.sessionUser.pid!=pid1){
-                pid1=pid2;
-            }
-            for each(var p:Object in ToolUtil.memberList){
-                if(p.id==pid1){
-                    g['id']= p.id;
-                    g['icon']= p.icon;
-                    g['name']= p.name;
-                    break;
-                }
-            }
-        }
-
-        g['timeline']=event.message.group.timeline;
-        g['members']=new Array();
-        for each(var u:Object in event.message.group.members){
-            for each(var item:Object in ToolUtil.memberList){
-                if(u.pid==item.id){
-                    item['level'] = 0;
-                    item['unread'] = 0;
-                    g["members"].push(item);
-                    break;
-                }
-            }
-        }
+        var g:ChatChannel=new ChatChannel();
+        g.init(event.message.group);
         ToolUtil.groupList.addItem(g);
 
 
     }
+
+    static public function updateChannelHandler(event:PomeloEvent):void{
+        if(event.message.group.channel.substr(0,1)=="0"){
+            return;
+        }
+        var g:ChatChannel=new ChatChannel();
+        for each(var org:ChatChannel in ToolUtil.groupList){
+            if(org.channel==event.message.group.channel){
+                g=org;
+            }
+        }
+        g.init(event.message.group);
+
+
+//        g['channel']=event.message.group.channel;
+//        g['name']=event.message.group.name;
+//        g['author']=event.message.group.author;
+//        if(event.message.group.channel.substr(0,1)=="g"){
+//            g['id']=event.message.group.channel.substr(1, event.message.group.channel.length - 1);
+//            g['icon']='/static/smalloaicon/group.png';
+//        }
+//        if(event.message.group.channel.substr(0,1)=="t"){
+//            g['id']=event.message.group.channel.substr(1, event.message.group.channel.length - 1);
+//            g['icon']='/static/smalloaicon/group.png';
+//        }
+
+//        if(!isNaN(event.message.group.channel.substr(0,1))&&event.message.group.channel.substr(0,1)!='0'){
+//            var pid1:int=Number(event.message.group.channel.split('p')[0]);
+//            var pid2:int=Number(event.message.group.channel.split('p')[1]);
+//            if(ToolUtil.sessionUser.pid!=pid1){
+//                pid1=pid2;
+//            }
+//            for each(var p:Object in ToolUtil.memberList){
+//                if(p.id==pid1){
+//                    g['id']= p.id;
+//                    g['icon']= p.icon;
+//                    g['name']= p.name;
+//                    break;
+//                }
+//            }
+//        }
+
+//        g['timeline']=event.message.group.timeline;
+//        g['members'].length=0;
+//        for each(var u:Object in event.message.group.members){
+//            for each(var item:Object in ToolUtil.memberList){
+//                if(u.pid==item.id){
+//                    item['level'] = 0;
+//                    item['unread'] = 0;
+//                    g["members"].push(item);
+//                    break;
+//                }
+//            }
+//        }
+//        ToolUtil.groupList.addItem(g);
+
+
+    }
+
+
     static public function removeChannelHandler(event:PomeloEvent):void{
-        for each(var org:Object in ToolUtil.groupList){
+        for each(var org:ChatChannel in ToolUtil.groupList){
             if(org.channel==event.message.channel){
                 ToolUtil.groupList.removeItemAt(ToolUtil.groupList.getItemIndex(org));
                 return;
@@ -356,13 +381,13 @@ public class ChatManager {
         }
     }
     static public function quiteChannelHandler(event:PomeloEvent):void{
-        for each(var org:Object in ToolUtil.groupList){
+        for each(var org:ChatChannel in ToolUtil.groupList){
             if(org.channel==event.message.channel){
                 for each(var person:Object in org.members){
                     if(person.id==event.message.pid){
 
-                        var i:int=org.members.indexOf(person);
-                        org.members.slice(i,1);
+                        var i:int=org.members.getItemIndex(person);
+                        org.members.removeItemAt(i);
                         return;
                     }
                 }
@@ -371,7 +396,7 @@ public class ChatManager {
         }
     }
     static public function joinChannelHandler(event:PomeloEvent):void{
-        for each(var org:Object in ToolUtil.groupList){
+        for each(var org:ChatChannel in ToolUtil.groupList){
             if(org.channel==event.message.channel){
                 var f:Boolean = false;
                 for each(var person:Object in org.members){
@@ -382,7 +407,7 @@ public class ChatManager {
                 if(!f){
                     for each(person in ToolUtil.memberList){
                         if(person.id==event.message.pid){
-                            org.members.push(person);
+                            org.members.addItem(person);
                             return;
                         }
                     }

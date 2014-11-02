@@ -9,6 +9,8 @@
         import events.CloseContainerEvent;
         import events.ListClickEvent;
 
+        import model.ChatChannel;
+
 
         import mx.collections.ArrayCollection;
         import mx.events.FlexEvent;
@@ -69,44 +71,19 @@
 
 
         private function listItemClick_handler(e:ListClickEvent):void {
-            var chat:Object = e.data;
-            var mod:String = '';
-            var type:String = '';
-            if (chat.hasOwnProperty('flag')) {
-                type = "d";
-            } else if (!chat.hasOwnProperty("channel")) {
-                type = "p";
-            } else {
-                if (chat.channel.substr(0, 1) == 'g') {
-                    type = "g";
-                }
-                if (chat.channel.substr(0, 1) == 'd') {
-                    type = "d";
-                }
-                if (chat.channel.substr(0, 1) == 't') {
-                    type = "t";
-                }
-                if (!isNaN(chat.channel.substr(0, 1))) {
-                    type = "p";
-                }
-
-
+            var chat:ChatChannel = e.data as ChatChannel;
+            if(chat==null){
+                trace("开启聊天框出错");
             }
-            mod = type + chat.id;
+            var mod:String = '';
+
+            mod = chat.type + chat.id;
 
             var c:CBorderContainer;
             c = cbar.getView(mod);
             if (c == null) {
                 var chatControl:ChatControl = new ChatControl();
                 chatControl.chatUser = chat;
-                chatControl.type = type;
-                if (chat.hasOwnProperty("members")) {
-                    chatControl.members = new ArrayCollection(chat.members as Array);
-                    for each(var m:Object in chatControl.members) {
-                        m.level = 0;
-                    }
-                }
-
                 c = chatControl;
             }
             if (c != null) {
