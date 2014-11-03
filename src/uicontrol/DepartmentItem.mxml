@@ -92,7 +92,7 @@
             depatementName.text = department.name;
             fzrFormItem.removeAllElements();
 
-            var person:Object = null;
+//            var person:Object = null;
             var personItem:PersonItem = null;
 
             powerAdd = false;
@@ -104,16 +104,15 @@
             } else {
 
                 for (var i:int = 0; i < department.managers.length; i++) {
-                    person = department.managers[i];
-                    if (person.id == ToolUtil.sessionUser.pid) {
+//                    person = department.managers[i];
+                    if (department.managers[i] == ToolUtil.sessionUser.pid) {
                         powerAdd = true;
                     }
                 }
 
                 if(fatherDepartment!=null){
                     for (i = 0; i < fatherDepartment.managers.length; i++) {
-                        person = fatherDepartment.managers[i];
-                        if (person.id == ToolUtil.sessionUser.pid) {
+                        if (fatherDepartment.managers[i] == ToolUtil.sessionUser.pid) {
                             powerDel = true;
                         }
                     }
@@ -128,10 +127,10 @@
                 group.removeElement(btnDel);
             }
             for (i = 0; i < department.managers.length; i++) {
-                person = department.managers[i];
+//                person = department.managers[i];
                 personItem = new PersonItem();
                 personItem.showBtn = powerAdd;
-                personItem.person = person;
+                personItem.person = ToolUtil.getActivePersonById(department.managers[i]);
                 personItem.department = department;
                 fzrFormItem.addElement(personItem);
             }

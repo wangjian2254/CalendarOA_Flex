@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" x="-1000" y="100" width="{getWindowWidth}"
-                             height="{getWindowHeight}"  title="{titlestr}" creationComplete="init()"
+                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" x="-1000" y="100"   title="{titlestr}" creationComplete="init()"
                              xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
     <fx:Script>
 		<![CDATA[
         import events.ChangeJoinUserEvent;
         import events.ChangeMenuEvent;
         import events.ChangeUserEvent;
+        import events.ChatTimelineEvent;
         import events.MembersEvent;
 
         import httpcontrol.HttpServiceUtil;
@@ -104,6 +104,7 @@
 
         public function init():void{
             addEventListener(CloseEvent.CLOSE, closeSchedule);
+            removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
             ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
             usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS,removeUsersHandler);
 
@@ -114,19 +115,22 @@
             btnRestart.visible = false;
             btnFinish.visible = false;
             if(schedulData==null){
-                if(chatControl!=null&&windowGroup.getElementIndex(chatControl)>=0){
-                    windowGroup.removeElement(chatControl);
-                }
+//                if(chatControl!=null&&windowGroup.getElementIndex(chatControl)>=0){
+//                    windowGroup.removeElement(chatControl);
+//                }
                 btnDel.visible = false;
                 scheduleTitle.setFocus();
             }else{
+                chatControl.visible = true;
+                chatControl.width = 500;
+//                this.width = chatControl.width+schedulePanel.width;
                 if(schedulData.cv==schedulData.v && schedulData.v!=0){
                     initChatControl();
                 }else{
                     initTaskChat();
                 }
 
-                chatControl.width=500;
+
                 if(schedulData.used){
                     btnDel.visible = false;
                 }else{
@@ -176,7 +180,7 @@
                 usersGroup.removeAllElements();
                 for each(var pid:int in schedulData.users){
                     var m:MemberItem=new MemberItem();
-                    m.person = ToolUtil.getPersonById(pid);
+                    m.person = ToolUtil.getAnyPersonById(pid);
                     m.showBtn = dopanel.visible;
                     if(m.person.hasOwnProperty("id")){
                         usersGroup.addElement(m);
@@ -220,7 +224,7 @@
 
             }else{
                 var m:MemberItem=new MemberItem();
-                m.person = ToolUtil.getPersonById(ToolUtil.sessionUser.pid);
+                m.person = ToolUtil.getAnyPersonById(ToolUtil.sessionUser.pid);
                 m.showBtn = dopanel.visible;
                 if(m.person.hasOwnProperty("id")){
                     usersGroup.addElement(m);
@@ -836,6 +840,16 @@
             chatControl.chatUser = chatUser;
             chatControl.init(null);
         }
+
+        private function flagTimeline(e:ChatTimelineEvent):void {
+            for each(var c:ChatChannel in ToolUtil.groupList) {
+                if (c.channel == e.channel) {
+                    c.unread = 0;
+                    Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {channel: e.channel, pid: ToolUtil.sessionUser.pid});
+                }
+            }
+            ToolUtil.groupList.refresh();
+        }
         ]]>
 	</fx:Script>
     <fx:Declarations>
@@ -1024,7 +1038,7 @@
             </mx:ControlBar>
         </s:Form>
 
-        <control:ChatControl id="chatControl" width="0" height="{schedulePanel.height}"  bigPanel="false"  visible="{schedulData}">
+        <control:ChatControl id="chatControl" width="500" height="{schedulePanel.height}"  bigPanel="false"  visible="false" includeInLayout="{chatControl.visible}">
 
         </control:ChatControl>
     </s:HGroup>

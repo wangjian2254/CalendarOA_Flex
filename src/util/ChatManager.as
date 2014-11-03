@@ -241,8 +241,8 @@ public class ChatManager {
         var f:Boolean = false;
         for each(var item2:Object in ToolUtil.departMentList) {
             f = false;
-            for each(var p:Object in item2.members) {
-                if (p.id == ToolUtil.sessionUser.pid) {
+            for each(var p:int in item2.members) {
+                if (p == ToolUtil.sessionUser.pid) {
                     f = true;
                 }
             }
@@ -289,7 +289,7 @@ public class ChatManager {
     static public function systemMessageHandler(event:PomeloEvent):void{
         switch (event.message.msg.type){
             case "org_users_changed":
-                ToolUtil.departMentListRefresh();
+                ToolUtil.currentOrgRefresh();
                 break;
             case "join_apply":
                 Alert.show(event.message.msg.msg,event.message.msg.type);

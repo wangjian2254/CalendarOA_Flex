@@ -110,7 +110,7 @@
         public function getHistoryChat():void {
             var timeline:String;
             if (chatsArr.length > 0) {
-                timeline = chatsArr.getItemAt(0)._id;
+                timeline = chatsArr.getItemAt(0).id;
             }
             var pids:Array = chatUser.getPids();
 

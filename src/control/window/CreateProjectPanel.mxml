@@ -129,6 +129,14 @@
                 Alert.show("项目描述必须填写", "提示");
                 return;
             }
+            if (startDate.selectedDate == null) {
+                Alert.show("项目开始日期必须填写", "提示");
+                return;
+            }
+            if (endDate.selectedDate == null) {
+                Alert.show("项目结束日期必须填写", "提示");
+                return;
+            }
 
             var obj:Object = new Object();
 
@@ -177,30 +185,44 @@
 			<s:layout>
 				<s:HorizontalLayout gap="5"/>
 			</s:layout>
-			<s:TextInput id="projectname"  width="100%"  tabIndex="5" >
+			<s:TextInput id="projectname"  width="100%"  tabIndex="1" >
 				
 			</s:TextInput>
+            <s:Label text="*" color="red"/>
 		</s:FormItem>
         <s:FormItem  label="项目描述:" textAlign="right">
-            <s:TextArea id="projectdesc" width="100%" height="60"></s:TextArea>
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <s:TextArea id="projectdesc" width="100%" height="60" tabIndex="2"></s:TextArea>
+            <s:Label text="*" color="red"/>
         </s:FormItem>
         <s:FormItem  label="父级项目:" textAlign="right">
-            <s:DropDownList id="fatherDownList" width="100%" labelField="name" selectedIndex="0" dataProvider="{myprojectList}" ></s:DropDownList>
+
+            <s:DropDownList id="fatherDownList" width="100%" labelField="name" selectedIndex="0" dataProvider="{myprojectList}" tabIndex="3" ></s:DropDownList>
         </s:FormItem>
         <s:FormItem  label="隶属部门:" textAlign="right">
-            <s:DropDownList id="departmentDownList" width="100%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="refreshManager()"  ></s:DropDownList>
+            <s:DropDownList id="departmentDownList" width="100%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="refreshManager()" tabIndex="4" ></s:DropDownList>
         </s:FormItem>
         <s:FormItem  label="负责人:" textAlign="right">
-            <s:DropDownList id="managerDownList" width="100%" labelField="name"  dataProvider="{managerList}"  ></s:DropDownList>
+            <s:DropDownList id="managerDownList" width="100%" labelField="name"  dataProvider="{managerList}" tabIndex="5"  ></s:DropDownList>
         </s:FormItem>
         <s:FormItem  label="开始日期:" textAlign="right">
-            <mx:DateField id="startDate" width="150"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <mx:DateField id="startDate" width="150"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" tabIndex="6" />
+            <s:Label text="*" color="red"/>
         </s:FormItem>
         <s:FormItem  label="结束日期:" textAlign="right">
-            <mx:DateField id="endDate" width="150"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+            <s:layout>
+                <s:HorizontalLayout gap="5"/>
+            </s:layout>
+            <mx:DateField id="endDate" width="150"  formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" tabIndex="7" />
+            <s:Label text="*" color="red"/>
         </s:FormItem>
         <s:FormItem  label="项目状态:" textAlign="right">
-            <s:DropDownList id="statusDownList" width="100%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.projectstatus}"  ></s:DropDownList>
+            <s:DropDownList id="statusDownList" width="100%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.projectstatus}" tabIndex="8" ></s:DropDownList>
         </s:FormItem>
 
 		<s:FormItem>

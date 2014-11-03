@@ -36,10 +36,8 @@
             personItem.department = department;
             head.source = person.icon;
             ismanager = true;
-            var p:Object = null;
             for (var i:int = 0; i < department.managers.length; i++) {
-                p = department.managers[i];
-                if (p.id == person.id) {
+                if (department.managers[i] == person.id) {
                     ismanager = false;
                 }
             }
@@ -55,8 +53,8 @@
             } else {
 
                 for (i = 0; i < department.managers.length; i++) {
-                    person = department.managers[i];
-                    if (person.id == ToolUtil.sessionUser.pid) {
+//                    person = department.managers[i];
+                    if (department.managers[i] == ToolUtil.sessionUser.pid) {
                         hasPower = true;
                     }
                 }

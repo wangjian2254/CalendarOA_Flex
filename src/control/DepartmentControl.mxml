@@ -313,12 +313,14 @@
             var personHead:PersonHeadItem;
             var person:Object;
             for (var i:int = 0; i < e.depart.members.length; i++) {
-                person = e.depart.members[i];
-                personHead = new PersonHeadItem();
-                personHead.department = e.depart;
-                personHead.person = person;
+                person =ToolUtil.getActivePersonById(e.depart.members[i]);
+                if(person!=null){
+                    personHead = new PersonHeadItem();
+                    personHead.department = e.depart;
+                    personHead.person = person;
+                    memebers.addElement(personHead);
+                }
 
-                memebers.addElement(personHead);
             }
 
         }

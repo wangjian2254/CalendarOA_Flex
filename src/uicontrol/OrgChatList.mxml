@@ -85,8 +85,8 @@
                 var f:Boolean = false;
                 for each(var item2:Object in l2) {
                     f = false;
-                    for each(var p:Object in item2.members) {
-                        if (p.id == ToolUtil.sessionUser.pid) {
+                    for each(var p:int in item2.members) {
+                        if (p == ToolUtil.sessionUser.pid) {
                             f = true;
                         }
                     }
@@ -126,11 +126,18 @@
                         }
                         depart['d' + item.father].dep_children.addItem(item);
                     }
-                    for each(var m:Object in item.members) {
-                        m['depart_id'] = item.id;
-                        m['level'] = item.level + 1;
+                    var members:ArrayCollection=new ArrayCollection();
+                    var person:Object;
+                    for each(var m:int in item.members) {
+                        person = ToolUtil.getActivePersonById(m);
+                        if(person!=null){
+                            person['depart_id'] = item.id;
+                            person['level'] = item.level + 1;
+                            members.addItem(person);
+                        }
+
                     }
-                    item.children.addAll(new ArrayCollection(item.members as Array));
+                    item.children.addAll(members);
                     item.name = item.name+" ("+item.children.length+")";
                 }
                 for each(item in l) {

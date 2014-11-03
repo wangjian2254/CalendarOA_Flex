@@ -58,7 +58,7 @@
             if (e.flag != cbar.getCurrentView().flag) {
 
             } else {
-                for each(var c:Object in ToolUtil.groupList) {
+                for each(var c:ChatChannel in ToolUtil.groupList) {
                     if (c.channel == e.channel) {
                         c.unread = 0;
                         Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {channel: e.channel, pid: ToolUtil.sessionUser.pid});

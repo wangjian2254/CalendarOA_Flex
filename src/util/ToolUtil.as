@@ -86,7 +86,7 @@ public class ToolUtil
 
         sessionUserRefresh();
         currentOrgRefresh();
-        departMentListRefresh();
+//        departMentListRefresh();
         contactsRefresh();
         allProjectListRefresh();
         projectListRefresh();
@@ -175,23 +175,20 @@ public class ToolUtil
             var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllDepart",resultAllDepartMent,"POST");
             http.resultFunArr.addItem(fun);
             http.send();
-
         }
 
     }
     public static function resultAllDepartMent(result:Object,e:ResultEvent):void{
         if(result.success==true){
-            ArrayTools.createArray(departMentList,result.result);
+            ArrayTools.createArray(departMentList,result.result.departlist);
 
 
-            var dobj:Object=new Object();
             for each(var item2:Object in departMentList) {
                 for each(var group:ChatChannel in ToolUtil.groupList){
                     if(group.id==item2.id){
                         group.setMembers(item2.members);
                     }
                 }
-
             }
 
 //            myDepartmentList.removeAll();
@@ -203,8 +200,8 @@ public class ToolUtil
                     continue;
                 }
                 f = false;
-                for each(var p:Object in item2.members) {
-                    if (p.id == ToolUtil.sessionUser.pid) {
+                for each(var p:int in item2.members) {
+                    if (p == ToolUtil.sessionUser.pid) {
                         f = true;
                     }
                 }
@@ -219,6 +216,8 @@ public class ToolUtil
             // 将有包含关系的部门，排序，形成缩进效果
             if(mydepartlist.length>0){
                 var departmentlist:ArrayCollection = initMyDepart(mydepartlist);
+            }else{
+                var departmentlist:ArrayCollection = new ArrayCollection();
             }
             departmentlist.addItemAt({id:0,name:"我自己的",label:"我自己的"},0);
             myDepartmentList=departmentlist;
@@ -236,22 +235,38 @@ public class ToolUtil
             depart['d' + item.id] = item;
             if (!item.father) {
                 rootDepart = item;
+
+            }
+            item.children = new ArrayCollection();
+            var hasFather:Boolean=false;
+            for each(var o:Object in mydepartlist){
+                if(item.father == o.id){
+                    hasFather = true;
+                    break;
+                }
+            }
+            if(!hasFather){
                 item.level = 0;
                 item.space ="";
                 item.label = item.space+item.name;
+                findDepartByFather(item,mydepartlist);
             }
-            item.children = new ArrayCollection();
         }
-        findDepartByFather(rootDepart,mydepartlist);
+
         for each(item in mydepartlist) {
-            if (item.father) {
+            if (item.father && depart.hasOwnProperty('d' + item.father)) {
 //                item.level = depart['d' + item.father].level + 1;
                 if (!depart['d' + item.father].hasOwnProperty('dep_children')) {
                     depart['d' + item.father].dep_children = new ArrayCollection();
                 }
                 depart['d' + item.father].dep_children.addItem(item);
             }
-            item.children.addAll(new ArrayCollection(item.members as Array));
+            for each(var p:int in item.members){
+                if(getActivePersonById(p)!=null){
+                    item.children.addItem(getActivePersonById(p));
+                }
+            }
+
         }
         for each(item in mydepartlist) {
             if (item.flag == 'free') {
@@ -383,13 +398,32 @@ public class ToolUtil
     [Bindable]
     public static var memberList:ArrayCollection=new ArrayCollection();
 
-    public static function getPersonById(id:*):Object{
-        for each(var item:Object in memberList){
-            if(item.id == id){
-                return item;
-            }
+    private static var membersmap:Object=new Object();
+
+    private static function getPersonById(id:*):Object{
+        if(membersmap.hasOwnProperty(id)){
+            return membersmap[id]
         }
         return new Object();
+    }
+
+    public static function getActivePersonById(id:*):Object{
+        var p:Object = getPersonById(id);
+        if(p.hasOwnProperty('id') && p.is_active){
+            return ObjectUtil.copy(p);
+        }
+        return null;
+    }
+
+    public static function getAnyPersonById(id:*):Object{
+        var p:Object = getPersonById(id);
+        if(p.hasOwnProperty('id') && p.is_active){
+            return ObjectUtil.copy(p);
+        }else{
+            var p2:Object = ObjectUtil.copy(p);
+            p2.name=p.name+"[已离职]";
+            return p2;
+        }
     }
 
     [Bindable]
@@ -411,6 +445,11 @@ public class ToolUtil
         if(result.success==true){
             org = result.result.org
             ArrayTools.createArray(memberList,result.result.members);
+            membersmap=new Object();
+            for each(var p:Object in memberList){
+                membersmap[p.id] = p;
+            }
+            resultAllDepartMent(result, e);
 
         }
     }

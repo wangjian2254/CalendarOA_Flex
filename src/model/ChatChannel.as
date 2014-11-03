@@ -195,14 +195,19 @@ public class ChatChannel {
             _members = value as ArrayCollection;
         }else{
             _members = new ArrayCollection();
-            for each(var u:int in value){
-                for each(var item:Object in ToolUtil.memberList){
-                    if(u==item.id){
-                        item['_level'] = 0;
-                        item['_unread'] = 0;
-                        _members.addItem(item);
-                        break;
-                    }
+            var item:Object;
+            for each(var u:Object in value){
+                item = null;
+                if(u is int){
+                    item = ToolUtil.getActivePersonById(u);
+                }
+                if(u.hasOwnProperty("id")){
+                    item = ToolUtil.getActivePersonById(u.id);
+                }
+                if(item!=null){
+                    item['_level'] = 0;
+                    item['_unread'] = 0;
+                    _members.addItem(item);
                 }
             }
         }

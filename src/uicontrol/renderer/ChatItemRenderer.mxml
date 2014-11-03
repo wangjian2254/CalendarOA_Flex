@@ -56,7 +56,7 @@
                 horizontalLayout.horizontalAlign="center";
                 chatstatus.horizontalAlign="center";
             }else{
-                var person:Object = ToolUtil.getPersonById(data.f);
+                var person:Object = ToolUtil.getAnyPersonById(data.f);
                 if(person.id==ToolUtil.sessionUser.pid){
                     head2.source = person.icon;
                     nameLabel2.text = person.name;
@@ -86,7 +86,7 @@
         }
 
         private function showChatImg():void{
-            var person:Object = ToolUtil.getPersonById(data.f);
+            var person:Object = ToolUtil.getAnyPersonById(data.f);
             if(!data.hasOwnProperty("f")){
                 back1.setStyle("borderColor",0xB5D0EB);
                 back10.color=0xB5D0EB;
