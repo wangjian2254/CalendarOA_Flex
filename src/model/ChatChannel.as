@@ -16,9 +16,11 @@ public class ChatChannel {
     private var _icon:String;
     private var _timeline:int;
     private var _level:int;
+    private var _v:int;
     private var _type:String;
     private var _flag:String;
     private var _members:ArrayCollection;
+
 
 
     public function ChatChannel(obj:Object=null) {
@@ -236,6 +238,14 @@ public class ChatChannel {
 
     public function set level(value:int):void {
         _level = value;
+    }
+
+    public function get v():int {
+        return _v;
+    }
+
+    public function set v(value:int):void {
+        _v = value;
     }
 }
 }

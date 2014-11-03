@@ -554,10 +554,19 @@ public class ToolUtil
 
 
 
-    public static function getScheduleByDate(start:String,end:String,fun:Function=null):void{
+    public static function getScheduleByDate(start:String,end:String,pid:int=0,departid=0,projectid=0,fun:Function=null):void{
         var obj:Object = new Object();
         obj["startdate"] = start;
         obj["enddate"] = end;
+        if(pid>0){
+            obj["pid"] = pid;
+        }
+        if(departid>0){
+            obj["departid"] = pid;
+        }
+        if(projectid>0){
+            obj["projectid"] = pid;
+        }
 
         if(fun==null){
             HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);

@@ -829,6 +829,9 @@
         }
 
         private function initChatControl():void{
+            if(schedulData.id == chatControl.chatUser.id && schedulData.v == chatControl.chatUser.v){
+                return;
+            }
             var chatUser:ChatChannel=new ChatChannel();
             chatUser.id=schedulData.id;
             chatUser.channel = "t"+schedulData.id;

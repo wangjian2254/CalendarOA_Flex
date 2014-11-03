@@ -74,6 +74,7 @@
 
         private function listItemClick_handler(e:ListClickEvent):void {
 
+            e.data;
         }
 
         public function showSchedule(e:ChangeScheduleEvent):void{
