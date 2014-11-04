@@ -9,6 +9,8 @@ import control.window.SelectOrgPanel;
 
 import events.ChangeScheduleEvent;
 import events.ChangeUserEvent;
+import events.InitDefaultMemberProjectEvent;
+import events.QueryScheduleEvent;
 
 import flash.events.TimerEvent;
 import flash.net.URLRequest;
@@ -34,6 +36,7 @@ import mx.rpc.events.ResultEvent;
 import mx.utils.ObjectUtil;
 
 import spark.components.Application;
+import spark.components.DropDownList;
 
 public class ToolUtil
 {
@@ -85,11 +88,10 @@ public class ToolUtil
 
 
         sessionUserRefresh();
-        currentOrgRefresh();
+
 //        departMentListRefresh();
-        contactsRefresh();
-        allProjectListRefresh();
-        projectListRefresh();
+
+
 //			taskRefresh();
 //        taskUnRefresh();
 
@@ -128,7 +130,10 @@ public class ToolUtil
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,result.result,true));
             }
             sessionUser=result.result;
-
+            projectListRefresh();
+            currentOrgRefresh();
+            contactsRefresh();
+            allProjectListRefresh();
         }else{
             sessionUser=false;
         }
@@ -163,7 +168,74 @@ public class ToolUtil
     [Bindable]
     public static var departMentList:ArrayCollection=new ArrayCollection();
     [Bindable]
-    public static var myDepartmentList:ArrayCollection=new ArrayCollection([{id:0,name:"我自己的",label:"我自己的"}]);;
+    public static var myDepartmentList:ArrayCollection=new ArrayCollection([{id:0,name:"个人项目",label:"个人项目"}]);;
+
+    [Bindable]
+    public static var projectByDepart:ArrayCollection=new ArrayCollection();
+    [Bindable]
+    public static var membersByDepart:ArrayCollection=new ArrayCollection();
+
+
+    public static function changeProjectByDepart(depart_id:int,person_id:int,membersDownList:DropDownList,projectDownList:DropDownList):void{
+        membersByDepart.removeAll();
+        membersByDepart.addItem({id:-1, name:"所有人"});
+        for each(var d:Object in departMentList){
+            if(d.id == depart_id){
+                for each(var i:int in d.members){
+                    if(getActivePersonById(i)!=null){
+                        membersByDepart.addItem(getActivePersonById(i));
+                    }
+
+                }
+                if(person_id<0){
+                    membersDownList.selectedIndex=0;
+                    projectByDepart.removeAll();
+                    projectByDepart.addItem({id:-1,name:"所有任务"});
+                    for each(var item:Object in ToolUtil.allProjectList){
+                        if(item.department==depart_id){
+                            projectByDepart.addItem(item);
+                        }
+                    }
+                    projectDownList.selectedIndex=0;
+                }else{
+                    for each(var person:Object in membersByDepart){
+                        if(person.id == person_id){
+                            membersDownList.selectedItem = person;
+                            initProjectByMember(membersDownList,projectDownList);
+                        }
+                    }
+                }
+                break;
+            }
+
+        }
+    }
+
+    private static function initProjectByMember(membersDownList:DropDownList,projectDownList:DropDownList):void{
+        projectByDepart.removeAll();
+        projectByDepart.addItem({id:-1,name:membersDownList.selectedItem.name+"参与的项目"});
+        for each(var item:Object in ToolUtil.allProjectList){
+            if(item.manager==membersDownList.selectedItem.id){
+                projectByDepart.addItem(item);
+            }
+        }
+        projectDownList.selectedIndex=0;
+    }
+
+    public static function changeProjectByMember(membersDownList:DropDownList,projectDownList:DropDownList):void{
+
+        if(membersDownList.selectedItem!=null){
+            initProjectByMember(membersDownList,projectDownList);
+            FlexGlobals.topLevelApplication.dispatchEvent(new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str,true));
+        }
+    }
+
+    public static function changeProject(projectDownList:DropDownList):void{
+
+        if(projectDownList.selectedItem!=null){
+            FlexGlobals.topLevelApplication.dispatchEvent(new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str,true));
+        }
+    }
 
 
 
@@ -219,7 +291,7 @@ public class ToolUtil
             }else{
                 var departmentlist:ArrayCollection = new ArrayCollection();
             }
-            departmentlist.addItemAt({id:0,name:"我自己的",label:"我自己的"},0);
+            departmentlist.addItemAt({id:0,name:"个人项目",label:"个人项目"},0);
             myDepartmentList=departmentlist;
 
         }
@@ -367,6 +439,15 @@ public class ToolUtil
     public static function resultProjectList(result:Object,e:ResultEvent):void{
         if(result.success==true){
             ArrayTools.createArray(projectList,result.result);
+            if(membersByDepart.length==0){
+                membersByDepart.addItem({id:sessionUser.id,name:"我自己"});
+                FlexGlobals.topLevelApplication.dispatchEvent(new InitDefaultMemberProjectEvent(InitDefaultMemberProjectEvent.Default_Member_EventStr,true));
+                projectByDepart.addItem({id:-1,name:"我参与的任务"});
+                projectByDepart.addAll(ObjectUtil.clone(projectList) as ArrayCollection);
+
+                FlexGlobals.topLevelApplication.dispatchEvent(new InitDefaultMemberProjectEvent(InitDefaultMemberProjectEvent.Default_Project_EventStr,true));
+            }
+
 
 
         }
@@ -558,15 +639,9 @@ public class ToolUtil
         var obj:Object = new Object();
         obj["startdate"] = start;
         obj["enddate"] = end;
-        if(pid>0){
-            obj["pid"] = pid;
-        }
-        if(departid>0){
-            obj["departid"] = pid;
-        }
-        if(projectid>0){
-            obj["projectid"] = pid;
-        }
+        obj["pid"] = pid;
+        obj["depart_id"] = departid;
+        obj["project_id"] = projectid;
 
         if(fun==null){
             HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);

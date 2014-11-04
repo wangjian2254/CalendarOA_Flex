@@ -143,7 +143,7 @@
                     case 1:
                         if(!obj.isOutOfDate()){
                             scheduleItem.setStyle("borderWeight", 1);
-                            scheduleItem.setStyle("borderColor", 0xcccccc);
+                            scheduleItem.setStyle("borderColor", 0x000000);
                         }
                         break;
                     case 2:

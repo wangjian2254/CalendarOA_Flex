@@ -47,7 +47,6 @@
         private function init():void {
             ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, projectRefresh);
             projectRefresh(null);
-
             if(projectData==null){
                 fatherDownList.selectedIndex=0;
 
@@ -86,33 +85,42 @@
 
         private function refreshManager():void{
             var manager:Object = managerDownList.selectedItem;
-            managerList = ObjectUtil.copy(departmentDownList.selectedItem.children) as ArrayCollection;
-            if(managerList==null){
+            if(departmentDownList.selectedItem.id == 0){
                 managerList=new ArrayCollection();
-            }
-            var f:Boolean=false;
-            for each(var person:Object in managerList){
-                if(person.id==ToolUtil.sessionUser.pid){
-                    f=true;
-                    managerDownList.selectedItem=person;
+                managerList.addItem(ToolUtil.getActivePersonById(ToolUtil.sessionUser.pid));
+                managerDownList.selectedIndex=0;
+                managerDownList.enabled = false;
+            }else{
+                managerDownList.enabled = true;
+                managerList = ObjectUtil.copy(departmentDownList.selectedItem.children) as ArrayCollection;
+                if(managerList==null){
+                    managerList=new ArrayCollection();
                 }
-            }
-            if(!f){
-                for each(var p:Object in ToolUtil.memberList){
-                    if(p.id==ToolUtil.sessionUser.pid){
-                        managerList.addItem(p);
-                        managerDownList.selectedItem=p;
+                var f:Boolean=false;
+                for each(var person:Object in managerList){
+                    if(person.id==ToolUtil.sessionUser.pid){
+                        f=true;
+                        managerDownList.selectedItem=person;
+                    }
+                }
+                if(!f){
+                    for each(var p:Object in ToolUtil.memberList){
+                        if(p.id==ToolUtil.sessionUser.pid){
+                            managerList.addItem(p);
+                            managerDownList.selectedItem=p;
+                        }
+                    }
+                }
+                if(manager!=null){
+                    managerDownList.selectedIndex=-1;
+                    for each(var p in managerList){
+                        if(p.id==manager.id){
+                            managerDownList.selectedItem=p;
+                        }
                     }
                 }
             }
-            if(manager!=null){
-                managerDownList.selectedIndex=-1;
-                for each(var p in managerList){
-                    if(p.id==manager.id){
-                        managerDownList.selectedItem=p;
-                    }
-                }
-            }
+
         }
 
 

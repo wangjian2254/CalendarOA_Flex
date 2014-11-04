@@ -6,6 +6,8 @@ import control.window.UserInfoPanel;
 
 import events.ChangeMenuEvent;
 import events.ChangeUserEvent;
+import events.InitDefaultMemberProjectEvent;
+import events.QueryScheduleEvent;
 import events.QuiteEvent;
 
 import flash.display.DisplayObject;
@@ -26,6 +28,7 @@ import spark.components.Button;
 import util.ChatManager;
 
 import util.RightClickRegister;
+import util.ToolUtil;
 import util.ToolUtil;
 import util.UserUtil;
 
@@ -50,7 +53,49 @@ public function init():void {
 	
 	menuXML.send();
 	FlexGlobals.topLevelApplication.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr, changeMenu);
+	FlexGlobals.topLevelApplication.addEventListener(InitDefaultMemberProjectEvent.Default_Member_EventStr, function(e:InitDefaultMemberProjectEvent):void{
+        membersDownList.selectedIndex = 0;
+    });
+	FlexGlobals.topLevelApplication.addEventListener(InitDefaultMemberProjectEvent.Default_Project_EventStr, function(e:InitDefaultMemberProjectEvent):void{
+        projectDownList.selectedIndex = 0;
+    });
     FlexGlobals.topLevelApplication.addEventListener(QuiteEvent.Quite,logout);
+    FlexGlobals.topLevelApplication.addEventListener(QueryScheduleEvent.QuerySchedule_Str,function(e:QueryScheduleEvent):void{
+
+        if(e.start==null || e.end==null){
+            var calendarBordar:CalendarControl = gongNengStack.selectedChild as CalendarControl;
+            if(calendarBordar==null){
+                return;
+            }
+            var parm:Object = calendarBordar.getShowDateRange();
+            if(parm==null){
+                return;
+            }
+            e.start = parm.start;
+            e.end = parm.end;
+        }
+
+        if(e.pid > 0){
+            ToolUtil.changeProjectByDepart(e.depart_id,e.pid,membersDownList,projectDownList);
+        }else{
+            if(e.depart_id>0){
+                ToolUtil.changeProjectByDepart(e.depart_id,-1,membersDownList,projectDownList);
+            }
+        }
+        if(e.pid==-1&&e.depart_id==-1&&e.project_id==-1){
+            if(membersDownList.selectedItem!=null){
+                e.pid = membersDownList.selectedItem.id;
+            }
+            if(projectDownList.selectedItem!=null){
+                e.project_id = projectDownList.selectedItem.id;
+            }
+            if(e.project_id>0){
+                e.pid = -1;
+            }
+
+        }
+        ToolUtil.getScheduleByDate(e.start,e.end,e.pid,e.depart_id,e.project_id);
+    });
 
 	
 }

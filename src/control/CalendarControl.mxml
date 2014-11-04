@@ -12,6 +12,7 @@
         import events.CloseContainerEvent;
         import events.ListClickEvent;
         import events.PageChangeEvent;
+        import events.QueryScheduleEvent;
 
         import httpcontrol.CHTTPService;
         import httpcontrol.HttpServiceUtil;
@@ -48,9 +49,9 @@
 
 
         override public function init(e:FlexEvent):void {
-            dateChooser.selectedDate = new Date();
-            FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr,showSchedule);
 
+            FlexGlobals.topLevelApplication.addEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr, showSchedule);
+//            dateChooser.selectedDate = new Date();
             changeShowModel();
 //				ToolUtil.taskUnList.addEventListener(CollectionEvent.COLLECTION_CHANGE,taskChange);
             taskChange(null);
@@ -64,8 +65,9 @@
             dispatchEvent(e);
 
         }
-        override public function releaseListener():void{
-            FlexGlobals.topLevelApplication.removeEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr,showSchedule);
+
+        override public function releaseListener():void {
+            FlexGlobals.topLevelApplication.removeEventListener(ChangeScheduleEvent.ChangeSchedule_EventStr, showSchedule);
         }
 
         override public function resizeContainer(e:ResizeEvent):void {
@@ -73,29 +75,67 @@
         }
 
         private function listItemClick_handler(e:ListClickEvent):void {
+            if (calendarBorder.numElements > 0) {
+                var event:QueryScheduleEvent = new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str, true);
+                if (e.data.hasOwnProperty("depart_id")) {
+                    event.pid = e.data.id;
+                    event.depart_id = e.data.depart_id;
 
-            e.data;
+                } else {
+                    event.depart_id = e.data.id;
+                    event.depart = e.data;
+                }
+                FlexGlobals.topLevelApplication.dispatchEvent(event);
+            }
         }
 
-        public function showSchedule(e:ChangeScheduleEvent):void{
+        private function querySchedule():void {
+            if(!ToolUtil.sessionUser.hasOwnProperty('pid')){
+                return;
+            }
+            if (calendarBorder.numElements > 0) {
+                var event:QueryScheduleEvent = new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str, true);
+                if (showModel.selectedItem.value == "monthly") {
+                    event.start = (calendarBorder.getElementAt(0) as DayItem).date;
+                } else {
+                    event.start = (calendarBorder.getElementAt(1) as DayItem).date;
+                }
+
+                event.end = (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date;
+                FlexGlobals.topLevelApplication.dispatchEvent(event);
+            }
+        }
+
+        public function getShowDateRange():Object {
+            if (calendarBorder.numElements > 0) {
+                if (showModel.selectedItem.value == "monthly") {
+                    return {'start': (calendarBorder.getElementAt(0) as DayItem).date, 'end': (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date};
+                } else {
+                    return {'start': (calendarBorder.getElementAt(1) as DayItem).date, 'end': (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date};
+                }
+            }
+            return null;
+        }
+
+        public function showSchedule(e:ChangeScheduleEvent):void {
 
 
-            var dayItem:DayItem=null;
-            for(var  i:Number=1;i<50;i++){
-                if(calendarPanel.numElements-1>=i){
+            var dayItem:DayItem = null;
+            for (var i:Number = 1; i < 50; i++) {
+                if (calendarPanel.numElements - 1 >= i) {
 
-                    dayItem = calendarPanel.getElementAt(i-1) as DayItem;
+                    dayItem = calendarPanel.getElementAt(i - 1) as DayItem;
 
                     dayItem.showSchedule();
 
                 }
-                if(calendarBorder.numElements-1>=i){
+                if (calendarBorder.numElements - 1 >= i) {
                     dayItem = calendarBorder.getElementAt(i) as DayItem;
 
                     dayItem.showSchedule();
 
                 }
-                if(daySchedule.numElements-1>=i){
+                if (daySchedule.numElements - 1 >= i) {
                     dayItem = daySchedule.getElementAt(i) as DayItem;
 
                     dayItem.showSchedule();
@@ -109,7 +149,7 @@
             currentMonth = -1;
             currentWeek = -1;
             currentDaily = -1;
-            if(showModel.selectedIndex==-1){
+            if (showModel.selectedIndex == -1) {
                 return;
             }
             showCalendar(dateChooser.selectedDate);
@@ -127,54 +167,55 @@
                     dayItem.init();
                 }
             }
-            if (showModel.selectedItem.value == "monthly") {
-
-                if (calendarPanel.numElements > 0) {
-                    ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date, (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date);
-                }
-            } else {
-                if (calendarBorder.numElements > 1) {
-                    ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
-                }
-
-            }
+//            if (showModel.selectedItem.value == "monthly") {
+//
+//                if (calendarPanel.numElements > 0) {
+//                    ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date, (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date);
+//                }
+//            } else {
+//                if (calendarBorder.numElements > 1) {
+//                    ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+//                }
+//
+//            }
+            querySchedule();
 //				ToolUtil.taskUnRefresh(showTaskList);
         }
 
 
-//        public function showGroup(group:GroupItem,g:Object):void{
-//            if(group.isshow){
-//                group.color = 0xffffff;
-//                group.isshow = false;
-//            }else{
-//                group.color = g.color;
-//                group.isshow = true;
-//            }
-//
-//            var dayItem:DayItem=null;
-//            for(var  i:Number=1;i<50;i++){
-//                if(calendarPanel.numElements-1>=i){
-//
-//                    dayItem = calendarPanel.getElementAt(i-1) as DayItem;
-//
-//                    dayItem.showSchedule(g.id,group.isshow);
-//
-//                }
-//                if(calendarBorder.numElements-1>=i){
-//                    dayItem = calendarBorder.getElementAt(i) as DayItem;
-//
-//                    dayItem.showSchedule(g.id,group.isshow);
-//
-//                }
-//                if(daySchedule.numElements-1>=i){
-//                    dayItem = daySchedule.getElementAt(i) as DayItem;
-//
-//                    dayItem.showSchedule(g.id,group.isshow);
-//
-//                }
-//
-//            }
-//        }
+        //        public function showGroup(group:GroupItem,g:Object):void{
+        //            if(group.isshow){
+        //                group.color = 0xffffff;
+        //                group.isshow = false;
+        //            }else{
+        //                group.color = g.color;
+        //                group.isshow = true;
+        //            }
+        //
+        //            var dayItem:DayItem=null;
+        //            for(var  i:Number=1;i<50;i++){
+        //                if(calendarPanel.numElements-1>=i){
+        //
+        //                    dayItem = calendarPanel.getElementAt(i-1) as DayItem;
+        //
+        //                    dayItem.showSchedule(g.id,group.isshow);
+        //
+        //                }
+        //                if(calendarBorder.numElements-1>=i){
+        //                    dayItem = calendarBorder.getElementAt(i) as DayItem;
+        //
+        //                    dayItem.showSchedule(g.id,group.isshow);
+        //
+        //                }
+        //                if(daySchedule.numElements-1>=i){
+        //                    dayItem = daySchedule.getElementAt(i) as DayItem;
+        //
+        //                    dayItem.showSchedule(g.id,group.isshow);
+        //
+        //                }
+        //
+        //            }
+        //        }
 
 
         private var currentMonth:Number = -1;
@@ -208,7 +249,7 @@
                 }
                 date.date += 1;
                 if (showModel.selectedItem.value == "monthly") {
-                    if ((currentMonth<11&&currentMonth < date.month && date.day == 0)||(currentMonth==11&& 0==date.month&&date.day==0)) {
+                    if ((currentMonth < 11 && currentMonth < date.month && date.day == 0) || (currentMonth == 11 && 0 == date.month && date.day == 0)) {
                         count = i + 1;
                         break;
                     }
@@ -219,7 +260,8 @@
                 calendarPanel.removeElementAt(i);
             }
             if (calendarPanel.numElements > 0) {
-                ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date, (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date);
+//                ToolUtil.getScheduleByDate((calendarPanel.getElementAt(0) as DayItem).date, (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date);
+                querySchedule();
             }
             resize();
             if (newDayItem != null) {
@@ -276,7 +318,8 @@
                 calendarBorder.removeElementAt(i);
             }
             if (calendarBorder.numElements > 0) {
-                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+//                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+                querySchedule();
             }
             resize();
             if (newDayItem != null) {
@@ -329,7 +372,8 @@
                 calendarBorder.removeElementAt(i);
             }
             if (calendarBorder.numElements > 0) {
-                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+//                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+                querySchedule();
             }
             resize();
             if (newDayItem != null) {

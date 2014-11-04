@@ -189,6 +189,11 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 	menuflag = null;
 	var xml:XML = event.item as XML;
 	var mod:String = xml.attribute('mod').toString();
+    if(mod == 'calendar'){
+        scheduleComb.visible = true;
+    }else{
+        scheduleComb.visible = false;
+    }
 	var c:CBorderContainer;
 	c = cbar.getView(mod);
 	if (c == null) {
@@ -196,6 +201,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 			
 			case 'calendar':
 				c = new CalendarControl();
+
 				break;
 			case 'contact':
 				c = new ContactControl();

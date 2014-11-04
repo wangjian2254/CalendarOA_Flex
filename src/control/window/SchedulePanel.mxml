@@ -829,7 +829,7 @@
         }
 
         private function initChatControl():void{
-            if(schedulData.id == chatControl.chatUser.id && schedulData.v == chatControl.chatUser.v){
+            if(chatControl.chatUser !=null && schedulData.id == chatControl.chatUser.id && schedulData.v == chatControl.chatUser.v){
                 return;
             }
             var chatUser:ChatChannel=new ChatChannel();
@@ -839,6 +839,7 @@
             chatUser.author = schedulData.author;
             chatUser.icon="/static/smalloaicon/group.png";
             chatUser.setMembers(schedulData.users);
+            chatUser.v = schedulData.v;
 
             chatControl.chatUser = chatUser;
             chatControl.init(null);
