@@ -17,6 +17,8 @@
         import httpcontrol.CHTTPService;
         import httpcontrol.HttpServiceUtil;
 
+        import model.Schedule;
+
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
@@ -31,6 +33,7 @@
 
         import uicontrol.DayItem;
         import uicontrol.GroupItem;
+        import uicontrol.ScheduleItem;
         import uicontrol.TaskItem;
 
         import util.DateUtil;
@@ -90,7 +93,7 @@
         }
 
         private function querySchedule():void {
-            if(!ToolUtil.sessionUser.hasOwnProperty('pid')){
+            if (!ToolUtil.sessionUser.hasOwnProperty('pid')) {
                 return;
             }
             if (calendarBorder.numElements > 0) {
@@ -142,6 +145,30 @@
 
                 }
 
+            }
+            //todo:整理逾期任务
+            showTask();
+            showOutOfTimeSchedule();
+
+
+        }
+
+        private function showOutOfTimeSchedule():void {
+            taskunpanel.removeAllElements();
+            var scheduleItem:ScheduleItem = null;
+            var obj:Schedule;
+            for each(var i:String in ToolUtil.scheduleMap['out_schedule_list']) {
+                obj = ToolUtil.scheduleMap['schedulemap'][i];
+                scheduleItem = new ScheduleItem();
+                scheduleItem.scheduleData = obj;
+                scheduleItem.scheduleName = obj.title;
+                scheduleItem.color = obj.color;
+                scheduleItem.scheduleId = obj.id;
+                scheduleItem.width = 245;
+                scheduleItem.setStyle("borderWeight", 1);
+                scheduleItem.setStyle("borderColor", 0xff0000);
+                scheduleItem.setStyle("backgroundColor", obj.color);
+                taskunpanel.addElement(scheduleItem);
             }
         }
 
@@ -579,11 +606,9 @@
         }
 
         private function showTask():void {
-            if (taskPanel.width > 100) {
+            if (ToolUtil.scheduleMap['out_schedule_list'].length == 0) {
                 taskPanel.width = 0;
-                mytask.color = 0xffffff;
             } else {
-                mytask.color = 0xfad165;
                 taskPanel.width = 250;
 
             }
@@ -658,10 +683,6 @@
 
             </s:Label>
             <mx:DateChooser id="dateChooser" width="100%" selectedDate="{new Date()}" change="changeDate()" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-
-            <s:Label id="mytasklbl" text="我的备忘" fontSize="18"  paddingTop="10" >
-            </s:Label>
-            <uicontrol:ScheduleItem id="mytask" color="#fad165" scheduleName="备忘" fun="showTask"/>
             <s:Label  text="组织结构" fontSize="18"  paddingTop="10" >
             </s:Label>
             <uicontrol:OrgChatList id="addressList"   type="org" borderVisible="false"
@@ -751,20 +772,22 @@
 								
 							</s:HorizontalLayout>
 						</s:layout>
-						<s:Label text="我的备忘"  fontSize="18"  paddingTop="10" >
+						<s:Label text="逾期任务"  fontSize="18"  paddingTop="10" >
 						</s:Label>
-                        <s:Spacer width="100%"></s:Spacer>
-                        <uicontrol:BtnAdd clickFun="createTask" />
-                        <uicontrol:BtnDel clickFun="showTask" />
-                        <s:Spacer width="20"></s:Spacer>
+                        <!--<s:Spacer width="100%"></s:Spacer>-->
+                        <!--<uicontrol:BtnAdd clickFun="createTask" />-->
+                        <!--<uicontrol:BtnDel clickFun="showTask" />-->
+                        <!--<s:Spacer width="20"></s:Spacer>-->
 					</s:BorderContainer>
-					
-					<s:BorderContainer id="taskunpanel" width="100%" borderVisible="false"  >
-						<s:layout>
-							<s:VerticalLayout>
-							</s:VerticalLayout>
-						</s:layout>
-					</s:BorderContainer>
+					<s:VGroup id="taskunpanel" width="100%">
+
+					</s:VGroup>
+					<!--<s:BorderContainer id="taskunpanel" width="100%" borderVisible="false"  >-->
+						<!--<s:layout>-->
+							<!--<s:VerticalLayout>-->
+							<!--</s:VerticalLayout>-->
+						<!--</s:layout>-->
+					<!--</s:BorderContainer>-->
 				</s:BorderContainer>
 			</s:Group>
 		</s:Scroller>

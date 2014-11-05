@@ -20,6 +20,7 @@ import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.managers.PopUpManager;
 import mx.rpc.events.ResultEvent;
+import mx.utils.ObjectUtil;
 
 import org.idream.pomelo.Pomelo;
 
@@ -28,6 +29,7 @@ import spark.components.Button;
 import util.ChatManager;
 
 import util.RightClickRegister;
+import util.ToolUtil;
 import util.ToolUtil;
 import util.ToolUtil;
 import util.UserUtil;
@@ -96,8 +98,25 @@ public function init():void {
         }
         ToolUtil.getScheduleByDate(e.start,e.end,e.pid,e.depart_id,e.project_id);
     });
+}
 
-	
+public function queryMySchedule():void{
+    var calendarBordar:CalendarControl = gongNengStack.selectedChild as CalendarControl;
+    if(calendarBordar==null){
+        return;
+    }
+    var parm:Object = calendarBordar.getShowDateRange();
+    if(parm==null){
+        return;
+    }
+    ToolUtil.getScheduleByDate(parm.start,parm.end);
+    ToolUtil.membersByDepart.removeAll();
+    ToolUtil.membersByDepart.addItem({id:ToolUtil.sessionUser.id,name:"我自己"});
+    FlexGlobals.topLevelApplication.dispatchEvent(new InitDefaultMemberProjectEvent(InitDefaultMemberProjectEvent.Default_Member_EventStr,true));
+    ToolUtil.projectByDepart.removeAll();
+    ToolUtil.projectByDepart.addItem({id:-1,name:"我参与的任务"});
+    ToolUtil.projectByDepart.addAll(ObjectUtil.clone(ToolUtil.projectList) as ArrayCollection);
+    FlexGlobals.topLevelApplication.dispatchEvent(new InitDefaultMemberProjectEvent(InitDefaultMemberProjectEvent.Default_Project_EventStr,true));
 }
 
 

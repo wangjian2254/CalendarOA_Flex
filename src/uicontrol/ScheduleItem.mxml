@@ -3,7 +3,7 @@
 				   xmlns:s="library://ns.adobe.com/flex/spark" 
 				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" height="25" borderColor="#ff0000" cornerRadius="7" borderVisible="true" borderWeight="4"  backgroundAlpha="1" creationComplete="init()" >
 	<s:layout>
-		<s:VerticalLayout gap="2" paddingLeft="10" verticalAlign="top" paddingTop="0" horizontalAlign="left"/>
+		<s:VerticalLayout gap="2" paddingLeft="10" verticalAlign="top" paddingTop="1" horizontalAlign="left"/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[

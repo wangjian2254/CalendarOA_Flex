@@ -168,7 +168,7 @@ public class ToolUtil
     [Bindable]
     public static var departMentList:ArrayCollection=new ArrayCollection();
     [Bindable]
-    public static var myDepartmentList:ArrayCollection=new ArrayCollection([{id:0,name:"个人项目",label:"个人项目"}]);;
+    public static var myDepartmentList:ArrayCollection=new ArrayCollection([{id:0,name:"只有我和责任人可见",label:"只有我和责任人可见"}]);;
 
     [Bindable]
     public static var projectByDepart:ArrayCollection=new ArrayCollection();
@@ -291,9 +291,8 @@ public class ToolUtil
             }else{
                 var departmentlist:ArrayCollection = new ArrayCollection();
             }
-            departmentlist.addItemAt({id:0,name:"个人项目",label:"个人项目"},0);
+            departmentlist.addItemAt({id:0,name:"只有我和责任人可见",label:"只有我和责任人可见"},0);
             myDepartmentList=departmentlist;
-
         }
     }
 
@@ -635,7 +634,8 @@ public class ToolUtil
 
 
 
-    public static function getScheduleByDate(start:String,end:String,pid:int=0,departid=0,projectid=0,fun:Function=null):void{
+    private static var queryScheduleTargetObj:Object={pid:null,depart_id:null,project_id:null};
+    public static function getScheduleByDate(start:String,end:String,pid:int=-1,departid=-1,projectid=-1):void{
         var obj:Object = new Object();
         obj["startdate"] = start;
         obj["enddate"] = end;
@@ -643,44 +643,57 @@ public class ToolUtil
         obj["depart_id"] = departid;
         obj["project_id"] = projectid;
 
-        if(fun==null){
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
-        }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST");
-            http.resultFunArr.addItem(fun);
-            http.send(obj);
-
+        if(queryScheduleTargetObj.pid!=pid||queryScheduleTargetObj.depart_id!=departid||queryScheduleTargetObj.project_id!=projectid){
+            queryScheduleTargetObj.pid = pid;
+            queryScheduleTargetObj.depart_id = departid;
+            queryScheduleTargetObj.project_id = projectid;
+            obj['outoftime'] = true;
         }
+        HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
+//        if(fun==null){
+//
+//        }else{
+//            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST");
+//            http.resultFunArr.addItem(fun);
+//            http.send(obj);
+//
+//        }
 
     }
 
     public static function queryResult(result:Object,e:ResultEvent):void{
         if(result.success){
             scheduleMap = new Object();
-            scheduleMap['scheduleall']=new Array();
+//            scheduleMap['scheduleall']=new Array();
+            scheduleMap['out_schedule_list']=new Array();
             scheduleMap['schedulemap']=new Object();
             scheduleMap['schedulelist']=new Object();
-            if(result.result){
-//                scheduleMap['scheduleall'] = result.result;
-                var schedule:Schedule;
-                for each(var obj:Object in result.result){
-                    //schedulelist schedulemap
-                    schedule = new Schedule(obj);
-                    scheduleMap['scheduleall'].push(schedule.id);
-                    scheduleMap['schedulemap'][schedule.id] = schedule;
-                    if(schedule.repeat_type != 'none'){
-                        if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.date)){
-                            scheduleMap['schedulelist'][schedule.date]=new Array();
-                        }
-                        scheduleMap['schedulelist'][schedule.date].push(schedule.id);
-                    }else{
-                        if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.startdate)){
-                            scheduleMap['schedulelist'][schedule.startdate]=new Array();
-                        }
-                        scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
+            var schedule:Schedule;
+            for each(var obj:Object in result.result.schedulelist){
+                //schedulelist schedulemap
+                schedule = new Schedule(obj);
+//                scheduleMap['scheduleall'].push(schedule.id);
+                scheduleMap['schedulemap'][schedule.id] = schedule;
+                if(schedule.repeat_type != 'none'){
+                    if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.date)){
+                        scheduleMap['schedulelist'][schedule.date]=new Array();
                     }
+                    scheduleMap['schedulelist'][schedule.date].push(schedule.id);
+                }else{
+                    if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.startdate)){
+                        scheduleMap['schedulelist'][schedule.startdate]=new Array();
+                    }
+                    scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
+                }
+                ScheduleUtil.updateSchedulePanel(schedule.id);
+            }
+            for each(var obj:Object in result.result.out_schedulelist){
+                schedule = new Schedule(obj);
+                if(!scheduleMap['schedulemap'].hasOwnProperty(schedule.id)){
+                    scheduleMap['schedulemap'][schedule.id] = schedule;
                     ScheduleUtil.updateSchedulePanel(schedule.id);
                 }
+                scheduleMap['out_schedule_list'].push(schedule.id);
             }
             FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
         }
@@ -693,9 +706,9 @@ public class ToolUtil
 
             ScheduleUtil.updateSchedulePanel(schedule.id);
         }else{
-            if(scheduleMap['scheduleall'].indexOf(id)>=0){
-                scheduleMap['scheduleall'].splice(scheduleMap['scheduleall'].indexOf(id),1);
-            }
+//            if(scheduleMap['scheduleall'].indexOf(id)>=0){
+//                scheduleMap['scheduleall'].splice(scheduleMap['scheduleall'].indexOf(id),1);
+//            }
             var s:Schedule = scheduleMap['schedulemap'][id];
             if(s.repeat_type == 'none'){
                 if(scheduleMap['schedulelist'][s.startdate].indexOf(id)>=0){
