@@ -230,7 +230,7 @@ public class ChatManager {
             })
             Pomelo.getIns().request("connector.entryHandler.unreadcount", {channels:channels});
 
-            listenOrg();
+//            listenOrg();
         });
     }
 
