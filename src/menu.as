@@ -42,7 +42,7 @@ public function failMenu(evt:FaultEvent):void {
 
 private function welcome(result:Object, e:ResultEvent):void {
 	var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
-	var xml1:XML = new XML("<menuitem label='日程管理' mod='calendar'></menuitem>");
+	var xml1:XML = new XML("<menuitem label='任务管理' mod='calendar'></menuitem>");
 	event1.item = xml1;
 	onMenuChange(event1);
 }

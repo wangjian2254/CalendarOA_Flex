@@ -27,6 +27,7 @@
             }
 
             this.addEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
+            this.addEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
             this.addEventListener(ChatTimelineEvent.Channel, flagTimeline);
             Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
 
@@ -40,14 +41,40 @@
         override public function closeContainer(e:CloseContainerEvent):void {
             dispatchEvent(e);
             this.removeEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
+            this.removeEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
             this.removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
         }
 
         // 重新进入时执行
         override public function reloadParamData(e:FlexEvent):void {
             if (param) {
-                if (param.hasOwnProperty("messageType")) {
-
+                var chatChannel:ChatChannel;
+                var c:ChatChannel;
+                for each(c in ToolUtil.groupList){
+                    if(c.channel == param){
+                        chatChannel = c;
+                        break;
+                    }
+                }
+                if(chatChannel==null){
+                    for each(c in addressList.departMember){
+                        if(c.channel == param){
+                            chatChannel = c;
+                            break;
+                        }
+                    }
+                }
+                if(chatChannel==null){
+                    for each(c in addressList.userMember){
+                        if(c.channel == param){
+                            chatChannel = c;
+                            break;
+                        }
+                    }
+                }
+                if(chatChannel!=null){
+                    var event:ListClickEvent = new ListClickEvent("chat",chatChannel);
+                    listItemClick_handler(event);
                 }
 
             }
@@ -69,6 +96,28 @@
 
         }
 
+        private function unsubscribe_handler(e:ListClickEvent):void{
+            var chat:ChatChannel = e.data as ChatChannel;
+            if(chat==null){
+                trace("开启聊天框出错");
+            }else{
+                Pomelo.getIns().request("connector.entryHandler.unsubscribeChannel", {channel: chat.channel, pid: ToolUtil.sessionUser.pid},function(data:Object):void{
+                    if (data.code == '500') {
+                        return;
+                    }
+                    if (data.code == 200) {
+                        var c:CBorderContainer;
+                        c = cbar.getView(chat.channel);
+                        if (c != null) {
+                            var evt:CloseContainerEvent = new CloseContainerEvent(CloseContainerEvent.Close_EventStr, c, true);
+                            c.closeContainer(evt);
+                        }
+                        ToolUtil.groupList.removeItemAt(ToolUtil.groupList.getItemIndex(chat));
+                        return;
+                    }
+                });
+            }
+        }
 
         private function listItemClick_handler(e:ListClickEvent):void {
             var chat:ChatChannel = e.data as ChatChannel;

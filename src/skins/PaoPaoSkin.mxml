@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+             minWidth="21" minHeight="21" alpha.disabled="0.5"
+             xmlns:mx="library://ns.adobe.com/flex/mx">
+<fx:Script><![CDATA[
+
+    ]]></fx:Script>
+    <!-- host component -->
+    <fx:Metadata>
+        <![CDATA[
+        /**
+         * @copy spark.skins.spark.ApplicationSkin#hostComponent
+         */
+        [HostComponent("uicontrol.NewsPannel")]
+        ]]>
+    </fx:Metadata>
+
+    <s:states>
+        <s:State name="disabled" />
+        <s:State name="normal" />
+    </s:states>
+    <s:Rect  left="0" right="0" top="0" bottom="0" radiusX="7.99944" radiusY="7.99944" >
+        <s:fill>
+            <s:LinearGradient x="265.5" y="86" scaleX="86" rotation="270">
+                <s:GradientEntry ratio="0" color="#E8E8E8"/>
+                <s:GradientEntry ratio="1" color="#FFFFFF"/>
+            </s:LinearGradient>
+        </s:fill>
+        <s:stroke>
+            <s:SolidColorStroke caps="none" joints="miter" miterLimit="10" color="#606060"/>
+        </s:stroke>
+        <s:filters>
+            <s:DropShadowFilter blurX="14" blurY="14" quality="2" alpha="0.6" angle="0" distance="0"/>
+        </s:filters>
+    </s:Rect>
+    <s:Group id="contentGroup" left="5" right="5" top="5" bottom="5" minWidth="0" minHeight="0">
+        <s:layout>
+            <s:BasicLayout/>
+        </s:layout>
+    </s:Group>
+</s:SparkSkin>

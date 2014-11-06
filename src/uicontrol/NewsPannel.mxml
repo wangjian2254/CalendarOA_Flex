@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<!--
+  Created by WangJian on 2014/11/6.
+-->
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" cornerRadius="12"
+                   borderColor="#000000" borderStyle="solid"  width="200" height="60" skinClass="skins.PaoPaoSkin"
+                   creationComplete="init()"  >
+<!--<s:backgroundFill>-->
+    <!--<s:SolidColor  id="back10" color="#b0e861" alpha="1"/>-->
+<!--</s:backgroundFill>-->
+
+    <fx:Script><![CDATA[
+        import control.ChatControl;
+
+        import events.PaoPaoEvent;
+
+        import flash.filters.BevelFilter;
+        import flash.filters.DropShadowFilter;
+        import flash.filters.GlowFilter;
+
+        import model.ChatChannel;
+
+        import mx.collections.ArrayCollection;
+        import mx.core.FlexGlobals;
+
+        import mx.managers.PopUpManager;
+
+        import org.idream.pomelo.Pomelo;
+
+        import util.ToolUtil;
+
+        [Bindable]
+        private var dropBevelFilter:BevelFilter = new BevelFilter(10, 270, 0, 0, 0xffffff, .5, 8, 8, 8, 8);
+
+        [Bindable]
+        private var dropShadow:DropShadowFilter = new DropShadowFilter(2, 90, 0x000000, 0.35, 4, 4);
+
+        [Bindable]
+        private var Inner:GlowFilter = new GlowFilter(0xffffff, .5, 8, 8, 2, 4, true);
+
+        public var unReadMessage:ArrayCollection = null;
+
+        public var message:Object;
+
+        public function init():void{
+            if(message!=null&&message.hasOwnProperty("te")){
+                contentLabel.text = message.te;
+                if(message.channel.substr(0,2)=="g"||message.channel.substr(0,2)=="t"){
+                    var f:Boolean = false;
+                    for each(var g:ChatChannel in ToolUtil.groupList){
+                        if(g.channel==message.channel){
+                            f=true;
+                        }
+                    }
+                    if(!f){
+                        Pomelo.getIns().request("connector.entryHandler.queryChannelInfo",{channel:message.channel},function(data:Object):void{
+                            if(data.code==200&&data.channel!=null){
+                                ToolUtil.groupList.addItem(new ChatChannel(data.channel));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+        private function m_over():void{
+            openButton.visible = true;
+            closeButton.visible = true;
+        }
+
+        private function m_out():void{
+            openButton.visible = false;
+            closeButton.visible = false;
+        }
+
+        private function closeW():void{
+            PopUpManager.removePopUp(this);
+            if(unReadMessage.getItemIndex(this)>-1){
+                unReadMessage.removeItemAt(unReadMessage.getItemIndex(this));
+            }
+
+        }
+        private function openW():void{
+            var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
+            event.msg = message;
+            event.channel = message.channel;
+            FlexGlobals.topLevelApplication.dispatchEvent(event);
+            closeW();
+
+
+        }
+        ]]></fx:Script>
+
+    <s:Label id="contentLabel" maxDisplayedLines="-1" top="5" bottom="5" right="5" left="5" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
+    <s:Button id="openButton" label="回复" right="5" top="2" click="openW()"  ></s:Button>
+    <s:Button id="closeButton" label="关闭" right="5" bottom="2" click="closeW()" ></s:Button>
+</s:BorderContainer>

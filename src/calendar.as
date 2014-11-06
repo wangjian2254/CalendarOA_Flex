@@ -7,6 +7,7 @@ import control.window.UserInfoPanel;
 import events.ChangeMenuEvent;
 import events.ChangeUserEvent;
 import events.InitDefaultMemberProjectEvent;
+import events.PaoPaoEvent;
 import events.QueryScheduleEvent;
 import events.QuiteEvent;
 
@@ -55,6 +56,12 @@ public function init():void {
 	
 	menuXML.send();
 	FlexGlobals.topLevelApplication.addEventListener(ChangeMenuEvent.ChangeMenu_EventStr, changeMenu);
+	FlexGlobals.topLevelApplication.addEventListener(PaoPaoEvent.CHAT, function(chatEvent:PaoPaoEvent):void{
+        var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+        var xml1:XML = new XML("<menuitem label='消息' mod='message'></menuitem>");
+        event1.item = xml1;
+        onMenuChange(event1,chatEvent.channel);
+    });
 	FlexGlobals.topLevelApplication.addEventListener(InitDefaultMemberProjectEvent.Default_Member_EventStr, function(e:InitDefaultMemberProjectEvent):void{
         membersDownList.selectedIndex = 0;
     });

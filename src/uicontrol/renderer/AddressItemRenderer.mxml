@@ -65,6 +65,7 @@
             }
             if(!data.hasOwnProperty('hideicon')){
                 childicon.source = null;
+//                childicon.visible = false;
                 head.source = data.icon;
                 rightContainer.visible = false;
                 rightContainer.width = 0;
@@ -92,6 +93,8 @@
             }
             horizontalLayout.paddingLeft = 5+data.level*15;
             solidColor.color = getColor(data);
+
+
 //            if(data.id>=0){
 //                nameLabel.addEventListener(MouseEvent.CLICK, select_handler);
 //                nameLabel.buttonMode = true;
@@ -113,6 +116,13 @@
             }
         }
 
+        private function unsubscribe_handler():void{
+            if((data && data.id>=0)||data.hasOwnProperty("channel")){
+                var listclickevent:ListClickEvent=new ListClickEvent(ListClickEvent.UNSUBSCRIBE,data);
+                dispatchEvent(listclickevent);
+            }
+
+        }
         private function select_handler(e:MouseEvent):void{
             if((data && data.id>=0)||data.hasOwnProperty("channel")){
                 var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
@@ -145,10 +155,14 @@
 
         protected function m_over():void{
             solidColor.color = 0x7ae7bf;
+            if(data.hasOwnProperty("delable")){
+                btnDel.visible = data.delable;
+            }
         }
 
         protected function m_out():void{
             solidColor.color = getColor(data);
+            btnDel.visible = false;
         }
         ]]></fx:Script>
     <fx:Declarations>
@@ -171,7 +185,8 @@
         <s:HGroup id="horizontalLayout"  click="zhankai(event)" verticalAlign="middle"   width="100%" height="100%" buttonMode="true"  >
 
 
-            <s:Image id="childicon" width="10" height="10"  buttonMode="true"></s:Image>
+            <s:Image id="childicon" width="10" height="10"  buttonMode="true" ></s:Image>
+
             <s:Image id="head" width="45" height="45"></s:Image>
             <s:Label id="nameLabel" ></s:Label>
             <s:BorderContainer id="num" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
@@ -182,6 +197,7 @@
             </s:BorderContainer>
 
         </s:HGroup>
+        <uicontrol:BtnDel id="btnDel" visible="false" width="15" height="15" right="5" top="15" clickFun="unsubscribe_handler"></uicontrol:BtnDel>
         <uicontrol:RightBtn id="rightContainer" buttonMode="true" right="0" click="select_handler(event)" width="50" top="0" bottom="1" >
 
         </uicontrol:RightBtn>

@@ -20,6 +20,7 @@ public class ChatChannel {
     private var _type:String;
     private var _flag:String;
     private var _members:ArrayCollection;
+    private var _delable:Boolean = false;
 
 
 
@@ -40,7 +41,12 @@ public class ChatChannel {
 
             }
         }
-        setMembers(obj['members']);
+        if(obj.hasOwnProperty("members")){
+            setMembers(obj['members']);
+        }else{
+            _type="p";
+        }
+
         if(obj.hasOwnProperty('_id')){
             channel=obj['_id'];
         }
@@ -246,6 +252,14 @@ public class ChatChannel {
 
     public function set v(value:int):void {
         _v = value;
+    }
+
+    public function get delable():Boolean {
+        return _delable;
+    }
+
+    public function set delable(value:Boolean):void {
+        _delable = value;
     }
 }
 }

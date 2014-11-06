@@ -44,6 +44,8 @@
         [Bindable]
         public var chatUser:ChatChannel;
 
+        private var isread:Boolean=false;
+
 
 //        [Bindable]
 //        public var type:String = "d";//部门 为“d” 任务为 “t” 讨论组为：“g”
@@ -105,6 +107,15 @@
             flagTimeline();
             Pomelo.getIns().addEventListener('quiteChannel', quiteChannelHandler);
             Pomelo.getIns().addEventListener('joinChannel', joinChannelHandler);
+
+            this.addEventListener(FocusEvent.FOCUS_IN, function(e:FocusEvent):void{
+                flagCurrentChannel();
+            });
+            flagCurrentChannel();
+        }
+
+        private function flagCurrentChannel():void{
+            ToolUtil.currentChannel = chatUser.channel;
         }
 
         public function getHistoryChat():void {
@@ -214,7 +225,10 @@
             chatsArr.addItem(event.message.msg);
             setPreDate(chatsArr);
             showLastMsg();
-            flagTimeline();
+            isread=true;
+            if(this.visible){
+                flagTimeline();
+            }
 
         }
 
@@ -227,6 +241,10 @@
 
             }
             super.reloadParamData(e);
+            if(isread){
+                flagTimeline();
+                isread = false;
+            }
         }
 
         private var contextMenuItems:ArrayCollection;
@@ -290,7 +308,8 @@
         }
 
         private function chatUserPanel():void {
-            var chatevent:ListClickEvent = new ListClickEvent("ChatUser", addressList.selectedItem);
+            var chat:ChatChannel = new ChatChannel(addressList.selectedItem);
+            var chatevent:ListClickEvent = new ListClickEvent("ChatUser", chat);
             dispatchEvent(chatevent);
         }
 
@@ -362,7 +381,7 @@
 
         private function al(data:Object, chat:Object):void {
             trace("chat:" + JParser.encode(data));
-
+            isread=false;
         }
 
         private function pressEnter(event:FlexEvent):void {

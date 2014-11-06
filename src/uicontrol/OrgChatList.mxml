@@ -6,6 +6,7 @@
          xmlns:uicontrol="uicontrol.*" creationComplete="init()" gap="3">
     <fx:Metadata>
         [Event(name="listItemClick",type="events.ListClickEvent")]
+        [Event(name="unsubscribe",type="events.ListClickEvent")]
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
@@ -28,9 +29,9 @@
         private var addressMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var departMember:ArrayCollection = new ArrayCollection();
+        public var departMember:ArrayCollection = new ArrayCollection();
         [Bindable]
-        private var userMember:ArrayCollection = new ArrayCollection();
+        public var userMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
         private var btnlist:ArrayCollection=new ArrayCollection([{label:"最近联系",mod:"group"},{label:"部门",mod:"org"},{label:"常用联系人",mod:"user"}]);;

@@ -4,6 +4,8 @@
 package util {
 import events.QuiteEvent;
 
+import flash.display.DisplayObject;
+
 import flash.events.Event;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
@@ -17,9 +19,14 @@ import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.events.CollectionEvent;
 import mx.events.FlexEvent;
+import mx.managers.PopUpManager;
 
 import org.idream.pomelo.Pomelo;
 import org.idream.pomelo.PomeloEvent;
+
+import spark.effects.Move;
+
+import uicontrol.NewsPannel;
 
 [Event(name="pStatus", type="org.idream.pomelo.PomeloEvent")]
 [Event(name="onChat", type = "org.idream.pomelo.PomeloEvent")]
@@ -49,8 +56,31 @@ public class ChatManager {
     public static var unReadMessage:ArrayCollection = new ArrayCollection();
 
     public function ChatManager() {
+//        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, paopaomove_handler);
 
 
+    }
+
+    public static function paopaomove_handler(e:CollectionEvent):void{
+        var p:NewsPannel = null;
+        var mve:Move =null;
+        var bottomY:int = FlexGlobals.topLevelApplication.height - 70;
+        var t_y:int=0;
+        for(var index:int = unReadMessage.length-1;index>=0;index--){
+            p = unReadMessage.getItemAt(index) as NewsPannel;
+            mve = new Move();
+            mve.xFrom = p.x;
+            mve.yFrom = p.y;
+            mve.xTo = p.x;
+            t_y=(unReadMessage.length-index-1) * (60+10)+10;
+            if(t_y<bottomY){
+                mve.yTo = t_y;
+            }else{
+                mve.yTo = bottomY;
+            }
+            mve.duration = 500;
+            mve.play([p]);
+        }
     }
 
 //    static public function clearUser():void{
@@ -72,7 +102,7 @@ public class ChatManager {
 
     static public function loginChat(e:Event=null):void{
         time.addEventListener(TimerEvent.TIMER,loginChat);
-        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChanged);
+        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, paopaomove_handler);
 //        for(var u:String in userStatus){
 //            userStatus[u]="off";
 //        }
@@ -155,6 +185,7 @@ public class ChatManager {
                     continue;
                 }
                 g=new ChatChannel(channel);
+                g.delable = true;
                 groups.addItem(g);
 //                if(channel.channel.substr(0,1)=="g"){
 //                    g['id']=channel.channel.substr(1, channel.channel.length - 1);
@@ -230,7 +261,7 @@ public class ChatManager {
             })
             Pomelo.getIns().request("connector.entryHandler.unreadcount", {channels:channels});
 
-//            listenOrg();
+            listenOrg();
         });
     }
 
@@ -275,12 +306,24 @@ public class ChatManager {
 //    }
     static public function chatHandler(event:PomeloEvent):void{
 
-        if(event.message.msg.f!=ToolUtil.sessionUser.pid){
+        if(event.message.msg.channel!=ToolUtil.currentChannel){
             event.message.msg.unread=true;
-            unReadMessage.addItem(event.message.msg);
+
+            var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+            s.message = event.message.msg;
+            s.y = 0 - s.height - 10;
+            s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+            s.unReadMessage = unReadMessage;
+            unReadMessage.addItem(s);
+//            unReadMessage.refresh();
         }else{
             if(event.message.msg.c!=type){
-                unReadMessage.addItem(event.message.msg);
+                var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+                s.message = event.message.msg;
+                s.y = 0 - s.height - 10;
+                s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+                s.unReadMessage = unReadMessage;
+                unReadMessage.addItem(s);
             }
         }
 

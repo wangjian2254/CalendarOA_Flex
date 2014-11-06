@@ -60,6 +60,7 @@ public class ToolUtil
 //    public static var taskstatuslist:ArrayCollection=new ArrayCollection([{id:1,label:"未开始"},{id:2,label:"正在进行"},{id:3,label:"待审核"},{id:4,label:"完成"}]);
     public static var taskurgentlist:ArrayCollection=new ArrayCollection([{id:1,label:"普通"},{id:2,label:"优先"},{id:3,label:"紧急"}]);
 
+    public static var currentChannel:String="";
     private static var time:Timer = new Timer(1000*60*5,0);
 
     public static function getTaskStatus(i:int):String{
