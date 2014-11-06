@@ -96,27 +96,32 @@
             if (!ToolUtil.sessionUser.hasOwnProperty('pid')) {
                 return;
             }
-            if (calendarBorder.numElements > 0) {
+            if ((showModel.selectedItem.value != "monthly" && calendarBorder.numElements > 0)||(showModel.selectedItem.value == "monthly"&&calendarPanel.numElements>0)) {
                 var event:QueryScheduleEvent = new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str, true);
                 if (showModel.selectedItem.value == "monthly") {
-                    event.start = (calendarBorder.getElementAt(0) as DayItem).date;
+                    event.start = (calendarPanel.getElementAt(0) as DayItem).date;
+                    event.end = (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date;
                 } else {
                     event.start = (calendarBorder.getElementAt(1) as DayItem).date;
+                    event.end = (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date;
                 }
 
-                event.end = (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date;
+
                 FlexGlobals.topLevelApplication.dispatchEvent(event);
             }
         }
 
         public function getShowDateRange():Object {
-            if (calendarBorder.numElements > 0) {
+            if ((showModel.selectedItem.value != "monthly" && calendarBorder.numElements > 0)||(showModel.selectedItem.value == "monthly"&&calendarPanel.numElements>0)) {
                 if (showModel.selectedItem.value == "monthly") {
-                    return {'start': (calendarBorder.getElementAt(0) as DayItem).date, 'end': (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date};
+                    return {'start': (calendarPanel.getElementAt(0) as DayItem).date, 'end': (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date};
                 } else {
                     return {'start': (calendarBorder.getElementAt(1) as DayItem).date, 'end': (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date};
                 }
+
+
             }
+
             return null;
         }
 
@@ -157,8 +162,8 @@
             taskunpanel.removeAllElements();
             var scheduleItem:ScheduleItem = null;
             var obj:Schedule;
-            for each(var i:String in ToolUtil.scheduleMap['out_schedule_list']) {
-                obj = ToolUtil.scheduleMap['schedulemap'][i];
+            for each(var i:String in ToolUtil.outScheduleMap['out_schedule_list']) {
+                obj = ToolUtil.outScheduleMap['schedulemap'][i];
                 scheduleItem = new ScheduleItem();
                 scheduleItem.scheduleData = obj;
                 scheduleItem.scheduleName = obj.title;
@@ -606,7 +611,7 @@
         }
 
         private function showTask():void {
-            if (ToolUtil.scheduleMap['out_schedule_list'].length == 0) {
+            if (ToolUtil.outScheduleMap['out_schedule_list'].length == 0) {
                 taskPanel.width = 0;
             } else {
                 taskPanel.width = 250;

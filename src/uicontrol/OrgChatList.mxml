@@ -208,12 +208,13 @@
         private function listItemZhanKai_handler(e:ListClickEvent):void {
             var depart:Object = e.data;
             var index:int = 0;
-            for (var i:int = 0; i < addressMember.length; i++) {
-                if (depart.id == addressMember.getItemAt(i).id) {
-                    index = i;
-                    break;
-                }
-            }
+            index = addressMember.getItemIndex(depart);
+//            for (var i:int = 0; i < addressMember.length; i++) {
+//                if (depart.id == addressMember.getItemAt(i).id) {
+//                    index = i;
+//                    break;
+//                }
+//            }
             var childrenDepart:ArrayCollection;
             if (depart.hasOwnProperty('childrenstatus') && depart['childrenstatus']) {
                 depart['childrenstatus'] = false;

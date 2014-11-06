@@ -622,6 +622,7 @@ public class ToolUtil
 //    }
 
     public static var scheduleMap:Object = new Object();
+    public static var outScheduleMap:Object = {"out_schedule_list":[]};
 
 
 
@@ -665,7 +666,7 @@ public class ToolUtil
         if(result.success){
             scheduleMap = new Object();
 //            scheduleMap['scheduleall']=new Array();
-            scheduleMap['out_schedule_list']=new Array();
+
             scheduleMap['schedulemap']=new Object();
             scheduleMap['schedulelist']=new Object();
             var schedule:Schedule;
@@ -687,14 +688,21 @@ public class ToolUtil
                 }
                 ScheduleUtil.updateSchedulePanel(schedule.id);
             }
-            for each(var obj:Object in result.result.out_schedulelist){
-                schedule = new Schedule(obj);
-                if(!scheduleMap['schedulemap'].hasOwnProperty(schedule.id)){
-                    scheduleMap['schedulemap'][schedule.id] = schedule;
-                    ScheduleUtil.updateSchedulePanel(schedule.id);
+            if(result.result.hasOwnProperty("out_schedulelist")){
+                outScheduleMap= new Object();
+                outScheduleMap['out_schedule_list']=new Array();
+                outScheduleMap['schedulemap']=new Object();
+                for each(var obj:Object in result.result.out_schedulelist){
+                    schedule = new Schedule(obj);
+                    outScheduleMap['schedulemap'][schedule.id] = schedule;
+                    if(!scheduleMap['schedulemap'].hasOwnProperty(schedule.id)){
+                        scheduleMap['schedulemap'][schedule.id] = schedule;
+                        ScheduleUtil.updateSchedulePanel(schedule.id);
+                    }
+                    outScheduleMap['out_schedule_list'].push(schedule.id);
                 }
-                scheduleMap['out_schedule_list'].push(schedule.id);
             }
+
             FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
         }
     }
