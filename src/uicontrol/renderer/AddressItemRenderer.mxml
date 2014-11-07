@@ -51,6 +51,7 @@
 
 
         override public function set data(value:Object):void {
+            trace("chat member list"+value.name);
             _data = value;
             super.data = value;
             if(value==null){

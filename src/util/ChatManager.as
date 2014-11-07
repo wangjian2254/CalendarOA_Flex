@@ -7,6 +7,8 @@ import events.QuiteEvent;
 import flash.display.DisplayObject;
 
 import flash.events.Event;
+import flash.events.IOErrorEvent;
+import flash.events.SecurityErrorEvent;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
 
@@ -109,7 +111,8 @@ public class ChatManager {
         unReadMessage.removeAll();
 //        Pomelo.getIns().disconnect();
         if(ToolUtil.sessionUser){
-                Pomelo.getIns().init(ToolUtil.sessionUser.chathost,ToolUtil.sessionUser.chatport,null,loginResult,1000*30);
+            chatClosedListeing();
+            Pomelo.getIns().init(ToolUtil.sessionUser.chathost,ToolUtil.sessionUser.chatport,null,loginResult,1000*30);
 
         }else{
             time.start();
@@ -126,6 +129,37 @@ public class ChatManager {
         }
     }
 
+    [Bindable]
+    static public var pomelo_online:Boolean=false;
+    static public var pomelo_error:Boolean=false;
+
+    static private function error_handler(e:Event):void{
+        if(pomelo_online){
+            pomelo_online=false;
+            loginChat(null);
+        }else{
+            if(pomelo_error){
+                Alert.show("即时通信服务正在维护中，目前不可使用。");
+            }
+            time.start();
+        }
+        pomelo_error = true;
+    }
+    static private function not_pomelo_handler(e:Event):void{
+        pomelo_online=false;
+        if(pomelo_error){
+            Alert.show("即时通信服务正在维护中，目前不可使用。");
+            time.start();
+        }
+        pomelo_error = true;
+
+    }
+    static public function chatClosedListeing():void{
+        Pomelo.getIns().addEventListener(Event.CLOSE, error_handler);
+        Pomelo.getIns().addEventListener(IOErrorEvent.IO_ERROR, error_handler);
+        Pomelo.getIns().addEventListener(SecurityErrorEvent.SECURITY_ERROR, not_pomelo_handler);
+    }
+
     static public function init():void{
 
         Pomelo.getIns().request("gate.gateHandler.queryEntry",  {"pid":ToolUtil.sessionUser.pid}, function (response:Object):void {
@@ -137,6 +171,7 @@ public class ChatManager {
             Pomelo.getIns().init(response.host, response.port, null, function (response:Object):void {
                 if (response.code == 200) {
                     time.stop();
+                    pomelo_online=true;
                     regOrg();
 //                    Pomelo.getIns().addEventListener(Event.CLOSE,loginChat);
                     Pomelo.getIns().on("loginOther",function(relogindata:PomeloEvent):void{

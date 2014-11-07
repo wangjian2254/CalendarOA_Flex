@@ -50,6 +50,9 @@ public class ChatChannel {
         if(obj.hasOwnProperty('_id')){
             channel=obj['_id'];
         }
+        if(type == 'p'){
+            _members = null;
+        }
 
 
     }
@@ -212,9 +215,12 @@ public class ChatChannel {
                 if(u.hasOwnProperty("id")){
                     item = ToolUtil.getActivePersonById(u.id);
                 }
+                if(u.hasOwnProperty("pid")){
+                    item = ToolUtil.getActivePersonById(u.pid);
+                }
                 if(item!=null){
-                    item['_level'] = 0;
-                    item['_unread'] = 0;
+                    item['level'] = 0;
+                    item['unread'] = 0;
                     _members.addItem(item);
                 }
             }

@@ -4,7 +4,7 @@
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" cornerRadius="12"
-                   borderColor="#000000" borderStyle="solid"  width="200" height="60" skinClass="skins.PaoPaoSkin"
+                   borderColor="#000000" borderStyle="solid"  width="250" height="60" skinClass="skins.PaoPaoSkin"
                    creationComplete="init()"  >
 <!--<s:backgroundFill>-->
     <!--<s:SolidColor  id="back10" color="#b0e861" alpha="1"/>-->
@@ -46,19 +46,41 @@
         public function init():void{
             if(message!=null&&message.hasOwnProperty("te")){
                 contentLabel.text = message.te;
-                if(message.channel.substr(0,2)=="g"||message.channel.substr(0,2)=="t"){
+                if(message.channel.substr(0,1)=="g"||message.channel.substr(0,1)=="t"){
                     var f:Boolean = false;
                     for each(var g:ChatChannel in ToolUtil.groupList){
                         if(g.channel==message.channel){
                             f=true;
+                            nameLabel.text = g.name;
                         }
                     }
                     if(!f){
                         Pomelo.getIns().request("connector.entryHandler.queryChannelInfo",{channel:message.channel},function(data:Object):void{
                             if(data.code==200&&data.channel!=null){
                                 ToolUtil.groupList.addItem(new ChatChannel(data.channel));
+                                nameLabel.text = data.channel.name;
                             }
                         });
+                    }
+                    head.source = "/static/smalloaicon/group.png";
+                }else{
+                    if(message.channel.substr(0,1)=="d"){
+                        var did:String = message.channel.substr(1,message.channel.length-1);
+                        for each(var depat:Object in ToolUtil.departMentList){
+                            if(did==depat.id){
+                                head.source = depat.icon;
+                                nameLabel.text = depat.name;
+                            }
+                        }
+                    }else{
+                        var pids:Array = message.channel.split("p");
+                        for each(var pid:String in pids){
+                            if(pid!=ToolUtil.sessionUser.pid){
+                                var person:Object = ToolUtil.getAnyPersonById(pid);
+                                head.source = person.icon;
+                                nameLabel.text = person.name;
+                            }
+                        }
                     }
                 }
             }
@@ -90,8 +112,12 @@
 
         }
         ]]></fx:Script>
+    <s:Image id="head" width="45" height="45" top="4" left="4"></s:Image>
+    <s:VGroup top="2" bottom="2" right="75" left="55">
+        <s:Label id="nameLabel" fontWeight="bold"  ></s:Label>
+        <s:Label id="contentLabel" maxDisplayedLines="-1" width="100%" height="100%" ></s:Label>
+    </s:VGroup>
 
-    <s:Label id="contentLabel" maxDisplayedLines="-1" top="5" bottom="5" right="5" left="5" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
     <s:Button id="openButton" label="回复" right="5" top="2" click="openW()"  ></s:Button>
     <s:Button id="closeButton" label="关闭" right="5" bottom="2" click="closeW()" ></s:Button>
 </s:BorderContainer>

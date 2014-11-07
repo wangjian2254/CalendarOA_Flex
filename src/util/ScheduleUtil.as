@@ -19,10 +19,15 @@ import mx.core.FlexGlobals;
 		private static var newSchedule:SchedulePanel=null;
 		private static var showSchedule:Object=new Object();
 		
-		public static function createSchedule(startdate:Date=null,enddate:Date=null):void{
-            if(newSchedule==null){
+		public static function createSchedule(startdate:Date=null,enddate:Date=null,create:Boolean=false,department:int=-1,project:int=-1,checker:int=-1,user:int=-1,content:String=null):void{
+            if(newSchedule==null||create){
                 newSchedule  = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,SchedulePanel,false) as SchedulePanel;
                 newSchedule.schedulData=null;
+				newSchedule.default_checker = checker;
+				newSchedule.default_department = department;
+				newSchedule.default_project = project;
+				newSchedule.default_users = user;
+				newSchedule.default_content = content;
                 if(startdate!=null&&enddate!=null){
                     newSchedule.startDateValue = startdate;
                     newSchedule.endDateValue = enddate;
@@ -42,8 +47,11 @@ import mx.core.FlexGlobals;
 //			PopUpManager.centerPopUp(newSchedule);
 		}
 		
-		public static function clearNewSchedule():void{
-			newSchedule=null;
+		public static function clearNewSchedule(s:SchedulePanel):void{
+			if(s==newSchedule){
+				newSchedule=null;
+			}
+
 		}
 		
 		public static function closeSchedulePanel(scheduleId:String):void{

@@ -11,11 +11,19 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
+        import control.ChatControl;
+
         import events.ListClickEvent;
 
         import flash.filters.DropShadowFilter;
 
         import flash.filters.GlowFilter;
+
+        import model.ChatChannel;
+
+        import uicontrol.AddressList;
+
+        import util.ScheduleUtil;
 
         import util.ToolUtil;
 
@@ -144,6 +152,53 @@
 
         }
 
+        private function mySchedule():void{
+            var list:AddressList = owner as AddressList;
+            if(list!=null&&list.chatChannel!=null){
+                var checker:int=-1;
+                if(data.f!=ToolUtil.sessionUser.pid){
+                    checker=data.f;
+                }
+                if(list.chatChannel.type == "p"){
+                    checker= Number(list.chatChannel.channel.replace(ToolUtil.sessionUser.pid.toString()).replace("p"));
+                    ScheduleUtil.createSchedule(null,null,true,-1,-1,checker,ToolUtil.sessionUser.pid,data.te );
+                }
+                if(list.chatChannel.type == "g"){
+                    ScheduleUtil.createSchedule(null,null,true,-1,-1,checker,ToolUtil.sessionUser.pid,data.te );
+                }
+                if(list.chatChannel.type == "t"){
+                    ScheduleUtil.createSchedule(null,null,true,-1,-1,checker,ToolUtil.sessionUser.pid,data.te );
+                    //todo:未来优化成 同一schedule下的 使用同一 project
+                }
+                if(list.chatChannel.type == "d"){
+                    ScheduleUtil.createSchedule(null,null,true,Number(list.chatChannel.channel.substr(1)),-1,checker,ToolUtil.sessionUser.pid,data.te );
+                }
+            }
+        }
+        private function myCheckerSchedule():void{
+            var list:AddressList = owner as AddressList;
+            if(list!=null&&list.chatChannel!=null){
+                var checker:int=-1;
+                if(data.f!=ToolUtil.sessionUser.pid){
+                    checker=data.f;
+                }
+                if(list.chatChannel.type == "p"){
+                    checker= Number(list.chatChannel.channel.replace(ToolUtil.sessionUser.pid.toString()).replace("p"));
+                    ScheduleUtil.createSchedule(null,null,true,-1,-1,ToolUtil.sessionUser.pid,checker,data.te );
+                }
+                if(list.chatChannel.type == "g"){
+                    ScheduleUtil.createSchedule(null,null,true,-1,-1,ToolUtil.sessionUser.pid,checker,data.te );
+                }
+                if(list.chatChannel.type == "t"){
+                    ScheduleUtil.createSchedule(null,null,true,-1,-1,ToolUtil.sessionUser.pid,checker,data.te );
+                    //todo:未来优化成 同一schedule下的 使用同一 project
+                }
+                if(list.chatChannel.type == "d"){
+                    ScheduleUtil.createSchedule(null,null,true,Number(list.chatChannel.channel.substr(1)),-1,ToolUtil.sessionUser.pid,checker,data.te );
+                }
+            }
+        }
+
         protected function m_over():void{
             if(data.hasOwnProperty('f')){
                 chatstatus.visible = true;
@@ -195,8 +250,8 @@
                     </s:BorderContainer>
                     <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
                     <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
-                        <mx:LinkButton id="myFZRButton" label="我负责" textDecoration="underline" ></mx:LinkButton>
-                        <mx:LinkButton id="selectFZRButton" label="指派"  textDecoration="underline" ></mx:LinkButton>
+                        <mx:LinkButton id="myFZRButton" label="我来做" textDecoration="underline" click="mySchedule()" ></mx:LinkButton>
+                        <mx:LinkButton id="selectFZRButton" label="我来审核"  textDecoration="underline" click="myCheckerSchedule()" ></mx:LinkButton>
                     </s:HGroup>
                 </s:BorderContainer>
             </s:VGroup>

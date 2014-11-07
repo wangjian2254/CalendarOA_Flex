@@ -55,11 +55,6 @@
         [Bindable]
         public var schedulData:Schedule=null;
 
-        public var checker:Object;
-        public var zeren:Object;
-        public var department:Object;
-        public var project:Object;
-
         [Bindable]
         private var myproject:ArrayCollection = new ArrayCollection();
 
@@ -82,6 +77,11 @@
 
         private var selectColor:Number =0x00CCFF;
 
+        public var default_checker:int=-1;
+        public var default_department:int=-1;
+        public var default_users:int=-1;
+        public var default_content:String;
+        public var default_project:int = -1;
 
 
         override public function  releaseListener(e:CloseEvent):void{
@@ -94,7 +94,7 @@
             if(schedulData!=null){
                 ScheduleUtil.closeSchedulePanel(schedulData.id);
             }else{
-                ScheduleUtil.clearNewSchedule();
+                ScheduleUtil.clearNewSchedule(this);
             }
         }
 
@@ -121,8 +121,7 @@
                 btnDel.visible = false;
                 scheduleTitle.setFocus();
             }else{
-                chatControl.visible = true;
-                chatControl.width = 500;
+
 //                this.width = chatControl.width+schedulePanel.width;
                 if(schedulData.cv==schedulData.v && schedulData.v!=0){
                     initChatControl();
@@ -188,9 +187,9 @@
                 }
                 need_check.selected=!schedulData['need_check'];
                 if(!need_check.selected){
-                    for each(var checker:Object in departmentMembers){
-                        if(schedulData.checker == checker.id){
-                            checkerDownList.selectedItem = checker;
+                    for each(var checkerperson:Object in departmentMembers){
+                        if(schedulData.checker == checkerperson.id){
+                            checkerDownList.selectedItem = checkerperson;
                             break;
                         }
                     }
@@ -282,37 +281,46 @@
             changeProjectByDepart();
 
             if(schedulData==null){
-                if(checker!=null){
-                    for each(var p:Object in checkerDownList.dataProvider){
-                        if(p.id==checker.id){
-                            checkerDownList.selectedItem=p;
-                            need_check.selected=false;
-                            break;
-                        }
-                    }
-                }
-                if(zeren!=null){
+
+                if(default_users>-1){
+                    usersGroup.removeAllElements();
                     var m:MemberItem=new MemberItem();
-                    m.person = zeren;
+                    m.person = ToolUtil.getActivePersonById(default_users);
                     m.showBtn = true;
-                    usersGroup.addElement(m);
+                    if(m.person!=null){
+
+                        usersGroup.addElement(m);
+                    }
+
                 }
-                if(department!=null){
+                if(default_department>-1){
                     for each(var d:Object in departmentDownList.dataProvider){
-                        if(d.id==department.id){
+                        if(d.id==default_department){
                             departmentDownList.selectedItem=d;
                             changeProjectByDepart();
                             break;
                         }
                     }
                 }
-                if(project!=null){
+                if(default_project>-1){
                     for each(var p:Object in projectDownList.dataProvider){
-                        if(p.id==project.id){
+                        if(p.id==default_project){
                             projectDownList.selectedItem=p;
                             break;
                         }
                     }
+                }
+                if(default_checker>-1){
+                    for each(var p:Object in checkerDownList.dataProvider){
+                        if(p.id==default_checker){
+                            checkerDownList.selectedItem=p;
+                            need_check.selected=false;
+                            break;
+                        }
+                    }
+                }
+                if(default_content!=null){
+                    scheduleTitle.text = default_content;
                 }
             }
 
@@ -455,7 +463,7 @@
 
         private function saveResult(result:Object,e:ResultEvent):void{
             if(result.success){
-                ScheduleUtil.clearNewSchedule();
+                ScheduleUtil.clearNewSchedule(this);
 
                 schedulData = new Schedule(result.result);
                 ScheduleUtil.rememberSchedulePanel(schedulData.id,this);
@@ -842,6 +850,8 @@
             chatUser.v = schedulData.v;
 
             chatControl.chatUser = chatUser;
+            chatControl.visible = true;
+            chatControl.width = 500;
             chatControl.init(null);
         }
 
@@ -881,11 +891,11 @@
                 <s:Spacer width="30"></s:Spacer>
                 <uicontrol:BtnAdd clickFun="{addProject}" />
             </s:FormItem>
-            <s:FormItem label="任务描述：" height="100">
+            <s:FormItem label="任务描述：" height="150">
                 <s:layout>
                     <s:HorizontalLayout gap="5" verticalAlign="middle" />
                 </s:layout>
-                <s:TextArea id="scheduleTitle" width="100%" height="85" toolTip="任务内容：描述任务的具体工作" prompt="请写明任务内容、发生地点">
+                <s:TextArea id="scheduleTitle" width="100%" height="135" toolTip="任务内容：描述任务的具体工作" prompt="请写明任务内容、发生地点">
                 </s:TextArea>
                 <s:Label text="*" color="red"/>
             </s:FormItem>

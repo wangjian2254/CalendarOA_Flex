@@ -18,6 +18,8 @@
         import org.idream.pomelo.Pomelo;
         import org.idream.pomelo.PomeloEvent;
 
+        import util.ChatManager;
+
         import util.ToolUtil;
         override public function releaseListener():void{
             Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
@@ -167,7 +169,7 @@
 	</control:layout>
 
 
-    <uicontrol:OrgChatList id="addressList"   type="chat"
+    <uicontrol:OrgChatList id="addressList"   type="chat" enabled="{ChatManager.pomelo_online}"
                            listItemClick="listItemClick_handler(event)"
                            width="230" height="100%">
     </uicontrol:OrgChatList>
@@ -202,8 +204,12 @@
 
             </mx:ViewStack>
         </s:VGroup>
+        <s:BorderContainer top="0" bottom="0" right="0" left="0" backgroundAlpha="0.5" backgroundColor="#cccccc" borderVisible="false" visible="{!ChatManager.pomelo_online}">
+            <s:layout>
+                <s:HorizontalLayout horizontalAlign="center" verticalAlign="middle"></s:HorizontalLayout>
+            </s:layout>
+                <s:Label text="即时通信服务器正在维护中，目前不可用." color="#ff0000" fontSize="20"></s:Label>
+        </s:BorderContainer>
     </s:BorderContainer>
-
-
 
 </control:CBorderContainer>

@@ -20,6 +20,7 @@
         import model.ChatChannel;
 
         import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
         import mx.controls.Menu;
         import mx.core.FlexGlobals;
         import mx.events.FlexEvent;
@@ -29,6 +30,8 @@
 
         import org.idream.pomelo.Pomelo;
         import org.idream.pomelo.PomeloEvent;
+
+        import spark.components.VScrollBar;
 
         import util.ChatManager;
         import util.DateUtil;
@@ -85,11 +88,14 @@
             }
             var pids:Array = chatUser.getPids();
             if (chatUser.type == "p") {
-
+                if(pids[0]==pids[2]){
+                    closeContainer(null);
+                    return;
+                }
 
                 Pomelo.getIns().request("connector.entryHandler.createChannel", {channel: chatUser.channel, users: pids}, function (data:Object):void {
-                    if (data.code == 200) {
-
+                    if (data.code == 500) {
+                        Alert.show("即时通信服务器异常，请稍后再试。");
                     }
                 });
             }
@@ -112,39 +118,60 @@
                 flagCurrentChannel();
             });
             flagCurrentChannel();
+
+//            chatList.addEventListener(Flex)
+            chatList.scroller.verticalScrollBar.addEventListener(Event.CHANGE, list_verticalScrollBar_change);
+        }
+
+        private var hashistory:Boolean=true;
+        private var isloading:Boolean=false;
+        private function list_verticalScrollBar_change(evt:Event):void{
+            if(!hashistory||isloading){
+                return;
+            }
+//            var vsb:VScrollBar = evt.currentTarget as VScrollBar;
+//            var obj:Object = {};
+//            obj.type = evt.type;
+//            obj.val = vsb.value;
+//            obj.max = vsb.maximum;
+            if(evt.currentTarget is VScrollBar && evt.currentTarget.value==0){
+                isloading = true;
+                callLater(getHistoryChat);
+            }
+//            callLater(dgScroll);
         }
 
         private function flagCurrentChannel():void{
             ToolUtil.currentChannel = chatUser.channel;
         }
 
+//        private var chatindex:int= -1;
         public function getHistoryChat():void {
             var timeline:String;
             if (chatsArr.length > 0) {
-                timeline = chatsArr.getItemAt(0).id;
+                timeline = chatsArr.getItemAt(0)._id;
             }
-            var pids:Array = chatUser.getPids();
-
             Pomelo.getIns().request("connector.entryHandler.history", {channel: chatUser.channel, id: timeline}, function (data:Object):void {
                 if (data.code == 200) {
                     var chats:ArrayCollection = new ArrayCollection(data.chats as Array);
                     if (chats.length == 0) {
+                        hashistory=false;
                         return;
                     }
 
-                    if (chats.length < 30) {
-                        historyButton.enabled = false;
-                    }
                     if (chatsArr.length == 0) {
                         chatsArr.addAll(chats);
                     } else {
                         chatsArr.addAllAt(chats, 0);
                     }
                     setPreDate(chatsArr);
-                    showLastMsg(chats.length - 1);
+//                    chatindex = chats.length-1;
+//                    showLastMsg();
+                    callLater(showLastMsg,[chats.length-1]);
                 }
             })
         }
+
 
         private function setPreDate(list:ArrayCollection):void {
             var pre:Object;
@@ -171,7 +198,7 @@
                 chatList.validateNow();
                 chatList.ensureIndexIsVisible(index);
             }
-
+            isloading=false;
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
@@ -308,6 +335,13 @@
         }
 
         private function chatUserPanel():void {
+            if(addressList.selectedItem==null){
+                return;
+            }
+            if(addressList.selectedItem.id==ToolUtil.sessionUser.pid){
+                Alert.show("不可以和自己聊天");
+                return;
+            }
             var chat:ChatChannel = new ChatChannel(addressList.selectedItem);
             var chatevent:ListClickEvent = new ListClickEvent("ChatUser", chat);
             dispatchEvent(chatevent);
@@ -420,12 +454,11 @@
                 <s:Label id="nameLabel" textDecoration="underline"  ></s:Label>
 
                 <mx:Spacer width="100%" height="10"/>
-                <s:Button id="quiteButton" label="退出讨论组" width="100" height="25" click="quiteGroup()"  />
-                <s:Button id="memberButton" label="成员管理" width="100" height="25" click="memberGroup()"  />
-                <s:Button id="usersButton" label="创建讨论组" width="100" height="25" click="createGroup()"  />
-                <s:Button id="historyButton" label="加载历史记录" width="150" height="25" click="getHistoryChat()"  />
+                <s:Button id="quiteButton" label="退出讨论组" width="100" height="25" click="quiteGroup()" includeInLayout="{quiteButton.visible}"  />
+                <s:Button id="memberButton" label="成员管理" width="100" height="25" click="memberGroup()" includeInLayout="{memberButton.visible}"  />
+                <s:Button id="usersButton" label="创建讨论组" width="100" height="25" click="createGroup()" includeInLayout="{usersButton.visible}"  />
             </s:BorderContainer>
-            <uicontrol:AddressList id="chatList"  dataProvider="{chatsArr}"
+            <uicontrol:AddressList id="chatList"  dataProvider="{chatsArr}" chatChannel="{chatUser}"
                                    listItemClick="chatItemClick_handler(event)"
                                    itemRenderer="uicontrol.renderer.ChatItemRenderer" width="100%" height="100%">
             </uicontrol:AddressList>
@@ -445,7 +478,7 @@
                     <!--/>-->
             <s:HGroup width="100%" height="50" horizontalAlign="left" verticalAlign="middle">
                 <mx:ColorPicker id="cp"/>
-                <s:TextInput  id="ti" prompt="回车(Enter)发送" width="100%" height="45" color="{cp.selectedColor}" enter="pressEnter(event)" />
+                <s:TextInput  id="ti" prompt="{ChatManager.pomelo_online?'回车(Enter)发送':'即时通信服务正在维护中，目前不可用。'}" width="100%" height="45" color="{cp.selectedColor}" enter="pressEnter(event)" enabled="{ChatManager.pomelo_online}" />
                 <!--<s:Button id="sendBTN" label="发送(Enter键)" chromeColor="#ff0000" color="#ffffff" width="120" height="25" click="sendBTN_clickHandler(event)"/>-->
                 <s:Button  label="清空" width="80" height="25" click="{ti.text='';}"  />
             </s:HGroup>
