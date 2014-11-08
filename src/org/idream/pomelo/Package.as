@@ -1,11 +1,11 @@
 package org.idream.pomelo
 {
-	import flash.utils.ByteArray;
-	import flash.utils.IDataInput;
-	
-	import org.idream.pomelo.interfaces.IPackage;
+import flash.utils.ByteArray;
+import flash.utils.IDataInput;
 
-	public class Package implements IPackage
+import org.idream.pomelo.interfaces.IPackage;
+
+public class Package implements IPackage
 	{
 		public static const TYPE_HANDSHAKE:int = 1;
 		public static const TYPE_HANDSHAKE_ACK:int = 2;

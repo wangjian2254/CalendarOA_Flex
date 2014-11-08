@@ -3,6 +3,7 @@
  */
 package util {
 import flash.system.Capabilities;
+
 public class UUIDUtil {
     public function UUIDUtil() {
     }

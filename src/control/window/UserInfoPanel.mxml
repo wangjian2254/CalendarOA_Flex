@@ -1,81 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:uicontrol="uicontrol.*"
                              xmlns:conobj="uicontrol.conobj.*"
                              width="500" height="400"
                              title="修改用户信息" creationComplete="init()" xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
         import events.QuiteEvent;
 
         import httpcontrol.HttpServiceUtil;
-			import httpcontrol.RemoteUtil;
-			
-			import mx.controls.Alert;
+
+        import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
-        import mx.managers.PopUpManager;
-			import mx.rpc.AbstractOperation;
-			import mx.rpc.events.ResultEvent;
-			
-			import util.ToolUtil;
-			import util.UserUtil;
-			
-			
+        import mx.rpc.events.ResultEvent;
 
+        import util.ToolUtil;
 
-            public function init():void{
-                headSelectArray.selectedIconByIcon(ToolUtil.sessionUser.uicon);
-                headSelectArray2.selectedIconByIcon(ToolUtil.sessionUser.icon);
+        public function init():void {
+            headSelectArray.selectedIconByIcon(ToolUtil.sessionUser.uicon);
+            headSelectArray2.selectedIconByIcon(ToolUtil.sessionUser.icon);
+        }
+
+        public function save():void {
+            if (this.username.text == "" || this.truename.text == "") {
+                Alert.show("请填写完整信息。 ", "提示");
+                return;
             }
-			
-			public function save():void{
-				if(this.username.text==""||this.truename.text==""){
-					Alert.show("请填写完整信息。 ","提示");
-					return;
-				}
-				
-				var obj:Object=new Object();
-				obj.uname=truename.text;
-				obj.uicon = headSelectArray.selectedIcon();
-				obj.name = orgName.text;
-				obj.icon = headSelectArray2.selectedIcon();
 
-				
-				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/updateUserInfo",refresh,"POST").send(obj);
-					
-				
-			}
-			public function refresh(r:Object,e:ResultEvent):void{
+            var obj:Object = new Object();
+            obj.uname = truename.text;
+            obj.uicon = headSelectArray.selectedIcon();
+            obj.name = orgName.text;
+            obj.icon = headSelectArray2.selectedIcon();
 
-                ToolUtil.sessionUser.uname = truename.text;
-                ToolUtil.sessionUser.uicon = headSelectArray.selectedIcon();
-                ToolUtil.sessionUser.name = orgName.text;
-                ToolUtil.sessionUser.icon = headSelectArray2.selectedIcon();
-                Alert.show("修改成功","提示");
-			}
 
-        private function leaveOrg():void{
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/updateUserInfo", refresh, "POST").send(obj);
+
+
+        }
+
+        public function refresh(r:Object, e:ResultEvent):void {
+
+            ToolUtil.sessionUser.uname = truename.text;
+            ToolUtil.sessionUser.uicon = headSelectArray.selectedIcon();
+            ToolUtil.sessionUser.name = orgName.text;
+            ToolUtil.sessionUser.icon = headSelectArray2.selectedIcon();
+            Alert.show("修改成功", "提示");
+        }
+
+        private function leaveOrg():void {
             Alert.show("确定要离开组织么?", "提示", Alert.YES | Alert.NO, null, deleteImg);
 
         }
+
         //上传图片到服务器
-        private function deleteImg(e:mx.events.CloseEvent):void {
+        private function deleteImg(e:CloseEvent):void {
             if (e.detail == Alert.YES) {
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/leaveOrg",leaveResult,"POST").send();
-            }else{
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/leaveOrg", leaveResult, "POST").send();
+            } else {
                 Alert.show("不离开组织");
             }
         }
-            public function leaveResult(r:Object,evt:ResultEvent):void{
-                var e:QuiteEvent = new QuiteEvent(QuiteEvent.Quite,true);
-                e.needTip = false;
-                FlexGlobals.topLevelApplication.dispatchEvent(e);
-                closeWin();
 
-            }
-		]]>
+        public function leaveResult(r:Object, evt:ResultEvent):void {
+            var e:QuiteEvent = new QuiteEvent(QuiteEvent.Quite, true);
+            e.needTip = false;
+            FlexGlobals.topLevelApplication.dispatchEvent(e);
+            closeWin();
+
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

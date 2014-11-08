@@ -1,8 +1,8 @@
 package org.bytearray.gif.frames
 {
-	import flash.display.BitmapData;
-	
-	public class GIFFrame 
+import flash.display.BitmapData;
+
+public class GIFFrame
 	{
 		public var bitmapData:BitmapData;
 		public var delay:int;

@@ -13,6 +13,7 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
+        import mx.events.CloseEvent;
         import mx.events.FlexEvent;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
@@ -37,8 +38,10 @@
         private var papKindArr:ArrayCollection = new ArrayCollection([]);
         [Bindable]
         private var ryArr:ArrayCollection = new ArrayCollection([]);
-        override public function releaseListener():void{
+
+        override public function releaseListener():void {
         }
+
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:MouseEvent):void {
@@ -113,7 +116,7 @@
         }
 
         private function delPager():void {
-            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:CloseEvent):void {
                 if (e.detail == Alert.YES) {
                     var o:Object = {};
                     o["id"] = pagerGrid.selectedItem["id"];

@@ -1,7 +1,6 @@
 // ActionScript file
 import control.CBorderContainer;
 import control.window.ChangePasswordPanel;
-
 import control.window.UserInfoPanel;
 
 import events.ChangeMenuEvent;
@@ -12,7 +11,6 @@ import events.QueryScheduleEvent;
 import events.QuiteEvent;
 
 import flash.display.DisplayObject;
-
 
 import model.User;
 
@@ -26,15 +24,12 @@ import mx.utils.ObjectUtil;
 import org.idream.pomelo.Pomelo;
 
 import spark.components.Button;
+import spark.components.TitleWindow;
 
 import util.ChatManager;
-
 import util.RightClickRegister;
 import util.ToolUtil;
-import util.ToolUtil;
-import util.ToolUtil;
 import util.UserUtil;
-
 
 public function init():void {
     new RightClickRegister();
@@ -187,7 +182,7 @@ public function reg():void {
 
 public function updateinfo():void {
 	var changepassword:UserInfoPanel = UserInfoPanel(PopUpManager.createPopUp(
-		this, UserInfoPanel, true) as spark.components.TitleWindow);
+		this, UserInfoPanel, true) as TitleWindow);
 	PopUpManager.centerPopUp(changepassword);
 }
 
@@ -216,7 +211,7 @@ public function logout(e:*=null):void {
 
 public function repassword():void {
 	var changepassword:ChangePasswordPanel = ChangePasswordPanel(PopUpManager.createPopUp(
-		this, ChangePasswordPanel, true) as spark.components.TitleWindow);
+		this, ChangePasswordPanel, true) as TitleWindow);
 	PopUpManager.centerPopUp(changepassword);
 	//				changepassword.x=(this.width-changepassword.width)/2;
 	//				changepassword.y=(this.height-changepassword.height)/2;

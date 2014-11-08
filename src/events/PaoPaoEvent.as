@@ -4,8 +4,6 @@
 package events {
 import flash.events.Event;
 
-import model.ChatChannel;
-
 public class PaoPaoEvent extends Event {
     public var msg:Object;
     public var channel:String;

@@ -5,7 +5,6 @@
                              xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
     <fx:Script>
 		<![CDATA[
-        import events.ChangeJoinUserEvent;
         import events.ChangeMenuEvent;
         import events.ChangeUserEvent;
         import events.ChatTimelineEvent;
@@ -14,7 +13,6 @@
         import httpcontrol.HttpServiceUtil;
 
         import model.ChatChannel;
-
         import model.Schedule;
 
         import mx.collections.ArrayCollection;
@@ -33,27 +31,27 @@
         import util.DateUtil;
         import util.ScheduleUtil;
         import util.ToolUtil;
-        import util.UUIDUtil;
 
         [Bindable]
-        public function get getWindowHeight():Number{
+        public function get getWindowHeight():Number {
             return windowGroup.height;
         }
 
         [Bindable]
-        public function get getWindowWidth():Number{
+        public function get getWindowWidth():Number {
             return windowGroup.width;
         }
-        [Bindable]
-        public var titlestr:String="创建任务";
 
         [Bindable]
-        public var startDateValue:Date=new Date();
-        [Bindable]
-        public var endDateValue:Date=new Date();
+        public var titlestr:String = "创建任务";
 
         [Bindable]
-        public var schedulData:Schedule=null;
+        public var startDateValue:Date = new Date();
+        [Bindable]
+        public var endDateValue:Date = new Date();
+
+        [Bindable]
+        public var schedulData:Schedule = null;
 
         [Bindable]
         private var myproject:ArrayCollection = new ArrayCollection();
@@ -62,9 +60,12 @@
         private var departmentMembers:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var timelist:ArrayCollection = new ArrayCollection([{"value":"0000","text":"凌晨 00:00"}]);
+        private var timelist:ArrayCollection = new ArrayCollection([{"value": "0000", "text": "凌晨 00:00"}]);
         [Bindable]
-        private var warninglist:ArrayCollection = new ArrayCollection([{"value":1,"text":"分钟"},{"value":60,"text":"小时"},{"value":60*24,"text":"天"},{"value":60*24*7,"text":"周"}]);
+        private var warninglist:ArrayCollection = new ArrayCollection([{"value": 1, "text": "分钟"}, {
+            "value": 60,
+            "text": "小时"
+        }, {"value": 60 * 24, "text": "天"}, {"value": 60 * 24 * 7, "text": "周"}]);
         //			[Bindable]
         //			private var warninglist2:ArrayCollection = new ArrayCollection([{"value":0,"text":"当天"},{"value":24*60,"text":"提前一天"},{"value":24*60*2,"text":"提前二天"},{"value":24*60*3,"text":"提前三天"},{"value":24*60*4,"text":"提前四天"},{"value":24*60*7,"text":"提前一星期"}]);
         [Bindable]
@@ -75,38 +76,38 @@
         private var departmentList:ArrayCollection = new ArrayCollection();
 
 
-        private var selectColor:Number =0x00CCFF;
+        private var selectColor:Number = 0x00CCFF;
 
-        public var default_checker:int=-1;
-        public var default_department:int=-1;
-        public var default_users:int=-1;
+        public var default_checker:int = -1;
+        public var default_department:int = -1;
+        public var default_users:int = -1;
         public var default_content:String;
         public var default_project:int = -1;
 
 
-        override public function  releaseListener(e:CloseEvent):void{
+        override public function releaseListener(e:CloseEvent):void {
             ToolUtil.projectList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
 
 
         }
 
-        private function closeSchedule(e:CloseEvent):void{
-            if(schedulData!=null){
+        private function closeSchedule(e:CloseEvent):void {
+            if (schedulData != null) {
                 ScheduleUtil.closeSchedulePanel(schedulData.id);
-            }else{
+            } else {
                 ScheduleUtil.clearNewSchedule(this);
             }
         }
 
-        private function refreshMyProject(e:CollectionEvent):void{
+        private function refreshMyProject(e:CollectionEvent):void {
             changeProjectByDepart();
         }
 
-        public function init():void{
+        public function init():void {
             addEventListener(CloseEvent.CLOSE, closeSchedule);
             removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
             ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
-            usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS,removeUsersHandler);
+            usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS, removeUsersHandler);
 
             btnSave.visible = true;
             btnStart.visible = false;
@@ -114,62 +115,58 @@
             btnDel.visible = true;
             btnRestart.visible = false;
             btnFinish.visible = false;
-            if(schedulData==null){
+            if (schedulData == null) {
 //                if(chatControl!=null&&windowGroup.getElementIndex(chatControl)>=0){
 //                    windowGroup.removeElement(chatControl);
 //                }
                 btnDel.visible = false;
                 scheduleTitle.setFocus();
-            }else{
+            } else {
 
 //                this.width = chatControl.width+schedulePanel.width;
-                if(schedulData.cv==schedulData.v && schedulData.v!=0){
+                if (schedulData.cv == schedulData.v && schedulData.v != 0) {
                     initChatControl();
-                }else{
+                } else {
                     initTaskChat();
                 }
 
 
-                if(schedulData.used){
-                    btnDel.visible = false;
-                }else{
-                    btnDel.visible = true;
-                }
+                btnDel.visible = !schedulData.used;
                 changeBorderColor();
             }
 
 
             //审核者 有资格修改任务
-            dopanel.visible = (schedulData==null||schedulData.isDelPower(ToolUtil.sessionUser.pid)||schedulData.isUser(ToolUtil.sessionUser.pid))?true:false;
+            dopanel.visible = (schedulData == null || schedulData.isDelPower(ToolUtil.sessionUser.pid) || schedulData.isUser(ToolUtil.sessionUser.pid)) ? true : false;
 
-            if(schedulData!=null){
+            if (schedulData != null) {
 
                 is_all_day.selected = !schedulData.is_all_day;
-                if(!is_all_day.selected){
+                if (!is_all_day.selected) {
 
-                    startDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
-                    endDateValue = DateField.stringToDate(schedulData.startdate,"YYYYMMDD");
-                }else{
-                    startDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_start);
-                    endDateValue = DateUtil.parseDate(schedulData.startdate+schedulData.time_end);
+                    startDateValue = DateField.stringToDate(schedulData.startdate, "YYYYMMDD");
+                    endDateValue = DateField.stringToDate(schedulData.startdate, "YYYYMMDD");
+                } else {
+                    startDateValue = DateUtil.parseDate(schedulData.startdate + schedulData.time_start);
+                    endDateValue = DateUtil.parseDate(schedulData.startdate + schedulData.time_end);
 
                 }
                 startDate.selectedDate = startDateValue;
-                endDate.selectedDate = DateField.stringToDate(schedulData.enddate,"YYYYMMDD")
+                endDate.selectedDate = DateField.stringToDate(schedulData.enddate, "YYYYMMDD")
 
                 scheduleTitle.text = schedulData.title;
                 repeatType.selectedValue = schedulData.repeat_type;
 
                 colorClick(schedulData.color);
-                for each(var department:Object in ToolUtil.myDepartmentList){
-                    if(schedulData.department == department.id){
+                for each(var department:Object in ToolUtil.myDepartmentList) {
+                    if (schedulData.department == department.id) {
                         departmentDownList.selectedItem = department;
                         break;
                     }
                 }
                 changeProjectByDepart();
-                for each(var project:Object in myproject){
-                    if(schedulData.project == project.id){
+                for each(var project:Object in myproject) {
+                    if (schedulData.project == project.id) {
                         projectDownList.selectedItem = project;
                         break;
                     }
@@ -177,102 +174,107 @@
 
 
                 usersGroup.removeAllElements();
-                for each(var pid:int in schedulData.users){
-                    var m:MemberItem=new MemberItem();
+                for each(var pid:int in schedulData.users) {
+                    var m:MemberItem = new MemberItem();
                     m.person = ToolUtil.getAnyPersonById(pid);
                     m.showBtn = dopanel.visible;
-                    if(m.person.hasOwnProperty("id")){
+                    if (m.person.hasOwnProperty("id")) {
                         usersGroup.addElement(m);
                     }
                 }
-                need_check.selected=!schedulData['need_check'];
-                if(!need_check.selected){
-                    for each(var checkerperson:Object in departmentMembers){
-                        if(schedulData.checker == checkerperson.id){
+                need_check.selected = !schedulData['need_check'];
+                if (!need_check.selected) {
+                    for each(var checkerperson:Object in departmentMembers) {
+                        if (schedulData.checker == checkerperson.id) {
                             checkerDownList.selectedItem = checkerperson;
                             break;
                         }
                     }
                 }
                 levleStepper.value = schedulData.level;
-                urgentDownList.selectedIndex = schedulData.urgent-1;
+                urgentDownList.selectedIndex = schedulData.urgent - 1;
 //                statusDownList.selectedIndex = schedulData.status-1;
-                if(schedulData.repeat_type!='none'){
-                    titlestr = schedulData.title +"--"+schedulData.date.substr(0,4)+"/"+schedulData.date.substr(4,6)+"/"+schedulData.date.substr(6,8)+ " --("+ToolUtil.getTaskUrgent(schedulData.urgent)+")" + " --["+ToolUtil.getTaskStatus(schedulData.status)+"]";
-                }else{
-                    titlestr = schedulData.title + " --("+ToolUtil.getTaskUrgent(schedulData.urgent)+")" + " --["+ToolUtil.getTaskStatus(schedulData.status)+"]";
+                if (schedulData.repeat_type != 'none') {
+                    titlestr = schedulData.title + "--" + schedulData.date.substr(0, 4) + "/" + schedulData.date.substr(4, 6) + "/" + schedulData.date.substr(6, 8) + " --(" + ToolUtil.getTaskUrgent(schedulData.urgent) + ")" + " --[" + ToolUtil.getTaskStatus(schedulData.status) + "]";
+                } else {
+                    titlestr = schedulData.title + " --(" + ToolUtil.getTaskUrgent(schedulData.urgent) + ")" + " --[" + ToolUtil.getTaskStatus(schedulData.status) + "]";
                 }
 
-                if(schedulData.status==1&&schedulData.isUser(ToolUtil.sessionUser.pid)){
+                if (schedulData.status == 1 && schedulData.isUser(ToolUtil.sessionUser.pid)) {
                     btnStart.visible = true;
                 }
-                if(schedulData.status==2&&schedulData.isUser(ToolUtil.sessionUser.pid)){
+                if (schedulData.status == 2 && schedulData.isUser(ToolUtil.sessionUser.pid)) {
                     btnFinish.visible = true;
                 }
-                if(schedulData.status==3 && schedulData.isCheck(ToolUtil.sessionUser.pid)){
+                if (schedulData.status == 3 && schedulData.isCheck(ToolUtil.sessionUser.pid)) {
                     btnCheck.visible = true;
                     btnRestart.visible = true;
                 }
-                if(schedulData.status==4 &&(schedulData.isUser(ToolUtil.sessionUser.pid)||schedulData.isCheck(ToolUtil.sessionUser.pid))){
+                if (schedulData.status == 4 && (schedulData.isUser(ToolUtil.sessionUser.pid) || schedulData.isCheck(ToolUtil.sessionUser.pid))) {
                     btnRestart.visible = true;
                 }
-                if(schedulData.status==4 ){
+                if (schedulData.status == 4) {
                     btnSave.visible = false;
                 }
 
 
-            }else{
-                var m:MemberItem=new MemberItem();
+            } else {
+                var m:MemberItem = new MemberItem();
                 m.person = ToolUtil.getAnyPersonById(ToolUtil.sessionUser.pid);
                 m.showBtn = dopanel.visible;
-                if(m.person.hasOwnProperty("id")){
+                if (m.person.hasOwnProperty("id")) {
                     usersGroup.addElement(m);
                 }
             }
 
 
-
             timelist.removeAll();
-            for(var i:Number=0;i<24;i++){
-                var h:String ="0"+i;
+            for (var i:Number = 0; i < 24; i++) {
+                var h:String = "0" + i;
                 var s:String = "凌晨 ";
-                if(i>=5&&i<9){
-                    s="上午 ";
+                if (i >= 5 && i < 9) {
+                    s = "上午 ";
                 }
-                if(i>=9&&i<15){
-                    s="中午 ";
+                if (i >= 9 && i < 15) {
+                    s = "中午 ";
                 }
-                if(i>=15&&i<18){
-                    s="下午 ";
+                if (i >= 15 && i < 18) {
+                    s = "下午 ";
                 }
-                if(i>=18){
-                    s="晚上 ";
+                if (i >= 18) {
+                    s = "晚上 ";
                 }
 
-                timelist.addItem({"value":h.substring(h.length-2)+"00","text":s+h.substring(h.length-2)+":00"});
-                timelist.addItem({"value":h.substring(h.length-2)+"30","text":s+h.substring(h.length-2)+":30"});
+                timelist.addItem({
+                    "value": h.substring(h.length - 2) + "00",
+                    "text": s + h.substring(h.length - 2) + ":00"
+                });
+                timelist.addItem({
+                    "value": h.substring(h.length - 2) + "30",
+                    "text": s + h.substring(h.length - 2) + ":30"
+                });
             }
 
-            try{
-                var index:Number=startDateValue.hours*2;
-                if(startDateValue.minutes>=30){
-                    index+=1;
+            try {
+                var index:Number = startDateValue.hours * 2;
+                if (startDateValue.minutes >= 30) {
+                    index += 1;
                 }
                 startTime.selectedItem = timelist.getItemAt(index);
                 endtimelist.removeAll();
-                for(index+=1;index<timelist.length;index++){
+                for (index += 1; index < timelist.length; index++) {
                     endtimelist.addItem(timelist.getItemAt(index));
-                    if(timeStr.format(endDateValue)>=timelist.getItemAt(index).value){
+                    if (timeStr.format(endDateValue) >= timelist.getItemAt(index).value) {
                         endTime.selectedItem = timelist.getItemAt(index);
                     }
                 }
-                endtimelist.addItem({"value":"2359","text":"24:00"});
-                if(endtimelist.length==1){
-                    endTime.selectedIndex=0;
-                }else{
-                    endTime.selectedIndex=1;
+                endtimelist.addItem({"value": "2359", "text": "24:00"});
+                if (endtimelist.length == 1) {
+                    endTime.selectedIndex = 0;
+                } else {
+                    endTime.selectedIndex = 1;
                 }
-            }catch(error:Error){
+            } catch (error:Error) {
 
             }
 
@@ -280,46 +282,46 @@
             changeTiXing();
             changeProjectByDepart();
 
-            if(schedulData==null){
+            if (schedulData == null) {
 
-                if(default_users>-1){
+                if (default_users > -1) {
                     usersGroup.removeAllElements();
-                    var m:MemberItem=new MemberItem();
+                    var m:MemberItem = new MemberItem();
                     m.person = ToolUtil.getActivePersonById(default_users);
                     m.showBtn = true;
-                    if(m.person!=null){
+                    if (m.person != null) {
 
                         usersGroup.addElement(m);
                     }
 
                 }
-                if(default_department>-1){
-                    for each(var d:Object in departmentDownList.dataProvider){
-                        if(d.id==default_department){
-                            departmentDownList.selectedItem=d;
+                if (default_department > -1) {
+                    for each(var d:Object in departmentDownList.dataProvider) {
+                        if (d.id == default_department) {
+                            departmentDownList.selectedItem = d;
                             changeProjectByDepart();
                             break;
                         }
                     }
                 }
-                if(default_project>-1){
-                    for each(var p:Object in projectDownList.dataProvider){
-                        if(p.id==default_project){
-                            projectDownList.selectedItem=p;
+                if (default_project > -1) {
+                    for each(var p:Object in projectDownList.dataProvider) {
+                        if (p.id == default_project) {
+                            projectDownList.selectedItem = p;
                             break;
                         }
                     }
                 }
-                if(default_checker>-1){
-                    for each(var p:Object in checkerDownList.dataProvider){
-                        if(p.id==default_checker){
-                            checkerDownList.selectedItem=p;
-                            need_check.selected=false;
+                if (default_checker > -1) {
+                    for each(var p:Object in checkerDownList.dataProvider) {
+                        if (p.id == default_checker) {
+                            checkerDownList.selectedItem = p;
+                            need_check.selected = false;
                             break;
                         }
                     }
                 }
-                if(default_content!=null){
+                if (default_content != null) {
                     scheduleTitle.text = default_content;
                 }
             }
@@ -328,8 +330,8 @@
             this.invalidateDisplayList();
         }
 
-        private function changeBorderColor():void{
-            switch (schedulData.status){
+        private function changeBorderColor():void {
+            switch (schedulData.status) {
                 case 1:
                     setStyle("borderColor", 0xcccccc);
                     break;
@@ -343,44 +345,44 @@
                     setStyle("borderColor", 0x000000);
                     break;
             }
-            if(schedulData.isOutOfDate()){
+            if (schedulData.isOutOfDate()) {
                 setStyle("borderColor", 0xff0000);
             }
         }
 
-        private function getData():Object{
-            var obj:Object=new Object();
-            if(schedulData!=null&&schedulData.id){
+        private function getData():Object {
+            var obj:Object = new Object();
+            if (schedulData != null && schedulData.id) {
                 obj.id = schedulData.id;
             }
-            obj.title=scheduleTitle.text;
+            obj.title = scheduleTitle.text;
             //子任务
             obj.startdate = datestr.format(startDate.selectedDate);
 
             obj.enddate = datestr.format(endDate.selectedDate);
 
             obj.is_all_day = !is_all_day.selected;
-            if(is_all_day.selected){
+            if (is_all_day.selected) {
                 obj.time_start = startTime.selectedItem.value;
                 obj.time_end = endTime.selectedItem.value;
             }
             obj.repeat_type = repeatType.selectedValue.toString();
 
             obj.repeat_date = new Array();
-            if(repeatType.selectedValue=="weekly"){
-                for(var m:Number=0;m<dayTile.numElements;m++){
-                    if((dayTile.getElementAt(m) as CheckBox).selected){
-                        if(m==0){
+            if (repeatType.selectedValue == "weekly") {
+                for (var m:Number = 0; m < dayTile.numElements; m++) {
+                    if ((dayTile.getElementAt(m) as CheckBox).selected) {
+                        if (m == 0) {
                             obj.repeat_date.push(6);
                         }
-                        obj.repeat_date.push(m-1);
+                        obj.repeat_date.push(m - 1);
                     }
                 }
             }
-            if(repeatType.selectedValue=="monthly"){
-                for(m=0;m<dayTile.numElements;m++){
-                    if((dayTile.getElementAt(m) as CheckBox).selected){
-                        obj.repeat_date.push(m+1);
+            if (repeatType.selectedValue == "monthly") {
+                for (m = 0; m < dayTile.numElements; m++) {
+                    if ((dayTile.getElementAt(m) as CheckBox).selected) {
+                        obj.repeat_date.push(m + 1);
                     }
                 }
             }
@@ -388,139 +390,139 @@
             obj.department = departmentDownList.selectedItem.id;
             obj.project = projectDownList.selectedItem.id;
             obj.users = new Array();
-            var p:MemberItem=null;
-            for(var i:int=0;i<usersGroup.numElements;i++){
-                p=usersGroup.getElementAt(i) as MemberItem;
+            var p:MemberItem = null;
+            for (var i:int = 0; i < usersGroup.numElements; i++) {
+                p = usersGroup.getElementAt(i) as MemberItem;
                 obj.users.push(p.person.id);
             }
-            obj.need_check=!need_check.selected;
-            if(!need_check.selected){
-                obj.checker=checkerDownList.selectedItem.id;
-            }else{
-                obj.checker=null;
+            obj.need_check = !need_check.selected;
+            if (!need_check.selected) {
+                obj.checker = checkerDownList.selectedItem.id;
+            } else {
+                obj.checker = null;
             }
-            obj.level=levleStepper.value;
+            obj.level = levleStepper.value;
             obj.urgent = urgentDownList.selectedItem.id;
 
 
             return obj;
         }
 
-        public function save():void{
-            if(this.scheduleTitle.text==""){
+        public function save():void {
+            if (this.scheduleTitle.text == "") {
                 scheduleTitle.selectAll();
-                Alert.show("请填写任务标题。","提示");
+                Alert.show("请填写任务标题。", "提示");
                 return;
             }
-            if(startDate.selectedDate==null){
-                Alert.show("请选择开始时间。","提示");
+            if (startDate.selectedDate == null) {
+                Alert.show("请选择开始时间。", "提示");
                 startDate.open();
                 return;
             }
-            if(endDate.selectedDate==null){
-                Alert.show("请选择结束时间。","提示");
+            if (endDate.selectedDate == null) {
+                Alert.show("请选择结束时间。", "提示");
                 endDate.open();
                 return;
             }
-            if(endDate.selectedDate.getTime()<startDate.selectedDate.getTime()){
-                Alert.show("结束时间不能早于开始时间。","提示");
+            if (endDate.selectedDate.getTime() < startDate.selectedDate.getTime()) {
+                Alert.show("结束时间不能早于开始时间。", "提示");
                 endDate.open();
                 return;
             }
-            if(repeatType.selectedValue!='none'&&(endDate.selectedDate.getTime()-startDate.selectedDate.getTime())/(1000*24*60*60)>366){
-                Alert.show("循环任务，时间跨度不能超过1年。","提示");
+            if (repeatType.selectedValue != 'none' && (endDate.selectedDate.getTime() - startDate.selectedDate.getTime()) / (1000 * 24 * 60 * 60) > 366) {
+                Alert.show("循环任务，时间跨度不能超过1年。", "提示");
                 endDate.open();
                 return;
             }
-            if(usersGroup.numElements==0){
-                Alert.show("请选择责任人。","提示");
+            if (usersGroup.numElements == 0) {
+                Alert.show("请选择责任人。", "提示");
                 openUserChoice();
                 return;
             }
             var obj:Object = getData();
-            if(schedulData!=null && schedulData.repeat_type != 'none'){
+            if (schedulData != null && schedulData.repeat_type != 'none') {
                 var msg:String;
-                if(schedulData.repeatEqual(repeatType.selectedValue.toString(),obj.repeat_date)){
+                if (schedulData.repeatEqual(repeatType.selectedValue.toString(), obj.repeat_date)) {
                     msg = "是否将信息修改，应用到后续任务？\n\n    是：对后续所有任务产生修改。\n\n    否：仅对当前任务产生修改。";
-                }else{
+                } else {
                     msg = "是否将信息修改，应用到后续任务？\n\n    是：对后续所有任务产生修改。\n        (注：循环规则发生变化，后续任务将会调整，其中已执行的任务不会被删除。)\n\n    否：仅对当前任务产生修改。";
                 }
-                Alert.show(msg, "提示", Alert.YES | Alert.NO | Alert.CANCEL, null, function(e:CloseEvent):void{
-                    if (e.detail == Alert.YES){
+                Alert.show(msg, "提示", Alert.YES | Alert.NO | Alert.CANCEL, null, function (e:CloseEvent):void {
+                    if (e.detail == Alert.YES) {
                         obj['single'] = false;
-                    }else{
+                    } else {
                         obj['single'] = true;
                     }
-                    HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(obj);
+                    HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule", saveResult, "POST").send(obj);
                 });
-            }else{
-                HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule",saveResult,"POST").send(obj);
+            } else {
+                HttpServiceUtil.getCHTTPServiceAndResult("/ca/updateSchedule", saveResult, "POST").send(obj);
             }
 
         }
 
 
-
-        private function saveResult(result:Object,e:ResultEvent):void{
-            if(result.success){
+        private function saveResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
                 ScheduleUtil.clearNewSchedule(this);
 
                 schedulData = new Schedule(result.result);
-                ScheduleUtil.rememberSchedulePanel(schedulData.id,this);
-                FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
+                ScheduleUtil.rememberSchedulePanel(schedulData.id, this);
+                FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr, ToolUtil.sessionUser, true));
             }
         }
 
-        private function changeSchedule(status:int):void{
-            var obj:Object=new Object();
-            if(schedulData!=null&&schedulData.id){
+        private function changeSchedule(status:int):void {
+            var obj:Object = new Object();
+            if (schedulData != null && schedulData.id) {
                 obj.id = schedulData.id;
             }
             obj.status = status;
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus",updateScheduleHandler,"POST").send(obj);
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleStatus", updateScheduleHandler, "POST").send(obj);
         }
 
-        private function updateScheduleHandler(result:Object, e:ResultEvent):void{
-            if(result.success){
+        private function updateScheduleHandler(result:Object, e:ResultEvent):void {
+            if (result.success) {
                 schedulData = new Schedule(result.result);
-                ToolUtil.updateSchedul(schedulData.id,schedulData);
+                ToolUtil.updateSchedul(schedulData.id, schedulData);
             }
         }
 
-        public function refresh():void{
-            var start:Number=timelist.getItemIndex(startTime.selectedItem);
+        public function refresh():void {
+            var start:Number = timelist.getItemIndex(startTime.selectedItem);
             endtimelist.removeAll();
-            for(var i:Number = start+1;i<timelist.length;i++){
+            for (var i:Number = start + 1; i < timelist.length; i++) {
                 endtimelist.addItem(timelist.getItemAt(i));
-                if(timeStr.format(endDateValue)>=timelist.getItemAt(i).value){
+                if (timeStr.format(endDateValue) >= timelist.getItemAt(i).value) {
                     endTime.selectedItem = timelist.getItemAt(i);
                 }
             }
         }
 
-        private function changeTiXing():void{
-            if(boxTiXing.selected){
-                itemTixing.visible=false;
-                itemTixing.height=0;
-            }else{
-                itemTixing.visible=true;
-                itemTixing.height=75;
+        private function changeTiXing():void {
+            if (boxTiXing.selected) {
+                itemTixing.visible = false;
+                itemTixing.height = 0;
+            } else {
+                itemTixing.visible = true;
+                itemTixing.height = 75;
             }
         }
-        private function repeatChange():void{
-            if(repeatType.selectedValue=="none"||repeatType.selectedValue=="daily"||repeatType.selectedValue=="yearly"){
+
+        private function repeatChange():void {
+            if (repeatType.selectedValue == "none" || repeatType.selectedValue == "daily" || repeatType.selectedValue == "yearly") {
                 dayTile.visible = false;
-                dayPanel.visible=false;
-                dayPanel.height=0;
-            }else{
+                dayPanel.visible = false;
+                dayPanel.height = 0;
+            } else {
                 dayTile.visible = true;
-                if(repeatType.selectedValue=="weekly"){
-                    dayPanel.visible=true;
-                    dayPanel.height=25;
+                if (repeatType.selectedValue == "weekly") {
+                    dayPanel.visible = true;
+                    dayPanel.height = 25;
                     dayTile.removeAllElements();
-                    for(var i:Number=0;i<7;i++){
+                    for (var i:Number = 0; i < 7; i++) {
                         var cb:CheckBox = new CheckBox();
-                        switch(i){
+                        switch (i) {
                             case 0:
                                 cb.label = "日";
                                 break;
@@ -544,40 +546,40 @@
                                 break;
                         }
 
-                        cb.selected=false;
+                        cb.selected = false;
                         cb.height = 25;
                         dayTile.addElement(cb);
                     }
-                    for (var index:Number = 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
-                        try{
-                            if(schedulData.repeat_date[index]==6){
+                    for (var index:Number = 0; schedulData != null ? (schedulData.hasOwnProperty("repeat_date") ? index < schedulData.repeat_date.length : false) : false; index++) {
+                        try {
+                            if (schedulData.repeat_date[index] == 6) {
 
                                 (dayTile.getElementAt(0) as CheckBox).selected = true;
-                            }else{
-                                (dayTile.getElementAt(Number( schedulData.repeat_date[index])+1) as CheckBox).selected = true;
+                            } else {
+                                (dayTile.getElementAt(Number(schedulData.repeat_date[index]) + 1) as CheckBox).selected = true;
                             }
-                        }catch(e:Error){
+                        } catch (e:Error) {
                         }
                     }
 
                 }
 
-                if(repeatType.selectedValue=="monthly"){
+                if (repeatType.selectedValue == "monthly") {
                     dayTile.removeAllElements();
-                    dayPanel.visible=true;
+                    dayPanel.visible = true;
                     dayPanel.height = 130;
-                    for( i=0;i<31;i++){
+                    for (i = 0; i < 31; i++) {
                         cb = new CheckBox();
 
-                        cb.label = ""+(i+1);
+                        cb.label = "" + (i + 1);
                         cb.height = 25;
-                        cb.selected=false;
+                        cb.selected = false;
                         dayTile.addElement(cb);
                     }
-                    for (index= 0;schedulData!=null?(schedulData.hasOwnProperty("repeat_date")? index<schedulData.repeat_date.length:false):false;index++){
-                        try{
-                            (dayTile.getElementAt(Number( schedulData.repeat_date[index])-1) as CheckBox).selected = true;
-                        }catch(e:Error){
+                    for (index = 0; schedulData != null ? (schedulData.hasOwnProperty("repeat_date") ? index < schedulData.repeat_date.length : false) : false; index++) {
+                        try {
+                            (dayTile.getElementAt(Number(schedulData.repeat_date[index]) - 1) as CheckBox).selected = true;
+                        } catch (e:Error) {
                         }
                     }
                 }
@@ -585,191 +587,191 @@
             this.invalidateDisplayList();
         }
 
-        private function colorChange():void{
+        private function colorChange():void {
             colorClick(colorPicker.selectedColor);
         }
 
-        private function colorClick(c:Number):void{
+        private function colorClick(c:Number):void {
             selectColor = c;
-            color0.setStyle("backgroundColor",c);
-            color1.setStyle("borderColor",0xffffff);
-            color2.setStyle("borderColor",0xffffff);
-            color3.setStyle("borderColor",0xffffff);
-            color4.setStyle("borderColor",0xffffff);
-            color5.setStyle("borderColor",0xffffff);
-            color6.setStyle("borderColor",0xffffff);
-            color7.setStyle("borderColor",0xffffff);
-            color8.setStyle("borderColor",0xffffff);
-            color9.setStyle("borderColor",0xffffff);
-            color10.setStyle("borderColor",0xffffff);
-            switch(c){
+            color0.setStyle("backgroundColor", c);
+            color1.setStyle("borderColor", 0xffffff);
+            color2.setStyle("borderColor", 0xffffff);
+            color3.setStyle("borderColor", 0xffffff);
+            color4.setStyle("borderColor", 0xffffff);
+            color5.setStyle("borderColor", 0xffffff);
+            color6.setStyle("borderColor", 0xffffff);
+            color7.setStyle("borderColor", 0xffffff);
+            color8.setStyle("borderColor", 0xffffff);
+            color9.setStyle("borderColor", 0xffffff);
+            color10.setStyle("borderColor", 0xffffff);
+            switch (c) {
                 case 0xaecfea:
-                    color1.setStyle("borderColor",0x000000);
+                    color1.setStyle("borderColor", 0x000000);
                     break;
                 case 0x5484ed:
-                    color2.setStyle("borderColor",0x000000);
+                    color2.setStyle("borderColor", 0x000000);
                     break;
                 case 0xa4bdfc:
-                    color3.setStyle("borderColor",0x000000);
+                    color3.setStyle("borderColor", 0x000000);
                     break;
                 case 0x46d6db:
-                    color4.setStyle("borderColor",0x000000);
+                    color4.setStyle("borderColor", 0x000000);
                     break;
                 case 0x7ae7bf:
-                    color5.setStyle("borderColor",0x000000);
+                    color5.setStyle("borderColor", 0x000000);
                     break;
                 case 0x51b749:
-                    color6.setStyle("borderColor",0x000000);
+                    color6.setStyle("borderColor", 0x000000);
                     break;
                 case 0xfbd75b:
-                    color7.setStyle("borderColor",0x000000);
+                    color7.setStyle("borderColor", 0x000000);
                     break;
                 case 0xffb878:
-                    color8.setStyle("borderColor",0x000000);
+                    color8.setStyle("borderColor", 0x000000);
                     break;
                 case 0xff887c:
-                    color9.setStyle("borderColor",0x000000);
+                    color9.setStyle("borderColor", 0x000000);
                     break;
                 case 0xdbadff:
-                    color10.setStyle("borderColor",0x000000);
+                    color10.setStyle("borderColor", 0x000000);
                     break;
                 default:
-                    if(colorPicker.selectedColor!=c){
-                        colorPicker.selectedColor=c;
+                    if (colorPicker.selectedColor != c) {
+                        colorPicker.selectedColor = c;
                     }
 
             }
         }
 
 
-        private function delAsk():void{
-            if(schedulData!=null &&schedulData.id){
-                if(schedulData.repeat_type=='none'){
-                    Alert.show("是否删除当前任务?", "提示", Alert.YES | Alert.CANCEL, null, function(e:CloseEvent):void{
-                        if (e.detail == Alert.YES){
+        private function delAsk():void {
+            if (schedulData != null && schedulData.id) {
+                if (schedulData.repeat_type == 'none') {
+                    Alert.show("是否删除当前任务?", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
+                        if (e.detail == Alert.YES) {
                             var data:Object = new Object();
                             data["id"] = schedulData.id;
-                            HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",delResult,"POST").send(data);
+                            HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule", delResult, "POST").send(data);
                         }
                     });
-                }else{
-                    Alert.show("后续任务是否一并删除？\n\n    是：删除后续任务。\n        (注：后续任务中已执行的任务不会被删除。)\n\n    否：仅删除当前任务。 ", "提示", Alert.YES | Alert.NO | Alert.CANCEL, null, function(e:CloseEvent):void{
+                } else {
+                    Alert.show("后续任务是否一并删除？\n\n    是：删除后续任务。\n        (注：后续任务中已执行的任务不会被删除。)\n\n    否：仅删除当前任务。 ", "提示", Alert.YES | Alert.NO | Alert.CANCEL, null, function (e:CloseEvent):void {
                         var data:Object = new Object();
                         data["id"] = schedulData.id;
-                        if (e.detail == Alert.YES){
+                        if (e.detail == Alert.YES) {
                             data["single"] = false;
                         }
-                        if (e.detail == Alert.NO){
+                        if (e.detail == Alert.NO) {
                             data["single"] = true;
                         }
-                        if(e.detail==Alert.YES||e.detail==Alert.NO){
-                            HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule",function delResult(result:Object,event:ResultEvent):void{
-                                if(result.success){
-                                    if(e.detail == Alert.YES){
-                                        FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,ToolUtil.sessionUser,true));
-                                    }else{
-                                        ToolUtil.updateSchedul(schedulData.id,null);
+                        if (e.detail == Alert.YES || e.detail == Alert.NO) {
+                            HttpServiceUtil.getCHTTPServiceAndResult("/ca/delSchedule", function delResult(result:Object, event:ResultEvent):void {
+                                if (result.success) {
+                                    if (e.detail == Alert.YES) {
+                                        FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr, ToolUtil.sessionUser, true));
+                                    } else {
+                                        ToolUtil.updateSchedul(schedulData.id, null);
                                     }
                                     closeWin();
                                 }
-                            },"POST").send(data);
+                            }, "POST").send(data);
                         }
 
                     });
                 }
 
-            }else{
+            } else {
                 closeWin();
             }
 
         }
 
-        private function delResult(result:Object,e:ResultEvent):void{
-            if(result.success){
-                ToolUtil.updateSchedul(schedulData.id,null);
+        private function delResult(result:Object, e:ResultEvent):void {
+            if (result.success) {
+                ToolUtil.updateSchedul(schedulData.id, null);
                 closeWin();
             }
         }
 
 
-        private function openAddress():void{
-            var obj:Object=new Object();
-            var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
+        private function openAddress():void {
+            var obj:Object = new Object();
+            var evt:ChangeMenuEvent = new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr, "contact", obj, true)
             FlexGlobals.topLevelApplication.dispatchEvent(evt);
         }
 
 
-        private function changeProjectByDepart():void{
+        private function changeProjectByDepart():void {
             myproject.removeAll();
 
-            for each(var item:Object in ToolUtil.projectList){
-                if((item.department==departmentDownList.selectedItem.id)||(item.department==null&&departmentDownList.selectedItem.id==0)){
+            for each(var item:Object in ToolUtil.projectList) {
+                if ((item.department == departmentDownList.selectedItem.id) || (item.department == null && departmentDownList.selectedItem.id == 0)) {
                     myproject.addItem(item);
                 }
             }
-            myproject.addItem({id:0,name:"无项目"});
-            projectDownList.selectedIndex=0;
+            myproject.addItem({id: 0, name: "无项目"});
+            projectDownList.selectedIndex = 0;
 
 
             //todo:审核人 范围验证
             var checker:Object = checkerDownList.selectedItem;
             departmentMembers.removeAll();
-            if(departmentDownList.selectedItem.hasOwnProperty("children")){
+            if (departmentDownList.selectedItem.hasOwnProperty("children")) {
                 departmentMembers.addAll(departmentDownList.selectedItem.children);
-            }else{
-                departmentMembers.addAll( ObjectUtil.copy(ToolUtil.memberList) as ArrayCollection);
+            } else {
+                departmentMembers.addAll(ObjectUtil.copy(ToolUtil.memberList) as ArrayCollection);
             }
 
-            if(checker!=null){
+            if (checker != null) {
                 var index:int = departmentMembers.getItemIndex(checker);
-                if(index>=0){
-                    checkerDownList.selectedIndex=index;
-                }else{
-                    checkerDownList.selectedIndex=-1;
+                if (index >= 0) {
+                    checkerDownList.selectedIndex = index;
+                } else {
+                    checkerDownList.selectedIndex = -1;
                 }
             }
-            if(checkerDownList.selectedIndex==-1){
-                for each(var item:Object in departmentMembers){
-                    if(item.id==ToolUtil.sessionUser.pid){
-                        checkerDownList.selectedItem=item;
+            if (checkerDownList.selectedIndex == -1) {
+                for each(var item:Object in departmentMembers) {
+                    if (item.id == ToolUtil.sessionUser.pid) {
+                        checkerDownList.selectedItem = item;
                         break;
                     }
                 }
             }
 
             // todo:责任人范围，修改。只能在部门内之间选择
-            var p:MemberItem=null;
-            var f:Boolean=false;
-            for(var i:int=usersGroup.numElements-1;i>=0;i--){
-                p=usersGroup.getElementAt(i) as MemberItem;
-                f=false;
-                for each(var person:Object in departmentMembers){
-                    if(person.id==p.person.id){
-                        f=true;
+            var p:MemberItem = null;
+            var f:Boolean = false;
+            for (var i:int = usersGroup.numElements - 1; i >= 0; i--) {
+                p = usersGroup.getElementAt(i) as MemberItem;
+                f = false;
+                for each(var person:Object in departmentMembers) {
+                    if (person.id == p.person.id) {
+                        f = true;
                     }
                 }
-                if(!f){
+                if (!f) {
                     usersGroup.removeElement(p);
                 }
             }
         }
 
-        private function  openUserChoice():void{
+        private function openUserChoice():void {
             var gp:TaskMemberPanel = PopUpManager.createPopUp(this, TaskMemberPanel, true) as TaskMemberPanel;
             gp.allmember = departmentMembers;
             var m:ArrayCollection = new ArrayCollection();
-            var p:MemberItem=null;
-            for(var i:int=0;i<usersGroup.numElements;i++){
-                p=usersGroup.getElementAt(i) as MemberItem;
+            var p:MemberItem = null;
+            for (var i:int = 0; i < usersGroup.numElements; i++) {
+                p = usersGroup.getElementAt(i) as MemberItem;
                 m.addItem(p.person);
             }
-            gp.usermember=m;
+            gp.usermember = m;
             gp.addEventListener(MembersEvent.MEMBERS, function (e:MembersEvent):void {
                 var members:ArrayCollection = e.data as ArrayCollection;
                 usersGroup.removeAllElements();
 
-                for each(var person:Object in members){
-                    p=new MemberItem();
+                for each(var person:Object in members) {
+                    p = new MemberItem();
                     p.person = person;
                     p.showBtn = true;
                     usersGroup.addElement(p);
@@ -780,72 +782,73 @@
 
         }
 
-        private function removeUsersHandler(e:MembersEvent):void{
+        private function removeUsersHandler(e:MembersEvent):void {
             var person:Object = e.data;
-            var p:MemberItem=null;
-            var f:Boolean=false;
-            for(var i:int=usersGroup.numElements-1;i>=0;i--){
-                p=usersGroup.getElementAt(i) as MemberItem;
-                f=false;
-                if(person.id==p.person.id){
-                    f=true;
+            var p:MemberItem = null;
+            var f:Boolean = false;
+            for (var i:int = usersGroup.numElements - 1; i >= 0; i--) {
+                p = usersGroup.getElementAt(i) as MemberItem;
+                f = false;
+                if (person.id == p.person.id) {
+                    f = true;
                 }
-                if(f){
+                if (f) {
                     usersGroup.removeElement(p);
                 }
             }
         }
 
-        private function addProject():void{
-            PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,CreateProjectPanel,true) as CreateProjectPanel;
+        private function addProject():void {
+            PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, CreateProjectPanel, true) as CreateProjectPanel;
         }
 
-        private function setEndDate(n:int):void{
+        private function setEndDate(n:int):void {
             var d:Date = ObjectUtil.clone(startDate.selectedDate) as Date;
-            d.date+=n;
-            endDate.selectedDate=d;
+            d.date += n;
+            endDate.selectedDate = d;
         }
 
         //创建 任务讨论组
-        private function initTaskChat():void{
+        private function initTaskChat():void {
             // 修改 pomelo 服务器的 createChannel 方法。如果存在，则变成修改。以适应任务讨论模块的情况。
-            var org:Object=new Object();
+            var org:Object = new Object();
 
-            org.channel = "t"+schedulData.id;
-            org.name = "[任务]"+schedulData.title.substr(0,10)+(schedulData.title.length>10?"……":"");
-            org.users=schedulData.users;
-            org.author=schedulData.author;
-            org.v=schedulData.v;
+            org.channel = "t" + schedulData.id;
+            org.name = "[任务]" + schedulData.title.substr(0, 10) + (schedulData.title.length > 10 ? "……" : "");
+            org.users = schedulData.users;
+            org.author = schedulData.author;
+            org.v = schedulData.v;
 
-            Pomelo.getIns().request("connector.entryHandler.createChannel",org,function(data:Object):void{
-                if(data.code==200){
-                    if(data.needupdate){
+            Pomelo.getIns().request("connector.entryHandler.createChannel", org, function (data:Object):void {
+                if (data.code == 200) {
+                    if (data.needupdate) {
                         var obj:Object = new Object();
-                        obj['id']=schedulData.id;
-                        HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleById",updateScheduleHandler,"POST").send(obj);
-                    }else{
+                        obj['id'] = schedulData.id;
+                        HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleById", updateScheduleHandler, "POST").send(obj);
+                    } else {
                         var obj:Object = new Object();
-                        obj['id']=schedulData.id;
-                        obj['cv']=schedulData.v;
-                        HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleChannelVersion",updateScheduleHandler,"POST").send(obj);
+                        obj['id'] = schedulData.id;
+                        obj['cv'] = schedulData.v;
+                        HttpServiceUtil.getCHTTPServiceAndResult("/ca/changeScheduleChannelVersion", updateScheduleHandler, "POST").send(obj);
                     }
-                }else{
+                } else {
                     chatControl.enabled = false;
                     chatControl.toolTip = "无法连接到通信服务器，请重新启动程序。";
                 }
             });
         }
 
-        private function initChatControl():void{
-            if(chatControl.chatUser !=null && schedulData.id == chatControl.chatUser.id && schedulData.v == chatControl.chatUser.v){
+        private function initChatControl():void {
+            if (chatControl.chatUser != null && schedulData.id == chatControl.chatUser.id && schedulData.v == chatControl.chatUser.v) {
                 return;
             }
-            var chatUser:ChatChannel=new ChatChannel();
-            chatUser.id=schedulData.id;
-            chatUser.channel = "t"+schedulData.id;
-            chatUser.name = "[任务]"+schedulData.title.substr(0,10)+(schedulData.title.length>10?"……":"");;
+            var chatUser:ChatChannel = new ChatChannel();
+            chatUser.id = schedulData.id;
+            chatUser.channel = "t" + schedulData.id;
+            chatUser.name = "[任务]" + schedulData.title.substr(0, 10) + (schedulData.title.length > 10 ? "……" : "");
+            ;
             chatUser.author = schedulData.author;
-            chatUser.icon="/static/smalloaicon/group.png";
+            chatUser.icon = "/static/smalloaicon/group.png";
             chatUser.setMembers(schedulData.users);
             chatUser.v = schedulData.v;
 
@@ -859,7 +862,10 @@
             for each(var c:ChatChannel in ToolUtil.groupList) {
                 if (c.channel == e.channel) {
                     c.unread = 0;
-                    Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {channel: e.channel, pid: ToolUtil.sessionUser.pid});
+                    Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {
+                        channel: e.channel,
+                        pid: ToolUtil.sessionUser.pid
+                    });
                 }
             }
             ToolUtil.groupList.refresh();
@@ -886,8 +892,8 @@
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="departmentDownList" width="40%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
-                <s:DropDownList id="projectDownList" width="60%" labelField="name" dataProvider="{myproject}"></s:DropDownList>
+                <s:DropDownList id="departmentDownList" width="50%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
+                <s:DropDownList id="projectDownList" width="50%" labelField="name" dataProvider="{myproject}"></s:DropDownList>
                 <s:Spacer width="30"></s:Spacer>
                 <uicontrol:BtnAdd clickFun="{addProject}" />
             </s:FormItem>
@@ -1011,7 +1017,7 @@
                 <s:CheckBox label="无需审核" selected="true" id="need_check">
                 </s:CheckBox>
             </s:FormItem>
-            <s:FormItem  label="提醒：" height="25">
+            <s:FormItem id="tixingItem" visible="{is_all_day.selected}" label="提醒：" height="25" includeInLayout="{tixingItem.visible}">
                 <s:CheckBox id="boxTiXing" change="changeTiXing()" selected="true" label="无需提醒" />
             </s:FormItem>
             <s:FormItem id="itemTixing" label="提醒：" height="75">

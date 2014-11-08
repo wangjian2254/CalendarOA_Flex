@@ -1,12 +1,12 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class ChangeTabButtonEvent extends Event
+import control.CBorderContainer;
+
+import flash.events.Event;
+
+import uicontrol.CTabButton;
+
+public class ChangeTabButtonEvent extends Event
 	{
 		public static var Change_TabButton:String="Change_TabButton";
 		public var view:CBorderContainer;

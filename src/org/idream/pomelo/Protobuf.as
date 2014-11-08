@@ -1,9 +1,9 @@
 package org.idream.pomelo
 {
-	import flash.utils.ByteArray;
-	import flash.utils.Endian;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
-	public class Protobuf
+public class Protobuf
 	{
 		private static const TYPES:Object = 
 		{

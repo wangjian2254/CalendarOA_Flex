@@ -1,8 +1,8 @@
 package events
 {
-	import flash.events.Event;
-	
-	public class GridEditPosition extends Event
+import flash.events.Event;
+
+public class GridEditPosition extends Event
 	{
 		private var editCell:Object;
 		public function GridEditPosition(type:String,editCell:Object, bubbles:Boolean=false, cancelable:Boolean=false)

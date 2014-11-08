@@ -1,19 +1,18 @@
 package httpcontrol
 {
-	import control.Loading;
-	
-	import mx.controls.Alert;
-	import mx.messaging.ChannelSet;
-	import mx.messaging.channels.AMFChannel;
-	import mx.rpc.AbstractOperation;
-	import mx.rpc.events.FaultEvent;
-	import mx.rpc.events.ResultEvent;
-	import mx.rpc.remoting.Operation;
-	import mx.rpc.remoting.RemoteObject;
-	
-	import util.LoadingUtil;
+import control.Loading;
 
-	public class RemoteUtil
+import mx.controls.Alert;
+import mx.messaging.ChannelSet;
+import mx.messaging.channels.AMFChannel;
+import mx.rpc.AbstractOperation;
+import mx.rpc.events.FaultEvent;
+import mx.rpc.events.ResultEvent;
+import mx.rpc.remoting.RemoteObject;
+
+import util.LoadingUtil;
+
+public class RemoteUtil
 	{
 		private static var remoteObject:RemoteObject=new RemoteObject("service");
 		private static var isInit:Boolean=false;

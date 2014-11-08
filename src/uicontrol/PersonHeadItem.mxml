@@ -23,7 +23,7 @@
 
         private function m_Out():void {
 
-                this.setStyle("backgroundColor", 0xffffff);
+            this.setStyle("backgroundColor", 0xffffff);
         }
 
         private function m_Over():void {
@@ -59,7 +59,7 @@
                     }
                 }
             }
-            if(department.flag == 'free'){
+            if (department.flag == 'free') {
                 hasPower = false;
             }
 

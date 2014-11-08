@@ -1,13 +1,8 @@
-
-import flash.display.NativeWindowDisplayState;
-import flash.events.Event;
 import flash.events.MouseEvent;
 
 import httpcontrol.CHTTPService;
 
-import mx.core.FlexGlobals;
 import mx.events.CloseEvent;
-import mx.events.ResizeEvent;
 
 public function quite(e:*=null):void {
 	Alert.show("确定要退出系统吗?","退出系统",3,this,CloseWindow);   

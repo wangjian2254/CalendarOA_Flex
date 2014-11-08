@@ -28,9 +28,9 @@
 
 package org.bytearray.gif.encoder
 {
-	import flash.utils.ByteArray;
-	
-	public class NeuQuant
+import flash.utils.ByteArray;
+
+public class NeuQuant
 	{
 		private static var netsize:int = 256; /* number of colours used */
 		

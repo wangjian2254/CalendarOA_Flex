@@ -1,14 +1,12 @@
 package util
 {
-	import control.Loading;
-	
-	import httpcontrol.RemoteUtil;
-	
-	import mx.collections.ArrayCollection;
-	import mx.rpc.AbstractOperation;
-	import mx.rpc.events.ResultEvent;
+import httpcontrol.RemoteUtil;
 
-	public class InfoUtil
+import mx.collections.ArrayCollection;
+import mx.rpc.AbstractOperation;
+import mx.rpc.events.ResultEvent;
+
+public class InfoUtil
 	{
 		public function InfoUtil()
 		{

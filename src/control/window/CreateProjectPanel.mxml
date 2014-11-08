@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
-                             xmlns:conobj="uicontrol.conobj.*"
+                             xmlns:mx="library://ns.adobe.com/flex/mx"
                              width="430" height="{getWindowHeight}" creationComplete="init()"
                              title="创建项目" xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
         import httpcontrol.HttpServiceUtil;
 
         import mx.collections.ArrayCollection;
-
         import mx.controls.Alert;
         import mx.events.CloseEvent;
         import mx.events.CollectionEvent;
@@ -18,63 +16,61 @@
         import mx.utils.ObjectUtil;
 
         import util.DateUtil;
-
         import util.ToolUtil;
 
         [Bindable]
-        public function get getWindowHeight():Number{
+        public function get getWindowHeight():Number {
             return form.height;
         }
 
 
-
         [Bindable]
-        private var myprojectList:ArrayCollection=new ArrayCollection();
+        private var myprojectList:ArrayCollection = new ArrayCollection();
         [Bindable]
-        private var managerList:ArrayCollection=new ArrayCollection();
+        private var managerList:ArrayCollection = new ArrayCollection();
 
         public var projectData:Object;
 
-        override public function  releaseListener(e:CloseEvent):void{
+        override public function releaseListener(e:CloseEvent):void {
             ToolUtil.projectList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, projectRefresh);
         }
 
-        private function projectRefresh(e:CollectionEvent):void{
-            myprojectList.addItem({id:0,name:"无"});
+        private function projectRefresh(e:CollectionEvent):void {
+            myprojectList.addItem({id: 0, name: "无"});
             myprojectList.addAll(ObjectUtil.copy(ToolUtil.allProjectList) as ArrayCollection)
         }
 
         private function init():void {
             ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, projectRefresh);
             projectRefresh(null);
-            if(projectData==null){
-                fatherDownList.selectedIndex=0;
+            if (projectData == null) {
+                fatherDownList.selectedIndex = 0;
 
                 refreshManager();
 
-            }else{
+            } else {
                 projectname.text = projectData.name;
                 projectdesc.text = projectData.desc;
                 startDate.selectedDate = DateUtil.parseLblDate(projectData.start_date);
-                if(projectData.hasOwnProperty("end_date")){
+                if (projectData.hasOwnProperty("end_date")) {
                     endDate.selectedDate = DateUtil.parseLblDate(projectData.end_date);
                 }
-                fatherDownList.selectedIndex=0;
-                for each(var p:Object in myprojectList){
-                    if(p.id==projectData.father){
-                        fatherDownList.selectedItem=p;
+                fatherDownList.selectedIndex = 0;
+                for each(var p:Object in myprojectList) {
+                    if (p.id == projectData.father) {
+                        fatherDownList.selectedItem = p;
                     }
                 }
-                fatherDownList.selectedIndex=0;
-                for each(var d:Object in ToolUtil.myDepartmentList){
-                    if(d.id==projectData.department){
-                        departmentDownList.selectedItem=d;
+                fatherDownList.selectedIndex = 0;
+                for each(var d:Object in ToolUtil.myDepartmentList) {
+                    if (d.id == projectData.department) {
+                        departmentDownList.selectedItem = d;
                     }
                 }
                 refreshManager();
-                for each(var p in managerList){
-                    if(p.id==projectData.manager){
-                        managerDownList.selectedItem=p;
+                for each(var p in managerList) {
+                    if (p.id == projectData.manager) {
+                        managerDownList.selectedItem = p;
                     }
                 }
 
@@ -83,39 +79,39 @@
 
         }
 
-        private function refreshManager():void{
+        private function refreshManager():void {
             var manager:Object = managerDownList.selectedItem;
-            if(departmentDownList.selectedItem.id == 0){
-                managerList=new ArrayCollection();
+            if (departmentDownList.selectedItem.id == 0) {
+                managerList = new ArrayCollection();
                 managerList.addItem(ToolUtil.getActivePersonById(ToolUtil.sessionUser.pid));
-                managerDownList.selectedIndex=0;
+                managerDownList.selectedIndex = 0;
                 managerDownList.enabled = false;
-            }else{
+            } else {
                 managerDownList.enabled = true;
                 managerList = ObjectUtil.copy(departmentDownList.selectedItem.children) as ArrayCollection;
-                if(managerList==null){
-                    managerList=new ArrayCollection();
+                if (managerList == null) {
+                    managerList = new ArrayCollection();
                 }
-                var f:Boolean=false;
-                for each(var person:Object in managerList){
-                    if(person.id==ToolUtil.sessionUser.pid){
-                        f=true;
-                        managerDownList.selectedItem=person;
+                var f:Boolean = false;
+                for each(var person:Object in managerList) {
+                    if (person.id == ToolUtil.sessionUser.pid) {
+                        f = true;
+                        managerDownList.selectedItem = person;
                     }
                 }
-                if(!f){
-                    for each(var p:Object in ToolUtil.memberList){
-                        if(p.id==ToolUtil.sessionUser.pid){
+                if (!f) {
+                    for each(var p:Object in ToolUtil.memberList) {
+                        if (p.id == ToolUtil.sessionUser.pid) {
                             managerList.addItem(p);
-                            managerDownList.selectedItem=p;
+                            managerDownList.selectedItem = p;
                         }
                     }
                 }
-                if(manager!=null){
-                    managerDownList.selectedIndex=-1;
-                    for each(var p in managerList){
-                        if(p.id==manager.id){
-                            managerDownList.selectedItem=p;
+                if (manager != null) {
+                    managerDownList.selectedIndex = -1;
+                    for each(var p in managerList) {
+                        if (p.id == manager.id) {
+                            managerDownList.selectedItem = p;
                         }
                     }
                 }
@@ -148,8 +144,8 @@
 
             var obj:Object = new Object();
 
-            if(projectData!=null){
-                obj.id=projectData.id;
+            if (projectData != null) {
+                obj.id = projectData.id;
             }
             obj.name = projectname.text;
             obj.desc = projectdesc.text;
@@ -158,10 +154,9 @@
             obj.department = departmentDownList.selectedItem.id;
             obj.status = statusDownList.selectedItem.id;
             obj.start_date = DateUtil.dateLbl1(startDate.selectedDate);
-            if(endDate.selectedDate!=null){
-                obj.end_date=DateUtil.dateLbl1(endDate.selectedDate);
+            if (endDate.selectedDate != null) {
+                obj.end_date = DateUtil.dateLbl1(endDate.selectedDate);
             }
-
 
 
             HttpServiceUtil.getCHTTPServiceAndResult("/ca/update_project", refresh, "POST").send(obj);

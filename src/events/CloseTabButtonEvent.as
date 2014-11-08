@@ -1,12 +1,12 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class CloseTabButtonEvent extends Event
+import control.CBorderContainer;
+
+import flash.events.Event;
+
+import uicontrol.CTabButton;
+
+public class CloseTabButtonEvent extends Event
 	{
 		public static var Close_TabButton:String="Close_TabButton";
 		public var view:CBorderContainer;

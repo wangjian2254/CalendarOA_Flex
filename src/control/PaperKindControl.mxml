@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
-	<fx:Style>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700"
+                          borderVisible="false" backgroundAlpha="0">
+    <fx:Style>
 		@namespace s "library://ns.adobe.com/flex/spark";
 		@namespace mx "library://ns.adobe.com/flex/mx";
 		@namespace control "control.*";
@@ -14,8 +15,6 @@
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[
-        import control.window.MessagePanel;
-
         import events.ChangeUserEvent;
         import events.CloseContainerEvent;
 
@@ -23,13 +22,10 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
-        import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.events.FlexEvent;
         import mx.events.ItemClickEvent;
-        import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
-
-        import spark.events.IndexChangeEvent;
 
         [Bindable]
         private var buttonArr1:ArrayCollection = new ArrayCollection([
@@ -42,8 +38,9 @@
         ;
         private var state:String = "refresh";//refresh(查询状态),addSam(增加同级),addNex(增加下级),mod(修改状态)
 
-        override public function releaseListener():void{
+        override public function releaseListener():void {
         }
+
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander():void {
@@ -127,7 +124,7 @@
         //删除方法
         private function delSubKindData():void {
             state = "del";
-            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:CloseEvent):void {
                 if (e.detail == Alert.YES) {
                     var o:Object = getData();
                     HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delPaperKind", delSubKindDataResult, "POST").send(o);

@@ -1,47 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="450" creationComplete="init(event)"
-                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*" title="创建讨论组">
+                             width="500" height="450" creationComplete="init(event)"
+                             xmlns:window="control.window.*" title="挑选责任人">
 
     <fx:Script>
 		<![CDATA[
-        import events.ListClickEvent;
         import events.MembersEvent;
 
         import mx.collections.ArrayCollection;
-        import mx.controls.Alert;
-
         import mx.events.CloseEvent;
-        import mx.rpc.events.ResultEvent;
-        import mx.utils.ObjectUtil;
-
-        import org.idream.pomelo.Pomelo;
+        import mx.events.FlexEvent;
 
         import uicontrol.PersonChatItem;
 
-        import util.ToolUtil;
-        import util.UUIDUtil;
-
         [Bindable]
-        public var allmember:ArrayCollection=new ArrayCollection();
+        public var allmember:ArrayCollection = new ArrayCollection();
         [Bindable]
-        public var usermember:ArrayCollection=new ArrayCollection();
+        public var usermember:ArrayCollection = new ArrayCollection();
 
         public var channel:String;
-        override public function  releaseListener(e:CloseEvent):void{
+
+        override public function releaseListener(e:CloseEvent):void {
         }
 
-        public function init(e:mx.events.FlexEvent):void{
+        public function init(e:FlexEvent):void {
 
             var pc:PersonChatItem;
-            for each(var p:Object in allmember){
-                pc=new PersonChatItem();
+            for each(var p:Object in allmember) {
+                pc = new PersonChatItem();
                 pc.person = p;
                 pc.selected = false;
 
-                for each(var m:Object in usermember){
-                    if(m.id==p.id){
+                for each(var m:Object in usermember) {
+                    if (m.id == p.id) {
                         pc.selected = true;
                         break
                     }
@@ -53,22 +45,21 @@
         }
 
 
-
-        private function createGroup():void{
+        private function createGroup():void {
             var pids:ArrayCollection = new ArrayCollection();
             var pci:PersonChatItem;
-            for(var i:int=0;i<memebers.numElements;i++){
-                pci=memebers.getElementAt(i) as PersonChatItem;
-                if(pci.selected){
+            for (var i:int = 0; i < memebers.numElements; i++) {
+                pci = memebers.getElementAt(i) as PersonChatItem;
+                if (pci.selected) {
                     pids.addItem(pci.person);
                 }
             }
 
-            var chatevent:MembersEvent=new MembersEvent(MembersEvent.MEMBERS,pids);
+            var chatevent:MembersEvent = new MembersEvent(MembersEvent.MEMBERS, pids);
             dispatchEvent(chatevent);
             closeWin();
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

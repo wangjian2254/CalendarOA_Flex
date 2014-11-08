@@ -12,17 +12,16 @@ import mx.events.FlexEvent;
 import mx.managers.PopUpManager;
 
 import spark.components.TitleWindow;
-
 import spark.effects.Move;
 import spark.effects.Rotate;
-import spark.effects.Rotate3D;
 
 public class EfficientTitleWindow extends TitleWindow{
 
     private var mve:Move = new Move();
     private var rotate:Rotate = new Rotate();
+    private var firstPoint:Object = null;
 
-public function EfficientTitleWindow() {
+    public function EfficientTitleWindow() {
         super();
         mve.target = this;
         rotate.target = this;
@@ -61,11 +60,15 @@ public function EfficientTitleWindow() {
         mve.addEventListener(EffectEvent.EFFECT_END,showAnimation2);
 
         mve.play();
+        firstPoint = {x:mve.xTo,y:mve.yTo};
     }
 
     public function showAnimation2(e:EffectEvent):void{
         mve.removeEventListener(EffectEvent.EFFECT_END,showAnimation2);
         if(mve.isPlaying || rotate.isPlaying){
+            return;
+        }
+        if (firstPoint!=null && Math.abs((FlexGlobals.topLevelApplication.width - this.width) / 2-firstPoint.x) < 10 && Math.abs((FlexGlobals.topLevelApplication.height - this.height) / 2 - firstPoint.y) < 10){
             return;
         }
         mve.xFrom = this.x;

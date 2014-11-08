@@ -1,200 +1,207 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
+                             xmlns:uicontrol="uicontrol.*"
                              xmlns:conobj="uicontrol.conobj.*"
                              width="450" height="{getWindowHeight}" creationComplete="init()"
                              xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
-			import httpcontrol.HttpServiceUtil;
-            import mx.controls.Alert;
-            import mx.core.FlexGlobals;
-            import mx.events.CloseEvent;
-            import mx.rpc.events.ResultEvent;
-			import util.ToolUtil;
-            override public function  releaseListener(e:CloseEvent):void{
-            }
-            public function get getWindowHeight():Number{
-                if(userType.selectedValue == 2){
-                    return loginForm.height;
-                }else{
+        import httpcontrol.HttpServiceUtil;
 
-                    return form.height;
-                }
-            }
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
+        import mx.rpc.events.ResultEvent;
 
-            private function init():void{
-                form.validateNow();
-                if(ToolUtil.joinOrgFlag){
-                    form.removeElement(orgNameItem);
-                    form.removeElement(orgIconItem);
-                    //getOrgByFlag
-                    var obj:Object=new Object();
-                    obj.flag=ToolUtil.joinOrgFlag;
-                    HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByFlag",getOrgByFlagResult,"POST").send(obj);
+        import util.ToolUtil;
+
+        override public function releaseListener(e:CloseEvent):void {
+        }
+
+        public function get getWindowHeight():Number {
+            if (userType.selectedValue == 2) {
+                return loginForm.height;
+            } else {
+
+                return form.height;
+            }
+        }
+
+        private function init():void {
+            form.validateNow();
+            if (ToolUtil.joinOrgFlag) {
+                form.removeElement(orgNameItem);
+                form.removeElement(orgIconItem);
+                //getOrgByFlag
+                var obj:Object = new Object();
+                obj.flag = ToolUtil.joinOrgFlag;
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByFlag", getOrgByFlagResult, "POST").send(obj);
 //                    this.height = 415;
-                }else{
-                    form.removeElement(userTypeItem);
+            } else {
+                form.removeElement(userTypeItem);
 //                    this.height = 540;
-                    this.title = "注册用户";
-                }
-                loginForm.visible = false;
-                form.validateNow();
+                this.title = "注册用户";
+            }
+            loginForm.visible = false;
+            form.validateNow();
 
+            loginForm.validateNow();
+
+            this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+            this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+        }
+
+        private function getOrgByFlagResult(result:Object, e:ResultEvent):void {
+            this.title = result.result.name + " 新成员注册";
+        }
+
+
+        private function userTypeChanged():void {
+            if (userType.selectedValue == 2) {
+                loginForm.visible = true;
+                form.visible = false;
+                userType2.selectedValue = 2;
                 loginForm.validateNow();
 
-                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
-                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
-            }
-
-            private function getOrgByFlagResult(result:Object,e:ResultEvent):void{
-                 this.title = result.result.name + " 新成员注册";
-            }
-
-
-            private function userTypeChanged():void{
-                if(userType.selectedValue == 2){
-                    loginForm.visible = true;
-                    form.visible = false;
-                    userType2.selectedValue = 2;
-                    loginForm.validateNow();
-
 //                    this.height = loginForm.height+25;
-                }
-
-
             }
 
-            private function userTypeChanged2():void{
-                if(userType2.selectedValue == 1){
-                    loginForm.visible = false;
-                    form.visible = true;
-                    userType.selectedValue = 1;
-                    form.validateNow();
+
+        }
+
+        private function userTypeChanged2():void {
+            if (userType2.selectedValue == 1) {
+                loginForm.visible = false;
+                form.visible = true;
+                userType.selectedValue = 1;
+                form.validateNow();
 
 //                    this.height = form.height+25;
-                }
             }
+        }
 
-            private function regTypeChanged():void{
+        private function regTypeChanged():void {
 
-                form.invalidateSize();
-                form.validateNow();
+            form.invalidateSize();
+            form.validateNow();
 //                this.height = form.height+25;
 
+        }
+
+        private function join():void {
+            if (this.loginUsername.text == "" ||
+                    this.loginPassword.text == "") {
+                Alert.show("请填写完整信息。", "提示");
+                return;
+            }
+            if (!emailexp.test(loginUsername.text) && !phoneexp.test(loginUsername.text)) {
+                Alert.show("请填写正确的邮箱或手机号。", "提示");
+                return;
             }
 
-            private function join():void{
-                if (this.loginUsername.text == "" ||
-                        this.loginPassword.text == "") {
-                    Alert.show("请填写完整信息。", "提示");
-                    return;
-                }
-                if(!emailexp.test(loginUsername.text)&&!phoneexp.test(loginUsername.text)){
-                    Alert.show("请填写正确的邮箱或手机号。", "提示");
-                    return;
-                }
+            var obj:Object = new Object();
+            obj.username = loginUsername.text;
+            obj.password = loginPassword.text;
+            obj.flag = ToolUtil.joinOrgFlag;
 
-                var obj:Object = new Object();
-                obj.username = loginUsername.text;
-                obj.password = loginPassword.text;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addOrganization", refresh, "POST").send(obj);
+        }
+
+        private var emailexp:RegExp = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+        private var phoneexp:RegExp = /^1\d{10}$/;
+
+        public function save():void {
+            if (!ToolUtil.joinOrgFlag) {
+                if (username.text == "" || truename.text == "" || password.text == "" || rpassword.text == "" || orgname.text == "") {
+                    Alert.show("请填写完整信息。 用户名、密码、姓名、组织名称必须填写", "提示");
+                    return;
+                }
+            } else {
+                if (username.text == "" || truename.text == "" || password.text == "" || rpassword.text == "") {
+                    Alert.show("请填写完整信息。 用户名、密码、姓名必须填写", "提示");
+                    return;
+                }
+            }
+
+            if ((regType.selectedValue == 'email' && !emailexp.test(username.text)) || (regType.selectedValue == 'tel' && !phoneexp.test(username.text))) {
+                Alert.show("请填写正确的邮箱或手机号。", "提示");
+                return;
+            }
+
+
+            if (this.password.text == "" || this.password.text != this.rpassword.text) {
+                Alert.show("密码和确认密码要一致。", "提示");
+                return;
+            }
+            var obj:Object = new Object();
+            obj.username = username.text;
+            obj.truename = truename.text;
+            obj.password = password.text;
+            obj.code = codeInput.text;
+            obj.regtype = regType.selectedValue;
+            if (ToolUtil.joinOrgFlag) {
                 obj.flag = ToolUtil.joinOrgFlag;
-
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/addOrganization", refresh, "POST").send(obj);
+            } else {
+                obj.name = orgname.text;
             }
 
-            private var emailexp:RegExp = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            private var phoneexp:RegExp =/^1\d{10}$/;
-			public function save():void{
-                if(!ToolUtil.joinOrgFlag){
-                    if(username.text==""||truename.text==""||password.text==""||rpassword.text==""||orgname.text==""){
-                        Alert.show("请填写完整信息。 用户名、密码、姓名、组织名称必须填写","提示");
-                        return;
-                    }
-                }else{
-                    if(username.text==""||truename.text==""||password.text==""||rpassword.text==""){
-                        Alert.show("请填写完整信息。 用户名、密码、姓名必须填写","提示");
-                        return;
-                    }
-                }
-
-                if((regType.selectedValue == 'email'&&!emailexp.test(username.text))||(regType.selectedValue=='tel'&&!phoneexp.test(username.text))){
-                    Alert.show("请填写正确的邮箱或手机号。", "提示");
-                    return;
-                }
+            obj.userhead = headSelectArray.selectedIcon();
+            obj.icon = orgHeadSelectArray.selectedIcon();
 
 
-				if(this.password.text==""||this.password.text!=this.rpassword.text){
-					Alert.show("密码和确认密码要一致。","提示");
-					return;
-				}
-				var obj:Object=new Object();
-				obj.username=username.text;
-				obj.truename = truename.text;
-				obj.password = password.text;
-                obj.code = codeInput.text;
-                obj.regtype = regType.selectedValue;
-                if(ToolUtil.joinOrgFlag){
-                    obj.flag = ToolUtil.joinOrgFlag;
-                }else{
-                    obj.name = orgname.text;
-                }
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regUser", refresh, "POST").send(obj);
 
-				obj.userhead = headSelectArray.selectedIcon();
-				obj.icon = orgHeadSelectArray.selectedIcon();
 
-				
-				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/regUser",refresh,"POST").send(obj);
-					
-				
-			}
-			public function refresh(r:Object,e:ResultEvent):void{
-				if(r.success){
-                    closeWin();
-                    ToolUtil.joinOrgFlag=null;
-					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+        }
 
-				}else{
+        public function refresh(r:Object, e:ResultEvent):void {
+            if (r.success) {
+                closeWin();
+                ToolUtil.joinOrgFlag = null;
+                ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+
+            } else {
 //					Alert.show("修改密码失败","提示");
-				}
-			}
+            }
+        }
 
-        public function foucePass(obj:Object):void{
+        public function foucePass(obj:Object):void {
             obj.setFocus();
         }
 
-        private var sendTime:Timer=new Timer(1000,60);
-        private var num:int=0;
-        private function sendCode():void{
-            if(username.text.length<10||!phoneexp.test(username.text)){
-                Alert.show("请填写正确的手机号","提示");
+        private var sendTime:Timer = new Timer(1000, 60);
+        private var num:int = 0;
+
+        private function sendCode():void {
+            if (username.text.length < 10 || !phoneexp.test(username.text)) {
+                Alert.show("请填写正确的手机号", "提示");
                 return;
             }
-            smsButton.enabled=false;
-            num=60;
-            sendTime.addEventListener(TimerEvent.TIMER, function(e:TimerEvent):void{
-                smsButton.label=num+"秒";
-                num-=1;
-                if(num<=0){
+            smsButton.enabled = false;
+            num = 60;
+            sendTime.addEventListener(TimerEvent.TIMER, function (e:TimerEvent):void {
+                smsButton.label = num + "秒";
+                num -= 1;
+                if (num <= 0) {
                     smsButton.label = "获取手机验证码";
-                    smsButton.enabled=true;
+                    smsButton.enabled = true;
                 }
             });
-            sendTime.addEventListener(TimerEvent.TIMER_COMPLETE, function(e:TimerEvent):void{
+            sendTime.addEventListener(TimerEvent.TIMER_COMPLETE, function (e:TimerEvent):void {
                 smsButton.label = "获取手机验证码";
-                smsButton.enabled=true;
+                smsButton.enabled = true;
             });
             sendTime.reset();
             sendTime.repeatCount = 60;
             sendTime.start();
-            var data:Object=new Object();
-            data["tel"]=username.text;
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/sendSmsCode",function(result:Object,e:ResultEvent):void{
-                Alert.show(result.message,"提示");
-            },"POST").send(data);
+            var data:Object = new Object();
+            data["tel"] = username.text;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/sendSmsCode", function (result:Object, e:ResultEvent):void {
+                Alert.show(result.message, "提示");
+            }, "POST").send(data);
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

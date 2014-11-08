@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="450" creationComplete="init(event)"
-                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*" title="创建讨论组">
+                             width="500" height="450" creationComplete="init(event)"
+                             xmlns:window="control.window.*" title="创建讨论组">
 
     <fx:Script>
 		<![CDATA[
@@ -12,8 +12,8 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
-
         import mx.events.CloseEvent;
+        import mx.events.FlexEvent;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
 
@@ -25,28 +25,29 @@
         import util.UUIDUtil;
 
         [Bindable]
-        public var chatmember:ArrayCollection=new ArrayCollection();
+        public var chatmember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var newmember:ArrayCollection=new ArrayCollection();
+        private var newmember:ArrayCollection = new ArrayCollection();
 
-        override public function  releaseListener(e:CloseEvent):void{
+        override public function releaseListener(e:CloseEvent):void {
         }
-        public function init(e:mx.events.FlexEvent):void{
-             newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
+
+        public function init(e:FlexEvent):void {
+            newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
 
             var pc:PersonChatItem;
-            for each(var p:Object in ToolUtil.memberList){
-                pc=new PersonChatItem();
+            for each(var p:Object in ToolUtil.memberList) {
+                pc = new PersonChatItem();
                 pc.person = p;
                 pc.selected = false;
-                if(ToolUtil.sessionUser.pid== p.id){
-                   pc.enUnselected = true;
-                   pc.toolTip = "不可以将自己排除在讨论组之外!";
+                if (ToolUtil.sessionUser.pid == p.id) {
+                    pc.enUnselected = true;
+                    pc.toolTip = "不可以将自己排除在讨论组之外!";
                     pc.selected = true;
                 }
-                for each(var m:Object in newmember){
-                    if(m.id==p.id){
+                for each(var m:Object in newmember) {
+                    if (m.id == p.id) {
                         pc.selected = true;
                     }
                 }
@@ -57,18 +58,18 @@
         }
 
 
-
-        private function sendMessageResult(result:Object,e:ResultEvent):void{
+        private function sendMessageResult(result:Object, e:ResultEvent):void {
             closeWin();
         }
-        private function addMember():void{
-            if(memberBox.selectedItem==null){
+
+        private function addMember():void {
+            if (memberBox.selectedItem == null) {
                 return;
             }
-            var pc:PersonChatItem=new PersonChatItem();
-            for(var i:int=0;i<memebers.numElements;i++){
+            var pc:PersonChatItem = new PersonChatItem();
+            for (var i:int = 0; i < memebers.numElements; i++) {
                 pc = memebers.getElementAt(i) as PersonChatItem;
-                if(pc.person.id == memberBox.selectedItem.id){
+                if (pc.person.id == memberBox.selectedItem.id) {
                     pc.selected = true;
                     return;
                 }
@@ -79,57 +80,57 @@
 //            memebers.addElement(pc);
         }
 
-        private function createGroup():void{
+        private function createGroup():void {
             var pids:Array = new Array();
             var pci:PersonChatItem;
             var person:Object;
-            for(var i:int=0;i<memebers.numElements;i++){
-                pci=memebers.getElementAt(i) as PersonChatItem;
-                if(pci.selected){
+            for (var i:int = 0; i < memebers.numElements; i++) {
+                pci = memebers.getElementAt(i) as PersonChatItem;
+                if (pci.selected) {
                     pids.push(pci.person.id);
-                    if(pci.person.id!=ToolUtil.sessionUser.pid){
+                    if (pci.person.id != ToolUtil.sessionUser.pid) {
                         person = pci.person;
                     }
                 }
             }
-            if(pids.length<2){
+            if (pids.length < 2) {
                 Alert.show("少于两个人，不可以创建讨论组");
                 return;
             }
-            var org:Object=new Object();
-            if(pids.length==2){
-                var chatevent:ListClickEvent=new ListClickEvent("ChatUser",person);
+            var org:Object = new Object();
+            if (pids.length == 2) {
+                var chatevent:ListClickEvent = new ListClickEvent("ChatUser", person);
                 dispatchEvent(chatevent);
                 closeWin();
                 return;
-            }else{
-                org.channel = "g"+UUIDUtil.create();
+            } else {
+                org.channel = "g" + UUIDUtil.create();
                 org.name = groupName.text;
             }
-            org.users=pids;
-            org.author=ToolUtil.sessionUser.pid;
-            if(groupName.text.length<1){
+            org.users = pids;
+            org.author = ToolUtil.sessionUser.pid;
+            if (groupName.text.length < 1) {
                 Alert.show("请填写讨论组名称。")
                 return;
             }
-            Pomelo.getIns().request("connector.entryHandler.createChannel",org,function(data:Object):void{
-                if(data.code==200){
-                    var chatUser:ChatChannel=new ChatChannel();
-                    chatUser.id=org.channel.substr(1,org.channel.length-1);
+            Pomelo.getIns().request("connector.entryHandler.createChannel", org, function (data:Object):void {
+                if (data.code == 200) {
+                    var chatUser:ChatChannel = new ChatChannel();
+                    chatUser.id = org.channel.substr(1, org.channel.length - 1);
                     chatUser.channel = org.channel;
                     chatUser.name = org.name;
                     chatUser.author = org.author;
-                    chatUser.icon="/static/smalloaicon/group.png";
+                    chatUser.icon = "/static/smalloaicon/group.png";
                     chatUser.setMembers(pids);
-                    var chatevent:ListClickEvent=new ListClickEvent("ChatUser",chatUser);
+                    var chatevent:ListClickEvent = new ListClickEvent("ChatUser", chatUser);
                     dispatchEvent(chatevent);
                     closeWin();
-                }else{
+                } else {
                     Alert.show("讨论组创建失败");
                 }
             });
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

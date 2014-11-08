@@ -1,19 +1,19 @@
 package control
 {
-	import events.ChangeTabButtonEvent;
-	import events.ChangeUserEvent;
-	import events.CloseContainerEvent;
-	
-	import mx.core.FlexGlobals;
-	import mx.core.INavigatorContent;
-	import mx.events.FlexEvent;
+import events.ChangeTabButtonEvent;
+import events.ChangeUserEvent;
+import events.CloseContainerEvent;
+
+import mx.core.FlexGlobals;
+import mx.core.INavigatorContent;
+import mx.events.FlexEvent;
 import mx.events.ResizeEvent;
 
 import skins.contentBoxSkin;
 
 import spark.components.BorderContainer;
-	
-	public class CBorderContainer extends BorderContainer implements INavigatorContent
+
+public class CBorderContainer extends BorderContainer implements INavigatorContent
 	{
 		private var _label:String;
 		private var _flag:String;

@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="450" creationComplete="init(event)"
-                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*" title="创建讨论组">
+                             width="500" height="450" creationComplete="init(event)"
+                             xmlns:window="control.window.*" title="创建讨论组">
 
     <fx:Script>
 		<![CDATA[
-        import events.ListClickEvent;
-
         import mx.collections.ArrayCollection;
-        import mx.controls.Alert;
-
         import mx.events.CloseEvent;
-        import mx.rpc.events.ResultEvent;
+        import mx.events.FlexEvent;
         import mx.utils.ObjectUtil;
 
         import org.idream.pomelo.Pomelo;
@@ -20,32 +16,32 @@
         import uicontrol.PersonChatItem;
 
         import util.ToolUtil;
-        import util.UUIDUtil;
 
         [Bindable]
-        public var chatmember:ArrayCollection=new ArrayCollection();
+        public var chatmember:ArrayCollection = new ArrayCollection();
         [Bindable]
-        private var newmember:ArrayCollection=new ArrayCollection();
+        private var newmember:ArrayCollection = new ArrayCollection();
 
         public var channel:String;
-        override public function  releaseListener(e:CloseEvent):void{
+
+        override public function releaseListener(e:CloseEvent):void {
         }
 
-        public function init(e:mx.events.FlexEvent):void{
+        public function init(e:FlexEvent):void {
             newmember = ObjectUtil.copy(chatmember) as ArrayCollection;
 
             var pc:PersonChatItem;
-            for each(var p:Object in ToolUtil.memberList){
-                pc=new PersonChatItem();
+            for each(var p:Object in ToolUtil.memberList) {
+                pc = new PersonChatItem();
                 pc.person = p;
                 pc.selected = false;
-                if(ToolUtil.sessionUser.pid== p.id){
+                if (ToolUtil.sessionUser.pid == p.id) {
                     pc.enUnselected = true;
                     pc.toolTip = "不可以将自己排除在讨论组之外!";
                     pc.selected = true;
                 }
-                for each(var m:Object in newmember){
-                    if(m.id==p.id){
+                for each(var m:Object in newmember) {
+                    if (m.id == p.id) {
                         pc.selected = true;
                     }
                 }
@@ -55,59 +51,59 @@
 
         }
 
-        private function addMember():void{
-            if(memberBox.selectedItem==null){
+        private function addMember():void {
+            if (memberBox.selectedItem == null) {
                 return;
             }
-            for(var i:int=0;i<memebers.numElements;i++){
+            for (var i:int = 0; i < memebers.numElements; i++) {
                 pc = memebers.getElementAt(i) as PersonChatItem;
-                if(pc.person.id == memberBox.selectedItem.id){
+                if (pc.person.id == memberBox.selectedItem.id) {
                     pc.selected = true;
                     return;
                 }
             }
-            var pc:PersonChatItem=new PersonChatItem();
+            var pc:PersonChatItem = new PersonChatItem();
 //            pc.person = memberBox.selectedItem;
 //            pc.selected = true;
 //            memebers.addElement(pc);
         }
 
-        private function createGroup():void{
+        private function createGroup():void {
             var pids:Array = new Array();
             var pci:PersonChatItem;
-            for(var i:int=0;i<memebers.numElements;i++){
-                pci=memebers.getElementAt(i) as PersonChatItem;
-                if(pci.selected){
+            for (var i:int = 0; i < memebers.numElements; i++) {
+                pci = memebers.getElementAt(i) as PersonChatItem;
+                if (pci.selected) {
                     pids.push(pci.person.id);
                 }
             }
 
             var f:Boolean;
-            for each(var person:Object in chatmember){
-                f=false;
-                for each(var op:Number in pids){
-                    if(op==person.id){
-                        f=true;
+            for each(var person:Object in chatmember) {
+                f = false;
+                for each(var op:Number in pids) {
+                    if (op == person.id) {
+                        f = true;
                     }
                 }
-                if(!f){
-                    Pomelo.getIns().notify("connector.entryHandler.quiteChannel",{channel:channel,pid:person.id});
+                if (!f) {
+                    Pomelo.getIns().notify("connector.entryHandler.quiteChannel", {channel: channel, pid: person.id});
                 }
             }
-            for each(op in pids){
-                f=false;
-                for each(person in chatmember){
-                    if(op==person.id){
-                        f=true;
+            for each(op in pids) {
+                f = false;
+                for each(person in chatmember) {
+                    if (op == person.id) {
+                        f = true;
                     }
                 }
-                if(!f){
-                    Pomelo.getIns().notify("connector.entryHandler.joinChannel",{channel:channel,pid:op});
+                if (!f) {
+                    Pomelo.getIns().notify("connector.entryHandler.joinChannel", {channel: channel, pid: op});
                 }
             }
 
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

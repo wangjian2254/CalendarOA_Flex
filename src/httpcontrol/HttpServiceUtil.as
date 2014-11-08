@@ -1,26 +1,19 @@
 package httpcontrol
 {
-	import control.Loading;
-import control.window.RegisterUserPanel;
-
 import flash.display.DisplayObject;
+import flash.events.TimerEvent;
+import flash.utils.Timer;
 
-import flash.display.DisplayObject;
-	import flash.events.TimerEvent;
-	import flash.utils.Timer;
-	
-	import mx.controls.Alert;
-	import mx.core.FlexGlobals;
-    import mx.managers.PopUpManager;
-	import mx.rpc.events.FaultEvent;
-	import mx.rpc.events.ResultEvent;
-
-import spark.components.TitleWindow;
+import mx.controls.Alert;
+import mx.core.FlexGlobals;
+import mx.managers.PopUpManager;
+import mx.rpc.events.FaultEvent;
+import mx.rpc.events.ResultEvent;
 
 import util.LoadingUtil;
-	import util.ToolUtil;
+import util.ToolUtil;
 
-	public class HttpServiceUtil
+public class HttpServiceUtil
 	{
 		public function HttpServiceUtil()
 		{

@@ -1,8 +1,8 @@
 package util
 {
-	import control.Loading;
+import control.Loading;
 
-	public class LoadingUtil
+public class LoadingUtil
 	{
 		public function LoadingUtil()
 		{

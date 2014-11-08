@@ -2,12 +2,11 @@
 <control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
                           xmlns:s="library://ns.adobe.com/flex/spark"
                           xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*"
-                          xmlns:uicontrol="uicontrol.*" xmlns:fc="http://www.adobe.com/2006/fc"
                           xmlns:conobj="uicontrol.conobj.*"
 
-                          width="700" height="500"  backgroundAlpha="0">
-	
-	<fx:Script>
+                          width="700" height="500" backgroundAlpha="0">
+
+    <fx:Script>
 		<![CDATA[
         import events.ChangeDepartmentEvent;
         import events.CloseContainerEvent;
@@ -16,14 +15,11 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
-        import mx.core.FlexGlobals;
         import mx.events.CollectionEvent;
         import mx.events.FlexEvent;
         import mx.events.FlexMouseEvent;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
-
-        import org.osmf.events.TimeEvent;
 
         import spark.core.IViewport;
 
@@ -43,9 +39,10 @@
         private var departChart:Object = null;
         private var rootDepart:Object = null;
 
-        override public function releaseListener():void{
+        override public function releaseListener():void {
             ToolUtil.departMentList.removeEventListener(CollectionEvent.COLLECTION_CHANGE, changeOrg);
         }
+
         override public function init(e:FlexEvent):void {
             initDepartment();
 
@@ -313,8 +310,8 @@
             var personHead:PersonHeadItem;
             var person:Object;
             for (var i:int = 0; i < e.depart.members.length; i++) {
-                person =ToolUtil.getActivePersonById(e.depart.members[i]);
-                if(person!=null){
+                person = ToolUtil.getActivePersonById(e.depart.members[i]);
+                if (person != null) {
                     personHead = new PersonHeadItem();
                     personHead.department = e.depart;
                     personHead.person = person;

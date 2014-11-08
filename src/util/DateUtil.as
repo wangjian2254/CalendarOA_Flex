@@ -1,8 +1,8 @@
 package util
 {
-	import mx.formatters.DateFormatter;
+import mx.formatters.DateFormatter;
 
-	public class DateUtil
+public class DateUtil
 	{
 		public function DateUtil()
 		{

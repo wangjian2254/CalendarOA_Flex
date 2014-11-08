@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
-                             xmlns:conobj="uicontrol.conobj.*"
+                             xmlns:uicontrol="uicontrol.*"
                              width="430" height="500" creationComplete="init()"
                              title="选择工作的组织" xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
         import events.ListClickEvent;
         import events.QuiteEvent;
@@ -13,7 +12,6 @@
         import httpcontrol.HttpServiceUtil;
 
         import mx.collections.ArrayCollection;
-
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.managers.PopUpManager;
@@ -25,8 +23,10 @@
         public var orglist:ArrayCollection;
 
         public var loginNickname:String;
-        override public function  releaseListener(e:CloseEvent):void{
+
+        override public function releaseListener(e:CloseEvent):void {
         }
+
         private function init():void {
 
             //getOrgByFlag

@@ -9,19 +9,12 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-        import control.window.SchedulePanel;
-        import control.ScheduleShow;
-
         import httpcontrol.HttpServiceUtil;
 
         import mx.controls.Alert;
-        import mx.core.FlexGlobals;
-        import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
 
-        import util.ScheduleUtil;
         import util.TaskUtil;
-        import util.ToolUtil;
 
         [Bindable]
         public var color:Number = 0xffffff;

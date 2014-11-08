@@ -20,9 +20,7 @@
         import mx.events.CollectionEvent;
         import mx.utils.ObjectUtil;
 
-
         import util.ChatManager;
-
         import util.ToolUtil;
 
         [Bindable]
@@ -34,7 +32,11 @@
         public var userMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var btnlist:ArrayCollection=new ArrayCollection([{label:"最近联系",mod:"group"},{label:"部门",mod:"org"},{label:"常用联系人",mod:"user"}]);;
+        private var btnlist:ArrayCollection = new ArrayCollection([{label: "最近联系", mod: "group"}, {
+            label: "部门",
+            mod: "org"
+        }, {label: "常用联系人", mod: "user"}]);
+        ;
 
         public var type:String = "org";
 
@@ -42,7 +44,7 @@
         public var borderVisible:Boolean = true;
 
         public function init():void {
-            if(type=="org"){
+            if (type == "org") {
                 this.removeElement(showModel);
                 this.removeElement(liyuwangBtn);
             }
@@ -50,9 +52,9 @@
             ToolUtil.contactsList.addEventListener(CollectionEvent.COLLECTION_CHANGE, initMember);
             initDepartment(null);
             initMember(null);
-            if(type=="chat"){
-                if(ToolUtil.groupList.length==0){
-                    showModel.selectedIndex=1;
+            if (type == "chat") {
+                if (ToolUtil.groupList.length == 0) {
+                    showModel.selectedIndex = 1;
                 }
                 changeShowModel();
             }
@@ -63,24 +65,24 @@
         }
 
 
-//        private function unReadChange(e:CollectionEvent):void{
-//            for each(var p:Object in addressMember){
-//                p.unread=0;
-//                for each(var chat:Object in ChatManager.unReadMessage){
-//                    if((p.hasOwnProperty('flag')&&chat.o==p.id)||(!p.hasOwnProperty('flag')&&chat.t==p.id)){
-//                        if(chat.unread){
-//                            p.unread+=1;
-//                        }
-//
-//                    }
-//                }
-//            }
-//            addressMember.refresh();
-//        }
+        //        private function unReadChange(e:CollectionEvent):void{
+        //            for each(var p:Object in addressMember){
+        //                p.unread=0;
+        //                for each(var chat:Object in ChatManager.unReadMessage){
+        //                    if((p.hasOwnProperty('flag')&&chat.o==p.id)||(!p.hasOwnProperty('flag')&&chat.t==p.id)){
+        //                        if(chat.unread){
+        //                            p.unread+=1;
+        //                        }
+        //
+        //                    }
+        //                }
+        //            }
+        //            addressMember.refresh();
+        //        }
 
 
-        private function initDepartment(e:CollectionEvent):void{
-            if(type == "chat"){
+        private function initDepartment(e:CollectionEvent):void {
+            if (type == "chat") {
                 departMember.removeAll();
                 var l2:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
                 var f:Boolean = false;
@@ -113,10 +115,10 @@
                     }
                     item.childrenstatus = true;
                     item.children = new ArrayCollection();
-                    item.hideicon=false;
+                    item.hideicon = false;
                 }
-                if(rootDepart!=null){
-                    ToolUtil.findDepartByFather(rootDepart,l);
+                if (rootDepart != null) {
+                    ToolUtil.findDepartByFather(rootDepart, l);
                 }
 
                 for each(item in l) {
@@ -127,11 +129,11 @@
                         }
                         depart['d' + item.father].dep_children.addItem(item);
                     }
-                    var members:ArrayCollection=new ArrayCollection();
+                    var members:ArrayCollection = new ArrayCollection();
                     var person:Object;
                     for each(var m:int in item.members) {
                         person = ToolUtil.getActivePersonById(m);
-                        if(person!=null){
+                        if (person != null) {
                             person['depart_id'] = item.id;
                             person['level'] = item.level + 1;
                             members.addItem(person);
@@ -139,7 +141,7 @@
 
                     }
                     item.children.addAll(members);
-                    item.name = item.name+" ("+item.children.length+")";
+                    item.name = item.name + " (" + item.children.length + ")";
                 }
                 for each(item in l) {
                     if (item.flag == 'free') {
@@ -155,8 +157,9 @@
                 addressList.dataProvider = addressMember;
             }
         }
-        private function initMember(e:CollectionEvent):void{
-            if(type == "chat"){
+
+        private function initMember(e:CollectionEvent):void {
+            if (type == "chat") {
                 userMember.removeAll();
                 var members:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 
@@ -171,9 +174,6 @@
         }
 
 
-
-
-
         private function showDepartChildren_handler(depart:Object):void {
             var index:int = 0;
             for (var i:int = 0; i < addressMember.length; i++) {
@@ -182,23 +182,23 @@
                     break;
                 }
             }
-            if (depart.hasOwnProperty('dep_children')){
+            if (depart.hasOwnProperty('dep_children')) {
                 if (index == addressMember.length - 1 && addressMember.length != 1) {
                     addressMember.addAll(depart.dep_children);
                 } else {
                     addressMember.addAllAt(depart.dep_children, index + 1);
                 }
-                for each(var d:Object in depart.dep_children){
+                for each(var d:Object in depart.dep_children) {
                     showDepartChildren_handler(d);
                 }
             }
 
 
-
         }
 
-        private function chatliyu():void{
-            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",ChatManager.liyu);
+        private function chatliyu():void {
+
+            var listclickevent:ListClickEvent = new ListClickEvent("listItemClick", new ChatChannel(ChatManager.liyu));
             dispatchEvent(listclickevent);
         }
 
@@ -261,15 +261,15 @@
 
         }
 
-        private function changeShowModel():void{
-            if(showModel.selectedItem.mod=="org"){
-               addressList.dataProvider = departMember;
+        private function changeShowModel():void {
+            if (showModel.selectedItem.mod == "org") {
+                addressList.dataProvider = departMember;
             }
-            if(showModel.selectedItem.mod=="user"){
+            if (showModel.selectedItem.mod == "user") {
                 addressList.dataProvider = userMember;
             }
-            if(showModel.selectedItem.mod=="group"){
-                addressList.dataProvider =  ToolUtil.groupList;
+            if (showModel.selectedItem.mod == "group") {
+                addressList.dataProvider = ToolUtil.groupList;
             }
         }
         ]]></fx:Script>

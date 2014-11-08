@@ -5,29 +5,27 @@
 */
 
 package org.bytearray.gif.player
-{	
-	import flash.events.TimerEvent;
-	import flash.net.URLLoaderDataFormat;
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
-	import flash.events.Event;
-	import flash.system.LoaderContext;
-	import flash.utils.ByteArray;
-	import flash.utils.Timer;
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
-	import flash.utils.getTimer;
-	import flash.events.IOErrorEvent;
-	import flash.errors.ScriptTimeoutError;
-	import org.bytearray.gif.frames.GIFFrame;
-	import org.bytearray.gif.decoder.GIFDecoder;
-	import org.bytearray.gif.events.GIFPlayerEvent;
-	import org.bytearray.gif.events.FrameEvent;
-	import org.bytearray.gif.events.TimeoutEvent;
-	import org.bytearray.gif.events.FileTypeEvent;
-	import org.bytearray.gif.errors.FileTypeError;
-	
-	public class GIFPlayer extends Bitmap
+{
+import flash.display.Bitmap;
+import flash.errors.ScriptTimeoutError;
+import flash.events.Event;
+import flash.events.IOErrorEvent;
+import flash.events.TimerEvent;
+import flash.net.URLLoader;
+import flash.net.URLLoaderDataFormat;
+import flash.net.URLRequest;
+import flash.utils.ByteArray;
+import flash.utils.Timer;
+
+import org.bytearray.gif.decoder.GIFDecoder;
+import org.bytearray.gif.errors.FileTypeError;
+import org.bytearray.gif.events.FileTypeEvent;
+import org.bytearray.gif.events.FrameEvent;
+import org.bytearray.gif.events.GIFPlayerEvent;
+import org.bytearray.gif.events.TimeoutEvent;
+import org.bytearray.gif.frames.GIFFrame;
+
+public class GIFPlayer extends Bitmap
 	{
 		private var urlLoader:URLLoader;
 		private var gifDecoder:GIFDecoder

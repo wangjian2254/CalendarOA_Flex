@@ -1,12 +1,8 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class ChangeJoinUserEvent extends Event
+import flash.events.Event;
+
+public class ChangeJoinUserEvent extends Event
 		
 	{
 		public static var ChangeUser_EventStr:String="Change_Join_User";

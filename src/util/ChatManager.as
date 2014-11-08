@@ -5,7 +5,6 @@ package util {
 import events.QuiteEvent;
 
 import flash.display.DisplayObject;
-
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.SecurityErrorEvent;
@@ -20,7 +19,6 @@ import mx.collections.ArrayCollection;
 import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.events.CollectionEvent;
-import mx.events.FlexEvent;
 import mx.managers.PopUpManager;
 
 import org.idream.pomelo.Pomelo;
@@ -92,19 +90,20 @@ public class ChatManager {
 //    }
 
     static public function unReadChanged(e:CollectionEvent):void{
-        var n:int=0;
-        for each(var chat:Object in ChatManager.unReadMessage){
-                if(chat.unread){
-                    n+=1;
-                }
-
-        }
-        ToolUtil.unreadMessageNum=n+"未读消息";
+//        var n:int=0;
+//        for each(var chat:Object in ChatManager.unReadMessage){
+//                if(chat.unread){
+//                    n+=1;
+//                }
+//
+//        }
+        ToolUtil.unreadMessageNum=ChatManager.unReadMessage.length+"未读消息";
     }
 
     static public function loginChat(e:Event=null):void{
         time.addEventListener(TimerEvent.TIMER,loginChat);
         unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, paopaomove_handler);
+        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChanged);
 //        for(var u:String in userStatus){
 //            userStatus[u]="off";
 //        }
@@ -386,6 +385,9 @@ public class ChatManager {
         }
         var g:ChatChannel=new ChatChannel();
         g.init(event.message.group);
+        if ('0' == g.channel.substr(0, 1)) {
+            return;
+        }
         ToolUtil.groupList.addItem(g);
 
 

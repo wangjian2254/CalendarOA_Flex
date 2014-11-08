@@ -8,14 +8,14 @@
 
 package org.bytearray.gif.decoder
 {
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
-	import flash.geom.Rectangle;
-	import flash.utils.ByteArray;
-	import org.bytearray.gif.errors.FileTypeError;
-	import org.bytearray.gif.frames.GIFFrame;
-	
-	public class GIFDecoder 
+import flash.display.BitmapData;
+import flash.geom.Rectangle;
+import flash.utils.ByteArray;
+
+import org.bytearray.gif.errors.FileTypeError;
+import org.bytearray.gif.frames.GIFFrame;
+
+public class GIFDecoder
 	{
 		/**
 		 * File read status: No errors.

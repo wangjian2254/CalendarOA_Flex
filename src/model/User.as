@@ -1,8 +1,8 @@
 package model
 {
-	import mx.collections.ArrayCollection;
+import mx.collections.ArrayCollection;
 
-	public class User
+public class User
 	{
 		private var _username:String;
 		private var _id:int;

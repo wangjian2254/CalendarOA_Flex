@@ -110,8 +110,9 @@
         [Bindable]
         private var optionArr:ArrayCollection = new ArrayCollection([]);
 
-        override public function releaseListener():void{
+        override public function releaseListener():void {
         }
+
         //新增，保存，删除,回复，转发的处理函数
         //多个按钮点击事件的处理函数
         private function clickHander(e:MouseEvent):void {
@@ -427,24 +428,24 @@
 													<mx:VBox horizontalAlign="center" width="100%" remove="removeHandler(event)">
 														<fx:Script>
 															<![CDATA[
-																import mx.events.ListEvent;
-																private var _data:Object;
-																import mx.events.FlexEvent;
-																
-																protected function removeHandler(event:FlexEvent):void
-																{
-																	_data=null;
-																}
-																
-																override public function set data(o:Object):void{
-																	_data=o;
-																	is_right.selected=o["is_right"];
-																}
-																private function clickHandler():void{
-																	_data["is_right"]=is_right.selected;
-																	dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,-1,null,this));
-																}
-															]]>
+                                                            import mx.events.FlexEvent;
+                                                            import mx.events.ListEvent;
+
+                                                            private var _data:Object;
+                                                            protected function removeHandler(event:FlexEvent):void {
+                                                                _data = null;
+                                                            }
+
+                                                            override public function set data(o:Object):void {
+                                                                _data = o;
+                                                                is_right.selected = o["is_right"];
+                                                            }
+
+                                                            private function clickHandler():void {
+                                                                _data["is_right"] = is_right.selected;
+                                                                dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK, false, false, -1, -1, null, this));
+                                                            }
+                                                            ]]>
 														</fx:Script>
 														<mx:CheckBox id="is_right" click="clickHandler()" focusEnabled="false">
 														</mx:CheckBox>

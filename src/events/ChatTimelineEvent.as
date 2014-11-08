@@ -1,8 +1,8 @@
 package events
 {
-	import flash.events.Event;
-	
-	public class ChatTimelineEvent extends Event
+import flash.events.Event;
+
+public class ChatTimelineEvent extends Event
 	{	
 		static public const Channel:String="ChatChannel";
         public var channel:String="";

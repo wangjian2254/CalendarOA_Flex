@@ -1,55 +1,53 @@
 package uicontrol
 {
-	
-	import flash.display.DisplayObject;
-	import flash.events.Event;
-	import flash.events.FocusEvent;
-	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
-	import flash.geom.Matrix;
-	import flash.geom.Point;
-	import flash.geom.Rectangle;
-	import flash.text.TextLineMetrics;
-	import flash.ui.Keyboard;
-	
-	import mx.collections.ArrayCollection;
-	import mx.collections.CursorBookmark;
-	import mx.collections.IViewCursor;
-	import mx.controls.ComboBase;
-	import mx.controls.List;
-	import mx.controls.dataGridClasses.DataGridListData;
-	import mx.controls.listClasses.BaseListData;
-	import mx.controls.listClasses.IDropInListItemRenderer;
-	import mx.controls.listClasses.IListItemRenderer;
-	import mx.controls.listClasses.ListBase;
-	import mx.controls.listClasses.ListData;
-	import mx.core.ClassFactory;
-	import mx.core.EdgeMetrics;
-	import mx.core.IDataRenderer;
-	import mx.core.IFactory;
-	import mx.core.LayoutDirection;
-	import mx.core.ScrollPolicy;
-	import mx.core.UIComponent;
-	import mx.core.UIComponentGlobals;
-	import mx.core.mx_internal;
-	import mx.effects.Tween;
-	import mx.events.CollectionEvent;
-	import mx.events.CollectionEventKind;
-	import mx.events.DropdownEvent;
-	import mx.events.FlexEvent;
-	import mx.events.FlexMouseEvent;
-	import mx.events.InterManagerRequest;
-	import mx.events.ListEvent;
-	import mx.events.SandboxMouseEvent;
-	import mx.events.ScrollEvent;
-	import mx.events.ScrollEventDetail;
-	import mx.managers.ISystemManager;
-	import mx.managers.PopUpManager;
-	import mx.styles.CSSStyleDeclaration;
-	import mx.utils.MatrixUtil;
-	import mx.utils.StringUtil;
-	
-	use namespace mx_internal;
+
+import flash.display.DisplayObject;
+import flash.events.Event;
+import flash.events.FocusEvent;
+import flash.events.KeyboardEvent;
+import flash.events.MouseEvent;
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import flash.text.TextLineMetrics;
+import flash.ui.Keyboard;
+
+import mx.collections.ArrayCollection;
+import mx.collections.CursorBookmark;
+import mx.collections.IViewCursor;
+import mx.controls.ComboBase;
+import mx.controls.Label;
+import mx.controls.List;
+import mx.controls.dataGridClasses.DataGridListData;
+import mx.controls.listClasses.BaseListData;
+import mx.controls.listClasses.IDropInListItemRenderer;
+import mx.controls.listClasses.IListItemRenderer;
+import mx.controls.listClasses.ListBase;
+import mx.controls.listClasses.ListData;
+import mx.core.ClassFactory;
+import mx.core.EdgeMetrics;
+import mx.core.IDataRenderer;
+import mx.core.IFactory;
+import mx.core.LayoutDirection;
+import mx.core.ScrollPolicy;
+import mx.core.UIComponent;
+import mx.core.UIComponentGlobals;
+import mx.effects.Tween;
+import mx.events.CollectionEvent;
+import mx.events.CollectionEventKind;
+import mx.events.DropdownEvent;
+import mx.events.FlexEvent;
+import mx.events.FlexMouseEvent;
+import mx.events.ListEvent;
+import mx.events.SandboxMouseEvent;
+import mx.events.ScrollEvent;
+import mx.events.ScrollEventDetail;
+import mx.managers.ISystemManager;
+import mx.managers.PopUpManager;
+import mx.utils.MatrixUtil;
+import mx.utils.StringUtil;
+
+use namespace mx_internal;
 	
 	//--------------------------------------
 	//  Events
@@ -653,7 +651,7 @@ package uicontrol
 			addEventListener(Event.REMOVED_FROM_STAGE, removedFromStageHandler);
 			///自定义
 			editable=true;
-			itemRenderer=new ClassFactory(mx.controls.Label);
+			itemRenderer=new ClassFactory(Label);
 			//			this.prompt='可筛选';
 			selectedIndex=-1;
 			addEventListener("creationComplete",init);  

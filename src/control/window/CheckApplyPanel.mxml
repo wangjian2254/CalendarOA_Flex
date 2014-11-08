@@ -1,68 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
-                             xmlns:conobj="uicontrol.conobj.*"
+                             xmlns:uicontrol="uicontrol.*"
                              width="740" height="500" creationComplete="init()"
                              title="申请加入组织的请求" xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
         import events.ListClickEvent;
-        import events.QuiteEvent;
 
         import httpcontrol.HttpServiceUtil;
 
-            import mx.collections.ArrayCollection;
-
-            import mx.core.FlexGlobals;
+        import mx.collections.ArrayCollection;
+        import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
-        import mx.events.EffectEvent;
-        import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			
-			import util.ToolUtil;
+        import mx.rpc.events.ResultEvent;
 
-            [Bindable]
-            private var orglist:ArrayCollection;
+        [Bindable]
+        private var orglist:ArrayCollection;
 
-        override public function  releaseListener(e:CloseEvent):void{
+        override public function releaseListener(e:CloseEvent):void {
         }
-            private function init():void{
+
+        private function init():void {
 
 
-                var obj:Object=new Object();
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllApplyOrg",getAllOrgResult,"POST").send(obj);
-                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
-                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+            var obj:Object = new Object();
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getAllApplyOrg", getAllOrgResult, "POST").send(obj);
+            this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+            this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+        }
+
+        private function getAllOrgResult(result:Object, e:ResultEvent):void {
+            orglist = new ArrayCollection(result.result as Array);
+            if (orglist.length == 0) {
+                queryLabel.text = "没有未处理的申请。";
+                applyAddressList.visible = false;
+            } else {
+                applyAddressList.visible = true;
+                queryLabel.visible = false;
             }
-
-            private function getAllOrgResult(result:Object, e:ResultEvent):void{
-                orglist = new ArrayCollection(result.result as Array);
-                if(orglist.length==0){
-                    queryLabel.text = "没有未处理的申请。";
-                    applyAddressList.visible = false;
-                }else{
-                    applyAddressList.visible = true;
-                    queryLabel.visible = false;
-                }
-            }
+        }
 
 
-
-
-        public function delOrgItem(item:Object):void{
-            for each(var obj:Object in orglist){
-                if(obj.id == item.id){
+        public function delOrgItem(item:Object):void {
+            for each(var obj:Object in orglist) {
+                if (obj.id == item.id) {
                     orglist.removeItemAt(orglist.getItemIndex(obj));
                 }
             }
         }
 
-			public function listItemClick_handler(e:ListClickEvent):void{
-				delOrgItem(e.data);
-			}
-
-		]]>
+        public function listItemClick_handler(e:ListClickEvent):void {
+            delOrgItem(e.data);
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

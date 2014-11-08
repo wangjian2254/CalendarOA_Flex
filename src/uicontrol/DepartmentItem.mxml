@@ -15,19 +15,15 @@
         import httpcontrol.HttpServiceUtil;
 
         import mx.collections.ArrayCollection;
-
         import mx.controls.Alert;
         import mx.controls.Menu;
         import mx.events.CloseEvent;
         import mx.events.MenuEvent;
-
         import mx.rpc.events.ResultEvent;
 
         import uicontrol.conobj.DepartmentSelectArray;
 
-
         import util.RightClickManager;
-
         import util.ToolUtil;
 
         private var _department:Object = null;
@@ -110,7 +106,7 @@
                     }
                 }
 
-                if(fatherDepartment!=null){
+                if (fatherDepartment != null) {
                     for (i = 0; i < fatherDepartment.managers.length; i++) {
                         if (fatherDepartment.managers[i] == ToolUtil.sessionUser.pid) {
                             powerDel = true;

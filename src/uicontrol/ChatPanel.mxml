@@ -6,7 +6,6 @@
           xmlns:uicontrol="uicontrol.*" xmlns:mx="library://ns.adobe.com/flex/mx">
 
     <fx:Script><![CDATA[
-        import events.ChatEvent;
         import events.ListClickEvent;
 
         import mx.collections.ArrayCollection;
@@ -16,14 +15,14 @@
         [Bindable]
         public var chatsArr:ArrayCollection;
 
-        private function chatItemClick_handler(e:ListClickEvent):void{
+        private function chatItemClick_handler(e:ListClickEvent):void {
             dispatchEvent(e);
         }
 
-        private function getMessage():Object{
+        private function getMessage():Object {
             var _re:RegExp = /^\s*$/;
             var __msg:String = ti.text;
-            if(_re.test(__msg))
+            if (_re.test(__msg))
             //如果输入的字符串仅包含空格、回车或者空，就不能发送信息
             {
                 ti.setFocus();
@@ -34,18 +33,16 @@
             chat['id'] = new Date().getTime();
             chat['te'] = __msg;
             chat['co'] = cp.selectedColor;
-            chat['we'] = bBTN.selected?'bold':'normal';
-            chat['st'] = iBTN.selected?'italic':'normal';
-            chat['de'] = uBTN.selected?'underline':'none';
-            chat['si'] =ns.value ;
+            chat['we'] = bBTN.selected ? 'bold' : 'normal';
+            chat['st'] = iBTN.selected ? 'italic' : 'normal';
+            chat['de'] = uBTN.selected ? 'underline' : 'none';
+            chat['si'] = ns.value;
             chat['d'] = DateUtil.dateLblChat(new Date());
 
 
-
-            chat['status']="loading";
+            chat['status'] = "loading";
             chatsArr.addItem(chat);
             showLastMsg();
-
 
 
             ti.text = '';
@@ -53,25 +50,25 @@
             return chat;
         }
 
-        public function showLastMsg():void{
-            if(chatsArr.length>0){
-                chatList.ensureIndexIsVisible(chatsArr.length-1);
+        public function showLastMsg():void {
+            if (chatsArr.length > 0) {
+                chatList.ensureIndexIsVisible(chatsArr.length - 1);
             }
         }
 
-        private function pressEnter(e:KeyboardEvent):void{
+        private function pressEnter(e:KeyboardEvent):void {
             var message:Object = getMessage();
-            if(message!=null){
+            if (message != null) {
                 var e:ChatEvent = new ChatEvent();
                 e.message = message;
                 dispatchEvent(e);
             }
 
         }
-        protected function sendBTN_clickHandler(event:MouseEvent=null):void
-        {
+
+        protected function sendBTN_clickHandler(event:MouseEvent = null):void {
             var message:Object = getMessage();
-            if(message!=null){
+            if (message != null) {
                 var e:ChatEvent = new ChatEvent();
                 e.message = message;
                 dispatchEvent(e);

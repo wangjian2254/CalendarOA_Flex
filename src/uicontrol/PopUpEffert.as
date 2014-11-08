@@ -1,15 +1,15 @@
 package uicontrol
 {
-	import flash.display.DisplayObject;
-	import flash.system.Capabilities;
-	
-	import mx.core.IFlexDisplayObject;
-	import mx.core.UIComponent;
-	import mx.effects.Move;
-	import mx.events.TweenEvent;
-	import mx.managers.PopUpManager;
+import flash.display.DisplayObject;
+import flash.system.Capabilities;
 
-	public class PopUpEffert
+import mx.core.IFlexDisplayObject;
+import mx.core.UIComponent;
+import mx.effects.Move;
+import mx.events.TweenEvent;
+import mx.managers.PopUpManager;
+
+public class PopUpEffert
 	{
 		static private var move:Move=new Move();
 		public function PopUpEffert()

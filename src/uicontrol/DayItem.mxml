@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" borderVisible="false" height="110" click="createSchedule(event)"  creationComplete="init()" xmlns:uicontrol="uicontrol.*">
-	<s:layout>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                   xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:mx="library://ns.adobe.com/flex/mx" width="100" borderVisible="false" height="110"
+                   click="createSchedule(event)" creationComplete="init()">
+    <s:layout>
 		<s:VerticalLayout gap="0"/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
         import events.ChangeScheduleEvent;
+
         import model.Schedule;
 
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
+
         import spark.layouts.BasicLayout;
         import spark.skins.spark.BorderContainerSkin;
 
         import util.DateUtil;
         import util.ScheduleUtil;
         import util.ToolUtil;
-
 
         [Bindable]
         public var blank:Boolean = false;
@@ -139,9 +141,9 @@
                 scheduleItem.scheduleId = obj.id;
                 scheduleItem.width = this.width - 5;
 
-                switch (obj.status){
+                switch (obj.status) {
                     case 1:
-                        if(!obj.isOutOfDate()){
+                        if (!obj.isOutOfDate()) {
                             scheduleItem.setStyle("borderWeight", 1);
                             scheduleItem.setStyle("borderColor", 0x000000);
                         }
@@ -159,7 +161,7 @@
 
                         break;
                 }
-                if(obj.isOutOfDate()){
+                if (obj.isOutOfDate()) {
                     scheduleItem.setStyle("borderColor", 0xff0000);
                 }
 

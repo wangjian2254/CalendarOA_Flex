@@ -8,16 +8,11 @@
 
 package org.bytearray.gif.encoder
 {
-	import flash.utils.ByteArray;
-	import flash.display.BitmapData;
-	import flash.display.Bitmap;
-	import org.bytearray.gif.encoder.NeuQuant
-	import flash.net.URLRequestHeader;
-	import flash.net.URLRequestMethod;
-	import flash.net.URLRequest;
-	import flash.net.navigateToURL;
-	
-	public class GIFEncoder
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.utils.ByteArray;
+
+public class GIFEncoder
 	{
 		private var width:int // image size
   		private var height:int;

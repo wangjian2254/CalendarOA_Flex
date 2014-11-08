@@ -1,10 +1,10 @@
 package org.idream.pomelo 
 {
-	import flash.utils.ByteArray;
-	
-	import org.idream.pomelo.interfaces.IMessage;
-	
-	/**
+import flash.utils.ByteArray;
+
+import org.idream.pomelo.interfaces.IMessage;
+
+/**
 	 * ...
 	 * @author Deo
 	 */

@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
-	<fx:Script>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700"
+                          borderVisible="false" backgroundAlpha="0">
+    <fx:Script>
 		<![CDATA[
         import control.window.CreateProjectPanel;
-        import control.window.GroupMemberPanel;
-        import control.window.GroupPanel;
         import control.window.PersonPanel;
 
         import events.ChangeUserEvent;
-        import events.ChatTimelineEvent;
         import events.CloseContainerEvent;
         import events.ListClickEvent;
 
         import httpcontrol.HttpServiceUtil;
-
-        import json.JParser;
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
@@ -28,11 +24,6 @@
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
 
-        import org.idream.pomelo.Pomelo;
-        import org.idream.pomelo.PomeloEvent;
-
-        import util.ChatManager;
-        import util.DateUtil;
         import util.RightClickManager;
         import util.ToolUtil;
 
@@ -43,8 +34,9 @@
             {label: "删除", icon: delimg, mod: "del"}
         ]);
 
-        override public function releaseListener():void{
+        override public function releaseListener():void {
         }
+
         override public function init(e:FlexEvent):void {
 
         }
@@ -102,20 +94,40 @@
         private function listItemClick_handler(e:ListClickEvent):void {
             contextMenuItems = new ArrayCollection([
                 {"icon": CBorderContainer.wximg, "text": "发送消息", "mode": "chat", "selectedUser": e.data},
-                {"icon": CBorderContainer.wximg, "text": "把'" + e.data.name + "'加入常用联系人", "mode": "addcontact", "selectedUser": e.data},
-                {"icon": CBorderContainer.saveimg, "text": "查看'" + e.data.name + "'的信息", "mode": "show", "selectedUser": e.data}
+                {
+                    "icon": CBorderContainer.wximg,
+                    "text": "把'" + e.data.name + "'加入常用联系人",
+                    "mode": "addcontact",
+                    "selectedUser": e.data
+                },
+                {
+                    "icon": CBorderContainer.saveimg,
+                    "text": "查看'" + e.data.name + "'的信息",
+                    "mode": "show",
+                    "selectedUser": e.data
+                }
             ]);
             for each(var contact:Object in ToolUtil.contactsList) {
                 if (e.data.id == contact.id) {
                     contextMenuItems = new ArrayCollection([
                         {"icon": CBorderContainer.wximg, "text": "发送消息", "mode": "chat", "selectedUser": e.data},
-                        {"icon": CBorderContainer.saveimg, "text": "查看'" + e.data.name + "'信息", "mode": "show", "selectedUser": e.data}
+                        {
+                            "icon": CBorderContainer.saveimg,
+                            "text": "查看'" + e.data.name + "'信息",
+                            "mode": "show",
+                            "selectedUser": e.data
+                        }
                     ]);
                 }
             }
             if (e.data.id == ToolUtil.sessionUser.pid) {
                 contextMenuItems = new ArrayCollection([
-                    {"icon": CBorderContainer.saveimg, "text": "查看'" + e.data.name + "'信息", "mode": "show", "selectedUser": e.data}
+                    {
+                        "icon": CBorderContainer.saveimg,
+                        "text": "查看'" + e.data.name + "'信息",
+                        "mode": "show",
+                        "selectedUser": e.data
+                    }
                 ]);
             }
 

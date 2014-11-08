@@ -1,103 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-				   xmlns:s="library://ns.adobe.com/flex/spark" 
-				   xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" width="426" height="300" borderVisible="false">
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+				   xmlns:s="library://ns.adobe.com/flex/spark"
+				   initialize="init()" width="426" height="300" borderVisible="false">
 	<s:layout>
 		<s:HorizontalLayout/>
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
-			import mx.events.CollectionEvent;
-			import mx.utils.ObjectUtil;
-			
-			private function init():void{
-				dataProvider.addEventListener(CollectionEvent.COLLECTION_CHANGE,changeDataProvider);
+		import mx.collections.ArrayCollection;
+		import mx.events.CollectionEvent;
+		import mx.utils.ObjectUtil;
+
+		private function init():void {
+			dataProvider.addEventListener(CollectionEvent.COLLECTION_CHANGE, changeDataProvider);
+		}
+
+		[Bindable]
+		public var dataProvider:ArrayCollection;
+
+
+		public function changeDataProvider(e:CollectionEvent):void {
+			this.dataProviderSelected.removeAll();
+			this.dataProviderUnSelected = ObjectUtil.copy(dataProvider) as ArrayCollection;
+		}
+
+		[Bindable]
+		private var _labelField:String;
+		public function get labelField():String {
+			return this._labelField;
+		}
+
+		public function set labelField(d:String):void {
+			this._labelField = d;
+		}
+
+		public function selectedItem(evt:MouseEvent):void {
+			var i:Number;
+			for each(var item:Object in all.selectedItems) {
+				if (item == null) {
+					return;
+				}
+				i = dataProviderUnSelected.getItemIndex(item);
+				if (i == -1) {
+					return;
+				}
+				dataProviderUnSelected.removeItemAt(i);
+				dataProviderSelected.addItem(item);
 			}
-			[Bindable]
-			public var dataProvider:ArrayCollection;
-			
-			
-			public function changeDataProvider(e:CollectionEvent):void{
-				this.dataProviderSelected.removeAll();
-				this.dataProviderUnSelected=ObjectUtil.copy(dataProvider) as ArrayCollection;
+
+		}
+
+		public function unSelectedItem(evt:MouseEvent):void {
+			var i:Number;
+			for each(var item:Object in selected.selectedItems) {
+				if (item == null) {
+					return;
+				}
+				i = dataProviderSelected.getItemIndex(item);
+				if (i == -1) {
+					return;
+				}
+				dataProviderSelected.removeItemAt(i);
+				dataProviderUnSelected.addItem(item);
 			}
-			
-			[Bindable]
-			private var _labelField:String;
-			public function get labelField():String{
-				return this._labelField;
+		}
+
+		public function get selectedItems():Vector.<Object> {
+			var items:Vector.<Object> = new Vector.<Object>();
+			for each(var item:Object in selected.dataProvider) {
+				items.push(item);
+
 			}
-			public function set labelField(d:String):void{
-				this._labelField=d;
+			return items;
+		}
+
+		public function set selectedItems(items:Vector.<Object>):void {
+
+			var i:Number;
+			for each(var itemObj:Object in dataProviderSelected) {
+				dataProviderUnSelected.addItem(itemObj);
 			}
-			
-			public function selectedItem(evt:MouseEvent):void{
-				var i:Number;
-				for each(var item:Object in all.selectedItems){
-					if(item==null){
-						return;
+			dataProviderSelected.removeAll();
+			for each(var item:Object in items) {
+				for each(var item1:Object in dataProviderUnSelected) {
+					if (item1.id != item.id) {
+						continue;
 					}
-					i=dataProviderUnSelected.getItemIndex(item);
-					if(i==-1){
+					i = dataProviderUnSelected.getItemIndex(item1);
+					if (i == -1) {
 						return;
 					}
 					dataProviderUnSelected.removeItemAt(i);
-					dataProviderSelected.addItem(item);
+					dataProviderSelected.addItem(item1);
 				}
-				
+
+
 			}
-			public function unSelectedItem(evt:MouseEvent):void{
-				var i:Number;
-				for each(var item:Object in selected.selectedItems){
-					if(item==null){
-						return;
-					}
-					i=dataProviderSelected.getItemIndex(item);
-					if(i==-1){
-						return;
-					}
-					dataProviderSelected.removeItemAt(i);
-					dataProviderUnSelected.addItem(item);
-				}
-			}
-			
-			public function get selectedItems():Vector.<Object>{
-				var items:Vector.<Object>=new Vector.<Object>();
-				for each(var item:Object in selected.dataProvider){
-					items.push(item);
-					
-				}
-				return items;
-			}
-			public function set selectedItems(items:Vector.<Object>):void{
-				
-				var i:Number;
-				for each(var itemObj:Object in dataProviderSelected){
-					dataProviderUnSelected.addItem(itemObj);
-				}
-				dataProviderSelected.removeAll();
-				for each(var item:Object in items){
-					for each(var item1:Object in dataProviderUnSelected){
-						if(item1.id!=item.id){
-							continue;
-						}
-						i=dataProviderUnSelected.getItemIndex(item1);
-						if(i==-1){
-							return;
-						}
-						dataProviderUnSelected.removeItemAt(i);
-						dataProviderSelected.addItem(item1);
-					}
-					
-					
-				}
-			}
-			
-			[Bindable]
-			private var dataProviderSelected:ArrayCollection=new ArrayCollection();
-			[Bindable]
-			private var dataProviderUnSelected:ArrayCollection;
+		}
+
+		[Bindable]
+		private var dataProviderSelected:ArrayCollection = new ArrayCollection();
+		[Bindable]
+		private var dataProviderUnSelected:ArrayCollection;
 		]]>
 	</fx:Script>
 	<fx:Declarations>

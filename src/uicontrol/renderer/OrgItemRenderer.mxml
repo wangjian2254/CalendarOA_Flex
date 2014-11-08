@@ -11,7 +11,6 @@
     </fx:Metadata>
     <fx:Script><![CDATA[
         import control.window.ApplyOrgPanel;
-        import control.window.ApplyOrgPanel;
 
         import events.ListClickEvent;
 

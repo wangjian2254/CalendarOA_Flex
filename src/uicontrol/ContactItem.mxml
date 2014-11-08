@@ -7,11 +7,7 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-        import control.window.SchedulePanel;
-
         import events.ChangeJoinUserEvent;
-
-        import mx.controls.Alert;
 
         import spark.components.TileGroup;
 

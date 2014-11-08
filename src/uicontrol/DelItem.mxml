@@ -7,69 +7,73 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import events.DelItemEvent;
-			
-			import mx.controls.Alert;
-			import mx.core.IVisualElementContainer;
-			import mx.core.UIComponent;
-			import mx.events.FlexEvent;
-			
-			
-			[Bindable]
-			[Embed("/assets/img/tabbutton/X_down.png")]
-			public var X_down:Class;
-			[Bindable]
-			[Embed("/assets/img/tabbutton/X_hover.png")]
-			public var X_hover:Class;
-			[Bindable]
-			[Embed("/assets/img/tabbutton/X_out.png")]
-			public var X_out:Class;
-			
-			
-			[Bindable]
-			public var data:Object = null;
-			
-			[Bindable]
-			public var modifyEnable:Boolean = false;
-			
-			
-			public var labelFunction:Function=null;
-			private var _labelField:String;
-			public function get labelField():String{
-				return _labelField
+		import events.DelItemEvent;
+
+		import mx.core.IVisualElementContainer;
+		import mx.core.UIComponent;
+		import mx.events.FlexEvent;
+
+		[Bindable]
+		[Embed("/assets/img/tabbutton/X_down.png")]
+		public var X_down:Class;
+		[Bindable]
+		[Embed("/assets/img/tabbutton/X_hover.png")]
+		public var X_hover:Class;
+		[Bindable]
+		[Embed("/assets/img/tabbutton/X_out.png")]
+		public var X_out:Class;
+
+
+		[Bindable]
+		public var data:Object = null;
+
+		[Bindable]
+		public var modifyEnable:Boolean = false;
+
+
+		public var labelFunction:Function = null;
+		private var _labelField:String;
+		public function get labelField():String {
+			return _labelField
+		}
+
+		public function set labelField(value:String):void {
+			_labelField = value;
+		}
+
+		private function init():void {
+			var text:String = labelFunction is Function ? labelFunction() : data[labelField];
+			if (text) {
+				linkItem.label = text;
+			} else {
+				linkItem.label = "";
 			}
-			public function set labelField(value:String):void{
-				_labelField=value;
-			}
-			private function init():void{
-				var text:String = labelFunction is Function ? labelFunction():data[labelField];
-				if(text){
-					linkItem.label=text;
-				}else{
-					linkItem.label="";
-				}
-			}
-			private function removeHandler(event:FlexEvent):void
-			{
-				labelFunction=null;
-				data=null;
-			}
-			private function clickHandler():void{
-				data.selected = false;
-				this.parent is IVisualElementContainer ? IVisualElementContainer(this.parent).removeElement(this):UIComponent(this.parent).removeChild(this);
-				dispatchEvent(new DelItemEvent());
-			}
-			public function closeO():void{
-				
-				this.clo.source=X_hover;
-			}
-			public function closeD():void{
-				
-				this.clo.source=X_down;
-			}
-			public function closeU():void{
-				this.clo.source=X_out;
-			}
+		}
+
+		private function removeHandler(event:FlexEvent):void {
+			labelFunction = null;
+			data = null;
+		}
+
+		private function clickHandler():void {
+			data.selected = false;
+			this.parent is IVisualElementContainer ? IVisualElementContainer(this.parent).removeElement(this) : UIComponent(this.parent).removeChild(this);
+			dispatchEvent(new DelItemEvent());
+		}
+
+		public function closeO():void {
+
+			this.clo.source = X_hover;
+		}
+
+		public function closeD():void {
+
+			this.clo.source = X_down;
+		}
+
+		public function closeU():void {
+			this.clo.source = X_out;
+		}
 		]]>
 	</fx:Script>
 	<fx:Declarations>

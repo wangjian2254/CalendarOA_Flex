@@ -1,8 +1,8 @@
 package events
 {
-	import flash.events.Event;
-	
-	public class QuiteEvent extends Event
+import flash.events.Event;
+
+public class QuiteEvent extends Event
 	{	
 		static public const Quite:String="quiteUser";
         public var needTip:Boolean = true;

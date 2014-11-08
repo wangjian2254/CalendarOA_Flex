@@ -11,28 +11,19 @@
         import events.ChangeUserEvent;
         import events.CloseContainerEvent;
         import events.ListClickEvent;
-        import events.PageChangeEvent;
         import events.QueryScheduleEvent;
-
-        import httpcontrol.CHTTPService;
-        import httpcontrol.HttpServiceUtil;
 
         import model.Schedule;
 
         import mx.collections.ArrayCollection;
-        import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CollectionEvent;
         import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
         import mx.events.ResizeEvent;
         import mx.formatters.DateFormatter;
-        import mx.managers.PopUpManager;
-        import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
 
         import uicontrol.DayItem;
-        import uicontrol.GroupItem;
         import uicontrol.ScheduleItem;
         import uicontrol.TaskItem;
 
@@ -96,7 +87,7 @@
             if (!ToolUtil.sessionUser.hasOwnProperty('pid')) {
                 return;
             }
-            if ((showModel.selectedItem.value != "monthly" && calendarBorder.numElements > 0)||(showModel.selectedItem.value == "monthly"&&calendarPanel.numElements>0)) {
+            if ((showModel.selectedItem.value != "monthly" && calendarBorder.numElements > 0) || (showModel.selectedItem.value == "monthly" && calendarPanel.numElements > 0)) {
                 var event:QueryScheduleEvent = new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str, true);
                 if (showModel.selectedItem.value == "monthly") {
                     event.start = (calendarPanel.getElementAt(0) as DayItem).date;
@@ -112,11 +103,17 @@
         }
 
         public function getShowDateRange():Object {
-            if ((showModel.selectedItem.value != "monthly" && calendarBorder.numElements > 0)||(showModel.selectedItem.value == "monthly"&&calendarPanel.numElements>0)) {
+            if ((showModel.selectedItem.value != "monthly" && calendarBorder.numElements > 0) || (showModel.selectedItem.value == "monthly" && calendarPanel.numElements > 0)) {
                 if (showModel.selectedItem.value == "monthly") {
-                    return {'start': (calendarPanel.getElementAt(0) as DayItem).date, 'end': (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date};
+                    return {
+                        'start': (calendarPanel.getElementAt(0) as DayItem).date,
+                        'end': (calendarPanel.getElementAt(calendarPanel.numElements - 1) as DayItem).date
+                    };
                 } else {
-                    return {'start': (calendarBorder.getElementAt(1) as DayItem).date, 'end': (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date};
+                    return {
+                        'start': (calendarBorder.getElementAt(1) as DayItem).date,
+                        'end': (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date
+                    };
                 }
 
 

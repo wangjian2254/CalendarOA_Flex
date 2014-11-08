@@ -1,24 +1,22 @@
-import control.ChatDemoContol;
-import control.ProjectControl;
-import control.window.AddPersonPanel;
 import control.CBorderContainer;
 import control.CalendarControl;
+import control.ChatDemoContol;
 import control.ContactControl;
 import control.DepartmentControl;
-import control.GroupControl;
 import control.IMControl;
-import control.window.CheckApplyPanel;
-import control.LogControl
+import control.LogControl;
 import control.PaperControl;
 import control.PaperKindControl;
+import control.ProjectControl;
 import control.SubjectControl;
 import control.SubjectKindControl;
 import control.UserPaperControl;
+import control.window.AddPersonPanel;
+import control.window.CheckApplyPanel;
 
 import events.ChangeMenuEvent;
 
 import flash.display.DisplayObject;
-
 import flash.events.Event;
 import flash.events.MouseEvent;
 
@@ -31,10 +29,7 @@ import mx.managers.PopUpManager;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 
-import spark.components.Button;
-
 import uicontrol.MenuButton;
-
 
 public function failMenu(evt:FaultEvent):void {
 	Alert.show("获取用户菜单失败。", "提示");

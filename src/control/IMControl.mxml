@@ -11,19 +11,18 @@
 
         import model.ChatChannel;
 
-
-        import mx.collections.ArrayCollection;
         import mx.events.FlexEvent;
 
         import org.idream.pomelo.Pomelo;
         import org.idream.pomelo.PomeloEvent;
 
         import util.ChatManager;
-
         import util.ToolUtil;
-        override public function releaseListener():void{
+
+        override public function releaseListener():void {
             Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
         }
+
         override public function init(e:FlexEvent):void {
             if (!param) {
             }
@@ -52,30 +51,30 @@
             if (param) {
                 var chatChannel:ChatChannel;
                 var c:ChatChannel;
-                for each(c in ToolUtil.groupList){
-                    if(c.channel == param){
+                for each(c in ToolUtil.groupList) {
+                    if (c.channel == param) {
                         chatChannel = c;
                         break;
                     }
                 }
-                if(chatChannel==null){
-                    for each(c in addressList.departMember){
-                        if(c.channel == param){
+                if (chatChannel == null) {
+                    for each(c in addressList.departMember) {
+                        if (c.channel == param) {
                             chatChannel = c;
                             break;
                         }
                     }
                 }
-                if(chatChannel==null){
-                    for each(c in addressList.userMember){
-                        if(c.channel == param){
+                if (chatChannel == null) {
+                    for each(c in addressList.userMember) {
+                        if (c.channel == param) {
                             chatChannel = c;
                             break;
                         }
                     }
                 }
-                if(chatChannel!=null){
-                    var event:ListClickEvent = new ListClickEvent("chat",chatChannel);
+                if (chatChannel != null) {
+                    var event:ListClickEvent = new ListClickEvent("chat", chatChannel);
                     listItemClick_handler(event);
                 }
 
@@ -90,7 +89,10 @@
                 for each(var c:ChatChannel in ToolUtil.groupList) {
                     if (c.channel == e.channel) {
                         c.unread = 0;
-                        Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {channel: e.channel, pid: ToolUtil.sessionUser.pid});
+                        Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {
+                            channel: e.channel,
+                            pid: ToolUtil.sessionUser.pid
+                        });
                     }
                 }
                 ToolUtil.groupList.refresh();
@@ -98,12 +100,15 @@
 
         }
 
-        private function unsubscribe_handler(e:ListClickEvent):void{
+        private function unsubscribe_handler(e:ListClickEvent):void {
             var chat:ChatChannel = e.data as ChatChannel;
-            if(chat==null){
+            if (chat == null) {
                 trace("开启聊天框出错");
-            }else{
-                Pomelo.getIns().request("connector.entryHandler.unsubscribeChannel", {channel: chat.channel, pid: ToolUtil.sessionUser.pid},function(data:Object):void{
+            } else {
+                Pomelo.getIns().request("connector.entryHandler.unsubscribeChannel", {
+                    channel: chat.channel,
+                    pid: ToolUtil.sessionUser.pid
+                }, function (data:Object):void {
                     if (data.code == '500') {
                         return;
                     }
@@ -123,7 +128,7 @@
 
         private function listItemClick_handler(e:ListClickEvent):void {
             var chat:ChatChannel = e.data as ChatChannel;
-            if(chat==null){
+            if (chat == null) {
                 trace("开启聊天框出错");
             }
             var mod:String = '';

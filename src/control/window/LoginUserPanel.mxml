@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" width="350" height="190" title="用户登录"
-                             creationComplete="init()"  xmlns:window="control.window.*">
-	<fx:Script>
+                             width="350" height="190" title="用户登录"
+                             creationComplete="init()" xmlns:window="control.window.*">
+    <fx:Script>
 		<![CDATA[
         import httpcontrol.HttpServiceUtil;
-        import httpcontrol.RemoteUtil;
 
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.managers.PopUpManager;
-        import mx.rpc.AbstractOperation;
         import mx.rpc.events.ResultEvent;
 
         import util.ToolUtil;
-        import util.UserUtil;
 
-        override public function  releaseListener(e:CloseEvent):void{
+        override public function releaseListener(e:CloseEvent):void {
         }
+
         private function init():void {
             this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
             this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
         }
-
 
 
         public function reg():void {
@@ -33,7 +30,7 @@
         }
 
         private var emailexp:RegExp = /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-        private var phoneexp:RegExp =/^1\d{10}$/;
+        private var phoneexp:RegExp = /^1\d{10}$/;
 
         public function save():void {
             if (this.username.text == "" ||
@@ -41,7 +38,7 @@
                 Alert.show("请填写完整信息。", "提示");
                 return;
             }
-            if(!emailexp.test(username.text)&&!phoneexp.test(username.text)){
+            if (!emailexp.test(username.text) && !phoneexp.test(username.text)) {
                 Alert.show("请填写正确的邮箱或手机号。", "提示");
                 return;
             }
@@ -56,8 +53,8 @@
         }
 
         public function refresh(r:Object, e:ResultEvent):void {
-                ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
-                closeWin();
+            ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+            closeWin();
         }
 
         private function foucePass():void {

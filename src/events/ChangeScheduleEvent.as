@@ -1,12 +1,8 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class ChangeScheduleEvent extends Event
+import flash.events.Event;
+
+public class ChangeScheduleEvent extends Event
 		
 	{
 		public static var ChangeSchedule_EventStr:String="Change_Schedule";

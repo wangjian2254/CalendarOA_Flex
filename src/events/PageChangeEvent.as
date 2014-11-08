@@ -1,12 +1,8 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class PageChangeEvent extends Event
+import flash.events.Event;
+
+public class PageChangeEvent extends Event
 		
 	{
 		public static var PageChange_EventStr:String="Page_Change";

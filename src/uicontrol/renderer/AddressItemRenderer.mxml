@@ -13,11 +13,6 @@
     <fx:Script><![CDATA[
         import events.ListClickEvent;
 
-        import mx.controls.Alert;
-
-
-        import spark.components.Group;
-
         import util.ColorUtil;
 
         private var rLum:Number = 0.2225;
@@ -40,9 +35,9 @@
         [Bindable]
         [Embed("/assets/img/arrow_closed.gif")]
         public static var righticon:Class;
-//        [Bindable]
-//        [Embed("/assets/img/arrow_opened.gif")]
-//        public static var opened:Class;
+        //        [Bindable]
+        //        [Embed("/assets/img/arrow_opened.gif")]
+        //        public static var opened:Class;
 
         private var _data:Object;
         override public function get data():Object {
@@ -51,48 +46,48 @@
 
 
         override public function set data(value:Object):void {
-            trace("chat member list"+value.name);
+            trace("chat member list" + value.name);
             _data = value;
             super.data = value;
-            if(value==null){
+            if (value == null) {
                 return;
             }
 
-            if(!data.hasOwnProperty('unread')||data.unread<1){
-                num.visible=false;
-            }else{
+            if (!data.hasOwnProperty('unread') || data.unread < 1) {
+                num.visible = false;
+            } else {
                 num.visible = true;
                 numLabel.text = data.unread;
             }
-            if(!data.hasOwnProperty('hideicon')){
+            if (!data.hasOwnProperty('hideicon')) {
                 childicon.source = null;
 //                childicon.visible = false;
                 head.source = data.icon;
                 rightContainer.visible = false;
                 rightContainer.width = 0;
 
-            }else if(data['childrenstatus']){
-                head.source=null;
+            } else if (data['childrenstatus']) {
+                head.source = null;
                 head.width = 0;
                 head.visible = false;
                 rightContainer.visible = true;
                 rightContainer.width = 50;
-                 childicon.source = closed;
-            }else{
-                head.source=null;
+                childicon.source = closed;
+            } else {
+                head.source = null;
                 head.width = 0;
                 head.visible = false;
                 rightContainer.visible = true;
                 rightContainer.width = 50;
-                 childicon.source = opened;
+                childicon.source = opened;
             }
 
             change_status();
             nameLabel.text = data.name;
-            if(!data.hasOwnProperty('level')){
-                data.level=0;
+            if (!data.hasOwnProperty('level')) {
+                data.level = 0;
             }
-            horizontalLayout.paddingLeft = 5+data.level*15;
+            horizontalLayout.paddingLeft = 5 + data.level * 15;
             solidColor.color = getColor(data);
 
 
@@ -105,63 +100,63 @@
 //            }
         }
 
-        private function change_status():void{
-            if(data.hasOwnProperty('online')){
-                if(data.online){
+        private function change_status():void {
+            if (data.hasOwnProperty('online')) {
+                if (data.online) {
                     head.filters = [];
-                }else{
+                } else {
                     head.filters = [cmf];
                 }
-            }else{
+            } else {
                 head.filters = [];
             }
         }
 
-        private function unsubscribe_handler():void{
-            if((data && data.id>=0)||data.hasOwnProperty("channel")){
-                var listclickevent:ListClickEvent=new ListClickEvent(ListClickEvent.UNSUBSCRIBE,data);
-                dispatchEvent(listclickevent);
-            }
-
-        }
-        private function select_handler(e:MouseEvent):void{
-            if((data && data.id>=0)||data.hasOwnProperty("channel")){
-                var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
+        private function unsubscribe_handler():void {
+            if ((data && data.id >= 0) || data.hasOwnProperty("channel")) {
+                var listclickevent:ListClickEvent = new ListClickEvent(ListClickEvent.UNSUBSCRIBE, data);
                 dispatchEvent(listclickevent);
             }
 
         }
 
-        private function zhankai(e:MouseEvent):void{
-            if(!rightContainer.visible){
+        private function select_handler(e:MouseEvent):void {
+            if ((data && data.id >= 0) || data.hasOwnProperty("channel")) {
+                var listclickevent:ListClickEvent = new ListClickEvent("listItemClick", data);
+                dispatchEvent(listclickevent);
+            }
+
+        }
+
+        private function zhankai(e:MouseEvent):void {
+            if (!rightContainer.visible) {
                 select_handler(null);
                 return;
             }
-            var listclickevent:ListClickEvent=new ListClickEvent("listItemZhanKai",data);
+            var listclickevent:ListClickEvent = new ListClickEvent("listItemZhanKai", data);
             dispatchEvent(listclickevent);
-            if(childicon.source == closed){
+            if (childicon.source == closed) {
                 childicon.source = opened;
-            }else{
+            } else {
                 childicon.source = closed;
             }
         }
 
-        protected function getColor(data:Object):uint
-        {
-            if(data){
-                return ColorUtil.generateTransitionalColor(0xffffff,0xB3B3B3,5)[data.level%5];
+        protected function getColor(data:Object):uint {
+            if (data) {
+                return ColorUtil.generateTransitionalColor(0xffffff, 0xB3B3B3, 5)[data.level % 5];
             }
             return 0xffffff;
         }
 
-        protected function m_over():void{
+        protected function m_over():void {
             solidColor.color = 0x7ae7bf;
-            if(data.hasOwnProperty("delable")){
+            if (data.hasOwnProperty("delable")) {
                 btnDel.visible = data.delable;
             }
         }
 
-        protected function m_out():void{
+        protected function m_out():void {
             solidColor.color = getColor(data);
             btnDel.visible = false;
         }

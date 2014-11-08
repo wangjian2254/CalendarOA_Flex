@@ -16,16 +16,17 @@
         import mx.controls.Alert;
         import mx.events.FlexEvent;
 
-
         import org.idream.pomelo.Pomelo;
         import org.idream.pomelo.PomeloEvent;
 
         private var pomelo:Pomelo;
-        override public function releaseListener():void{
+
+        override public function releaseListener():void {
             pomelo.removeEventListener('onAdd', addUserHandler);
             pomelo.removeEventListener('onLeave', removeUserHandler);
             pomelo.removeEventListener('onChat', chatHandler);
         }
+
         override public function init(e:FlexEvent):void {
             if (!param) {
             }
@@ -107,7 +108,11 @@
             var target:String = usersList.selectedItem ? usersList.selectedItem : '*';
             if (target != '*')
                 msg.text += '你对' + target + '说: ' + msgInput.text + '\n';
-            pomelo.request('chat.chatHandler.send', {content: msgInput.text, rid: roomID, target: target}, function (data:Object):void {
+            pomelo.request('chat.chatHandler.send', {
+                content: msgInput.text,
+                rid: roomID,
+                target: target
+            }, function (data:Object):void {
                 trace(data);
             });
         }

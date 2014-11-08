@@ -2,10 +2,7 @@
  * Created by WangJian on 2014/10/30.
  */
 package model {
-import mx.effects.Fade;
-
 import util.DateUtil;
-
 import util.ToolUtil;
 
 public class Schedule {

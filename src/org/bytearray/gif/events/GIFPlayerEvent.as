@@ -1,9 +1,9 @@
 package org.bytearray.gif.events
 {
-	import flash.events.Event;
-	import flash.geom.Rectangle;
-	
-	public class GIFPlayerEvent extends Event
+import flash.events.Event;
+import flash.geom.Rectangle;
+
+public class GIFPlayerEvent extends Event
 	{
 		public var rect:Rectangle;
 		

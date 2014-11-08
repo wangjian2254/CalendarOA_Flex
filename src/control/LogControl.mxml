@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
-						  xmlns:uicontrol="uicontrol.*"
-						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
-	
-	<fx:Script>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*"
+                          width="700" height="500" borderVisible="false" backgroundAlpha="0">
+
+    <fx:Script>
 		<![CDATA[
-        import control.*;
-
         import events.CloseContainerEvent;
-        import events.PageChangeEvent;
 
-        import httpcontrol.CHTTPService;
         import httpcontrol.HttpServiceUtil;
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
+        import mx.events.CloseEvent;
         import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
-        import mx.utils.StringUtil;
 
         import util.DateUtil;
         import util.ToolUtil;
@@ -40,8 +34,9 @@
         [Bindable]
         private var list:ArrayCollection = new ArrayCollection();
 
-        override public function releaseListener():void{
+        override public function releaseListener():void {
         }
+
         override public function init(e:FlexEvent):void {
             showLog();
             queryLog();
@@ -140,7 +135,7 @@
             }
         }
 
-        private function showLogItem(e:mx.events.CloseEvent):void {
+        private function showLogItem(e:CloseEvent):void {
             if (e.detail == Alert.YES) {
                 cBoxModelHistory.selected = false;
                 showChangeMessage();

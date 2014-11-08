@@ -10,21 +10,17 @@
         import events.ChangeMenuEvent;
         import events.ChangeUserEvent;
         import events.CloseContainerEvent;
-        import events.PageChangeEvent;
 
-        import httpcontrol.CHTTPService;
         import httpcontrol.HttpServiceUtil;
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
         import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
-        import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
 
         import util.ToolUtil;
-
 
         [Bindable]
         private var joinlist:ArrayCollection = new ArrayCollection();
@@ -32,8 +28,10 @@
         private var observerlist:ArrayCollection = new ArrayCollection();
 
         private var groupData:Object = null;
-        override public function releaseListener():void{
+
+        override public function releaseListener():void {
         }
+
         override public function init(e:FlexEvent):void {
 
             add();
@@ -166,7 +164,7 @@
         }
 
         //删除日程
-        private function del(e:mx.events.CloseEvent):void {
+        private function del(e:CloseEvent):void {
             if (e.detail == Alert.YES) {
                 var data:Object = new Object();
                 data["id"] = groupData.id;
@@ -186,7 +184,7 @@
         }
 
         //删除日程
-        private function quit(e:mx.events.CloseEvent):void {
+        private function quit(e:CloseEvent):void {
             if (e.detail == Alert.YES) {
                 var data:Object = new Object();
                 data["id"] = groupData.id;

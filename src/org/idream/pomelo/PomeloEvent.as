@@ -1,8 +1,8 @@
 package org.idream.pomelo
 {
-	import flash.events.Event;
-	
-	public class PomeloEvent extends Event
+import flash.events.Event;
+
+public class PomeloEvent extends Event
 	{
 		/**
 		 * 连接 Pomelo 服务器成功并验证成功

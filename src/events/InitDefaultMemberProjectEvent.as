@@ -1,12 +1,8 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class InitDefaultMemberProjectEvent extends Event
+import flash.events.Event;
+
+public class InitDefaultMemberProjectEvent extends Event
 		
 	{
 		public static var Default_Member_EventStr:String="InitDefaultMember";

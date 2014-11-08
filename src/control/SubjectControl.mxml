@@ -13,8 +13,8 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
+        import mx.events.CloseEvent;
         import mx.events.FlexEvent;
-        import mx.events.ListEvent;
         import mx.rpc.events.ResultEvent;
 
         import uicontrol.DelItem;
@@ -105,7 +105,7 @@
 
         private function delSubject():void {
             state = "del";
-            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:CloseEvent):void {
                 if (e.detail == Alert.YES) {
                     var o:Object = getFormData();
                     HttpServiceUtil.getCHTTPServiceAndResult("/kaoshi/delSubject", delSubjectDataResult, "POST").send(o);
@@ -120,7 +120,7 @@
         }
 
         private function delOption():void {
-            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:mx.events.CloseEvent):void {
+            Alert.show("是否删除", "提示", Alert.YES | Alert.NO, null, function (e:CloseEvent):void {
                 if (e.detail == Alert.YES) {
                     var o:Object = {};
                     o["id"] = optionGrid.selectedItem["id"];
@@ -414,23 +414,24 @@
 													<mx:VBox horizontalAlign="center" width="100%" remove="removeHandler(event)">
 														<fx:Script>
 															<![CDATA[
-																import mx.events.ListEvent;
-																private var _data:Object;
-																import mx.events.FlexEvent;
-																
-																protected function removeHandler(event:FlexEvent):void
-																{
-																	_data=null;
-																}
-																override public function set data(o:Object):void{
-																	_data=o;
-																	is_right.selected=o["is_right"];
-																}
-																private function clickHandler():void{
-																	_data["is_right"]=is_right.selected;
-																	dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK,false,false,-1,-1,null,this));
-																}
-															]]>
+                                                            import mx.events.FlexEvent;
+                                                            import mx.events.ListEvent;
+
+                                                            private var _data:Object;
+                                                            protected function removeHandler(event:FlexEvent):void {
+                                                                _data = null;
+                                                            }
+
+                                                            override public function set data(o:Object):void {
+                                                                _data = o;
+                                                                is_right.selected = o["is_right"];
+                                                            }
+
+                                                            private function clickHandler():void {
+                                                                _data["is_right"] = is_right.selected;
+                                                                dispatchEvent(new ListEvent(ListEvent.ITEM_CLICK, false, false, -1, -1, null, this));
+                                                            }
+                                                            ]]>
 														</fx:Script>
 														<mx:CheckBox id="is_right" click="clickHandler()">
 														</mx:CheckBox>

@@ -7,31 +7,32 @@
 	</s:layout>
 	<fx:Script>
 		<![CDATA[
-			import mx.controls.Alert;
-			[Bindable]
-			public var color:Number = 0xffffff;
-			[Bindable]
-			public var groupName : String = "开会";
-			
-			[Bindable]
-			public var groupId:String="21";
-			
-			[Bindable]
-			public var groupData:Object = null;
-			
-			public var fun:Function=null;
-			public var isshow:Boolean=true;
-			
-			
-			private function openSchedule():void{
-				if(fun!=null){
-					fun(this,groupData);
-				}else{
-					Alert.show(groupName,"日程");
-				}
-				
-				
+		import mx.controls.Alert;
+
+		[Bindable]
+		public var color:Number = 0xffffff;
+		[Bindable]
+		public var groupName:String = "开会";
+
+		[Bindable]
+		public var groupId:String = "21";
+
+		[Bindable]
+		public var groupData:Object = null;
+
+		public var fun:Function = null;
+		public var isshow:Boolean = true;
+
+
+		private function openSchedule():void {
+			if (fun != null) {
+				fun(this, groupData);
+			} else {
+				Alert.show(groupName, "日程");
 			}
+
+
+		}
 		]]>
 	</fx:Script>
 	<fx:Declarations>

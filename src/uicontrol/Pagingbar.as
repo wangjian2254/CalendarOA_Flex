@@ -1,13 +1,16 @@
 package uicontrol
 {
-	import flash.display.DisplayObject;
-	import flash.events.MouseEvent;
-	
-	import spark.components.Button;
-	import spark.components.TextInput;
-	import spark.components.supportClasses.SkinnableComponent;
+import httpcontrol.CHTTPService;
+import httpcontrol.HttpServiceUtil;
 
-	public class Pagingbar extends SkinnableComponent  
+import mx.collections.ArrayCollection;
+import mx.rpc.events.ResultEvent;
+
+import spark.components.Button;
+import spark.components.TextInput;
+import spark.components.supportClasses.SkinnableComponent;
+
+public class Pagingbar extends SkinnableComponent
 	{
 		[SkinPart(required="true")]  
 		public var fstButton:Button;
@@ -25,12 +28,7 @@ package uicontrol
 		{
 			
 		}
-		import httpcontrol.CHTTPService;
-		import httpcontrol.HttpServiceUtil;
-		
-		import mx.collections.ArrayCollection;
-		import mx.rpc.events.ResultEvent;
-		[Bindable]
+	[Bindable]
 		public var url:String="";
 		public var source:ArrayCollection;
 		public var limitProperty:String="limit";

@@ -1,17 +1,17 @@
 package uicontrol
 {
-	import flash.display.Loader;
-	import flash.events.Event;
-	import flash.events.ProgressEvent;
-	import flash.net.URLRequest;
-	import flash.text.TextField;
-	import flash.text.TextFormat;
-	import flash.utils.getTimer;
-	
-	import mx.events.RSLEvent;
-	import mx.preloaders.SparkDownloadProgressBar;
-	
-	public class LoadingExampleProgressBar extends SparkDownloadProgressBar
+import flash.display.Loader;
+import flash.events.Event;
+import flash.events.ProgressEvent;
+import flash.net.URLRequest;
+import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.utils.getTimer;
+
+import mx.events.RSLEvent;
+import mx.preloaders.SparkDownloadProgressBar;
+
+public class LoadingExampleProgressBar extends SparkDownloadProgressBar
 	{
 		private var _displayStartCount:uint = 0; 
 		private var _initProgressCount:uint = 0;

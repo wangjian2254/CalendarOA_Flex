@@ -10,21 +10,13 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
-        import control.window.ApplyOrgPanel;
-        import control.window.ApplyOrgPanel;
-
         import events.ListClickEvent;
 
         import httpcontrol.HttpServiceUtil;
 
-        import mx.controls.Alert;
-        import mx.core.FlexGlobals;
-        import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
 
-        import util.ToolUtil;
-
-        private var isFirstForAni:Boolean=true;
+        private var isFirstForAni:Boolean = true;
         private var _data:Object;
         override public function get data():Object {
             return _data;
@@ -33,7 +25,7 @@
         override public function set data(value:Object):void {
             _data = value;
             super.data = value;
-            if(value==null){
+            if (value == null) {
                 return;
             }
             solidColor.color = getColor();
@@ -46,40 +38,38 @@
         }
 
 
+        private function checkApply(f:Boolean):void {
 
-        private function checkApply(f:Boolean):void{
-
-                var obj:Object=new Object();
-                obj.apply_id = data.id;
-            if(f){
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/checkApply",refresh,"POST").send(obj);
-            }else{
-                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delApplyOrg",refresh,"POST").send(obj);
+            var obj:Object = new Object();
+            obj.apply_id = data.id;
+            if (f) {
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/checkApply", refresh, "POST").send(obj);
+            } else {
+                HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/delApplyOrg", refresh, "POST").send(obj);
             }
 
 
         }
 
-        private function refresh(result:Object, e:ResultEvent):void{
-            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
+        private function refresh(result:Object, e:ResultEvent):void {
+            var listclickevent:ListClickEvent = new ListClickEvent("listItemClick", data);
             dispatchEvent(listclickevent);
         }
 
 
-        protected function getColor():uint
-        {
-            if(itemIndex%2==1){
+        protected function getColor():uint {
+            if (itemIndex % 2 == 1) {
                 return 0xf5f6f6;
             }
 
             return 0xffffff;
         }
 
-        protected function m_over():void{
+        protected function m_over():void {
             solidColor.color = 0x7ae7bf;
         }
 
-        protected function m_out():void{
+        protected function m_out():void {
             solidColor.color = getColor();
         }
         ]]></fx:Script>

@@ -1,8 +1,8 @@
 package org.idream.pomelo.interfaces
 {
-	import flash.utils.ByteArray;
+import flash.utils.ByteArray;
 
-	public interface IMessage
+public interface IMessage
 	{
 		/**
 		 * encode

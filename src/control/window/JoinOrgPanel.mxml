@@ -1,113 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*"
-                             xmlns:conobj="uicontrol.conobj.*"
+                             xmlns:uicontrol="uicontrol.*"
                              width="430" height="500" creationComplete="init()"
                              title="选择工作的组织" xmlns:window="control.window.*">
-	<fx:Script>
+    <fx:Script>
 		<![CDATA[
         import events.ListClickEvent;
-        import events.QuiteEvent;
 
         import httpcontrol.HttpServiceUtil;
 
-            import mx.collections.ArrayCollection;
-        import mx.controls.Alert;
-
+        import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.events.FlexEvent;
-        import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			
-			import util.ToolUtil;
+        import mx.rpc.events.ResultEvent;
 
-            [Bindable]
-            private var orglist:ArrayCollection=new ArrayCollection();
+        import util.ToolUtil;
 
-        override public function  releaseListener(e:CloseEvent):void{
+        [Bindable]
+        private var orglist:ArrayCollection = new ArrayCollection();
+
+        override public function releaseListener(e:CloseEvent):void {
         }
-            private function init():void{
-                this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
-                this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
-                textInput.setFocus();
-                this.addEventListener(FlexEvent.SHOW, show);
-            }
-        private function show(e:FlexEvent):void{
-            for each(var org:Object in orglist){
-                if(org.hasOwnProperty('apply_id')){
+
+        private function init():void {
+            this.x = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+            this.y = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+            textInput.setFocus();
+            this.addEventListener(FlexEvent.SHOW, show);
+        }
+
+        private function show(e:FlexEvent):void {
+            for each(var org:Object in orglist) {
+                if (org.hasOwnProperty('apply_id')) {
                     delete org.apply_id;
                 }
                 orglist.refresh();
             }
         }
 
-        public function addOrgItem(item:Object):void{
+        public function addOrgItem(item:Object):void {
             orglist.refresh();
         }
 
         private var queryflag:Boolean = true;
-            private function getAllOrgResult(result:Object, e:ResultEvent):void{
-                var r:ArrayCollection = new ArrayCollection(result.result as Array);
-                if(queryflag){
-                    orglist = new ArrayCollection(result.result as Array);
-                    if(orglist.length==0){
-                        queryLabel.text = "没有满足条件的公司或组织";
-                        orgAddressList.visible = false;
-                    }else{
-                        orgAddressList.visible = true;
-                        queryLabel.text ="";
-                        if(r.length==20){
-                            var lastobj:Object = new Object();
-                            lastobj['type'] = 'next';
-                            orglist.addItem(lastobj);
-                        }
 
+        private function getAllOrgResult(result:Object, e:ResultEvent):void {
+            var r:ArrayCollection = new ArrayCollection(result.result as Array);
+            if (queryflag) {
+                orglist = new ArrayCollection(result.result as Array);
+                if (orglist.length == 0) {
+                    queryLabel.text = "没有满足条件的公司或组织";
+                    orgAddressList.visible = false;
+                } else {
+                    orgAddressList.visible = true;
+                    queryLabel.text = "";
+                    if (r.length == 20) {
+                        var lastobj:Object = new Object();
+                        lastobj['type'] = 'next';
+                        orglist.addItem(lastobj);
                     }
-                }else{
 
-                    orglist.addAllAt(r,orglist.length-1);
-                    if(r.length<20){
-                        orglist.removeItemAt(orglist.length-1);
-                    }
                 }
+            } else {
 
-
+                orglist.addAllAt(r, orglist.length - 1);
+                if (r.length < 20) {
+                    orglist.removeItemAt(orglist.length - 1);
+                }
             }
 
-			public function queryOrg(start:Boolean = true):void{
-                queryflag = start;
-                if(textInput.text.length==0){
-                    textInput.setFocus();
-                    return;
-                }
-				var obj:Object=new Object();
-                obj['content'] =  textInput.text;
-                if(!start){
-                    obj['start'] = orglist.length-1;
-                }
 
-				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByName",getAllOrgResult,"POST").send(obj);
-			}
-
-			public function listItemClick_handler(e:ListClickEvent):void{
-
-				var obj:Object=new Object();
-                obj.orgid = e.data.id;
-				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/selectedOrg",refresh,"POST").send(obj);
-			}
-        public function refreshList():void{
-              orglist.refresh();
         }
 
-			public function refresh(r:Object,e:ResultEvent):void{
-					ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
-					closeWin();
-			}
+        public function queryOrg(start:Boolean = true):void {
+            queryflag = start;
+            if (textInput.text.length == 0) {
+                textInput.setFocus();
+                return;
+            }
+            var obj:Object = new Object();
+            obj['content'] = textInput.text;
+            if (!start) {
+                obj['start'] = orglist.length - 1;
+            }
 
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/getOrgByName", getAllOrgResult, "POST").send(obj);
+        }
 
-		]]>
+        public function listItemClick_handler(e:ListClickEvent):void {
+
+            var obj:Object = new Object();
+            obj.orgid = e.data.id;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/selectedOrg", refresh, "POST").send(obj);
+        }
+
+        public function refreshList():void {
+            orglist.refresh();
+        }
+
+        public function refresh(r:Object, e:ResultEvent):void {
+            ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+            closeWin();
+        }
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

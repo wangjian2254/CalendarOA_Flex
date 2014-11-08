@@ -12,14 +12,11 @@
     <!--</fx:Metadata>-->
     <fx:Script><![CDATA[
         import control.window.PersonPanel;
-        import control.window.PersonPanel;
 
         import httpcontrol.HttpServiceUtil;
 
         import mx.core.FlexGlobals;
-
         import mx.managers.PopUpManager;
-
         import mx.rpc.events.ResultEvent;
 
         import spark.skins.spark.BorderContainerSkin;
@@ -33,10 +30,10 @@
         public var showBtn:Boolean = false;
 
         private function init():void {
-            try{
+            try {
                 personName.text = _person.name;
 
-            }catch (e:Error){
+            } catch (e:Error) {
 
             }
 
@@ -51,6 +48,7 @@
             _person = value;
             init();
         }
+
         private function delPerson():void {
             var obj:Object = new Object();
 
@@ -66,9 +64,9 @@
 
         }
 
-        public function showDetail(e:MouseEvent):void{
-            if(e.target is BorderContainerSkin){
-                var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel,true) as PersonPanel;
+        public function showDetail(e:MouseEvent):void {
+            if (e.target is BorderContainerSkin) {
+                var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel, true) as PersonPanel;
                 p.personData = person;
 //                p.departmentData = department;
             }

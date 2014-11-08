@@ -1,6 +1,8 @@
 package org.bytearray.gif.events
 {
-	import flash.events.Event;;
+import flash.events.Event;
+
+;
 	
 	public class TimeoutEvent extends Event
 	{

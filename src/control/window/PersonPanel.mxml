@@ -1,61 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" width="300" height="200" creationComplete="init(event)"
-                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
+                             xmlns:mx="library://ns.adobe.com/flex/mx" width="300" height="200"
+                             creationComplete="init(event)"
+                             xmlns:window="control.window.*">
 
     <fx:Script>
 		<![CDATA[
+        import httpcontrol.HttpServiceUtil;
 
-			import httpcontrol.HttpServiceUtil;
+        import mx.controls.Alert;
+        import mx.events.CloseEvent;
+        import mx.events.EffectEvent;
+        import mx.events.FlexEvent;
+        import mx.rpc.events.ResultEvent;
 
-            import mx.controls.Alert;
-            import mx.events.CloseEvent;
-            import mx.events.EffectEvent;
-			import mx.rpc.events.ResultEvent;
-			import util.ToolUtil;
+        import util.ToolUtil;
 
-            public var personData:Object=null;
-//            public var departmentData:Object=null;
+        public var personData:Object = null;
+        //            public var departmentData:Object=null;
 
-            override public function  releaseListener(e:CloseEvent):void{
+        override public function releaseListener(e:CloseEvent):void {
+        }
+
+        public function init(e:FlexEvent):void {
+
+            this.height = hGroup.height + 20;
+            if (hGroup.width > 300) {
+                this.width = hGroup.width;
             }
-			public function init(e:mx.events.FlexEvent):void{
-
-                this.height = hGroup.height+20;
-                if(hGroup.width>300){
-                    this.width = hGroup.width;
-                }
 
 //                this.minWidth = 400;
-                this.title =personData.name +" 的个人信息";
-                head.source = personData.icon;
+            this.title = personData.name + " 的个人信息";
+            head.source = personData.icon;
 //                emailLabel.text = personData.username;
-                nameLabel.text = personData.name;
-                buttonRemove.visible = false;
-                if (ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0) {
-                    buttonRemove.visible = true;
-                }
-			}
-
-			private function sendMessageResult(result:Object,e:ResultEvent):void{
-                ToolUtil.departMentListRefresh();
-                closeWin();
-			}
-            private function delPerson():void{
-                Alert.show("确定要将 "+personData.name+" 移出组织么？","移除成员",3,this,removePerson);
+            nameLabel.text = personData.name;
+            buttonRemove.visible = false;
+            if (ToolUtil.org.managers.indexOf(ToolUtil.sessionUser.pid) >= 0) {
+                buttonRemove.visible = true;
             }
+        }
 
-        private function removePerson(e:CloseEvent):void{
-            if(e.detail==Alert.YES){
-                var url:String="/riliusers/removePerson";//保存url
+        private function sendMessageResult(result:Object, e:ResultEvent):void {
+            ToolUtil.departMentListRefresh();
+            closeWin();
+        }
+
+        private function delPerson():void {
+            Alert.show("确定要将 " + personData.name + " 移出组织么？", "移除成员", 3, this, removePerson);
+        }
+
+        private function removePerson(e:CloseEvent):void {
+            if (e.detail == Alert.YES) {
+                var url:String = "/riliusers/removePerson";//保存url
                 var obj:Object = new Object();
-                obj['pid'] =  personData.id;
-                HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
+                obj['pid'] = personData.id;
+                HttpServiceUtil.getCHTTPServiceAndResult(url, sendMessageResult, "POST").send(obj);
             }
 
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

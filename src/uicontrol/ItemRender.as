@@ -1,9 +1,8 @@
 package uicontrol
 {
-	import mx.core.IFactory;
-	import mx.core.mx_internal;
-	
-	public class ItemRender implements IFactory
+import mx.core.IFactory;
+
+public class ItemRender implements IFactory
 	{
 		private var o:*;
 		public function ItemRender()

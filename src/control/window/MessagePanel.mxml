@@ -9,210 +9,228 @@
 	</s:layout>
     <fx:Script>
 		<![CDATA[
-			import events.ChangeJoinUserEvent;
-			import events.ChangeMenuEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.events.CloseEvent;
-			import mx.events.EffectEvent;
-			import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			import mx.utils.ObjectUtil;
-			
-			import uicontrol.ContactItem;
-			
-			import util.ToolUtil;
-			[Bindable]
-			private var sjrArr:ArrayCollection;
-			private var isFirstForAni:Boolean=true;
+		import events.ChangeJoinUserEvent;
+		import events.ChangeMenuEvent;
 
-            public var message:Object=null;
-            public var type:String=null;
-			
-			private function init(e:mx.events.FlexEvent):void{
-				if(isFirstForAni){
-					showAnimation();
-				}
-                sjrArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+		import httpcontrol.HttpServiceUtil;
+
+		import mx.collections.ArrayCollection;
+		import mx.controls.Alert;
+		import mx.core.FlexGlobals;
+		import mx.events.CloseEvent;
+		import mx.events.EffectEvent;
+		import mx.events.FlexEvent;
+		import mx.managers.PopUpManager;
+		import mx.rpc.events.ResultEvent;
+		import mx.utils.ObjectUtil;
+
+		import uicontrol.ContactItem;
+
+		import util.ToolUtil;
+
+		[Bindable]
+		private var sjrArr:ArrayCollection;
+		private var isFirstForAni:Boolean = true;
+
+		public var message:Object = null;
+		public var type:String = null;
+
+		private function init(e:FlexEvent):void {
+			if (isFirstForAni) {
+				showAnimation();
+			}
+			sjrArr = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
 
 
-                if(type==null&&message!=null){
-                    mesTitle.text = message.title;
-                    mesContent.text = message.desc;
-                    for each(var u:Object in message.to){
-                        for each(var t:Object in sjrArr){
-                            if(u.username == t.username){
-                                t.selected=true;
-                            }
-                        }
-                    }
-                }
-                if(type=="huifu"&&message!=null){
-                    sjrContainer.visible=false;
-                    form.width = this.width;
-                    mesTitle.text = "回复："+message.title;
-                    for each(var tt:Object in sjrArr){
-                        if(message.author == tt.username){
-                            tt.selected=true;
-                        }
-                    }
-
-                }
-                if(type=="zhuanfa"&&message!=null){
-                    mesTitle.text = "转发："+message.title;
-                    mesContent.text = message.desc;
-                }
-                changeUsers();
-			}
-			public function changeUsers():void{
-				users.removeAllElements();
-				var address:ContactItem = null;
-				for each(var obj:Object in sjrArr){
-					if(obj.selected){
-						address = new ContactItem();
-						address.tileGroup = users;
-						address.modifyEnable = true;
-						address.userData = obj;
-						address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr,delJoin);
-						users.addElement(address);
-					}
-				}
-			}
-			private function closeWin(e:mx.events.CloseEvent):void{
-				closeAnimation();
-			}
-			private function openAddress():void{
-				var obj:Object=new Object();
-				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
-				FlexGlobals.topLevelApplication.dispatchEvent(evt);
-			}
-			private function refreshAddress(result:Object,e:ResultEvent):void{
-				var contacts:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
-				for each(var u:Object in contacts){
-					for each(var c:Object in sjrGrid.dataProvider as ArrayCollection){
-						if(u.username == c.username){
-							if(c.selected){
-								u.selected=true;
-							}
+			if (type == null && message != null) {
+				mesTitle.text = message.title;
+				mesContent.text = message.desc;
+				for each(var u:Object in message.to) {
+					for each(var t:Object in sjrArr) {
+						if (u.username == t.username) {
+							t.selected = true;
 						}
 					}
 				}
-				sjrArr = contacts;
-				sjrGrid.invalidateList();
-				changeUsers();
 			}
-			private function delJoin(e:ChangeJoinUserEvent):void{
-				sjrGrid.invalidateList();
-			}
-			public  function showAnimation():void{
-				mve.xFrom=0-this.width;
-				mve.yFrom=(FlexGlobals.topLevelApplication.height-this.height)/2;
-				mve.xTo=(FlexGlobals.topLevelApplication.width-this.width)/2;
-				mve.yTo=(FlexGlobals.topLevelApplication.height-this.height)/2;
-				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-				var pb:Point=new Point(mve.xTo,mve.yTo);
-				mve.duration = int(Point.distance(pa,pb))/100*70;
-				mve.addEventListener(EffectEvent.EFFECT_END,showAnimationEnd);
-				mve.play();
-			}
-			private function showAnimationEnd(e:EffectEvent):void{
-				isFirstForAni=false;
-			}
-			public  function closeAnimation():void{
-				mve.xFrom=this.x;
-				mve.yFrom=this.y;
-				mve.xTo=FlexGlobals.topLevelApplication.width;
-				mve.yTo =FlexGlobals.topLevelApplication.height;
-				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-				var pb:Point=new Point(mve.xTo,mve.yTo);
-				mve.duration = int(Point.distance(pa,pb))/100*70;
-				mve.addEventListener(EffectEvent.EFFECT_END,closeAnimationEnd);
-				mve.play();
-			}
-			private function closeAnimationEnd(e:EffectEvent):void{
-				PopUpManager.removePopUp(this);
-			}
-			public  function sendAnimation():void{
-				mve.xFrom=this.width;
-				mve.yFrom=this.height;
-				mve.xTo=FlexGlobals.topLevelApplication.width;
-				mve.yTo =0;
-				var pa:Point=new Point(mve.xFrom,mve.yFrom);
-				var pb:Point=new Point(mve.xTo,mve.yTo);
-				mve.duration = int(Point.distance(pa,pb))/100*70;
-				mve.addEventListener(EffectEvent.EFFECT_END,sendAnimationEnd);
-				mve.play();
-			}
-			private function sendAnimationEnd(e:EffectEvent):void{
-				PopUpManager.removePopUp(this);
-			}
-			//保存草稿
-			private function savSketch():void{
-				if(!isValid()){
-					return;
-				}
-				var url:String="/oamessage/updateMessage";
-				var obj:Object=getData();
-				obj.flag=true;
-				HttpServiceUtil.getCHTTPServiceAndResult(url,null,"POST").send(obj);
-			}
-			private function sendMessage():void{
-				if(!isValid()){
-					return;
-				}
-				var url:String="/oamessage/updateMessage";//保存url
-				var obj:Object=getData();//获取数据方法
-				obj.flag=false;
-				HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send(obj);
-			}
-			private function sendMessageResult(result:Object,e:ResultEvent):void{
-				sendAnimation();
-			}
-			public function getData():Object{
-				var o:Object={};
-                o["title"] = mesTitle.text;
-                o["desc"] = mesContent.text;
-                if(type=="huifu"&&message!=null){
-                    if(message.fatherMessage_id){
-                        o["fatherMessage"]=message.fatherMessage_id;
-                    }else{
-                        o["fatherMessage"]=message.id;
-                    }
-
-                }
-                if(type==null&&message!=null){
-                    o["id"]=message.id;
-                }
-                o["t"] = new Array();
-                for each(var obj:Object in sjrArr){
-                    if(obj.selected){
-                        o["t"].push(obj.id);
-                    }
-
-                }
-				return o;
-			}
-			private function isValid():Boolean{
-				var obj:Object=getData();
-				if(obj.title==""&&obj.desc==""){
-					Alert.show("标题 和 内容 不能同时为空","提示");
-					return false;
-				}
-				if(obj.title.length>200){
-					Alert.show("标题长度不能超过200个字","提示");
-					return false;
+			if (type == "huifu" && message != null) {
+				sjrContainer.visible = false;
+				form.width = this.width;
+				mesTitle.text = "回复：" + message.title;
+				for each(var tt:Object in sjrArr) {
+					if (message.author == tt.username) {
+						tt.selected = true;
+					}
 				}
 
-				if(obj["t"].length<=0){
-					Alert.show("请选择接收人","提示");
-					return false;
-				}
-				return true;
 			}
+			if (type == "zhuanfa" && message != null) {
+				mesTitle.text = "转发：" + message.title;
+				mesContent.text = message.desc;
+			}
+			changeUsers();
+		}
+
+		public function changeUsers():void {
+			users.removeAllElements();
+			var address:ContactItem = null;
+			for each(var obj:Object in sjrArr) {
+				if (obj.selected) {
+					address = new ContactItem();
+					address.tileGroup = users;
+					address.modifyEnable = true;
+					address.userData = obj;
+					address.addEventListener(ChangeJoinUserEvent.ChangeUser_EventStr, delJoin);
+					users.addElement(address);
+				}
+			}
+		}
+
+		private function closeWin(e:CloseEvent):void {
+			closeAnimation();
+		}
+
+		private function openAddress():void {
+			var obj:Object = new Object();
+			var evt:ChangeMenuEvent = new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr, "contact", obj, true)
+			FlexGlobals.topLevelApplication.dispatchEvent(evt);
+		}
+
+		private function refreshAddress(result:Object, e:ResultEvent):void {
+			var contacts:ArrayCollection = ObjectUtil.copy(ToolUtil.contactsList) as ArrayCollection;
+			for each(var u:Object in contacts) {
+				for each(var c:Object in sjrGrid.dataProvider as ArrayCollection) {
+					if (u.username == c.username) {
+						if (c.selected) {
+							u.selected = true;
+						}
+					}
+				}
+			}
+			sjrArr = contacts;
+			sjrGrid.invalidateList();
+			changeUsers();
+		}
+
+		private function delJoin(e:ChangeJoinUserEvent):void {
+			sjrGrid.invalidateList();
+		}
+
+		public function showAnimation():void {
+			mve.xFrom = 0 - this.width;
+			mve.yFrom = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+			mve.xTo = (FlexGlobals.topLevelApplication.width - this.width) / 2;
+			mve.yTo = (FlexGlobals.topLevelApplication.height - this.height) / 2;
+			var pa:Point = new Point(mve.xFrom, mve.yFrom);
+			var pb:Point = new Point(mve.xTo, mve.yTo);
+			mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
+			mve.addEventListener(EffectEvent.EFFECT_END, showAnimationEnd);
+			mve.play();
+		}
+
+		private function showAnimationEnd(e:EffectEvent):void {
+			isFirstForAni = false;
+		}
+
+		public function closeAnimation():void {
+			mve.xFrom = this.x;
+			mve.yFrom = this.y;
+			mve.xTo = FlexGlobals.topLevelApplication.width;
+			mve.yTo = FlexGlobals.topLevelApplication.height;
+			var pa:Point = new Point(mve.xFrom, mve.yFrom);
+			var pb:Point = new Point(mve.xTo, mve.yTo);
+			mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
+			mve.addEventListener(EffectEvent.EFFECT_END, closeAnimationEnd);
+			mve.play();
+		}
+
+		private function closeAnimationEnd(e:EffectEvent):void {
+			PopUpManager.removePopUp(this);
+		}
+
+		public function sendAnimation():void {
+			mve.xFrom = this.width;
+			mve.yFrom = this.height;
+			mve.xTo = FlexGlobals.topLevelApplication.width;
+			mve.yTo = 0;
+			var pa:Point = new Point(mve.xFrom, mve.yFrom);
+			var pb:Point = new Point(mve.xTo, mve.yTo);
+			mve.duration = int(Point.distance(pa, pb)) / 100 * 70;
+			mve.addEventListener(EffectEvent.EFFECT_END, sendAnimationEnd);
+			mve.play();
+		}
+
+		private function sendAnimationEnd(e:EffectEvent):void {
+			PopUpManager.removePopUp(this);
+		}
+
+		//保存草稿
+		private function savSketch():void {
+			if (!isValid()) {
+				return;
+			}
+			var url:String = "/oamessage/updateMessage";
+			var obj:Object = getData();
+			obj.flag = true;
+			HttpServiceUtil.getCHTTPServiceAndResult(url, null, "POST").send(obj);
+		}
+
+		private function sendMessage():void {
+			if (!isValid()) {
+				return;
+			}
+			var url:String = "/oamessage/updateMessage";//保存url
+			var obj:Object = getData();//获取数据方法
+			obj.flag = false;
+			HttpServiceUtil.getCHTTPServiceAndResult(url, sendMessageResult, "POST").send(obj);
+		}
+
+		private function sendMessageResult(result:Object, e:ResultEvent):void {
+			sendAnimation();
+		}
+
+		public function getData():Object {
+			var o:Object = {};
+			o["title"] = mesTitle.text;
+			o["desc"] = mesContent.text;
+			if (type == "huifu" && message != null) {
+				if (message.fatherMessage_id) {
+					o["fatherMessage"] = message.fatherMessage_id;
+				} else {
+					o["fatherMessage"] = message.id;
+				}
+
+			}
+			if (type == null && message != null) {
+				o["id"] = message.id;
+			}
+			o["t"] = new Array();
+			for each(var obj:Object in sjrArr) {
+				if (obj.selected) {
+					o["t"].push(obj.id);
+				}
+
+			}
+			return o;
+		}
+
+		private function isValid():Boolean {
+			var obj:Object = getData();
+			if (obj.title == "" && obj.desc == "") {
+				Alert.show("标题 和 内容 不能同时为空", "提示");
+				return false;
+			}
+			if (obj.title.length > 200) {
+				Alert.show("标题长度不能超过200个字", "提示");
+				return false;
+			}
+
+			if (obj["t"].length <= 0) {
+				Alert.show("请选择接收人", "提示");
+				return false;
+			}
+			return true;
+		}
 		]]>
 	</fx:Script>
 	<fx:Declarations>

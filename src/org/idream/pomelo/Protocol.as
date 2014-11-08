@@ -1,8 +1,8 @@
 package org.idream.pomelo
 {
-	import flash.utils.ByteArray;
+import flash.utils.ByteArray;
 
-	public class Protocol
+public class Protocol
 	{
 		public static function strencode(str:String):ByteArray
 		{

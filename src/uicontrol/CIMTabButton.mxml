@@ -13,12 +13,8 @@
 
     <fx:Script>
 		<![CDATA[
-        import control.CBorderContainer;
-
         import events.ChangeTabButtonEvent;
         import events.CloseTabButtonEvent;
-
-
 
         override public function clickBtn():void {
             var e:ChangeTabButtonEvent = new ChangeTabButtonEvent(ChangeTabButtonEvent.Change_TabButton, view, this, true);
@@ -31,7 +27,6 @@
         }
 
         //////
-
 
 
         private var _flag:String = STATUS_U;

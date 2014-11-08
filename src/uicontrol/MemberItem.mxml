@@ -12,21 +12,13 @@
     <!--</fx:Metadata>-->
     <fx:Script><![CDATA[
         import control.window.PersonPanel;
-        import control.window.PersonPanel;
 
         import events.MembersEvent;
 
-        import httpcontrol.HttpServiceUtil;
-
         import mx.core.FlexGlobals;
-
         import mx.managers.PopUpManager;
 
-        import mx.rpc.events.ResultEvent;
-
         import spark.skins.spark.BorderContainerSkin;
-
-        import util.ToolUtil;
 
         private var _person:Object = null;
 
@@ -34,14 +26,14 @@
         public var showBtn:Boolean = false;
 
         private function init():void {
-            try{
+            try {
                 personName.text = _person.name;
 //                personName.validateNow();
 //                if (showBtn) {
 //                    this.width = personName.width + btnDel.width;
 //                }
 //                this.width = personName.width;
-            }catch (e:Error){
+            } catch (e:Error) {
 
             }
 
@@ -56,23 +48,21 @@
             _person = value;
             init();
         }
+
         private function delPerson():void {
-            var chatevent:MembersEvent=new MembersEvent(MembersEvent.REMOVE_MEMBERS,person);
+            var chatevent:MembersEvent = new MembersEvent(MembersEvent.REMOVE_MEMBERS, person);
             dispatchEvent(chatevent);
         }
 
 
-
-        public function showDetail(e:MouseEvent):void{
-            if(e.target is BorderContainerSkin){
-                var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel,true) as PersonPanel;
+        public function showDetail(e:MouseEvent):void {
+            if (e.target is BorderContainerSkin) {
+                var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel, true) as PersonPanel;
                 p.personData = person;
 //                p.departmentData = department;
             }
 
         }
-
-
         ]]></fx:Script>
     <s:layout>
         <s:HorizontalLayout gap="5" verticalAlign="middle"  horizontalAlign="left" paddingRight="10" paddingLeft="10">

@@ -1,12 +1,8 @@
 package events
 {
-	import control.CBorderContainer;
-	
-	import flash.events.Event;
-	
-	import uicontrol.CTabButton;
-	
-	public class ChangeDepartmentEvent extends Event
+import flash.events.Event;
+
+public class ChangeDepartmentEvent extends Event
 		
 	{
 		public static var ChangeDepartment_EventStr:String="Change_Department";

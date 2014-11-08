@@ -11,31 +11,27 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
-        import control.ChatControl;
-
         import events.ListClickEvent;
 
+        import flash.filters.BevelFilter;
         import flash.filters.DropShadowFilter;
-
         import flash.filters.GlowFilter;
 
-        import model.ChatChannel;
+        import model.Schedule;
 
         import uicontrol.AddressList;
 
         import util.ScheduleUtil;
-
         import util.ToolUtil;
 
+        [Bindable]
+        private var dropBevelFilter:BevelFilter = new BevelFilter(10, 270, 0, 0, 0xffffff, .5, 8, 8, 8, 8);
 
         [Bindable]
-        private var dropBevelFilter:flash.filters.BevelFilter = new flash.filters.BevelFilter(10,270,0,0,0xffffff,.5,8,8,8,8);
+        private var dropShadow:DropShadowFilter = new DropShadowFilter(2, 90, 0x000000, 0.35, 4, 4);
 
         [Bindable]
-        private var dropShadow:flash.filters.DropShadowFilter=new DropShadowFilter(2,90,0x000000,0.35,4,4);
-
-        [Bindable]
-        private var Inner:flash.filters.GlowFilter=new flash.filters.GlowFilter(0xffffff,.5,8,8,2,4,true);
+        private var Inner:GlowFilter = new GlowFilter(0xffffff, .5, 8, 8, 2, 4, true);
 
         private var _data:Object;
         override public function get data():Object {
@@ -45,73 +41,72 @@
         override public function set data(value:Object):void {
             _data = value;
             super.data = value;
-            if(value==null){
+            if (value == null) {
                 return;
             }
-            if(!data.hasOwnProperty('f')||!data.predate||(data.predate.substr(0,16)!=data.d.substr(0,16))){
-                dateGroup.height=30;
-                dateGroup.visible=true;
-            }else{
-                dateGroup.height=0;
-                dateGroup.visible=false;
+            if (!data.hasOwnProperty('f') || !data.predate || (data.predate.substr(0, 16) != data.d.substr(0, 16))) {
+                dateGroup.height = 30;
+                dateGroup.visible = true;
+            } else {
+                dateGroup.height = 0;
+                dateGroup.visible = false;
             }
             dateLabel.text = data.d;
-            if(!data.hasOwnProperty('f')){
+            if (!data.hasOwnProperty('f')) {
                 head.source = null;
                 head2.source = null;
                 nameLabel.text = "";
                 nameLabel2.text = "";
-                horizontalLayout.horizontalAlign="center";
-                chatstatus.horizontalAlign="center";
-            }else{
+                horizontalLayout.horizontalAlign = "center";
+                chatstatus.horizontalAlign = "center";
+            } else {
                 var person:Object = ToolUtil.getAnyPersonById(data.f);
-                if(person.id==ToolUtil.sessionUser.pid){
+                if (person.id == ToolUtil.sessionUser.pid) {
                     head2.source = person.icon;
                     nameLabel2.text = person.name;
                     head.source = null;
                     nameLabel.text = "";
-                    horizontalLayout.horizontalAlign="right";
-                    chatstatus.horizontalAlign="right";
-                }else{
+                    horizontalLayout.horizontalAlign = "right";
+                    chatstatus.horizontalAlign = "right";
+                } else {
                     head.source = person.icon;
                     head2.source = null;
                     nameLabel.text = person.name;
                     nameLabel2.text = "";
-                    horizontalLayout.horizontalAlign="left";
-                    chatstatus.horizontalAlign="left";
+                    horizontalLayout.horizontalAlign = "left";
+                    chatstatus.horizontalAlign = "left";
                 }
             }
             contentLabel.text = data.te;
-            contentLabel.setStyle("fontFamily","simsun,MINGLIU");
-            contentLabel.setStyle("alignmentBaseline","ideographicCenter");
-            contentLabel.setStyle("color",data.co);
+            contentLabel.setStyle("fontFamily", "simsun,MINGLIU");
+            contentLabel.setStyle("alignmentBaseline", "ideographicCenter");
+            contentLabel.setStyle("color", data.co);
             contentLabel.validateNow();
             back1.validateNow();
             showChatImg();
 
 
-
         }
 
-        private function showChatImg():void{
+        private function showChatImg():void {
             var person:Object = ToolUtil.getAnyPersonById(data.f);
-            if(!data.hasOwnProperty("f")){
-                back1.setStyle("borderColor",0xB5D0EB);
-                back10.color=0xB5D0EB;
-                back2.setStyle("borderColor",0xB5D0EB);
-                back20.color=0xB5D0EB;
+            if (!data.hasOwnProperty("f")) {
+                back1.setStyle("borderColor", 0xB5D0EB);
+                back10.color = 0xB5D0EB;
+                back2.setStyle("borderColor", 0xB5D0EB);
+                back20.color = 0xB5D0EB;
                 back1.graphics.clear();
-            }else if(person.id==ToolUtil.sessionUser.pid){
-                back1.setStyle("borderColor",0xb0e861);
-                back10.color=0xb0e861;
-                back2.setStyle("borderColor",0xb0e861);
-                back20.color=0xb0e861;
+            } else if (person.id == ToolUtil.sessionUser.pid) {
+                back1.setStyle("borderColor", 0xb0e861);
+                back10.color = 0xb0e861;
+                back2.setStyle("borderColor", 0xb0e861);
+                back20.color = 0xb0e861;
 
                 var vertices:Vector.<Number> = new Vector.<Number>();
 
-                vertices.push(back1.width-8, back1.height-5);
-                vertices.push(back1.width-18, back1.height-2);
-                vertices.push(back1.width, back1.height+5);
+                vertices.push(back1.width - 8, back1.height - 5);
+                vertices.push(back1.width - 18, back1.height - 2);
+                vertices.push(back1.width, back1.height + 5);
 
                 var indices:Vector.<int> = new Vector.<int>();
                 indices.push(0, 1, 2);
@@ -119,20 +114,20 @@
                 back1.graphics.clear();
                 back1.graphics.beginFill(0xb0e861);
 
-                back1.graphics.drawTriangles(vertices,indices);
+                back1.graphics.drawTriangles(vertices, indices);
 
                 back1.graphics.endFill();
-            }else{
-                back1.setStyle("borderColor",0xdbe2ed);
-                back10.color=0xdbe2ed;
-                back2.setStyle("borderColor",0xdbe2ed);
-                back20.color=0xdbe2ed;
+            } else {
+                back1.setStyle("borderColor", 0xdbe2ed);
+                back10.color = 0xdbe2ed;
+                back2.setStyle("borderColor", 0xdbe2ed);
+                back20.color = 0xdbe2ed;
 
                 var vertices2:Vector.<Number> = new Vector.<Number>();
 
-                vertices2.push(8, back1.height-5);
-                vertices2.push(18, back1.height-2);
-                vertices2.push(0, back1.height+5);
+                vertices2.push(8, back1.height - 5);
+                vertices2.push(18, back1.height - 2);
+                vertices2.push(0, back1.height + 5);
 
                 var indices2:Vector.<int> = new Vector.<int>();
                 indices2.push(0, 1, 2);
@@ -140,74 +135,88 @@
                 back1.graphics.clear();
                 back1.graphics.beginFill(0xdbe2ed);
 
-                back1.graphics.drawTriangles(vertices2,indices2);
+                back1.graphics.drawTriangles(vertices2, indices2);
 
                 back1.graphics.endFill();
             }
         }
 
-        private function select_handler(e:MouseEvent):void{
-            var listclickevent:ListClickEvent=new ListClickEvent("listItemClick",data);
+        private function select_handler(e:MouseEvent):void {
+            var listclickevent:ListClickEvent = new ListClickEvent("listItemClick", data);
             dispatchEvent(listclickevent);
 
         }
 
-        private function mySchedule():void{
+        private function mySchedule():void {
             var list:AddressList = owner as AddressList;
-            if(list!=null&&list.chatChannel!=null){
-                var checker:int=-1;
-                if(data.f!=ToolUtil.sessionUser.pid){
-                    checker=data.f;
+            if (list != null && list.chatChannel != null) {
+                var checker:int = -1;
+                if (data.f != ToolUtil.sessionUser.pid) {
+                    checker = data.f;
                 }
-                if(list.chatChannel.type == "p"){
-                    checker= Number(list.chatChannel.channel.replace(ToolUtil.sessionUser.pid.toString()).replace("p"));
-                    ScheduleUtil.createSchedule(null,null,true,-1,-1,checker,ToolUtil.sessionUser.pid,data.te );
+                if (list.chatChannel.type == "p") {
+                    checker = Number(list.chatChannel.channel.replace(ToolUtil.sessionUser.pid.toString()).replace("p"));
+                    ScheduleUtil.createSchedule(null, null, true, -1, -1, checker, ToolUtil.sessionUser.pid, data.te);
                 }
-                if(list.chatChannel.type == "g"){
-                    ScheduleUtil.createSchedule(null,null,true,-1,-1,checker,ToolUtil.sessionUser.pid,data.te );
+                if (list.chatChannel.type == "g") {
+                    ScheduleUtil.createSchedule(null, null, true, -1, -1, checker, ToolUtil.sessionUser.pid, data.te);
                 }
-                if(list.chatChannel.type == "t"){
-                    ScheduleUtil.createSchedule(null,null,true,-1,-1,checker,ToolUtil.sessionUser.pid,data.te );
+                if (list.chatChannel.type == "t") {
+                    var schedule:Schedule = ToolUtil.getSchedule(list.chatChannel.channel.substr(1));
+                    if (schedule != null && schedule.project > 0) {
+                        ScheduleUtil.createSchedule(null, null, true, -1, schedule.project, checker, ToolUtil.sessionUser.pid, data.te);
+                    } else {
+                        ScheduleUtil.createSchedule(null, null, true, -1, -1, checker, ToolUtil.sessionUser.pid, data.te);
+                    }
+
                     //todo:未来优化成 同一schedule下的 使用同一 project
                 }
-                if(list.chatChannel.type == "d"){
-                    ScheduleUtil.createSchedule(null,null,true,Number(list.chatChannel.channel.substr(1)),-1,checker,ToolUtil.sessionUser.pid,data.te );
-                }
-            }
-        }
-        private function myCheckerSchedule():void{
-            var list:AddressList = owner as AddressList;
-            if(list!=null&&list.chatChannel!=null){
-                var checker:int=-1;
-                if(data.f!=ToolUtil.sessionUser.pid){
-                    checker=data.f;
-                }
-                if(list.chatChannel.type == "p"){
-                    checker= Number(list.chatChannel.channel.replace(ToolUtil.sessionUser.pid.toString()).replace("p"));
-                    ScheduleUtil.createSchedule(null,null,true,-1,-1,ToolUtil.sessionUser.pid,checker,data.te );
-                }
-                if(list.chatChannel.type == "g"){
-                    ScheduleUtil.createSchedule(null,null,true,-1,-1,ToolUtil.sessionUser.pid,checker,data.te );
-                }
-                if(list.chatChannel.type == "t"){
-                    ScheduleUtil.createSchedule(null,null,true,-1,-1,ToolUtil.sessionUser.pid,checker,data.te );
-                    //todo:未来优化成 同一schedule下的 使用同一 project
-                }
-                if(list.chatChannel.type == "d"){
-                    ScheduleUtil.createSchedule(null,null,true,Number(list.chatChannel.channel.substr(1)),-1,ToolUtil.sessionUser.pid,checker,data.te );
+                if (list.chatChannel.type == "d") {
+
+                    ScheduleUtil.createSchedule(null, null, true, Number(list.chatChannel.channel.substr(1)), -1, checker, ToolUtil.sessionUser.pid, data.te);
                 }
             }
         }
 
-        protected function m_over():void{
-            if(data.hasOwnProperty('f')){
+        private function myCheckerSchedule():void {
+            var list:AddressList = owner as AddressList;
+            if (list != null && list.chatChannel != null) {
+                var checker:int = -1;
+                if (data.f != ToolUtil.sessionUser.pid) {
+                    checker = data.f;
+                }
+                if (list.chatChannel.type == "p") {
+                    checker = Number(list.chatChannel.channel.replace(ToolUtil.sessionUser.pid.toString()).replace("p"));
+                    ScheduleUtil.createSchedule(null, null, true, -1, -1, ToolUtil.sessionUser.pid, checker, data.te);
+                }
+                if (list.chatChannel.type == "g") {
+                    ScheduleUtil.createSchedule(null, null, true, -1, -1, ToolUtil.sessionUser.pid, checker, data.te);
+                }
+                if (list.chatChannel.type == "t") {
+                    var schedule:Schedule = ToolUtil.getSchedule(list.chatChannel.channel.substr(1));
+                    if (schedule != null && schedule.project > 0) {
+                        ScheduleUtil.createSchedule(null, null, true, -1, schedule.project, ToolUtil.sessionUser.pid, checker, data.te);
+                    } else {
+                        ScheduleUtil.createSchedule(null, null, true, -1, -1, ToolUtil.sessionUser.pid, checker, data.te);
+                    }
+
+                    //todo:未来优化成 同一schedule下的 使用同一 project
+                }
+                if (list.chatChannel.type == "d") {
+                    ScheduleUtil.createSchedule(null, null, true, Number(list.chatChannel.channel.substr(1)), -1, ToolUtil.sessionUser.pid, checker, data.te);
+                }
+            }
+        }
+
+        protected function m_over():void {
+            if (data.hasOwnProperty('f') &&data.hasOwnProperty('f')&&data.f!=0 && data.hasOwnProperty('t')&&data.t!=0) {
                 chatstatus.visible = true;
             }
 
 //            solidColor.color = 0x7ae7bf;
         }
 
-        protected function m_out():void{
+        protected function m_out():void {
             chatstatus.visible = false;
 //            solidColor.color = 0xffffff;
         }

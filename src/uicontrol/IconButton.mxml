@@ -8,43 +8,40 @@
     <fx:Script><![CDATA[
         import uicontrol.conobj.HeadSelectArray;
 
-        public var border_color:uint=0xffffff;
+        public var border_color:uint = 0xffffff;
 
 
         [Bindable]
-        public var headSelectArray:HeadSelectArray=null;
+        public var headSelectArray:HeadSelectArray = null;
 
         public var selected:Boolean = false;
 
         [Bindable]
-        public var iconurl:String='';
+        public var iconurl:String = '';
 
-        public function click_image():void{
-            if(headSelectArray.selectedButtons()){
+        public function click_image():void {
+            if (headSelectArray.selectedButtons()) {
                 headSelectArray.selectedButtons().clear_border();
             }
-            this.setStyle("borderColor","#ff0000");
+            this.setStyle("borderColor", "#ff0000");
             selected = true;
         }
-        public function clear_border():void{
-            this.setStyle("borderColor","#ffffff");
+
+        public function clear_border():void {
+            this.setStyle("borderColor", "#ffffff");
             selected = false;
         }
 
-        public function isSelected():Boolean{
+        public function isSelected():Boolean {
             return selected;
         }
 
-        private function init():void{
+        private function init():void {
             headSelectArray.addArr(this);
-            if(selected){
-               click_image();
+            if (selected) {
+                click_image();
             }
         }
-
-
-
-
         ]]></fx:Script>
     <s:Image source="{iconurl}" x="0" y="0" click="click_image()" width="45" height="45">
 

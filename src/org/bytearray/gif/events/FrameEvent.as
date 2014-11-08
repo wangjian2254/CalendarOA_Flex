@@ -1,9 +1,10 @@
 package org.bytearray.gif.events
-{	
-	import flash.events.Event;
-	import org.bytearray.gif.frames.GIFFrame;
-	
-	public class FrameEvent extends Event	
+{
+import flash.events.Event;
+
+import org.bytearray.gif.frames.GIFFrame;
+
+public class FrameEvent extends Event
 	{
 		public var frame:GIFFrame;
 	

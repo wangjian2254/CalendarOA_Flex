@@ -1,21 +1,21 @@
 package uicontrol
 {
-	import events.AutoGridEvent;
-	
-	import flash.events.Event;
-	
-	import mx.collections.ArrayCollection;
-	import mx.controls.DataGrid;
-	import mx.controls.Label;
-	import mx.controls.dataGridClasses.DataGridColumn;
-	import mx.core.UIComponent;
-	import mx.events.CollectionEvent;
-	import mx.events.DataGridEvent;
-	import mx.events.FlexEvent;
-	import mx.events.ListEvent;
-	import mx.events.ResizeEvent;
+import events.AutoGridEvent;
 
-	[Event(name="autoDelete",type="events.AutoGridEvent")]
+import flash.events.Event;
+
+import mx.collections.ArrayCollection;
+import mx.controls.DataGrid;
+import mx.controls.Label;
+import mx.controls.dataGridClasses.DataGridColumn;
+import mx.core.UIComponent;
+import mx.events.CollectionEvent;
+import mx.events.DataGridEvent;
+import mx.events.FlexEvent;
+import mx.events.ListEvent;
+import mx.events.ResizeEvent;
+
+[Event(name="autoDelete",type="events.AutoGridEvent")]
 	[Event(name="autoAdd",type="events.AutoGridEvent")]
 	public class AutoGrid extends DataGrid
 	{

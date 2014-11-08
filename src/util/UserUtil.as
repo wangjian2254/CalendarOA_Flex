@@ -1,8 +1,8 @@
 package util
 {
-	import model.User;
+import model.User;
 
-	public class UserUtil
+public class UserUtil
 	{
 		public function UserUtil()
 		{

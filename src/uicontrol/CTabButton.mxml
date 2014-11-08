@@ -15,20 +15,23 @@
 
         import events.ChangeTabButtonEvent;
         import events.CloseTabButtonEvent;
+
         [Bindable]
         public var label:String;
 
         [Bindable]
         public var view:CBorderContainer;
 
-        public function clickBtn():void{
-            var e:ChangeTabButtonEvent=new ChangeTabButtonEvent(ChangeTabButtonEvent.Change_TabButton,view,this,true);
+        public function clickBtn():void {
+            var e:ChangeTabButtonEvent = new ChangeTabButtonEvent(ChangeTabButtonEvent.Change_TabButton, view, this, true);
             dispatchEvent(e);
         }
-        public function close():void{
-            var e:CloseTabButtonEvent=new CloseTabButtonEvent(CloseTabButtonEvent.Close_TabButton,view,this,true);
+
+        public function close():void {
+            var e:CloseTabButtonEvent = new CloseTabButtonEvent(CloseTabButtonEvent.Close_TabButton, view, this, true);
             dispatchEvent(e);
         }
+
         //////
 
         [Bindable]
@@ -41,42 +44,43 @@
         [Embed("/assets/img/tabbutton/X_out.png")]
         public var X_out:Class;
 
-        private var _flag:String=STATUS_U;
-        public function get flag():String
-        {
+        private var _flag:String = STATUS_U;
+        public function get flag():String {
             return _flag;
         }
 
-        public function set flag(value:String):void
-        {
+        public function set flag(value:String):void {
             _flag = value;
             mouseU();
         }
 
-        public static var STATUS_D:String="D";
-        public static var STATUS_U:String="U";
+        public static var STATUS_D:String = "D";
+        public static var STATUS_U:String = "U";
 
-        public function mouseU():void{
-            if(STATUS_D==flag){
+        public function mouseU():void {
+            if (STATUS_D == flag) {
                 mouseD();
-            }else{
-                this.currentState="selected";
+            } else {
+                this.currentState = "selected";
             }
         }
-        public function mouseD():void{
-            this.currentState="unSelected";
+
+        public function mouseD():void {
+            this.currentState = "unSelected";
         }
 
-        public function closeO():void{
+        public function closeO():void {
 
-            this.clo.source=X_hover;
+            this.clo.source = X_hover;
         }
-        public function closeD():void{
 
-            this.clo.source=X_down;
+        public function closeD():void {
+
+            this.clo.source = X_down;
         }
-        public function closeU():void{
-            this.clo.source=X_out;
+
+        public function closeU():void {
+            this.clo.source = X_out;
         }
         ]]>
 	</fx:Script>

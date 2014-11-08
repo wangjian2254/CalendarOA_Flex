@@ -7,12 +7,9 @@ import flash.events.MouseEvent;
 import flash.external.ExternalInterface;
 
 import mx.collections.ArrayCollection;
-
 import mx.controls.Menu;
-
 import mx.core.FlexGlobals;
 import mx.core.UIComponent;
-
 
 public class RightClickManager {
     public function RightClickManager() {

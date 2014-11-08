@@ -1,65 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-                             xmlns:mx="library://ns.adobe.com/flex/mx" width="500" height="200" creationComplete="init(event)"
-                             xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*">
+                             width="500" height="200" creationComplete="init(event)"
+                             xmlns:window="control.window.*">
 
     <fx:Script>
 		<![CDATA[
-			import events.ChangeMenuEvent;
-			
-			import httpcontrol.HttpServiceUtil;
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.core.FlexGlobals;
-			import mx.events.CloseEvent;
-			import mx.events.EffectEvent;
-			import mx.managers.PopUpManager;
-			import mx.rpc.events.ResultEvent;
-			[Bindable]
-			private var sjrArr:ArrayCollection;
+        import events.ChangeMenuEvent;
 
-            public var message:Object=null;
-            public var type:String=null;
+        import httpcontrol.HttpServiceUtil;
 
-            override public function  releaseListener(e:CloseEvent):void{
-            }
-			private function init(e:mx.events.FlexEvent):void{
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
+        import mx.events.EffectEvent;
+        import mx.events.FlexEvent;
+        import mx.rpc.events.ResultEvent;
 
-                this.height = form.height+10;
-                this.title ="邀请新成员";
-                getOrgFlag();
+        [Bindable]
+        private var sjrArr:ArrayCollection;
 
-			}
+        public var message:Object = null;
+        public var type:String = null;
 
-			private function openAddress():void{
-				var obj:Object=new Object();
-				var evt:ChangeMenuEvent=new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr,"contact",obj,true)
-				FlexGlobals.topLevelApplication.dispatchEvent(evt);
-			}
-
-
-
-			private function getOrgFlag():void{
-
-				var url:String="/riliusers/getOrgFlag";//保存url
-				HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send();
-			}
-			private function sendMessageResult(result:Object,e:ResultEvent):void{
-				areaUrl.text = result.result.url;
-			}
-
-        private function updateUrl():void{
-            var url:String="/riliusers/updateOrgFlag";//保存url
-            HttpServiceUtil.getCHTTPServiceAndResult(url,sendMessageResult,"POST").send();
+        override public function releaseListener(e:CloseEvent):void {
         }
 
-        private function copyUrl():void{
+        private function init(e:FlexEvent):void {
+
+            this.height = form.height + 10;
+            this.title = "邀请新成员";
+            getOrgFlag();
+
+        }
+
+        private function openAddress():void {
+            var obj:Object = new Object();
+            var evt:ChangeMenuEvent = new ChangeMenuEvent(ChangeMenuEvent.ChangeMenu_EventStr, "contact", obj, true)
+            FlexGlobals.topLevelApplication.dispatchEvent(evt);
+        }
+
+
+        private function getOrgFlag():void {
+
+            var url:String = "/riliusers/getOrgFlag";//保存url
+            HttpServiceUtil.getCHTTPServiceAndResult(url, sendMessageResult, "POST").send();
+        }
+
+        private function sendMessageResult(result:Object, e:ResultEvent):void {
+            areaUrl.text = result.result.url;
+        }
+
+        private function updateUrl():void {
+            var url:String = "/riliusers/updateOrgFlag";//保存url
+            HttpServiceUtil.getCHTTPServiceAndResult(url, sendMessageResult, "POST").send();
+        }
+
+        private function copyUrl():void {
             System.setClipboard(areaUrl.text);
-            Alert.show("已经复制到粘贴板了","提示");
+            Alert.show("已经复制到粘贴板了", "提示");
         }
-		]]>
+        ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->

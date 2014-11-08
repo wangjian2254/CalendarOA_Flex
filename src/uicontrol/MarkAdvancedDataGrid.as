@@ -1,21 +1,20 @@
 package uicontrol
 {
-	import events.GridEditPosition;
-	
-	import flash.events.Event;
-	import flash.events.KeyboardEvent;
-	import flash.ui.Keyboard;
-	
-	import mx.collections.ArrayCollection;
-	import mx.controls.AdvancedDataGrid;
-	import mx.controls.TextInput;
-	import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
-	import mx.events.AdvancedDataGridEvent;
-	import mx.events.ListEvent;
-	import mx.utils.ObjectUtil;
-	import mx.utils.UIDUtil;
-	
-	[Event(name="gridEditPositionEvent",type="flex.events.GridEditPosition")]
+import events.GridEditPosition;
+
+import flash.events.Event;
+import flash.events.KeyboardEvent;
+import flash.ui.Keyboard;
+
+import mx.collections.ArrayCollection;
+import mx.controls.AdvancedDataGrid;
+import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+import mx.events.AdvancedDataGridEvent;
+import mx.events.ListEvent;
+import mx.utils.ObjectUtil;
+import mx.utils.UIDUtil;
+
+[Event(name="gridEditPositionEvent",type="flex.events.GridEditPosition")]
 	public class MarkAdvancedDataGrid extends AdvancedDataGrid
 	{
 		public function MarkAdvancedDataGrid()

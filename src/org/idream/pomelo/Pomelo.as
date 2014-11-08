@@ -1,22 +1,22 @@
 package org.idream.pomelo
 {
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.IOErrorEvent;
-	import flash.events.OutputProgressEvent;
-	import flash.events.ProgressEvent;
-	import flash.events.SecurityErrorEvent;
-	import flash.net.Socket;
-	import flash.system.Security;
-	import flash.utils.ByteArray;
-	import flash.utils.Dictionary;
-	import flash.utils.clearTimeout;
-	import flash.utils.setTimeout;
-	
-	import org.idream.pomelo.interfaces.IMessage;
-	import org.idream.pomelo.interfaces.IPackage;
-	
-	[Event(name="handshake", type="org.idream.pomelo.PomeloEvent")]
+import flash.events.Event;
+import flash.events.EventDispatcher;
+import flash.events.IOErrorEvent;
+import flash.events.OutputProgressEvent;
+import flash.events.ProgressEvent;
+import flash.events.SecurityErrorEvent;
+import flash.net.Socket;
+import flash.system.Security;
+import flash.utils.ByteArray;
+import flash.utils.Dictionary;
+import flash.utils.clearTimeout;
+import flash.utils.setTimeout;
+
+import org.idream.pomelo.interfaces.IMessage;
+import org.idream.pomelo.interfaces.IPackage;
+
+[Event(name="handshake", type="org.idream.pomelo.PomeloEvent")]
 	[Event(name="kicked", type = "org.idream.pomelo.PomeloEvent")]
 	[Event(name="close", type = "flash.events.Event")]
 	[Event(name="ioError", type="flash.events.IOErrorEvent")]

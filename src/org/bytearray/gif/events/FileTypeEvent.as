@@ -1,8 +1,8 @@
 package org.bytearray.gif.events
 {
-	import flash.events.Event;
-	
-	public class FileTypeEvent extends Event 	
+import flash.events.Event;
+
+public class FileTypeEvent extends Event
 	{
 		public static const INVALID:String = "invalid";
 		

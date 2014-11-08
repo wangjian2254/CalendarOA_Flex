@@ -1,17 +1,15 @@
 package util
 {
-	import control.window.SchedulePanel;
-	import control.ScheduleShow;
-	import control.window.TaskPanel;
-	
-	import flash.display.DisplayObject;
-	
-	import mx.core.FlexGlobals;
-	import mx.managers.PopUpManager;
-	
-	import uicontrol.TaskItem;
+import control.window.TaskPanel;
 
-	public class TaskUtil
+import flash.display.DisplayObject;
+
+import mx.core.FlexGlobals;
+import mx.managers.PopUpManager;
+
+import uicontrol.TaskItem;
+
+public class TaskUtil
 	{
 		public function TaskUtil()
 		{

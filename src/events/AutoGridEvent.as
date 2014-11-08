@@ -1,8 +1,8 @@
 package events
 {
-	import flash.events.Event;
-	
-	public class AutoGridEvent extends Event
+import flash.events.Event;
+
+public class AutoGridEvent extends Event
 	{
 		public static const DELETE:String="autoDelete";
 		public static const ADD:String="autoAdd";

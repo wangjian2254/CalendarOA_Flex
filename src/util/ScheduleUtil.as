@@ -1,16 +1,15 @@
 package util
 {
-	import control.window.SchedulePanel;
-	import control.ScheduleShow;
-	
-	import flash.display.DisplayObject;
+import control.window.SchedulePanel;
+
+import flash.display.DisplayObject;
 
 import model.Schedule;
 
 import mx.core.FlexGlobals;
-	import mx.managers.PopUpManager;
+import mx.managers.PopUpManager;
 
-	public class ScheduleUtil
+public class ScheduleUtil
 	{
 		public function ScheduleUtil()
 		{
