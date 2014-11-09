@@ -205,7 +205,10 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				c = new DepartmentControl();
 				break;
 			case 'message':
-				c = new IMControl();
+				var im:Object = openChatWindow();
+				if(im!=null){
+					c = im as CBorderContainer;
+				}
 				break;
             case 'chat':
                 c = new ChatDemoContol();

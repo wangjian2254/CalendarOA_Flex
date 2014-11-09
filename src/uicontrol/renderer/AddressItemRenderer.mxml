@@ -46,13 +46,13 @@
 
 
         override public function set data(value:Object):void {
-            trace("chat member list" + value.name);
+            
             _data = value;
             super.data = value;
             if (value == null) {
                 return;
             }
-
+			trace("chat member list" + value.name);
             if (!data.hasOwnProperty('unread') || data.unread < 1) {
                 num.visible = false;
             } else {
@@ -183,7 +183,7 @@
 
             <s:Image id="childicon" width="10" height="10"  buttonMode="true" ></s:Image>
 
-            <s:Image id="head" width="45" height="45"></s:Image>
+            <uicontrol:HeadImage id="head" width="45" height="45"/>
             <s:Label id="nameLabel" ></s:Label>
             <s:BorderContainer id="num" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
                 <s:layout>

@@ -32,15 +32,7 @@
         import util.ScheduleUtil;
         import util.ToolUtil;
 
-        [Bindable]
-        public function get getWindowHeight():Number {
-            return windowGroup.height;
-        }
 
-        [Bindable]
-        public function get getWindowWidth():Number {
-            return windowGroup.width;
-        }
 
         [Bindable]
         public var titlestr:String = "创建任务";

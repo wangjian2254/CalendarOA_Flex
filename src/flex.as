@@ -1,3 +1,5 @@
+import control.IMControl;
+
 import flash.external.ExternalInterface;
 
 import httpcontrol.HttpServiceUtil;
@@ -6,8 +8,6 @@ import mx.controls.Alert;
 import mx.events.CloseEvent;
 
 import util.ToolUtil;
-
-// ActionScript file
 
 public function quite(e:*=null):void {
 
@@ -23,6 +23,11 @@ public function CloseWindow(event:CloseEvent):void{
         quiteNoTip();
 
 	}
+}
+
+public function openChatWindow():Object
+{
+	return new IMControl();
 }
 
 public function initFlex():void{

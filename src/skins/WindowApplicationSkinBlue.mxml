@@ -52,7 +52,7 @@
     </s:Rect>
 	
 	<!-- 头部背景 -->
-	<s:Rect height="48" top="0" left="0" right="0">
+	<s:Rect height="47" top="1" left="0" right="0">
 		<s:fill>
 			<s:LinearGradient rotation="90">
 				<s:GradientEntry color="0xffffff" ratio="0"/>

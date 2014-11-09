@@ -4,7 +4,7 @@
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    width="115" height="55" borderVisible="true" borderColor="#cccccc" cornerRadius="7"
-                   creationComplete="init()" buttonMode="true" click="changeBack()"
+                   creationComplete="init()" buttonMode="true" click="changeBack()" xmlns:uicontrol="uicontrol.*"
         >
     <fx:Script><![CDATA[
         public var selected:Boolean=false;
@@ -59,7 +59,7 @@
 
         </s:HorizontalLayout>
     </s:layout>
-    <s:Image id="head" width="45" height="45" ></s:Image>
+    <uicontrol:HeadImage id="head" width="45" height="45" />
     <s:Label id="nameLabel" width="60"></s:Label>
 
 </s:BorderContainer>

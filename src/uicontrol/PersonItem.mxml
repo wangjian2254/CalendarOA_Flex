@@ -32,6 +32,7 @@
         private function init():void {
             try {
                 personName.text = _person.name;
+				personName.toolTip = _person.name;
 
             } catch (e:Error) {
 
@@ -86,6 +87,6 @@
 
         </s:HorizontalLayout>
     </s:layout>
-    <s:Label id="personName" buttonMode="true"  ></s:Label>
+    <s:Label id="personName" buttonMode="true" maxWidth="80" height="18" maxDisplayedLines="-1"  ></s:Label>
     <uicontrol:BtnDel id="btnDel" visible="{showBtn}" clickFun="delPerson"></uicontrol:BtnDel>
 </s:BorderContainer>

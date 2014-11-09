@@ -2,7 +2,7 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
-					   creationComplete="init()"    minWidth="955" minHeight="600" skinClass="skins.WindowApplicationSkinBlue" 
+					   creationComplete="init()"    minWidth="955" minHeight="600" width="80%" height="80%" skinClass="skins.WindowApplicationSkinBlue" 
 					   xmlns:uicontrol="uicontrol.*" xmlns:httpcontrol="httpcontrol.*"
 					   showStatusBar="false"
 					    viewSourceURL="srcview/index.html">
@@ -37,13 +37,7 @@
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
 			<mx:LinkButton icon="{CBorderContainer.refreshimg}" label="{ToolUtil.unreadMessageNum}" click="openMessage()" styleName="textStyle2" textDecoration="underline" />
-			<s:HGroup gap="0">
-				<s:Label text="用户:" styleName="textStyle2"/>	
-				<s:Label text="{ToolUtil.sessionUser.nickname}" styleName="textStyle2"/>	
-				<s:Label text=" | " styleName="textStyle2"/>	
-				<s:Label text=" 用户名:" styleName="textStyle2"/>	
-				<s:Label text="{ToolUtil.sessionUser.username}" styleName="textStyle2"/>
-			</s:HGroup>	
+			<s:Label text="{ToolUtil.sessionUser.name} | {ToolUtil.sessionUser.org_name}" styleName="textStyle2"/>
 				
 			<s:SkinnableContainer  id="loginBtnPanel"  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
 				<s:layout>
@@ -55,7 +49,7 @@
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>
 				<s:Label text="|" styleName="textStyle1" />
-				<mx:LinkButton x="0" y="2" height="25" label="最小化"  styleName="textStyle1" visible="true" click="this.minimize()" />
+				<mx:LinkButton x="0" y="2" height="25" label="最小化"  styleName="textStyle1" click="this.minimize()" />
 				<s:Label text="|" styleName="textStyle1" />
 				
 				<mx:LinkButton x="0" y="2" height="25" label="最大化" id="resizeBtn1"  styleName="textStyle1"  click="this.maxResize()" />
@@ -100,12 +94,22 @@
 		
 		<s:SkinnableContainer  height="28" top="77" left="0" right="0" skinClass="skins.locGroupSkin" id="locGroup" visible="true">
 			<s:layout>
-				<s:BasicLayout/>
+				<s:HorizontalLayout paddingLeft="20" paddingRight="20" verticalAlign="middle"/>
 			</s:layout>
-			<s:Label text="当前位置： " left="20" top="8" styleName="textStyle3"/>
-			<s:Label id="website" left="85" top="8" styleName="textStyle3"/>
-			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" top="0" bottom="0" left="0" right="0" textAlign="center" verticalAlign="middle" />
-			<mx:LinkButton label="刷新页面数据" visible="true" click="reLogin()" top="3" right="12" color="0x353535"/>
+			<s:Label text="当前位置： "  styleName="textStyle3"/>
+			<s:Label id="website"  styleName="textStyle3"/>
+			<s:Spacer width="100%"></s:Spacer>
+			<s:HGroup id="scheduleComb" includeInLayout="{scheduleComb.visible}">
+				<s:Button label="我的任务" click="queryMySchedule()" chromeColor="0x3e76f4" color="#ffffff" height="25"/>
+				<s:DropDownList id="membersDownList" width="150" labelField="name" dataProvider="{ToolUtil.membersByDepart}" change="{ToolUtil.changeProjectByMember(membersDownList,projectDownList)}"></s:DropDownList>
+				<s:DropDownList id="projectDownList" width="250" labelField="name" dataProvider="{ToolUtil.projectByDepart}" change="{ToolUtil.changeProject(projectDownList)}"></s:DropDownList>
+			</s:HGroup>
+			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" textAlign="center" verticalAlign="middle" />
+			<s:Spacer width="100%"></s:Spacer>
+			<!-- 全局搜索框:根据文字显示搜索结果： 历史搜索记录、日程、任务、备忘、成员或文件，每种类型对应相应的图标,以苹果的 Spotlight 为榜样-->
+			<s:TextInput width="200" prompt="搜索日程、任务、备忘、成员或文件" click="searcher()" height="25"/>
+			<s:Button label="搜索" chromeColor="0x3e76f4" color="#ffffff" height="25"/>
+			<s:Spacer width="10"></s:Spacer>
 		</s:SkinnableContainer>		
 	</s:Group>
 	

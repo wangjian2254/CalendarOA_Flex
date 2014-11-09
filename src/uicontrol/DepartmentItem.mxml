@@ -240,7 +240,7 @@
 
                 </s:HorizontalLayout>
             </s:layout>
-    <s:Image id="orgHead"  width="45" height="45"></s:Image>
+    <uicontrol:HeadImage id="orgHead"  width="45" height="45"/>
     <s:VGroup id="formDepart" width="100%" gap="5">
         <s:HGroup gap="15" id="group" horizontalAlign="right" verticalAlign="middle"  width="100%">
             <uicontrol:BtnAdd toolTip="添加子部门" visible="{powerAdd}" clickFun="{addChildDepartment}" ></uicontrol:BtnAdd>

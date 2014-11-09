@@ -4,7 +4,7 @@
 -->
 <s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                 xmlns:mx="library://ns.adobe.com/flex/mx"
-                autoDrawBackground="true"
+                autoDrawBackground="true" xmlns:uicontrol="uicontrol.*"
         >
     <fx:Metadata>
         [Event(name="listItemClick",type="events.ListClickEvent")]
@@ -241,7 +241,7 @@
         </s:HGroup>
         <s:HGroup  verticalAlign="bottom" horizontalAlign="center" width="100%" gap="0" paddingRight="5" paddingLeft="5">
             <s:VGroup  horizontalAlign="center" gap="2">
-                <s:Image id="head" width="25" height="25"></s:Image>
+                <uicontrol:HeadImage id="head" width="25" height="25"/>
                 <s:Label id="nameLabel"  color="#000000"></s:Label>
             </s:VGroup>
             <s:VGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="5" paddingLeft="5" paddingBottom="5">
@@ -265,7 +265,7 @@
                 </s:BorderContainer>
             </s:VGroup>
             <s:VGroup   horizontalAlign="center" gap="2">
-                <s:Image id="head2" width="25" height="25"></s:Image>
+                <uicontrol:HeadImage id="head2" width="25" height="25"/>
                 <s:Label id="nameLabel2"  color="#000000"></s:Label>
             </s:VGroup>
 
