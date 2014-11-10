@@ -102,8 +102,13 @@ public class ChatManager {
 
     static public function loginChat(e:Event=null):void{
         time.addEventListener(TimerEvent.TIMER,loginChat);
-        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, paopaomove_handler);
-        unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChanged);
+		if(type=="flex"){
+			unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, paopaomove_handler);
+			unReadMessage.addEventListener(CollectionEvent.COLLECTION_CHANGE, unReadChanged);
+		}else{
+			
+		}
+        
 //        for(var u:String in userStatus){
 //            userStatus[u]="off";
 //        }
@@ -198,7 +203,10 @@ public class ChatManager {
             trace("登录成功");
 
 //            Pomelo.getIns().addEventListener('pStatus', personChangedHandler);
-            Pomelo.getIns().addEventListener('onChat', chatHandler);
+			if(type=="flex"){
+				Pomelo.getIns().addEventListener('onChat', chatHandler);
+			}
+            
             Pomelo.getIns().addEventListener('sys', systemMessageHandler);
             Pomelo.getIns().addEventListener('createChannel', createChannelHandler);
             Pomelo.getIns().addEventListener('updateChannel', updateChannelHandler);

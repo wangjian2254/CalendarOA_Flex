@@ -18,6 +18,8 @@
     <s:states>
         <s:State name="disabled" />
         <s:State name="normal" />
+		<s:State name="normalAndInactive" />
+		<s:State name="disabledAndInactive" />
     </s:states>
     <s:Rect  left="0" right="0" top="0" bottom="0" radiusX="7.99944" radiusY="7.99944" >
         <s:fill>

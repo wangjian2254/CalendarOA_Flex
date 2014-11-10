@@ -620,6 +620,9 @@ public class ToolUtil
         if(ToolUtil.scheduleMap.hasOwnProperty("schedulemap")&&ToolUtil.scheduleMap.schedulemap.hasOwnProperty(id)){
             return ToolUtil.scheduleMap.schedulemap[id];
         }
+		if(ToolUtil.outScheduleMap.hasOwnProperty("schedulemap")&&ToolUtil.outScheduleMap.schedulemap.hasOwnProperty(id)){
+			return ToolUtil.outScheduleMap.schedulemap[id];
+		}
         return null;
     }
 
