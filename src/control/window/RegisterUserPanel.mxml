@@ -158,6 +158,10 @@
         public function refresh(r:Object, e:ResultEvent):void {
             if (r.success) {
                 closeWin();
+                if(ToolUtil.joinOrgFlag !=null){
+                    navigateToURL(new URLRequest("/"),"_self");
+                    return;
+                }
                 ToolUtil.joinOrgFlag = null;
                 ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
 
@@ -213,8 +217,8 @@
 	</fx:Declarations>
 
 
-
-    <s:Form width="100%" id="loginForm" visible="false">
+<s:Group>
+    <s:Form width="100%" id="loginForm" visible="false" includeInLayout="{loginForm.visible}">
         <s:FormItem  label="是否新用户：" textAlign="right">
             <s:layout>
                 <s:HorizontalLayout gap="10"></s:HorizontalLayout>
@@ -250,7 +254,7 @@
             </s:Button>
         </s:FormItem>
     </s:Form>
-	<s:Form width="100%" id="form" >
+	<s:Form width="100%" id="form"  includeInLayout="{form.visible}">
         <s:layout>
             <s:FormLayout gap="0"></s:FormLayout>
         </s:layout>
@@ -343,7 +347,7 @@
 		</s:FormItem>
 		
 
-		<s:FormItem height="40">
+		<s:FormItem height="40" >
 				<s:layout>
 					<s:HorizontalLayout gap="10"/>
 				</s:layout>
@@ -355,4 +359,5 @@
 				</s:Button>
 		</s:FormItem>
 	</s:Form>
+</s:Group>
 </window:EfficientTitleWindow>
