@@ -15,6 +15,7 @@
 
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
+        import mx.events.CloseEvent;
         import mx.events.CollectionEvent;
         import mx.events.FlexEvent;
         import mx.events.FlexMouseEvent;
@@ -372,6 +373,17 @@
             obj['fid'] = departBox.selectedItem.id;
             HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/changeDepartment", addMemberResult, "POST").send(obj);
         }
+
+        private function askSave():void{
+            if(departmentSelectArray.getById(selectDepartmentId)!=null&&departmentSelectArray.getById(selectDepartmentId).department.name != departmentName.text){
+                Alert.show("部门名称已经修改，是否保存修改?", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
+                    if (e.detail == Alert.YES) {
+                        saveDepartment();
+                    }
+                });
+            }
+
+        }
         ]]>
 	</fx:Script>
     <fx:Declarations>
@@ -402,7 +414,7 @@
                 <s:Label text="部门头像:"></s:Label>
                 <s:Image id="orgHead"  width="40" height="40" click="showHeadPanel()" toolTip="点击修改部门头像" buttonMode="true"></s:Image>
                 <s:Label text="部门名称:"></s:Label>
-                <s:TextInput id="departmentName" width="200" prompt="按回车键保存" toolTip="按回车键保存" enter="saveDepartment()"></s:TextInput>
+                <s:TextInput id="departmentName" width="200" prompt="按回车键保存" toolTip="按回车键保存" enter="saveDepartment()" focusOut="askSave()"></s:TextInput>
                 <s:Label text="添加成员:"></s:Label>
                 <s:ComboBox id="memberBox" dataProvider="{ToolUtil.memberList}" labelField="name" width="150" change="addMember()"  />
                 <s:Label text="父级部门:"></s:Label>

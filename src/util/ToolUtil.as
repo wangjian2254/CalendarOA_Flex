@@ -339,6 +339,8 @@ public class ToolUtil
         if(rootDepart!=null){
             departmentlist.addItem(rootDepart);
             showDepartChildren_handler(rootDepart,departmentlist);
+        }else{
+            departmentlist.addAll(mydepartlist);
         }
         return departmentlist;
     }
