@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="CalendarOA_Flex">
     <configurations>
-      <configuration name="CalendarOA_Flex" main-class="CalendarOA_Flex" output-file="CalendarOA_Flex.swf" output-folder="$MODULE_DIR$/../../django/CalendarOA/static/swf" use-html-wrapper="true" wrapper-template-path="$MODULE_DIR$/html-template">
+      <configuration name="CalendarOA_Flex" main-class="CalendarOA_Flex" output-file="CalendarOA_Flex.swf" output-folder="$MODULE_DIR$/../LiYuOA/static/swf" use-html-wrapper="true" wrapper-template-path="$MODULE_DIR$/html-template">
         <dependencies target-player="11.1">
           <entries>
             <entry library-id="e01b8708-faf2-462b-8cbd-732bf671dc4a">
@@ -13,6 +13,7 @@
         </dependencies>
         <compiler-options>
           <map>
+            <entry key="compiler.debug.swf" value="true" />
             <entry key="compiler.locale" value="en_US" />
           </map>
         </compiler-options>
@@ -43,4 +44,3 @@
     </orderEntry>
   </component>
 </module>
-

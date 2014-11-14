@@ -89,7 +89,7 @@
             }
             var pids:Array = chatUser.getPids();
             if (chatUser.type == "p") {
-                if (pids[0] == pids[2]) {
+                if (pids[0] == pids[1]) {
                     var evt:CloseContainerEvent = new CloseContainerEvent(CloseContainerEvent.Close_EventStr, this, true);
                     closeContainer(evt);
                     return;

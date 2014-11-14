@@ -191,11 +191,11 @@ public class ChatChannel {
         var pids:Array = new Array();
         if (members == null) {
 
-            pids.push(id);
-            pids.push(ToolUtil.sessionUser.pid);
+            pids.push(int(id));
+            pids.push(int(ToolUtil.sessionUser.pid));
         } else {
             for each(var p:Object in members) {
-                pids.push(p.id);
+                pids.push(int(p.id));
             }
         }
         return pids;

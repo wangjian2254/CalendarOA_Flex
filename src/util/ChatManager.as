@@ -359,14 +359,14 @@ public class ChatManager {
             unReadMessage.addItem(s);
 //            unReadMessage.refresh();
         }else{
-            if(event.message.msg.c!=type){
-                var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
-                s.message = event.message.msg;
-                s.y = 0 - s.height - 10;
-                s.x = FlexGlobals.topLevelApplication.width - s.width-10;
-                s.unReadMessage = unReadMessage;
-                unReadMessage.addItem(s);
-            }
+//            if(event.message.msg.c!=type){
+//                var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+//                s.message = event.message.msg;
+//                s.y = 0 - s.height - 10;
+//                s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+//                s.unReadMessage = unReadMessage;
+//                unReadMessage.addItem(s);
+//            }
         }
 
         trace("chat:"+JParser.encode(event.message.msg));

@@ -105,7 +105,7 @@
 				}
 				var pids:Array = chatUser.getPids();
 				if (chatUser.type == "p") {
-					if (pids[0] == pids[2]) {
+					if (pids[0] == pids[1]) {
 						closeContainer();
 						return;
 					}
@@ -122,6 +122,12 @@
 				if (chatUser.type != 'g') {
 					quiteButton.visible = false;
 					
+				}
+				if (chatUser.type == 't') {
+					scheduleButton.visible = true;
+					
+				}else{
+					scheduleButton.visible = false;
 				}
 				memberButton.visible = false;
 				if (chatUser.type == 'g' && chatUser.author == ToolUtil.sessionUser.pid) {
@@ -143,6 +149,8 @@
 				chatList.scroller.verticalScrollBar.addEventListener(Event.CHANGE, list_verticalScrollBar_change);
 				
 				chatTitleContainer.addEventListener(MouseEvent.MOUSE_DOWN,pushApp);
+				
+				this.title = chatUser.name;
 			}
 			
 			public function pushApp(e:MouseEvent):void{
@@ -513,7 +521,7 @@
 				<s:Label id="nameLabel" textDecoration="underline"  ></s:Label>
 				
 				<mx:Spacer width="100%" height="10"/>
-				<s:Button id="scheduleButton" label="显示任务" width="100" height="25" click="showSchedule()" visible="{bigPanel}" includeInLayout="{scheduleButton.visible}"  />
+				<s:Button id="scheduleButton" label="显示任务" width="100" height="25" click="showSchedule()" includeInLayout="{scheduleButton.visible}"  />
 				<s:Button id="quiteButton" label="退出讨论组" width="100" height="25" click="quiteGroup()" includeInLayout="{quiteButton.visible}"  />
 				<s:Button id="memberButton" label="成员管理" width="100" height="25" click="memberGroup()" includeInLayout="{memberButton.visible}"  />
 				<s:Button id="usersButton" label="创建讨论组" width="100" height="25" click="createGroup()" includeInLayout="{usersButton.visible}"  />
