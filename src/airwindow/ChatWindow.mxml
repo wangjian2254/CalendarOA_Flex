@@ -2,198 +2,221 @@
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		   xmlns:s="library://ns.adobe.com/flex/spark" 
 		   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" width="230" height="700" xmlns:uicontrol="uicontrol.*" showStatusBar="false"  >
+	
 	<fx:Script>
 		<![CDATA[
-			import events.ChangeUserEvent;
-			import events.ChatTimelineEvent;
-			import events.CloseContainerEvent;
-			import events.ListClickEvent;
-			import events.PaoPaoEvent;
-			
-			import model.ChatChannel;
-			
-			import mx.core.FlexGlobals;
-			import mx.events.CloseEvent;
-			import mx.events.FlexEvent;
-			import mx.managers.PopUpManager;
-			
-			import org.idream.pomelo.Pomelo;
-			import org.idream.pomelo.PomeloEvent;
-			
-			import uicontrol.ChatPanel;
-			
-			import util.ChatManager;
-			import util.ToolUtil;
-			
-			public var chat_map:Object=new Object();
-			
-			public function closeWindow(e:Event):void {
-				Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
-				Pomelo.getIns().removeEventListener('onChat', chatHandler);
-				this.removeEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
-				this.removeEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
-				this.removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
-				changeCurrentUser(null);
-			}
-			
-			public function init():void {
-				
-				this.addEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
-				this.addEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
-				this.addEventListener(ChatTimelineEvent.Channel, flagTimeline);
-				Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
-				Pomelo.getIns().addEventListener('onChat', chatHandler);
-				
-				addEventListener(CloseEvent.CLOSE, closeWindow);
-				FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);
-				
-				addressList.addEventListener(MouseEvent.MOUSE_DOWN,pushApp);
-			}
+		import events.ChangeUserEvent;
+		import events.ChatTimelineEvent;
+		import events.CloseContainerEvent;
+		import events.ListClickEvent;
+		import events.PaoPaoEvent;
 
+		import model.ChatChannel;
 
-			public function chatHandler(event:PomeloEvent):void{
-				var cp:ChatPannel = chat_map[event.message.msg.channel];
-				
-				if(event.message.msg.channel!=ToolUtil.currentChannel){
-					if(cp==null){
-						var notice:NoticeWindow = new NoticeWindow();
-						notice.transparent=true;
-						notice.type=NativeWindowType.UTILITY;
-						notice.systemChrome=NativeWindowSystemChrome.NONE;
-						notice.message = event.message.msg;
-						notice.open();
-						notice.addEventListener(PaoPaoEvent.CHAT,openChatByChannel);
-					}else{
-						cp.nativeWindow.notifyUser(NotificationType.CRITICAL);
-					}
-					event.message.msg.unread=true;
-					
-					
-				}else{
-//					if(event.message.msg.c!=ChatManager.type){
-//						if(cp==null){
-//							notice = new NoticeWindow();
-//							notice.transparent=true;
-//							notice.type=NativeWindowType.UTILITY;
-//							notice.systemChrome=NativeWindowSystemChrome.NONE;
-//							notice.message = event.message.msg;
-//							notice.open();
-//							notice.addEventListener(PaoPaoEvent.CHAT,openChatByChannel);
-//						}else{
-//							
-//						}
-//					}
+		import mx.collections.ArrayCollection;
+		import mx.core.FlexGlobals;
+		import mx.events.CloseEvent;
+		import mx.events.FlexEvent;
+		import mx.managers.PopUpManager;
+
+		import org.idream.pomelo.Pomelo;
+		import org.idream.pomelo.PomeloEvent;
+
+		import uicontrol.ChatPanel;
+
+		import util.ChatManager;
+		import util.ToolUtil;
+
+		public var chat_map:Object = new Object();
+
+		public var unread_messagelist:Object = new Object();
+
+		public function closeWindow(e:Event):void {
+			Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
+			Pomelo.getIns().removeEventListener('onChat', chatHandler);
+			this.removeEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
+			this.removeEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
+			this.removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
+			changeCurrentUser(null);
+			Pomelo.getIns().disconnect();
+
+		}
+
+		public function init():void {
+			ChatManager.loginChat();
+			this.addEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
+			this.addEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
+			this.addEventListener(ChatTimelineEvent.Channel, flagTimeline);
+			Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
+			Pomelo.getIns().addEventListener('onChat', chatHandler);
+
+			addEventListener(CloseEvent.CLOSE, closeWindow);
+			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr, changeCurrentUser);
+
+			addressList.addEventListener(MouseEvent.MOUSE_DOWN, pushApp);
+
+		}
+
+		public function noticeWindow(msg:Object):void {
+			var cp:ChatPannel = chat_map[msg.channel];
+			unread_messagelist[msg.channel].unread+= 1;
+			if (msg.channel != ToolUtil.currentChannel) {
+				if (cp == null) {
+					var notice:NoticeWindow = new NoticeWindow();
+					notice.transparent = true;
+					notice.type = NativeWindowType.UTILITY;
+					notice.systemChrome = NativeWindowSystemChrome.NONE;
+					notice.message = msg;
+					notice.open();
+					notice.addEventListener(PaoPaoEvent.CHAT, openChatByChannel);
+
+				} else {
 					cp.nativeWindow.notifyUser(NotificationType.CRITICAL);
-					
+					cp.nativeWindow.orderToFront();
 				}
-				
-				
+				msg.unread = true;
 
+
+			} else {
+				if (cp != null) {
+					cp.nativeWindow.notifyUser(NotificationType.CRITICAL);
+				}
 			}
-			
-			private function openChatByChannel(e:PaoPaoEvent):void{
-				var chatChannel:ChatChannel;
-				var c:ChatChannel;
-				for each(c in ToolUtil.groupList) {
-					if (c.channel == e.channel) {
+
+		}
+
+		public function chatHandler(event:PomeloEvent):void {
+
+			if (!unread_messagelist.hasOwnProperty(event.message.msg.channel)) {
+				// 放入 chatchannel 对象。和 ToolUtil.grouplist 等公用。未读信息才会共用。
+				var chatChannel:ChatChannel = getChatByChannel(event.message.msg.channel);
+				if (chatChannel == null) {
+					Pomelo.getIns().request("connector.entryHandler.queryChannelInfo", {channel: event.message.msg.channel}, function (data:Object):void {
+						if (data.code == 200 && data.channel != null) {
+							chatChannel = new ChatChannel(data.channel);
+							ToolUtil.groupList.addItem(chatChannel);
+							unread_messagelist[event.message.msg.channel]= chatChannel;
+							noticeWindow(event.message.msg);
+						}
+					});
+				} else {
+					unread_messagelist[event.message.msg.channel] = chatChannel;
+					noticeWindow(event.message.msg);
+				}
+			} else {
+				noticeWindow(event.message.msg);
+			}
+		}
+
+		private function getChatByChannel(channel:String):ChatChannel {
+			var chatChannel:ChatChannel;
+			var c:ChatChannel;
+			for each(c in ToolUtil.groupList) {
+				if (c.channel == channel) {
+					chatChannel = c;
+					break;
+				}
+			}
+			if (chatChannel == null) {
+				for each(c in addressList.departMember) {
+					if (c.channel == channel) {
 						chatChannel = c;
 						break;
 					}
 				}
-				if (chatChannel == null) {
-					for each(c in addressList.departMember) {
-						if (c.channel == e.channel) {
-							chatChannel = c;
-							break;
-						}
+			}
+			if (chatChannel == null) {
+				for each(c in addressList.userMember) {
+					if (c.channel == channel) {
+						chatChannel = c;
+						break;
 					}
 				}
-				if (chatChannel == null) {
-					for each(c in addressList.userMember) {
-						if (c.channel == e.channel) {
-							chatChannel = c;
-							break;
-						}
-					}
-				}
-				if (chatChannel != null) {
-					var event:ListClickEvent = new ListClickEvent("chat", chatChannel);
-					listItemClick_handler(event);
-				}
-				
 			}
-			
-			public function pushApp(e:MouseEvent):void{
-				if(this.nativeWindow.displayState== NativeWindowDisplayState.NORMAL){
-					this.nativeWindow.startMove();
-				}
+			return chatChannel;
+		}
+
+		private function openChatByChannel(e:PaoPaoEvent):void {
+			var chatChannel:ChatChannel = getChatByChannel(e.channel);
+			if (chatChannel != null) {
+				var event:ListClickEvent = new ListClickEvent("chat", chatChannel);
+				listItemClick_handler(event);
 			}
-			
-			public function changeCurrentUser(e:ChangeUserEvent):void {
-				for(var p:String in chat_map){
-					chat_map[p].nativeWindow.close();
-				}
+
+		}
+
+		public function pushApp(e:MouseEvent):void {
+			if (this.nativeWindow.displayState == NativeWindowDisplayState.NORMAL) {
+				this.nativeWindow.startMove();
 			}
-			
-			
-			private function flagTimeline(e:ChatTimelineEvent):void {
-				for each(var c:ChatChannel in ToolUtil.groupList) {
-					if (c.channel == e.channel) {
-						c.unread = 0;
-						Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {
-							channel: e.channel,
-							pid: ToolUtil.sessionUser.pid
-						});
-					}
-				}
-				ToolUtil.groupList.refresh();
+		}
+
+		public function changeCurrentUser(e:ChangeUserEvent):void {
+			for (var p:String in chat_map) {
+				chat_map[p].nativeWindow.close();
 			}
-			
-			private function unsubscribe_handler(e:ListClickEvent):void {
-				var chat:ChatChannel = e.data as ChatChannel;
-				if (chat == null) {
-					trace("开启聊天框出错");
-				} else {
-					Pomelo.getIns().request("connector.entryHandler.unsubscribeChannel", {
-						channel: chat.channel,
+		}
+
+
+		private function flagTimeline(e:ChatTimelineEvent):void {
+			for each(var c:ChatChannel in ToolUtil.groupList) {
+				if (c.channel == e.channel) {
+					c.unread = 0;
+					delete unread_messagelist[c.channel];
+					Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {
+						channel: e.channel,
 						pid: ToolUtil.sessionUser.pid
-					}, function (data:Object):void {
-						if (data.code == '500') {
-							return;
-						}
-						if (data.code == 200) {
-							var c:ChatPannel = chat_map[chat.channel];
-							if(c!=null){
-								c.close();
-							}
-							ToolUtil.groupList.removeItemAt(ToolUtil.groupList.getItemIndex(chat));
-							return;
-						}
 					});
 				}
 			}
-			
-			private function listItemClick_handler(e:ListClickEvent):void {
-				var chat:ChatChannel = e.data as ChatChannel;
-				if (chat == null) {
-					trace("开启聊天框出错");
-				}
-				var c:ChatPannel = chat_map[chat.channel];
-				if(c==null){
-					c = new ChatPannel();
+			ToolUtil.groupList.refresh();
+		}
+
+		private function unsubscribe_handler(e:ListClickEvent):void {
+			var chat:ChatChannel = e.data as ChatChannel;
+			if (chat == null) {
+				trace("开启聊天框出错");
+			} else {
+				Pomelo.getIns().request("connector.entryHandler.unsubscribeChannel", {
+					channel: chat.channel,
+					pid: ToolUtil.sessionUser.pid
+				}, function (data:Object):void {
+					if (data.code == '500') {
+						return;
+					}
+					if (data.code == 200) {
+						var c:ChatPannel = chat_map[chat.channel];
+						if (c != null) {
+							c.close();
+						}
+						ToolUtil.groupList.removeItemAt(ToolUtil.groupList.getItemIndex(chat));
+						return;
+					}
+				});
+			}
+		}
+
+		public function listItemClick_handler(e:ListClickEvent):void {
+			var chat:ChatChannel = e.data as ChatChannel;
+			if (chat == null) {
+				trace("开启聊天框出错");
+			}
+			var c:ChatPannel = chat_map[chat.channel];
+			if (c == null) {
+				c = new ChatPannel();
 //					c.transparent=true;
 //					c.type=NativeWindowType.UTILITY;
 //					c.systemChrome=NativeWindowSystemChrome.NONE;
-					c.chatUser = chat;
-					c.open();
-					c.addEventListener(CloseEvent.CLOSE,closeChatPannel);
-					c.addEventListener("ChatUser",listItemClick_handler);
-					chat_map[chat.channel]=c;
-				}else{
-					c.nativeWindow.activate();
-				}
-				
-				
+				c.chatUser = chat;
+				c.open();
+				c.addEventListener(CloseEvent.CLOSE, closeChatPannel);
+				c.addEventListener("ChatUser", listItemClick_handler);
+				chat_map[chat.channel] = c;
+			} else {
+				c.nativeWindow.activate();
+			}
+
+
 //				
 //				c = cbar.getView(mod);
 //				if (c == null) {
@@ -209,25 +232,27 @@
 //						cbar.addView(c);
 //					}
 //				}
-				
-				
+
+
+		}
+
+		public function closeChatPannel(event:Event):void {
+			var c:ChatPannel = event.target as ChatPannel;
+			c.removeEventListener(CloseEvent.CLOSE, closeChatPannel);
+			if (c != null) {
+				delete chat_map[c.chatUser.channel];
+				ToolUtil.currentChannel = null;
 			}
-			
-			public function closeChatPannel(event:Event):void{
-				var c:ChatPannel = event.target as ChatPannel;
-				c.removeEventListener(CloseEvent.CLOSE,closeChatPannel);
-				if(c!=null){
-					delete chat_map[c.chatUser.channel];
-				}
+		}
+
+		public function removeChannelHandler(event:PomeloEvent):void {
+			var c:ChatPannel = chat_map[event.message.channel];
+			if (c != null) {
+				c.nativeWindow.close();
+				delete chat_map[event.message.channel];
+				ToolUtil.currentChannel = null;
 			}
-			
-			public function removeChannelHandler(event:PomeloEvent):void {
-				var c:ChatPannel = chat_map[event.message.channel];
-				if(c!=null){
-					c.nativeWindow.close();
-					delete chat_map[event.message.channel];
-				}
-			}
+		}
 		]]>
 	</fx:Script>
 	<fx:Declarations>

@@ -20,6 +20,7 @@
 	<fx:Script source="air.as">
 	
 	</fx:Script>
+	<fx:Script source="/airwindow/trayicon.as"/>
 	<fx:Declarations>
 		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 		

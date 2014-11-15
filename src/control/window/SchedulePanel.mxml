@@ -807,7 +807,10 @@
 
             org.channel = "t" + schedulData.id;
             org.name = "[任务]" + schedulData.title.substr(0, 10) + (schedulData.title.length > 10 ? "……" : "");
-            org.users = schedulData.users;
+            org.users = new Array();
+            for(var i:int=0;i<schedulData.users.length;i++){
+                org.users.push(int(schedulData.users[i]));
+            }
             org.author = schedulData.author;
             org.v = schedulData.v;
 

@@ -101,7 +101,7 @@ public class ChatChannel {
         if(!isNaN(Number(value.substr(0, 1)))&&value.substr(0,1)!='0'){
             var pid1:int=Number(value.split('p')[0]);
             var pid2:int=Number(value.split('p')[1]);
-            if(ToolUtil.sessionUser.pid!=pid1){
+            if(ToolUtil.sessionUser.pid==pid1){
                 pid1=pid2;
             }
             for each(var p:Object in ToolUtil.memberList){
@@ -182,7 +182,6 @@ public class ChatChannel {
 //        _type = value;
 //    }
 
-    [Bindable]
     public function get members():ArrayCollection {
         return _members;
     }

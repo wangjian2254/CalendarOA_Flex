@@ -107,6 +107,7 @@
 					this.setLocation(this._x,this._y-30-this._height);
 				}
 				else{
+					nativeWindow.orderToFront();
 					this.Timer2.addEventListener(TimerEvent.TIMER,wait);
 					this.Timer2.start();
 					this.Timer1.stop();

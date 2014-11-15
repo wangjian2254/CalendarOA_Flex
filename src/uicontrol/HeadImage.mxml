@@ -11,7 +11,10 @@
 			override public function set source(s:Object):void{
 				if(s is String){
 					super.source = CHTTPService.baseUrl+s;
+				}else{
+					super.source = s;
 				}
+
 			}
 		]]>
 	</fx:Script>

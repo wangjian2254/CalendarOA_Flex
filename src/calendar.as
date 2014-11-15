@@ -133,7 +133,7 @@ private function currentUser(result:Object, e:ResultEvent):void {
             // 成功登陆
 			userinfoGroup2.visible = false;
 			userinfoGroup.visible = true;
-            ChatManager.loginChat();
+			openChatManager();
 
 		}
 		menuXML.send();

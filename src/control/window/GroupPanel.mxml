@@ -87,7 +87,7 @@
             for (var i:int = 0; i < memebers.numElements; i++) {
                 pci = memebers.getElementAt(i) as PersonChatItem;
                 if (pci.selected) {
-                    pids.push(pci.person.id);
+                    pids.push(int(pci.person.id));
                     if (pci.person.id != ToolUtil.sessionUser.pid) {
                         person = pci.person;
                     }

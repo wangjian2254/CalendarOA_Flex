@@ -30,6 +30,10 @@ public function openChatWindow():Object
 	return new IMControl();
 }
 
+public function openChatManager():void{
+	ChatManager.loginChat();
+}
+
 public function initFlex():void{
     var url:String = ExternalInterface.call('window.location.href.toString');
     if(url.indexOf("addPerson?flag=")>0){

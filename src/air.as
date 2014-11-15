@@ -34,6 +34,7 @@ private var chatWindow:ChatWindow;
 public function openChatWindow():Object
 {
 	if(chatWindow!=null){
+		chatWindow.nativeWindow.orderToFront();
 		chatWindow.nativeWindow.activate();
 		return null;
 	}
@@ -59,6 +60,7 @@ public function initAir():void{
 	
 	callLater(moveCenter);
 	
+	addSysTrayIcon();
 	
 
 //	this.stage.nativeWindow.x=(Capabilities.screenResolutionX=this.nativeWindow.width)/2;
@@ -67,6 +69,10 @@ public function initAir():void{
 //	this.maximize();
 }
 
+public function openChatManager():void{
+	
+	callLater(openChatWindow);
+}
 
 public function moveCenter():void
 {
@@ -76,7 +82,7 @@ public function moveCenter():void
 	window.x = 0;
 	window.y = 0;
 	maxResize();
-	callLater(openChatWindow);
+	
 //	maxResize();
 }
 
