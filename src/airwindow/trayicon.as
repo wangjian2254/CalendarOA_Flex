@@ -6,8 +6,11 @@ import flash.display.NativeMenu;
 import flash.display.NativeMenuItem;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.ui.MouseCursor;
 
 import model.ChatChannel;
+
+import mx.utils.object_proxy;
 
 [Embed(source='/assets/logo_icon.png')]
 private var logoicon:Class;
@@ -20,7 +23,8 @@ private function addSysTrayIcon():void{
 //		sti.menu = createSysTrayMenu();
 		//单击系统托盘图标时恢复窗口
 		sti.addEventListener(MouseEvent.CLICK,undockHandler);
-		sti.addEventListener(MouseEvent.RIGHT_CLICK,rightMenu);
+//		sti.addEventListener(MouseEvent.RIGHT_CLICK,rightMenu);
+		sti.addEventListener(MouseEvent.MOUSE_OVER,rightMenu);
 	}
 }
 
@@ -29,6 +33,10 @@ private function rightMenu(e:MouseEvent):void{
 		var sti:SystemTrayIcon = SystemTrayIcon(this.nativeApplication.icon);
 		//创建菜单列表
 		sti.menu = createSysTrayMenu();
+		if(sti.menu.numItems>1){
+			sti.menu.display(this.stage,e.stageX,e.stageY);
+		}
+		
 
 	}
 }

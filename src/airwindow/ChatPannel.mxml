@@ -56,7 +56,6 @@
 			
 			private var _flag:String;
 			
-			private var isread:Boolean = false;
 			
 			
 			//        [Bindable]
@@ -297,20 +296,10 @@
 				chatsArr.addItem(event.message.msg);
 				setPreDate(chatsArr);
 				showLastMsg();
-				isread = true;
-				if (this.visible&&event.message.msg.hasOwnProperty('f')&&event.message.msg.f!=ToolUtil.sessionUser.pid) {
+				if (event.message.msg.channel==ToolUtil.currentChannel &&event.message.msg.hasOwnProperty('f')&&event.message.msg.f!=ToolUtil.sessionUser.pid) {
 					flagTimeline();
 				}
 				
-			}
-			
-			// 重新进入时执行
-			public function reloadParamData(e:FlexEvent):void {
-				
-				if (isread) {
-					flagTimeline();
-					isread = false;
-				}
 			}
 			
 			private var contextMenuItems:ArrayCollection;
@@ -474,7 +463,6 @@
 			
 			private function al(data:Object, chat:Object):void {
 				trace("chat:" + JParser.encode(data));
-				isread = false;
 			}
 			
 			private function pressEnter(event:FlexEvent):void {
