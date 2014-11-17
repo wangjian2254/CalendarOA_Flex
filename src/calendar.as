@@ -23,7 +23,6 @@ import mx.utils.ObjectUtil;
 
 import org.idream.pomelo.Pomelo;
 
-import spark.components.Button;
 import spark.components.TitleWindow;
 
 import util.ChatManager;

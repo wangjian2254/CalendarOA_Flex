@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Image xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		 xmlns:s="library://ns.adobe.com/flex/spark" 
-		 xmlns:mx="library://ns.adobe.com/flex/mx">
+<s:Image xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import httpcontrol.CHTTPService;
-			override public function set source(s:Object):void{
-				if(s is String){
-					super.source = CHTTPService.baseUrl+s;
-				}else{
-					super.source = s;
-				}
+		import httpcontrol.CHTTPService;
 
+		override public function set source(s:Object):void {
+			if (s is String) {
+				super.source = CHTTPService.baseUrl + s;
+			} else {
+				super.source = s;
 			}
+
+		}
 		]]>
 	</fx:Script>
 </s:Image>

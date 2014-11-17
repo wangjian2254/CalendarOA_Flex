@@ -1,24 +1,15 @@
 import airwindow.ChatWindow;
-import airwindow.NoticeWindow;
 
-import flash.display.NativeWindowSystemChrome;
-import flash.display.NativeWindowType;
-import flash.display.Stage;
+import events.PaoPaoEvent;
+
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.system.Capabilities;
 
 import httpcontrol.CHTTPService;
 
-import mx.core.FlexGlobals;
 import mx.events.AIREvent;
 import mx.events.CloseEvent;
-import mx.managers.PopUpManager;
-
-
-
-import util.ChatManager;
-import util.ToolUtil;
 
 public function quite(e:*=null):void {
 	Alert.show("确定要退出系统吗?","退出系统",3,this,CloseWindow);   
@@ -51,11 +42,12 @@ public function openChatWindow():Object
 		chatWindow.nativeWindow.y = 0;
 	});
 	chatWindow.open();
+	chatWindow.addEventListener(PaoPaoEvent.CHAT, rightMenu);
 	return null;
 }
 
 public function initAir():void{
-    CHTTPService.baseUrl = "http://192.168.101.18:8000";
+    CHTTPService.baseUrl = "http://liyuoa.duapp.com";
 	header.addEventListener(MouseEvent.MOUSE_DOWN,pushApp);
 	
 	callLater(moveCenter);

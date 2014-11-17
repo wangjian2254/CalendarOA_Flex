@@ -1,16 +1,7 @@
 import control.CBorderContainer;
 import control.CalendarControl;
-import control.ChatDemoContol;
-import control.ContactControl;
 import control.DepartmentControl;
-import control.IMControl;
-import control.LogControl;
-import control.PaperControl;
-import control.PaperKindControl;
 import control.ProjectControl;
-import control.SubjectControl;
-import control.SubjectKindControl;
-import control.UserPaperControl;
 import control.window.AddPersonPanel;
 import control.window.CheckApplyPanel;
 
@@ -198,9 +189,6 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				c = new CalendarControl();
 
 				break;
-			case 'contact':
-				c = new ContactControl();
-				break;
 			case 'group':
 				c = new DepartmentControl();
 				break;
@@ -210,27 +198,21 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 					c = im as CBorderContainer;
 				}
 				break;
-            case 'chat':
-                c = new ChatDemoContol();
-                break;
-			case 'log':
-				c = new LogControl();
-				break;
-			case 'paper':
-				c = new PaperControl();
-				break;
-			case 'paperkind':
-				c = new PaperKindControl();
-				break;
-			case 'mypaper':
-				c = new UserPaperControl();
-				break;
-			case 'subject':
-				c = new SubjectControl();
-				break;
-			case 'subjectkind':
-				c = new SubjectKindControl();
-				break;
+//			case 'paper':
+//				c = new PaperControl();
+//				break;
+//			case 'paperkind':
+//				c = new PaperKindControl();
+//				break;
+//			case 'mypaper':
+//				c = new UserPaperControl();
+//				break;
+//			case 'subject':
+//				c = new SubjectControl();
+//				break;
+//			case 'subjectkind':
+//				c = new SubjectKindControl();
+//				break;
             case 'project':
                 c = new ProjectControl();
                 break;

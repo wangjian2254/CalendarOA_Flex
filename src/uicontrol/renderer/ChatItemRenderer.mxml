@@ -209,7 +209,7 @@
         }
 
         protected function m_over():void {
-            if ((data.hasOwnProperty('f') &&data.f!=0 && !data.hasOwnProperty('t')) || (data.hasOwnProperty('t')&&data.t!=0)) {
+            if ((data.hasOwnProperty('f') && data.f != 0 && !data.hasOwnProperty('t')) || (data.hasOwnProperty('t') && data.t != 0)) {
                 chatstatus.visible = true;
             }
 

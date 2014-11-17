@@ -1,6 +1,8 @@
 import control.IMControl;
 
 import flash.external.ExternalInterface;
+import flash.net.URLRequest;
+import flash.net.navigateToURL;
 
 import httpcontrol.HttpServiceUtil;
 
@@ -47,4 +49,8 @@ public function initFlex():void{
         }
 
     }
+}
+
+private function downloadAir():void{
+    navigateToURL(new URLRequest("/ca/downloadair"),"_blank");
 }

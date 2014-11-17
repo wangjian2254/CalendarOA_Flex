@@ -1,161 +1,164 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="callLater(init)" width="300" height="200" showStatusBar="false" skinClass="skins.PaoPaoSkin" xmlns:uicontrol="uicontrol.*">
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  creationComplete="callLater(init)" width="300" height="200" showStatusBar="false" skinClass="skins.PaoPaoSkin"
+		  xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-			import events.PaoPaoEvent;
-			
-			import model.ChatChannel;
-			
-			import mx.collections.ArrayCollection;
-			
-			import org.idream.pomelo.Pomelo;
-			
-			import util.ToolUtil;
-			//定时器淡入
-			private var Timer1:Timer=new Timer(1);
-			//停留时间
-			private var Timer2:Timer=new Timer(8000,1);
-			//定时器淡出
-			private var Timer3:Timer=new Timer(1);
-			private var _x:uint=0;
-			private var _y:uint=0;
-			private var _height:uint=0;
-			private  var screenBounds:Rectangle;
-			
-//			public var unReadMessage:ArrayCollection = null;
-			
-			public var message:Object;
-			
-			
-			public function init():void {
-				if (message != null && message.hasOwnProperty("te")) {
-					contentLabel.text = message.te;
-					if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
-						var f:Boolean = false;
-						for each(var g:ChatChannel in ToolUtil.groupList) {
-							if (g.channel == message.channel) {
-								f = true;
-								nameLabel.text = g.name;
+		import events.PaoPaoEvent;
+
+		import model.ChatChannel;
+
+		import org.idream.pomelo.Pomelo;
+
+		import util.ToolUtil;
+
+		//定时器淡入
+		private var Timer1:Timer = new Timer(1);
+		//停留时间
+		private var Timer2:Timer = new Timer(8000, 1);
+		//定时器淡出
+		private var Timer3:Timer = new Timer(1);
+		private var _x:uint = 0;
+		private var _y:uint = 0;
+		private var _height:uint = 0;
+		private var screenBounds:Rectangle;
+
+		//			public var unReadMessage:ArrayCollection = null;
+
+		public var message:Object;
+
+
+		public function init():void {
+			nativeWindow.alwaysInFront = true;
+			if (message != null && message.hasOwnProperty("te")) {
+				contentLabel.text = message.te;
+				if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
+					var f:Boolean = false;
+					for each(var g:ChatChannel in ToolUtil.groupList) {
+						if (g.channel == message.channel) {
+							f = true;
+							nameLabel.text = g.name;
+						}
+					}
+					if (!f) {
+						Pomelo.getIns().request("connector.entryHandler.queryChannelInfo", {channel: message.channel}, function (data:Object):void {
+							if (data.code == 200 && data.channel != null) {
+								ToolUtil.groupList.addItem(new ChatChannel(data.channel));
+								nameLabel.text = data.channel.name;
+							}
+						});
+					}
+					head.source = "/static/smalloaicon/group.png";
+				} else {
+					if (message.channel.substr(0, 1) == "d") {
+						var did:String = message.channel.substr(1, message.channel.length - 1);
+						for each(var depat:Object in ToolUtil.departMentList) {
+							if (did == depat.id) {
+								head.source = depat.icon;
+								nameLabel.text = depat.name;
 							}
 						}
-						if (!f) {
-							Pomelo.getIns().request("connector.entryHandler.queryChannelInfo", {channel: message.channel}, function (data:Object):void {
-								if (data.code == 200 && data.channel != null) {
-									ToolUtil.groupList.addItem(new ChatChannel(data.channel));
-									nameLabel.text = data.channel.name;
-								}
-							});
-						}
-						head.source = "/static/smalloaicon/group.png";
 					} else {
-						if (message.channel.substr(0, 1) == "d") {
-							var did:String = message.channel.substr(1, message.channel.length - 1);
-							for each(var depat:Object in ToolUtil.departMentList) {
-								if (did == depat.id) {
-									head.source = depat.icon;
-									nameLabel.text = depat.name;
-								}
-							}
-						} else {
-							var pids:Array = message.channel.split("p");
-							for each(var pid:String in pids) {
-								if (pid != ToolUtil.sessionUser.pid) {
-									var person:Object = ToolUtil.getAnyPersonById(pid);
-									head.source = person.icon;
-									nameLabel.text = person.name;
-								}
+						var pids:Array = message.channel.split("p");
+						for each(var pid:String in pids) {
+							if (pid != ToolUtil.sessionUser.pid) {
+								var person:Object = ToolUtil.getAnyPersonById(pid);
+								head.source = person.icon;
+								nameLabel.text = person.name;
 							}
 						}
 					}
 				}
-				this.startPosition();
-				this.Timer1.addEventListener(TimerEvent.TIMER,scorllUp);
-				this.Timer1.start();
 			}
-			
+			this.startPosition();
+			this.Timer1.addEventListener(TimerEvent.TIMER, scorllUp);
+			this.Timer1.start();
+		}
 
-			
-			private function closeW():void {
-				nativeWindow.close();
-				Timer1.stop();
-				Timer2.stop();
-				Timer3.stop();
+
+		private function closeW():void {
+			nativeWindow.close();
+			Timer1.stop();
+			Timer2.stop();
+			Timer3.stop();
 //				if (unReadMessage.getItemIndex(this) > -1) {
 //					unReadMessage.removeItemAt(unReadMessage.getItemIndex(this));
 //				}
-				
+
+		}
+
+		private function openW():void {
+			var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
+			event.msg = message;
+			event.channel = message.channel;
+			dispatchEvent(event);
+			closeW();
+
+
+		}
+
+		/**
+		 *弹出窗口
+		 */
+		private function scorllUp(e:TimerEvent):void {
+			if (this._height < 200) {
+				this._height++;
+				this.setLocation(this._x, this._y - 30 - this._height);
 			}
-			
-			private function openW():void {
-				var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
-				event.msg = message;
-				event.channel = message.channel;
-				dispatchEvent(event);
-				closeW();
-				
-				
+			else {
+
+				this.Timer2.addEventListener(TimerEvent.TIMER, wait);
+				this.Timer2.start();
+				this.Timer1.stop();
+			}
+		}
+
+		/*
+		 *设置y坐标
+		 *
+		 */
+		private function setLocation(x:uint, y:uint):void {
+			this.nativeWindow.y = y;
+			this.nativeWindow.x = x;
+			//trace(x+'='+y);
+		}
+
+		private function wait(e:TimerEvent):void {
+			this.Timer3.addEventListener(TimerEvent.TIMER, scorllDown);
+			this.Timer3.start();
+		}
+
+		private function scorllDown(e:TimerEvent):void {
+
+			if (this.Timer2 != null) {
+				this.Timer2.stop();
+				this.Timer2 = null;
+			}
+			if (this._height > 0) {
+				this._height--;
+				//trace(this._height);
+
+				this.setLocation(this._x, this.nativeWindow.y + 1);
+				//trace(this.nativeWindow.y);
+			}
+			else {
+				this.Timer3.stop();
+				this.close();
 			}
 
-			/**
-			 *弹出窗口
-			 */  
-			private function scorllUp(e:TimerEvent):void{
-				if(this._height<200){
-					this._height++;
-					this.setLocation(this._x,this._y-30-this._height);
-				}
-				else{
-					nativeWindow.orderToFront();
-					this.Timer2.addEventListener(TimerEvent.TIMER,wait);
-					this.Timer2.start();
-					this.Timer1.stop();
-				}
-			}
-			/*
-			*设置y坐标
-			*
-			*/
-			private function setLocation(x:uint,y:uint):void{
-				this.nativeWindow.y=y;
-				this.nativeWindow.x=x;
-				//trace(x+'='+y);
-			}
-			private function wait(e:TimerEvent):void{
-				this.Timer3.addEventListener(TimerEvent.TIMER,scorllDown);
-				this.Timer3.start();
-			}
-			private function scorllDown(e:TimerEvent):void{
-				
-				if(this.Timer2!=null){
-					this.Timer2.stop();
-					this.Timer2=null;
-				}
-				if(this._height>0){
-					this._height--;
-					//trace(this._height);
-					
-					this.setLocation(this._x,this.nativeWindow.y+1);
-					//trace(this.nativeWindow.y);
-				}
-				else{
-					this.Timer3.stop();
-					this.close();
-				}
-				
-			}
-			/*
-			*初始位置
-			*/
-			public function startPosition():void{
-				this.screenBounds=Screen.mainScreen.bounds;
-				this._x=this.screenBounds.width- 300;
-				this._y=this.screenBounds.height;
-				this.nativeWindow.x=this._x;
-				this.nativeWindow.y=this._y;
-			}
+		}
 
+		/*
+		 *初始位置
+		 */
+		public function startPosition():void {
+			this.screenBounds = Screen.mainScreen.bounds;
+			this._x = this.screenBounds.width - 300;
+			this._y = this.screenBounds.height;
+			this.nativeWindow.x = this._x;
+			this.nativeWindow.y = this._y;
+		}
 		]]>
 	</fx:Script>
 	<fx:Declarations>

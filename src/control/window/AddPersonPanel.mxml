@@ -14,7 +14,6 @@
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
-        import mx.events.EffectEvent;
         import mx.events.FlexEvent;
         import mx.rpc.events.ResultEvent;
 

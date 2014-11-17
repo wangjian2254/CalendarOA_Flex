@@ -48,6 +48,8 @@
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="个人信息" styleName="textStyle1" click="updateinfo()"/>
+				<s:Label text="|" styleName="textStyle1"/>
+				<mx:LinkButton x="0" y="2" height="25" label="下载客户端" styleName="textStyle1" click="downloadAir()"/>
 
 				
 			</s:SkinnableContainer>
@@ -65,7 +67,8 @@
 				<mx:LinkButton x="0" y="2" height="25" label="登录"  styleName="textStyle1" click="login()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="注册" styleName="textStyle1" click="reg()"/>
-
+				<s:Label text="|" styleName="textStyle1"/>
+				<mx:LinkButton x="0" y="2" height="25" label="下载客户端" styleName="textStyle1" click="downloadAir()"/>
 			</s:SkinnableContainer>
 			
 		</s:Group>

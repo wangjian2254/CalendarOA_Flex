@@ -374,8 +374,8 @@
             HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/changeDepartment", addMemberResult, "POST").send(obj);
         }
 
-        private function askSave():void{
-            if(departmentSelectArray.getById(selectDepartmentId)!=null&&departmentSelectArray.getById(selectDepartmentId).department.name != departmentName.text){
+        private function askSave():void {
+            if (departmentSelectArray.getById(selectDepartmentId) != null && departmentSelectArray.getById(selectDepartmentId).department.name != departmentName.text) {
                 Alert.show("部门名称已经修改，是否保存修改?", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
                     if (e.detail == Alert.YES) {
                         saveDepartment();

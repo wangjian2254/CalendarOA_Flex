@@ -166,7 +166,7 @@
             </s:VGroup>
 
 
-            <s:Image id="headPerson" width="45" height="45"></s:Image>
+			<uicontrol:HeadImage id="headPerson" width="45" height="45" />
             <s:Label id="statusLabel" text="昵称：" ></s:Label>
             <s:Label id="nameLabel"  ></s:Label>
         </s:HGroup>

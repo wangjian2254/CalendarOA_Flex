@@ -32,8 +32,6 @@
         import util.ScheduleUtil;
         import util.ToolUtil;
 
-
-
         [Bindable]
         public var titlestr:String = "创建任务";
 
@@ -150,6 +148,13 @@
                 repeatType.selectedValue = schedulData.repeat_type;
 
                 colorClick(schedulData.color);
+                for each(var projectitem:Object in ToolUtil.allProjectList) {
+                    if (schedulData.project == projectitem.id) {
+                        schedulData.department = projectitem.department;
+                        ;
+                        break;
+                    }
+                }
                 for each(var department:Object in ToolUtil.myDepartmentList) {
                     if (schedulData.department == department.id) {
                         departmentDownList.selectedItem = department;
@@ -272,9 +277,10 @@
 
             repeatChange();
             changeTiXing();
-            changeProjectByDepart();
+
 
             if (schedulData == null) {
+                changeProjectByDepart();
 
                 if (default_users > -1) {
                     usersGroup.removeAllElements();
@@ -808,7 +814,7 @@
             org.channel = "t" + schedulData.id;
             org.name = "[任务]" + schedulData.title.substr(0, 10) + (schedulData.title.length > 10 ? "……" : "");
             org.users = new Array();
-            for(var i:int=0;i<schedulData.users.length;i++){
+            for (var i:int = 0; i < schedulData.users.length; i++) {
                 org.users.push(int(schedulData.users[i]));
             }
             org.author = schedulData.author;

@@ -114,11 +114,10 @@
         }
 
         private function queryLogResult(result:Object, e:ResultEvent):void {
+            list.removeAll();
             if (result.result) {
-                list.removeAll();
                 list.addAll(new ArrayCollection(result.result as Array));
             }
-
         }
 
         private function click_logItem():void {

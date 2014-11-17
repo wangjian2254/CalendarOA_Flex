@@ -158,8 +158,8 @@
         public function refresh(r:Object, e:ResultEvent):void {
             if (r.success) {
                 closeWin();
-                if(ToolUtil.joinOrgFlag !=null){
-                    navigateToURL(new URLRequest("/"),"_self");
+                if (ToolUtil.joinOrgFlag != null) {
+                    navigateToURL(new URLRequest("/"), "_self");
                     return;
                 }
                 ToolUtil.joinOrgFlag = null;

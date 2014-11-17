@@ -1,41 +1,89 @@
 import events.ListClickEvent;
 
-import flash.desktop.NativeApplication;
-import flash.desktop.SystemTrayIcon;
+import flash.display.BitmapData;
+import flash.display.Loader;
 import flash.display.NativeMenu;
 import flash.display.NativeMenuItem;
 import flash.events.Event;
 import flash.events.MouseEvent;
-import flash.ui.MouseCursor;
+import flash.events.TimerEvent;
+import flash.net.URLRequest;
+import flash.utils.Timer;
+
+import httpcontrol.CHTTPService;
 
 import model.ChatChannel;
 
-import mx.utils.object_proxy;
-
 [Embed(source='/assets/logo_icon.png')]
 private var logoicon:Class;
+
+[Embed(source='/assets/logo_icon2.png')]
+private var logoicon2:Class;
+
+private var icon1:Loader = new Loader();
+private var logo_1:BitmapData;
+private var icon2:Loader = new Loader();
+private var logo_2:BitmapData;
+
+private var icontimer:Timer=new Timer(500,0);
+private var iconflag:Boolean = true;
 private function addSysTrayIcon():void{
 	//icon16是一个图片文件，大小为16*16
 	this.nativeApplication.icon.bitmaps = [new logoicon()];
 	if(NativeApplication.supportsSystemTrayIcon){
+		icon1.contentLoaderInfo.addEventListener(Event.COMPLETE, iconLoadComplete1);
+		icon1.load(new URLRequest(CHTTPService.baseUrl+"/static/swf/assets/logo_icon.png"));
+		icon2.contentLoaderInfo.addEventListener(Event.COMPLETE, iconLoadComplete2);
+		icon2.load(new URLRequest(CHTTPService.baseUrl+"/static/swf/assets/logo_icon2.png"));
+		
 		var sti:SystemTrayIcon = SystemTrayIcon(this.nativeApplication.icon);
 		//创建菜单列表
 //		sti.menu = createSysTrayMenu();
 		//单击系统托盘图标时恢复窗口
 		sti.addEventListener(MouseEvent.CLICK,undockHandler);
+		
 //		sti.addEventListener(MouseEvent.RIGHT_CLICK,rightMenu);
-		sti.addEventListener(MouseEvent.MOUSE_OVER,rightMenu);
+//		sti.addEventListener(MouseEvent.MOUSE_OVER,rightMenu);
+		
+		icontimer.addEventListener(TimerEvent.TIMER, iconShan);
+		icontimer.start();
+	}
+}
+private function iconLoadComplete1(event:Event):void
+{
+	logo_1 = event.target.content.bitmapData;
+}
+private function iconLoadComplete2(event:Event):void
+{
+	logo_2 = event.target.content.bitmapData;
+}
+
+private function iconShan(e:TimerEvent):void{
+	if(logo_1==null||logo_2==null){
+		return;
+	}
+	var hasMessage:Boolean = false;
+	if(chatWindow!=null){
+		for each(var obj:ChatChannel in chatWindow.unread_messagelist){
+			hasMessage = true;
+			break;
+		}
+	}
+	if(iconflag && hasMessage){
+		this.nativeApplication.icon.bitmaps = [logo_1];
+		iconflag= false;
+	}else{
+		this.nativeApplication.icon.bitmaps = [logo_2];
+		iconflag = true;
 	}
 }
 
-private function rightMenu(e:MouseEvent):void{
+private function rightMenu(e:Event):void{
 	if(NativeApplication.supportsSystemTrayIcon){
 		var sti:SystemTrayIcon = SystemTrayIcon(this.nativeApplication.icon);
 		//创建菜单列表
 		sti.menu = createSysTrayMenu();
-		if(sti.menu.numItems>1){
-			sti.menu.display(this.stage,e.stageX,e.stageY);
-		}
+//		sti.menu.display(this.stage,e.stageX,e.stageY);
 		
 
 	}

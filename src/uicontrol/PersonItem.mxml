@@ -32,7 +32,7 @@
         private function init():void {
             try {
                 personName.text = _person.name;
-				personName.toolTip = _person.name;
+                personName.toolTip = _person.name;
 
             } catch (e:Error) {
 

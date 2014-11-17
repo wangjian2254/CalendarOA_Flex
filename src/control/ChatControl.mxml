@@ -216,6 +216,9 @@
 
         override public function closeContainer(e:CloseContainerEvent):void {
             Pomelo.getIns().removeEventListener('onChat', chatHandler);
+            if (ToolUtil.currentChannel == chatUser.channel) {
+                ToolUtil.currentChannel = null;
+            }
             dispatchEvent(e);
         }
 
@@ -262,7 +265,7 @@
             setPreDate(chatsArr);
             showLastMsg();
             isread = true;
-            if (this.visible&&event.message.msg.hasOwnProperty('f')&&event.message.msg.f!=ToolUtil.sessionUser.pid) {
+            if (this.visible && event.message.msg.hasOwnProperty('f') && event.message.msg.f != ToolUtil.sessionUser.pid) {
                 flagTimeline();
             }
 

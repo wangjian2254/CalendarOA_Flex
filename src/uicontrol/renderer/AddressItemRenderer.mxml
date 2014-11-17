@@ -46,13 +46,13 @@
 
 
         override public function set data(value:Object):void {
-            
+
             _data = value;
             super.data = value;
             if (value == null) {
                 return;
             }
-			trace("chat member list" + value.name);
+            trace("chat member list" + value.name);
             if (!data.hasOwnProperty('unread') || data.unread < 1) {
                 num.visible = false;
             } else {

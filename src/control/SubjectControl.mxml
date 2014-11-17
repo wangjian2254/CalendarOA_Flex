@@ -418,6 +418,7 @@
                                                             import mx.events.ListEvent;
 
                                                             private var _data:Object;
+
                                                             protected function removeHandler(event:FlexEvent):void {
                                                                 _data = null;
                                                             }
