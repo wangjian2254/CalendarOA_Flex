@@ -10,6 +10,17 @@
 			
 			private var _label:String;
 
+			public function get source():Object
+			{
+				return _source;
+			}
+
+			[Bindable]
+			public function set source(value:Object):void
+			{
+				_source = value;
+			}
+
 			public function get label():String
 			{
 				return _label;
@@ -25,6 +36,7 @@
 				bar.setProgress(result,all);
 				
 			}
+			private var _source:Object;
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -44,5 +56,6 @@
 					fontSize="14"
 					color="#0000ff" 
 					visible="{this.visible}"
+					source="{this.source}"
 					/>
 </s:BorderContainer>

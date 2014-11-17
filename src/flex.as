@@ -9,6 +9,8 @@ import httpcontrol.HttpServiceUtil;
 import mx.controls.Alert;
 import mx.events.CloseEvent;
 
+import org.idream.pomelo.Pomelo;
+
 import util.ToolUtil;
 
 public function quite(e:*=null):void {
@@ -17,6 +19,8 @@ public function quite(e:*=null):void {
 }
 
 public function quiteNoTip():void{
+	ToolUtil.sessionUser=new Object();
+	Pomelo.getIns().disconnect();
     HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", currentUser, "POST").send();
 }
 
