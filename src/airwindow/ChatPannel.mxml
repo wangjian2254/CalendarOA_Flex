@@ -398,6 +398,7 @@
 
 		private function createGroup():void {
 			var gp:GroupPanel = PopUpManager.createPopUp(this, GroupPanel, true) as GroupPanel;
+			gp.isEffect = false;
 			if (chatUser.members == null) {
 				var m:ArrayCollection = new ArrayCollection();
 				for each(var p:Object in ToolUtil.memberList) {
@@ -477,6 +478,7 @@
 
 		private function memberGroup():void {
 			var gp:GroupMemberPanel = PopUpManager.createPopUp(this, GroupMemberPanel, true) as GroupMemberPanel;
+			gp.isEffect = false;
 			gp.chatmember = chatUser.members;
 			gp.channel = chatUser.channel;
 		}

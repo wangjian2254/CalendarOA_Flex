@@ -3,6 +3,7 @@
  */
 package control.window {
 
+import flash.events.Event;
 import flash.geom.Point;
 
 import mx.core.FlexGlobals;
@@ -20,6 +21,7 @@ public class EfficientTitleWindow extends TitleWindow{
     private var mve:Move = new Move();
     private var rotate:Rotate = new Rotate();
     private var firstPoint:Object = null;
+	public var isEffect:Boolean = true;
 
     public function EfficientTitleWindow() {
         super();
@@ -29,12 +31,10 @@ public class EfficientTitleWindow extends TitleWindow{
         preinit();
     }
     private function preinit():void {
-        addEventListener(FlexEvent.CREATION_COMPLETE, showAnimation);
-        addEventListener(FlexEvent.SHOW, showAnimation);
-        addEventListener(CloseEvent.CLOSE, releaseListener);
-        addEventListener(CloseEvent.CLOSE, closeAnimation);
-
-
+			addEventListener(FlexEvent.CREATION_COMPLETE, showAnimation);
+			addEventListener(FlexEvent.SHOW, showAnimation);
+			addEventListener(CloseEvent.CLOSE, releaseListener);
+			addEventListener(CloseEvent.CLOSE, closeAnimation);
     }
 
     public function releaseListener(e:CloseEvent):void{
@@ -45,8 +45,16 @@ public class EfficientTitleWindow extends TitleWindow{
         var e:CloseEvent = new CloseEvent(CloseEvent.CLOSE);
         dispatchEvent(e);
     }
+	
+	public function showCenter(e:FlexEvent):void{
+		PopUpManager.centerPopUp(this);
+	}
 
     public function showAnimation(e:FlexEvent):void {
+		if(!isEffect){
+			showCenter(e);
+			return;
+		}
         if(mve.isPlaying || rotate.isPlaying){
             return;
         }
@@ -90,6 +98,11 @@ public class EfficientTitleWindow extends TitleWindow{
     }
 
     public function closeAnimation(e:*=null):void {
+		if(!isEffect){
+			closeAnimationEnd(null);
+			return;
+		}
+		
         if(mve.isPlaying || rotate.isPlaying){
             return;
         }
@@ -104,7 +117,7 @@ public class EfficientTitleWindow extends TitleWindow{
         mve.play();
     }
 
-    private function closeAnimationEnd(e:EffectEvent):void{
+    private function closeAnimationEnd(e:Event):void{
         mve.removeEventListener(EffectEvent.EFFECT_END,closeAnimationEnd);
         PopUpManager.removePopUp(this);
     }

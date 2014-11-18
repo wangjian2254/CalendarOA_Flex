@@ -7,20 +7,20 @@
     <fx:Script>
 		<![CDATA[
         import events.ListClickEvent;
-
+        
         import model.ChatChannel;
-
+        
         import mx.collections.ArrayCollection;
         import mx.controls.Alert;
         import mx.events.CloseEvent;
         import mx.events.FlexEvent;
         import mx.rpc.events.ResultEvent;
         import mx.utils.ObjectUtil;
-
+        
         import org.idream.pomelo.Pomelo;
-
+        
         import uicontrol.PersonChatItem;
-
+        
         import util.ToolUtil;
         import util.UUIDUtil;
 
@@ -99,7 +99,7 @@
             }
             var org:Object = new Object();
             if (pids.length == 2) {
-                var chatevent:ListClickEvent = new ListClickEvent("ChatUser", person);
+                var chatevent:ListClickEvent = new ListClickEvent(ListClickEvent.CHATUSER, new ChatChannel(person));
                 dispatchEvent(chatevent);
                 closeWin();
                 return;
@@ -122,7 +122,7 @@
                     chatUser.author = org.author;
                     chatUser.icon = "/static/smalloaicon/group.png";
                     chatUser.setMembers(pids);
-                    var chatevent:ListClickEvent = new ListClickEvent("ChatUser", chatUser);
+                    var chatevent:ListClickEvent = new ListClickEvent(ListClickEvent.CHATUSER, chatUser);
                     dispatchEvent(chatevent);
                     closeWin();
                 } else {

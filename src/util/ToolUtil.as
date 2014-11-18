@@ -104,10 +104,10 @@ public class ToolUtil
     public static function sessionUserRefresh(fun:Function=null):void{
 //			RemoteUtil.getOperationAndResult("getAllUser",resultAllUser).send();
         if(fun==null){
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/currentUser",resultFinduser,"POST").send()
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/currentUser",resultFinduser,"POST").send()
 //				RemoteUtil.getOperationAndResult("",resultAllUser,false).send();
         }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResultAndFault("/ca/currentUser",resultFinduser,failueFinduser,"POST");
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResultAndFault("/riliusers/currentUser",resultFinduser,failueFinduser,"POST");
 
             http.resultFunArr.addItem(fun);
             http.send();
@@ -120,8 +120,9 @@ public class ToolUtil
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,result.result,true));
             }
             sessionUser=result.result;
+			resultCurrentOrg(result,e);
             projectListRefresh();
-            currentOrgRefresh();
+//            currentOrgRefresh();
             contactsRefresh();
             allProjectListRefresh();
         }else{
@@ -257,7 +258,7 @@ public class ToolUtil
             var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
             var mydepartlist:ArrayCollection = new ArrayCollection();
             var f:Boolean = false;
-            for each(var item2:Object in l) {
+            for each(item2 in l) {
                 if(item2.flag=='free'){
                     continue;
                 }
@@ -279,7 +280,7 @@ public class ToolUtil
             if(mydepartlist.length>0){
                 var departmentlist:ArrayCollection = initMyDepart(mydepartlist);
             }else{
-                var departmentlist:ArrayCollection = new ArrayCollection();
+                departmentlist = new ArrayCollection();
             }
             departmentlist.addItemAt({id:0,name:"只有我和责任人可见",label:"只有我和责任人可见"},0);
             myDepartmentList=departmentlist;
@@ -631,7 +632,7 @@ public class ToolUtil
 
 
     private static var queryScheduleTargetObj:Object={pid:null,depart_id:null,project_id:null};
-    public static function getScheduleByDate(start:String,end:String,pid:int=-1,departid=-1,projectid=-1):void{
+    public static function getScheduleByDate(start:String,end:String,pid:int=-1,departid:int=-1,projectid:int=-1):void{
         var obj:Object = new Object();
         obj["startdate"] = start;
         obj["enddate"] = end;
@@ -687,7 +688,7 @@ public class ToolUtil
                 outScheduleMap= new Object();
                 outScheduleMap['out_schedule_list']=new Array();
                 outScheduleMap['schedulemap']=new Object();
-                for each(var obj:Object in result.result.out_schedulelist){
+                for each(obj in result.result.out_schedulelist){
                     schedule = new Schedule(obj);
                     outScheduleMap['schedulemap'][schedule.id] = schedule;
                     if(!scheduleMap['schedulemap'].hasOwnProperty(schedule.id)){
