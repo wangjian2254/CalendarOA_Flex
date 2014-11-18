@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 width="400" height="300" creationComplete="init()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+		import mx.collections.ArrayCollection;
+		import mx.containers.Panel;
+		import mx.controls.Alert;
+		import mx.controls.List;
+		import mx.managers.PopUpManager;
+
+		public var type:int = 1;
+
+		private var d:Array = ["cat", "milk", "orange", "pepper", "recipe"];
+		private var dg:ArrayCollection = new ArrayCollection([{label: "cat", type: "01"}, {
+			label: "milk",
+			type: "02"
+		}, {label: "orange", type: "01"}]);
+		private var a:ArrayCollection = new ArrayCollection([
+			{icon: "a.png", label: "make", type: "短信"},
+			{icon: "a.png", label: "oranges", type: "短信"},
+			{icon: "a.png", label: "cak", type: "微信"},
+			{icon: "a.png", label: "pepper", type: "微信"},
+			{icon: "a.png", label: "cap", type: "邮件"},
+			{icon: "a.png", label: "cat", type: "系统消息"},
+			{icon: "a.png", label: "can", type: "短信"},
+			{icon: "a.png", label: "milk", type: "邮件"},
+			{icon: "a.png", label: "recipe", type: "邮件"},
+			{icon: "a.png", label: "orange", type: "微信"},
+			{icon: "a.png", label: "milk", type: "系统消息"},
+			{icon: "a.png", label: "milks", type: "微信"},
+			{icon: "a.png", label: "oranged", type: "系统消息"}
+		]);
+
+		private function init():void {
+			l.datalist = a;
+			l.addEventListener("changed", getalert);
+			l.addEventListener("change", getvaluelabel);
+			//l.addEventListener("click",getalert);
+			a.filterFunction = filterA;
+		}
+
+		private function getalert(e:Event):void {
+
+			var a1:Object = l.myl.selectedItem;
+			Alert.show(a1.label);
+		}
+
+		private var pan:Panel;
+		private var ti:List = new List();
+		;
+		private var regexp:RegExp;
+
+		private function checkInput0():void {
+			switch (type) {
+				case 1:
+					checkInput1();
+					break;
+
+			}
+		}
+
+		private function checkInput1():void {
+
+			var str:String = input.text;
+			var e:Array = new Array();
+			if (str == "") {
+				e = d;
+			}
+			else {
+				for (var i:int = 0; i < d.length - 1; i++) {
+
+					var dstr:String = d[i].toString();
+					if (dstr.indexOf(str) > -1) {
+						e.push(dstr);
+					}
+
+				}
+			}
+			var x:int = this.x;
+			ti.x = x;
+			var y:int = this.y + input.height;
+			ti.y = y;
+			ti.top = 20;
+			ti.width = 200;
+			ti.dataProvider = e;
+			ti.addEventListener("change", getvalue);
+			PopUpManager.addPopUp(ti, this, false);
+
+
+		}
+
+
+		private var l:MyList = new MyList();
+
+		private function filterA(item:Object):Boolean {
+			if (item.label.indexOf(input.text) >= 0) {
+				return true;
+
+			}
+			return false;
+		}
+
+
+		private function getvalue(e:Event):void {
+
+			input.text = ti.selectedItem.toString();
+			PopUpManager.removePopUp(ti);
+		}
+
+		private function getvaluelabel(e:Event):void {
+
+			var a1:Object = l.myl.selectedItem;
+			//Alert.show(a1.label);
+			input.text = a1.label;
+			PopUpManager.removePopUp(l);
+		}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+	</fx:Declarations>
+	<s:TextInput id="input" change="checkInput0()" width="100%" height="20" />
+</s:Group>

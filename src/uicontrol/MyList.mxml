@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"  borderVisible="false" >
+	<fx:Metadata>
+		[Event(name="change",type="spark.events.IndexChangeEvent")]
+		[Event(name="changed",type="flash.events.Event")]
+		[Event(name="click",type="flash.events.MouseEvent")]
+	</fx:Metadata>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Bindable]
+			public var datalist:ArrayCollection;
+			
+
+			public var a:String;
+
+			
+			protected function myl_clickHandler(event:MouseEvent):void
+			{
+				dispatchEvent(event);
+			}
+			
+//	
+			private function changeItem(e:IndexChangeEvent):void{
+				dispatchEvent(e);
+			}
+
+			protected function clickItem(event:MouseEvent):void
+			{
+				dispatchEvent(new Event("changed"));
+			}
+			
+			
+
+
+
+
+		]]>
+	</fx:Script>
+	<s:List  id="myl" dataProvider="{datalist}" itemRenderer="uicontrol.ListItem"    width="100%"  change="changeItem(event)" doubleClickEnabled="true" doubleClick="clickItem(event)"  buttonMode="true">
+		
+	</s:List>
+
+</s:BorderContainer>

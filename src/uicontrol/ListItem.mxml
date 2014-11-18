@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:uicontrol="uicontrol.*" width="100%"
+				xmlns:control="control.*">
+    <s:layout>
+		 <s:VerticalLayout >
+			 
+		 </s:VerticalLayout>
+
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			
+			
+			
+			private var _data:Object;
+			
+			override public function get data():Object
+			{
+				return _data;
+				
+			}
+
+			override public function set data(value:Object):void
+			{
+				_data = value;
+				
+				if(value==null){
+					return;
+				}
+				img.iconsouce=data.icon;
+				nameLable.text=data.label;
+				if(data.flag){
+					borderC.height=45;
+					sc1.visible= true;
+					sc1.height =15;
+					type.text = data.type;
+					type.height = 15;
+					sg2.height=30;
+				}else{
+					borderC.height=30;
+					type.height=0;
+					sc1.visible=false;
+					sc1.height = 0;
+					sc2.height=30;
+				}
+			}
+			
+			protected function m_over():void{
+				solidColor.color =0x7ae7bf;
+			}
+			
+			protected function m_out():void{
+				solidColor.color = 0xffffff;
+			}
+
+
+		]]>
+	</fx:Script> 
+	<s:BorderContainer  id="borderC"   width="100%" borderVisible="false" >
+		<s:layout>
+			<s:VerticalLayout gap="0" />
+		</s:layout>
+	<s:BorderContainer   id="sc1" width="100%"     borderVisible="false"  >	
+		<s:Label id="type"  paddingLeft="5" fontSize="10">
+			
+		</s:Label>
+	</s:BorderContainer>
+	<s:BorderContainer   id="sc2" width="100%"     borderVisible="false" mouseOver="m_over()" mouseOut=" m_out()"   >
+		<s:Rect left="0" right="0" top="0" bottom="0">
+			<s:fill>
+				<s:SolidColor id="solidColor" color="0xffffff"/>
+			</s:fill>
+		</s:Rect>
+	<s:HGroup  id="sg2" width="100%"  paddingLeft="10"  verticalAlign="middle"  paddingTop="3" >
+		
+<!--
+		<s:Image id="img" width="20" height="20" >
+			
+		</s:Image>-->
+		<!--<ImageC id="img"  width="30" height="100%"   >-->
+		<uicontrol:ImageControl id="img" width="30" height="100%"></uicontrol:ImageControl>
+
+		<s:Label id="nameLable"  verticalAlign="middle" height="100%" >
+			
+		</s:Label>
+		
+	</s:HGroup>
+	</s:BorderContainer>
+	</s:BorderContainer>	
+</s:ItemRenderer>
