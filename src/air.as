@@ -2,6 +2,7 @@ import airwindow.ChatWindow;
 
 import events.PaoPaoEvent;
 
+import flash.desktop.NativeApplication;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.system.Capabilities;
@@ -23,7 +24,10 @@ public function quiteNoTip():void{
 	this.nativeWindow.close();//关闭窗体
 	ToolUtil.sessionUser=new Object();
 	Pomelo.getIns().disconnect();
-	chatWindow.nativeWindow.close();
+	if(chatWindow!=null){
+		chatWindow.nativeWindow.close();
+	}
+	
     
 }
 
@@ -46,7 +50,7 @@ public function openChatWindow():Object
 	});
 	chatWindow.addEventListener(AIREvent.WINDOW_COMPLETE,function(e:Event):void{
 		chatWindow.nativeWindow.x = Capabilities.screenResolutionX-chatWindow.width;
-		chatWindow.nativeWindow.y = 0;
+		chatWindow.nativeWindow.y = 30;
 	});
 	chatWindow.open();
 	chatWindow.addEventListener(PaoPaoEvent.CHAT, rightMenu);
@@ -61,7 +65,7 @@ public function initAir():void{
 	
 	addSysTrayIcon();
 	updater.initialize()
-
+	startAtLogin();
 //	this.stage.nativeWindow.x=(Capabilities.screenResolutionX=this.nativeWindow.width)/2;
 //	this.stage.nativeWindow.y=(Capabilities.screenResolutionY=this.nativeWindow.height)/2;
 	
@@ -76,11 +80,12 @@ public function openChatManager():void{
 public function moveCenter():void
 {
 	var window:NativeWindow=stage.nativeWindow;
-	window.width = Capabilities.screenResolutionX-230;
-	window.height = Capabilities.screenResolutionY;
+	window.width = (Capabilities.screenResolutionX-230)*0.9;
+	window.height = (Capabilities.screenResolutionY)*0.9;
 	window.x = 0;
 	window.y = 0;
 	maxResize();
+	
 	
 //	maxResize();
 }
@@ -120,6 +125,18 @@ public function maxResize():void{
 }
 
 
+private function startAtLogin():void{
+	
+	if(NativeApplication.supportsStartAtLogin==true){
+		try{
+			NativeApplication.nativeApplication.startAtLogin = true;
+		}catch(e:Error){
+			
+		}
+		
+	}
+}
+
 import air.update.events.DownloadErrorEvent;
 import air.update.events.StatusUpdateEvent;
 import air.update.events.UpdateEvent;
@@ -127,21 +144,10 @@ import air.update.events.UpdateEvent;
 import mx.controls.Alert;
 import flash.events.ErrorEvent;
 
-[Bindable]
-protected var downlaoding:Boolean = false;
-
-protected function isNewerFunction(currentVersion:String, updateVersion:String):Boolean
-{
-	// Example of custom isNewerFunction function, it can be omitted if one doesn't want
-	// to implement it's own version comparison logic. Be default it does simple string
-	// comparison.
-	return true;
-}
 
 protected function updater_errorHandler(event:ErrorEvent):void
 {
-	Alert.show(event.text);
-	airprogress.visible= false;
+	return;
 }
 
 
@@ -159,31 +165,36 @@ protected function updater_updateStatusHandler(event:StatusUpdateEvent):void
 		// and switch to the view that gives the user ability to decide if he wants to
 		// install new version of the application.
 		event.preventDefault();
+		Alert.show("检测到有新版本程序发布，是否下载安装？", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
+			if (e.detail == Alert.YES) {
+				updater.addEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, updater_downloadErrorHandler);
+				updater.addEventListener(UpdateEvent.DOWNLOAD_COMPLETE, updater_downloadCompleteHandler);
+				updater.downloadUpdate();
+			}
+		});
 		
-		downlaoding = true;
-		airprogress.visible= true;
-		updater.addEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, updater_downloadErrorHandler);
-		updater.addEventListener(UpdateEvent.DOWNLOAD_COMPLETE, updater_downloadCompleteHandler);
-		updater.downloadUpdate();
 	}
 	else
 	{
-		Alert.show("Your application is up to date!");
+		return;
 	}
 }
 
 
 private function updater_downloadCompleteHandler(event:UpdateEvent):void
 {
-	airprogress.visible= false;
 	// When update is downloaded install it.
-	updater.installUpdate();
+	Alert.show("已下载了新版本程序，是否安装？", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
+		if (e.detail == Alert.YES) {
+			updater.installUpdate();
+		}
+	});
+	
 }
 
 private function updater_downloadErrorHandler(event:DownloadErrorEvent):void
 {
-	airprogress.visible= false;
-	Alert.show("Error downloading update file, try again later.");
+	return;
 }
 
 

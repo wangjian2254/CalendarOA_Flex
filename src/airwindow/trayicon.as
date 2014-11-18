@@ -70,10 +70,10 @@ private function iconShan(e:TimerEvent):void{
 		}
 	}
 	if(iconflag && hasMessage){
-		this.nativeApplication.icon.bitmaps = [logo_1];
+		this.nativeApplication.icon.bitmaps = [logo_2];
 		iconflag= false;
 	}else{
-		this.nativeApplication.icon.bitmaps = [logo_2];
+		this.nativeApplication.icon.bitmaps = [logo_1];
 		iconflag = true;
 	}
 }

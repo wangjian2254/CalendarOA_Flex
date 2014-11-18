@@ -26,9 +26,8 @@
 	<fx:Declarations>
 		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 		<updater:NativeApplicationUpdater id="updater" 
-										  updateURL="http://192.168.101.18:8000/static/swf/update.xml"
+										  updateURL="http://liyuoa.duapp.com/static/swf/update.xml"
 										  updateStatus="updater_updateStatusHandler(event)"
-										  
 										  error="updater_errorHandler(event)"
 										  downloadError="updater_errorHandler(event)"
 										  updateError="updater_errorHandler(event)"
@@ -133,7 +132,5 @@
 	<uicontrol:CTabBar id="cbar" dataProvider="{gongNengStack}" left="2" right="2" width="100%" bottom="1" height="31" borderVisible="false"  creationComplete="trace('tabbar')">
 		
 	</uicontrol:CTabBar>
-	<uicontrol:CProgressBar id="airprogress" source="{updater}" width="100%" height="100%" visible="false">
-		
-	</uicontrol:CProgressBar>
+
 </s:WindowedApplication>

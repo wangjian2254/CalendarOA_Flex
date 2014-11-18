@@ -216,7 +216,7 @@
 
 
             } else {
-                var m:MemberItem = new MemberItem();
+                m = new MemberItem();
                 m.person = ToolUtil.getAnyPersonById(ToolUtil.sessionUser.pid);
                 m.showBtn = dopanel.visible;
                 if (m.person.hasOwnProperty("id")) {
