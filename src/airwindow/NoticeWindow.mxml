@@ -171,7 +171,7 @@
 	</s:layout>
 	
 	<s:HGroup width="100%">
-		<uicontrol:HeadImage id="head" width="45" height="45" top="4" left="4" />
+		<uicontrol:HeadImage id="head" isPerson="true" width="45" height="45" top="4" left="4" />
 		<s:Label id="nameLabel" fontWeight="bold"  ></s:Label>
 		<s:Spacer width="100%">
 			

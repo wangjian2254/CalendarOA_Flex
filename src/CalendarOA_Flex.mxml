@@ -98,7 +98,8 @@
 			<s:Label id="msg" text="{ToolUtil.resultMsg}" color="red" textAlign="center" verticalAlign="middle" />
             <s:Spacer width="100%"></s:Spacer>
 			<!-- 全局搜索框:根据文字显示搜索结果： 历史搜索记录、日程、任务、备忘、成员或文件，每种类型对应相应的图标,以苹果的 Spotlight 为榜样-->
-            <s:TextInput width="200" prompt="搜索日程、任务、备忘、成员或文件" click="searcher()" height="25"/>
+            <!--<s:TextInput width="200" prompt="搜索日程、任务、备忘、成员或文件" click="searcher()" height="25"/>-->
+			<uicontrol:SearchControl width="200" height="25" />
             <s:Button label="搜索" chromeColor="0x3e76f4" color="#ffffff" height="25"/>
             <s:Spacer width="10"></s:Spacer>
 		</s:SkinnableContainer>		

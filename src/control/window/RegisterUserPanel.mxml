@@ -301,12 +301,12 @@
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
             </s:layout>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/9.png" selected="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/20.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/23.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/24.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/30.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
-            <uicontrol:IconButton iconurl="/static/smalloaicon/40.png" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/9.png" isPerson="true" selected="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/20.png" isPerson="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/23.png" isPerson="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/24.png" isPerson="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/30.png" isPerson="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
+            <uicontrol:IconButton iconurl="/static/smalloaicon/40.png" isPerson="true" headSelectArray="{headSelectArray}"></uicontrol:IconButton>
         </s:FormItem>
 		<s:FormItem label="密码:" textAlign="right">
 			<s:layout>

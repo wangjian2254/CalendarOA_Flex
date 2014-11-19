@@ -15,10 +15,10 @@
 	
 	<fx:Script>
 		<![CDATA[
-			
-			
-			
-			private var _data:Object;
+		import model.Schedule;
+
+
+		private var _data:Object;
 			
 			override public function get data():Object
 			{
@@ -33,13 +33,13 @@
 				if(value==null){
 					return;
 				}
-				img.iconsouce=data.icon;
+				img.source=data.icon;
 				nameLable.text=data.label;
 				if(data.flag){
 					borderC.height=45;
 					sc1.visible= true;
 					sc1.height =15;
-					type.text = data.type;
+					type.text = data.typestr;
 					type.height = 15;
 					sg2.height=30;
 				}else{
@@ -48,6 +48,12 @@
 					sc1.visible=false;
 					sc1.height = 0;
 					sc2.height=30;
+				}
+				if(data.searchtype == "schedule"){
+					var s:Schedule = new Schedule(data);
+					img.source = null;
+					nameLable.text = s.title;
+					nameLable.toolTip = s.getDesc();
 				}
 			}
 			
@@ -84,8 +90,7 @@
 			
 		</s:Image>-->
 		<!--<ImageC id="img"  width="30" height="100%"   >-->
-		<uicontrol:ImageControl id="img" width="30" height="100%"></uicontrol:ImageControl>
-
+		<uicontrol:HeadImage id="img" width="28" height="28"></uicontrol:HeadImage>
 		<s:Label id="nameLable"  verticalAlign="middle" height="100%" >
 			
 		</s:Label>

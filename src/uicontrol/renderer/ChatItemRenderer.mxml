@@ -241,7 +241,7 @@
         </s:HGroup>
         <s:HGroup  verticalAlign="bottom" horizontalAlign="center" width="100%" gap="0" paddingRight="5" paddingLeft="5">
             <s:VGroup  horizontalAlign="center" gap="2">
-                <uicontrol:HeadImage id="head" width="25" height="25"/>
+                <uicontrol:HeadImage id="head"  width="25" height="25"/>
                 <s:Label id="nameLabel"  color="#000000"></s:Label>
             </s:VGroup>
             <s:VGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="5" paddingLeft="5" paddingBottom="5">

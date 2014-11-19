@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Image xmlns:fx="http://ns.adobe.com/mxml/2009"
-		 xmlns:s="library://ns.adobe.com/flex/spark">
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark" width="100%" height="100%" creationComplete="init()">
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
@@ -8,14 +8,55 @@
 		<![CDATA[
 		import httpcontrol.CHTTPService;
 
-		override public function set source(s:Object):void {
+		private var _isPerson:Boolean = false;
+
+		[Bindable]
+		private var _source:Object;
+
+		public function get source():Object {
+			return _source;
+		}
+
+		public function set source(s:Object):void {
 			if (s is String) {
-				super.source = CHTTPService.baseUrl + s;
+				_source = CHTTPService.baseUrl + s;
 			} else {
-				super.source = s;
+				_source = s;
+			}
+
+		}
+
+		public function get isPerson():Boolean {
+			return _isPerson;
+		}
+
+		public function set isPerson(value:Boolean):void {
+			_isPerson = value;
+			init();
+		}
+
+		private function init():void{
+			try{
+				if(isPerson){
+					if(this.width>30){
+						backimg.setStyle("cornerRadius",20);
+					}else{
+						backimg.setStyle("cornerRadius",10);
+					}
+
+				}else{
+					backimg.setStyle("cornerRadius",0);
+				}
+			}catch(e:Error){
+
 			}
 
 		}
 		]]>
 	</fx:Script>
-</s:Image>
+	<s:BorderContainer id="backimg" width="100%" height="100%" cornerRadius="20"  >
+		<!--<s:Label id="l" text="sadas" width="100%" height="100%" textAlign="center" verticalAlign="middle" visible="true"   />-->
+
+	</s:BorderContainer>
+	<s:Image id="img"    width="100%" height="100%" mask="{backimg}" source="{_source}" />
+</s:Group>

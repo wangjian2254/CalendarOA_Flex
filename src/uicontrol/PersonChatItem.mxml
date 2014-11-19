@@ -59,7 +59,7 @@
 
         </s:HorizontalLayout>
     </s:layout>
-    <uicontrol:HeadImage id="head" width="45" height="45" />
+    <uicontrol:HeadImage id="head" isPerson="true" width="45" height="45" />
     <s:Label id="nameLabel" width="60"></s:Label>
 
 </s:BorderContainer>

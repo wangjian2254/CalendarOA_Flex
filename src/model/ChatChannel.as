@@ -104,14 +104,10 @@ public class ChatChannel {
             if(ToolUtil.sessionUser.pid==pid1){
                 pid1=pid2;
             }
-            for each(var p:Object in ToolUtil.memberList){
-                if(p.id==pid1){
-                    id= p.id.toString();
-                    icon= p.icon;
-                    name= p.name;
-                    break;
-                }
-            }
+            var p:Object = ToolUtil.getAnyPersonById(pid1);
+            id = p.id;
+            icon = p.icon;
+            name = p.name;
         }
         if ('d' == value.substr(0, 1)) {
             id=value.substr(1);

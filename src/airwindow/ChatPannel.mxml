@@ -101,6 +101,7 @@
 			}
 			var pids:Array = chatUser.getPids();
 			if (chatUser.type == "p") {
+				head.isPerson = true;
 				if (pids[0] == pids[1]) {
 					closeContainer();
 					return;
@@ -360,7 +361,7 @@
 			var mod:String = item.mode;
 			switch (mod) {
 				case 'chat':
-					var chatevent:ListClickEvent = new ListClickEvent("ChatUser", e.item.selectedUser);
+					var chatevent:ListClickEvent = new ListClickEvent("ChatUser",  new ChatChannel(e.item.selectedUser));
 					dispatchEvent(chatevent);
 					break;
 				case 'addcontact':
@@ -541,7 +542,7 @@
 		</s:VGroup>
 		
 		<uicontrol:AddressList  id="addressList" dataProvider="{chatUser.members}"  visible="{bigPanel}" includeInLayout="{bigPanel}"
-								doubleClickEnabled="true" doubleClick="chatUserPanel()" toolTip="双击发送信息"
+								doubleClickEnabled="true" doubleClick="chatUserPanel()" toolTip="双击发送信息" listItemClick="listItemClick_handler(event)"
 								itemRenderer="uicontrol.renderer.AddressItemRenderer" width="150" height="100%">
 		</uicontrol:AddressList>
 		

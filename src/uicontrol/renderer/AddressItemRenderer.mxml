@@ -13,6 +13,8 @@
     <fx:Script><![CDATA[
         import events.ListClickEvent;
 
+        import model.ChatChannel;
+
         import util.ColorUtil;
 
         private var rLum:Number = 0.2225;
@@ -66,6 +68,16 @@
                 rightContainer.visible = false;
                 rightContainer.width = 0;
 
+                if(data){
+                    if(data is ChatChannel){
+                        if(data.type=='p'){
+                            head.isPerson=true;
+                        }
+                    }else{
+                        head.isPerson=true;
+                    }
+                }
+
             } else if (data['childrenstatus']) {
                 head.source = null;
                 head.width = 0;
@@ -82,7 +94,7 @@
                 childicon.source = opened;
             }
 
-            change_status();
+//            change_status();
             nameLabel.text = data.name;
             if (!data.hasOwnProperty('level')) {
                 data.level = 0;
@@ -122,7 +134,7 @@
 
         private function select_handler(e:MouseEvent):void {
             if ((data && data.id >= 0) || data.hasOwnProperty("channel")) {
-                var listclickevent:ListClickEvent = new ListClickEvent("listItemClick", data);
+                var listclickevent:ListClickEvent = new ListClickEvent(ListClickEvent.LISTITEMCLICK, data);
                 dispatchEvent(listclickevent);
             }
 

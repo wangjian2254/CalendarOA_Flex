@@ -9,6 +9,7 @@ public class ListClickEvent extends Event {
 
     public static var CHATUSER:String = "ChatUser";
     public static var UNSUBSCRIBE:String = "unsubscribe";
+    public static var LISTITEMCLICK:String = "listItemClick";
 
     public function ListClickEvent(type:String, value:Object ) {
         super(type, true);
