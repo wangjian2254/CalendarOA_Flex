@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             minWidth="21" minHeight="21" alpha.disabled="0.5">
+    <fx:Script><![CDATA[
+   
+    ]]></fx:Script>
+    <!-- host component -->
+    <fx:Metadata>
+        <![CDATA[
+        /**
+         * @copy spark.skins.spark.ApplicationSkin#hostComponent
+         */
+        [HostComponent("spark.components.Button")]
+        ]]>
+    </fx:Metadata>
+
+    <s:states>
+        <s:State name="up" />
+        <s:State name="over" />
+        <s:State name="down" />
+        <s:State name="disabled" />
+    </s:states>
+
+	<s:Rect width="28.5" height="28.5" >
+		<s:fill>
+			<s:SolidColor color="#F2F2F2" color.over="#3A95DE" color.down="#3c7edd"/>
+		</s:fill>
+	</s:Rect>
+	<s:Path x="8.78125" y="10.4985" winding="nonZero"  data="M0 0 0 9.06299 10.9375 9.06299 10.9375 0 0 0ZM8.96875 7.09424 1.96875 7.09424 1.96875 1.96924 8.96875 1.96924 8.96875 7.09424Z">
+		<s:fill>
+			<s:SolidColor color="#999999"  color.over="#ffffff" color.down="#FFFFFF"/>
+		</s:fill>
+	</s:Path>
+	
+	
+    <s:Label id="labelDisplay"
+             textAlign="center"
+             verticalAlign="middle"
+             maxDisplayedLines="1"
+             horizontalCenter="0" verticalCenter="0"
+             left="0" right="0" top="0" bottom="0">
+
+    </s:Label>
+</s:SparkSkin>

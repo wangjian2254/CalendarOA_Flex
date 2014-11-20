@@ -17,7 +17,7 @@
         /**
          * @copy spark.skins.spark.ApplicationSkin#hostComponent
          */
-        [HostComponent("uicontrol.RightBtn")]
+        [HostComponent("spark.components.Button")]
         ]]>
     </fx:Metadata>
 

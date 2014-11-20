@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="28.5" viewWidth="28.5" ai:appVersion="16.0.0.682" ATE:version="1.0.0" flm:version="1.0.0" d:using="" xmlns="http://ns.adobe.com/fxg/2008" xmlns:ATE="http://ns.adobe.com/ate/2009" xmlns:ai="http://ns.adobe.com/ai/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:flm="http://ns.adobe.com/flame/2008">
+  <Library/>
+  <Group blendMode="normal" d:layerType="page" d:pageHeight="28.5" d:pageWidth="28.5" d:type="layer" d:userLabel="画板 1">
+    <Group d:type="layer" d:userLabel="图层 1">
+      <Group ai:seqID="1">
+        <Rect width="28.5" height="28.499" ai:seqID="2">
+          <fill>
+            <SolidColor color="#CE5849"/>
+          </fill>
+        </Rect>
+        <Path x="9.50879" y="10.0791" winding="nonZero" ai:seqID="3" data="M9.48242 1.36963 8.1123 0 4.74121 3.37061 1.37109 0 0.000976563 1.36963 3.37109 4.74072 0 8.11133 1.37012 9.48047 4.74121 6.11133 8.1123 9.48242 9.48242 8.11133 6.11133 4.74072 9.48242 1.36963Z">
+          <fill>
+            <SolidColor color="#FFFFFF"/>
+          </fill>
+        </Path>
+      </Group>
+    </Group>
+  </Group>
+  <Private/>
+</Graphic>

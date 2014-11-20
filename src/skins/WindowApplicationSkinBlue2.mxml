@@ -2,61 +2,124 @@
 
 <!--
 
-    ADOBE SYSTEMS INCORPORATED
-    Copyright 2008 Adobe Systems Incorporated
-    All Rights Reserved.
+ADOBE SYSTEMS INCORPORATED
+Copyright 2008 Adobe Systems Incorporated
+All Rights Reserved.
 
-    NOTICE: Adobe permits you to use, modify, and distribute this file
-    in accordance with the terms of the license agreement accompanying it.
+NOTICE: Adobe permits you to use, modify, and distribute this file
+in accordance with the terms of the license agreement accompanying it.
 
 -->
 
 <!--- The default skin class for the Spark Application component. 
-        
-       @see spark.components.Application
-        
-      @langversion 3.0
-      @playerversion Flash 10
-      @playerversion AIR 1.5
-      @productversion Flex 4
+
+@see spark.components.Application
+
+@langversion 3.0
+@playerversion Flash 10
+@playerversion AIR 1.5
+@productversion Flex 4
 -->
 <s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-        alpha.disabled="0.5" alpha.disabledAndInactive="0.5">
-
-    <fx:Metadata>
-    <![CDATA[ 
-        /** 
-         * A strongly typed property that references the component to which this skin is applied.
-         */
-        [HostComponent("spark.components.WindowedApplication")]
-    ]]>
-    </fx:Metadata> 
-    
-    <s:states>
-        <s:State name="normal" />
-        <s:State name="disabled" />
-        <s:State name="normalAndInactive" />
-        <s:State name="disabledAndInactive" />
-    </s:states>
-    
-	<s:Rect  left="0" right="0" top="0" bottom="0" radiusX="7.99944" radiusY="7.99944" >
+		alpha.disabled="0.5" alpha.disabledAndInactive="0.5">
+	
+	<fx:Metadata>
+		<![CDATA[ 
+		/** 
+		* A strongly typed property that references the component to which this skin is applied.
+		*/
+		[HostComponent("spark.components.WindowedApplication")]
+		]]>
+	</fx:Metadata> 
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="disabled" />
+		<s:State name="normalAndInactive" />
+		<s:State name="disabledAndInactive" />
+	</s:states>
+	
+	<s:Rect  width="100%" height="100%" >
 		<s:fill>
-			<s:LinearGradient x="265.5" y="86" scaleX="86" rotation="270">
-				<s:GradientEntry ratio="0" color="#E8E8E8"/>
-				<s:GradientEntry ratio="1" color="#FFFFFF"/>
+			<s:SolidColor color="#828282"/>
+		</s:fill>
+	</s:Rect>
+	<!-- fill -->
+	<!--- 
+	A rectangle with a solid color fill that forms the background of the application.
+	The color of the fill is set to the Application's backgroundColor property.
+	-->
+	<s:Rect id="backgroundRect" left="3" right="3" top="3" bottom="3"  >
+		<s:fill>
+			<!--- @private -->
+			<s:SolidColor id="bgRectFill" color="#f5f5f3"/>
+		</s:fill>
+	</s:Rect>
+	
+	<!-- 头部背景 -->
+	<s:Rect height="47" top="4" left="3" right="3">
+		<s:fill>
+			<s:LinearGradient rotation="90">
+				<s:GradientEntry color="0xffffff" ratio="0"/>
+				<s:GradientEntry color="0xe8e8e8" ratio="1"/>
 			</s:LinearGradient>
 		</s:fill>
-		<s:stroke>
-			<s:SolidColorStroke caps="none" joints="miter" miterLimit="10" color="#606060"/>
-		</s:stroke>
-		<s:filters>
-			<s:DropShadowFilter blurX="14" blurY="14" quality="2" alpha="0.6" angle="0" distance="0"/>
-		</s:filters>
 	</s:Rect>
-	<s:Group id="contentGroup" left="5" right="5" top="5" bottom="5" minWidth="0" minHeight="0">
+	
+	<!-- 导航背景 -->
+	<s:Rect height="35" top="51" left="2" right="2">
+		<s:fill>
+			<s:LinearGradient rotation="90">			
+				<s:GradientEntry color="0x6e95bc" ratio="0"/>
+				<s:GradientEntry color="0x6993bb" ratio=".1"/>				
+				<s:GradientEntry color="0x4485b3" ratio=".7"/>
+			</s:LinearGradient>
+		</s:fill>
+		
+		<s:stroke>
+			<s:LinearGradientStroke rotation="90" weight="1">
+				<s:GradientEntry color="0x5e7fac" />
+				<s:GradientEntry color="0x305b82" />
+			</s:LinearGradientStroke>
+		</s:stroke>
+	</s:Rect>
+	
+	<!-- foot背景 -->
+	<s:Rect bottom="3" left="3" right="3" height="31">
+		<s:fill>			
+			<s:SolidColor color="0x7792ac"/>
+		</s:fill>
+	</s:Rect>
+	<s:Rect bottom="34" left="3" right="3" height="1">
+		<s:fill>			
+			<s:SolidColor color="0x506273"/>
+		</s:fill>
+	</s:Rect>
+	<s:Rect bottom="33" left="3" right="3" height="1">
+		<s:fill>			
+			<s:SolidColor color="0x637a90"/>
+		</s:fill>
+	</s:Rect>
+	
+	
+	
+	
+	<!--- 
+	<s:Group left="0" right="0" top="0" bottom="0">
 		<s:layout>
-			<s:BasicLayout/>
+			<s:VerticalLayout gap="0" horizontalAlign="justify" />
 		</s:layout>
+		
+		
+		@private
+		Application Control Bar
+		
+		
+		
+		
+		
 	</s:Group>
-
+	-->
+	<!--- @copy spark.components.SkinnableContainer#contentGroup -->
+	<s:Group id="contentGroup" top="3" bottom="3" right="3" left="3"  minWidth="0" minHeight="0" />
 </s:Skin>

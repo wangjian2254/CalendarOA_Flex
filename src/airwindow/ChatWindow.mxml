@@ -207,9 +207,8 @@
 			var c:ChatPannel = chat_map[chat.channel];
 			if (c == null) {
 				c = new ChatPannel();
-//					c.transparent=true;
-//					c.type=NativeWindowType.UTILITY;
-//					c.systemChrome=NativeWindowSystemChrome.NONE;
+				c.transparent=true;
+				c.systemChrome=NativeWindowSystemChrome.NONE;
 				c.chatUser = chat;
 				c.open();
 				c.addEventListener(CloseEvent.CLOSE, closeChatPannel);
