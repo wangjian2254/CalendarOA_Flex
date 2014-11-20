@@ -505,23 +505,23 @@
 
 		<uicontrol:HeadImage id="head" width="35" height="35"/>
 		<s:Label id="nameLabel" textDecoration="underline"  ></s:Label>
-		
+
 		<mx:Spacer width="100%" height="10"/>
 		<s:HGroup verticalAlign="top" height="100%">
 			<s:Button skinClass="skins.MinBtnSkin" width="28.5" height="28.5" buttonMode="true" />
 			<s:Button skinClass="skins.MaxBtnSkin" width="28.5" height="28.5" buttonMode="true" />
 			<s:Button skinClass="skins.CloseBtnSkin" width="28.5" height="28.5" buttonMode="true" />
 		</s:HGroup>
-		
+
 	</s:HGroup>
 	<s:HGroup id="horGroup" width="100%" height="100%" gap="8">
 		<s:VGroup   width="100%" height="100%" >
-			
+
 			<uicontrol:AddressList id="chatList" borderColor="#d6d6d6"  dataProvider="{chatsArr}" chatChannel="{chatUser}"
 								   listItemClick="chatItemClick_handler(event)"
 								   itemRenderer="uicontrol.renderer.ChatItemRenderer" width="100%" height="100%">
 			</uicontrol:AddressList>
-			
+
 			<!--<s:TextArea id="ti" width="100%" height="50"-->
 			<!--paddingTop="10" paddingBottom="5" paddingLeft="5" paddingRight="5"-->
 			<!--focusEnabled="true" fontLookup="device"-->
@@ -542,7 +542,7 @@
 				<s:Button skinClass="skins.BtnWenJianSkin" buttonMode="true" />
 				<s:Button skinClass="skins.BtnShangChuanSkin" buttonMode="true" />
 				<s:Spacer width="100%">
-					
+
 				</s:Spacer>
 				<s:Button id="scheduleButton" label="显示任务" width="100" buttonMode="true" skinClass="skins.Chat2BtnSkin" click="showSchedule()" includeInLayout="{scheduleButton.visible}"  />
 				<s:Button id="quiteButton" label="退出讨论组" width="100" buttonMode="true" skinClass="skins.Chat2BtnSkin" click="quiteGroup()" includeInLayout="{quiteButton.visible}"  />
@@ -550,20 +550,20 @@
 				<s:Button id="usersButton" label="创建讨论组" width="100" buttonMode="true" skinClass="skins.Chat2BtnSkin" click="createGroup()" includeInLayout="{usersButton.visible}"  />
 			</s:HGroup>
 			<s:TextArea  id="ti" height="94" borderColor="#d6d6d6" prompt="{ChatManager.pomelo_online?'回车(Enter)发送':'即时通信服务正在维护中，目前不可用。'}" width="100%"  color="{cp.selectedColor}" enabled="{ChatManager.pomelo_online}" />
-			
+
 			<s:HGroup width="100%" height="44" horizontalAlign="right" verticalAlign="middle">
 				<s:Button  label="关闭" color="#ffffff" width="60" skinClass="skins.ChatBtnSkin" buttonMode="true"  height="28" click="{ti.text='';}"  />
 				<s:Button  label="发送" color="#ffffff" width="60" skinClass="skins.ChatBtnSkin" buttonMode="true" height="28" click="{ti.text='';}"  />
 			</s:HGroup>
-			
+
 		</s:VGroup>
-		
+
 		<uicontrol:AddressList  id="addressList" borderColor="#d6d6d6"  dataProvider="{chatUser.members}"  visible="{bigPanel}" includeInLayout="{bigPanel}"
 								doubleClickEnabled="true" doubleClick="chatUserPanel()" toolTip="双击发送信息" listItemClick="listItemClick_handler(event)"
 								itemRenderer="uicontrol.renderer.AddressItemRenderer" width="150" height="100%">
 		</uicontrol:AddressList>
-		
-		
+
+
 	</s:HGroup>
 
 </s:Window>
