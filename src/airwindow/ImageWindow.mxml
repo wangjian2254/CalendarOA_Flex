@@ -1,53 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" xmlns:uicontrol="uicontrol.*">
-	<fx:Script>
-		<![CDATA[
-			import httpcontrol.CHTTPService;
-			private var _imgurl:Object = null;
-			
-			[Bindable]
-			public function get imgurl():Object
-			{
-				return _imgurl;
-			}
-
-			public function set imgurl(value:Object):void
-			{
-				if(value is String){
-					if(value.toLocaleLowerCase().indexOf("http")!=0){
-						_imgurl = CHTTPService.baseUrl + value;
-						return;
-					}
-				}
-				
-				_imgurl = value;
-			}
-			
-			private function movePos():void {
-				var window:NativeWindow=stage.nativeWindow;
-				if(window.width>Capabilities.screenResolutionX){
-					window.width = Capabilities.screenResolutionX-20;
-				}
-				if(window.height>Capabilities.screenResolutionY){
-					window.height = Capabilities.screenResolutionY -50;
-				}
-				window.x = (Capabilities.screenResolutionX-window.width)/2;
-				window.y = (Capabilities.screenResolutionY-window.height)/2;
-			}
-		]]>
+		  xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" showStatusBar="false" minWidth="600" minHeight="300" xmlns:uicontrol="uicontrol.*" skinClass="skins.WindowChannelSkin">
+	<fx:Script source="../asfile/imageWindowAs.as">
+		
 	</fx:Script>
+	<fx:Script><![CDATA[
+
+		private function pushApp(e:MouseEvent):void{
+			if(this.nativeWindow.displayState== NativeWindowDisplayState.NORMAL){
+				this.nativeWindow.startMove();
+			}
+		}
+
+		private function closePannel():void{
+			close();
+		}
+
+		]]></fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:RadioButtonGroup id="statusRadio" >
+		</s:RadioButtonGroup>
 	</fx:Declarations>
-	<s:HGroup verticalAlign="top" height="100%">
-		<s:Button skinClass="skins.MinBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="最小化" click="{this.minimize()}" />
-		<s:Button skinClass="skins.MaxBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="最大化" click="{this.maximize()}" />
-		<s:Button skinClass="skins.MaxBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="恢复" click="{this.restore()}" />
-		<s:Button skinClass="skins.CloseBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="关闭" click="{this.close()}" />
-	</s:HGroup>
-	<s:Image id="img" width="100%" complete="movePos()" resize="movePos()">
+		<s:Image id="img" top="29"  >
+			
+		</s:Image>
+		<s:HGroup left="10" top="3" height="28" verticalAlign="middle">
+			<s:Label text="文件名称：" />
+			<s:TextInput id="filename" width="150" text="{imgname}" >
+			</s:TextInput>
+			<s:Spacer width="10" />
+			<s:RadioButton value="1" label="永久保留" selected="true" group="{statusRadio}"/>
+			<s:RadioButton value="0" label="临时保存（7天）" group="{statusRadio}"/>
+			<s:Spacer width="10" />
+			<s:Button id="btnSave" chromeColor="red" label="上传" height="25" color="#ffffff" click="save()" />
+			<s:Button id="btnDel" chromeColor="#cccccc" label="放弃" height="25" color="#000000" click="closeimg()" />
+			<s:Spacer width="5" />
+		</s:HGroup>
+	<uicontrol:WindowControlBtn height="28.5" right="10" minshow="false"  window="{this}">
 		
-	</s:Image>
+	</uicontrol:WindowControlBtn>
+	<uicontrol:CProgressBar id="bar" width="100%" height="100%" visible="false" />
 </s:Window>

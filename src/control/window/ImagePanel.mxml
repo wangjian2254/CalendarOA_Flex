@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark"
+							 creationComplete="init()"  minWidth="600" minHeight="300" 
+							 xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*" title="创建讨论组"> 
+
+	<fx:Script source="../../asfile/imageWindowAs.as" />
+<fx:Script><![CDATA[
+	import mx.events.CloseEvent;
+	import mx.managers.PopUpManager;
+
+	private function pushApp(e:MouseEvent):void{
+
+	}
+	override public function releaseListener(e:CloseEvent):void {
+	}
+
+	private function closePannel():void{
+		PopUpManager.removePopUp(this);
+	}
+	]]></fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:RadioButtonGroup id="statusRadio" >
+		</s:RadioButtonGroup>
+	</fx:Declarations>
+	<s:Image id="img" top="29"  >
+		
+	</s:Image>
+	<s:HGroup left="10" top="3" height="28" verticalAlign="middle">
+		<s:Label text="文件名称：" />
+		<s:TextInput id="filename" width="150" text="{imgname}" >
+		</s:TextInput>
+		<s:Spacer width="10" />
+		<s:RadioButton value="1" label="永久保留" selected="true" group="{statusRadio}"/>
+		<s:RadioButton value="0" label="临时保存（7天）" group="{statusRadio}"/>
+		<s:Spacer width="10" />
+		<s:Button id="btnSave" chromeColor="red" label="上传" height="25" color="#ffffff" click="save()" />
+		<s:Button id="btnDel" chromeColor="#cccccc" label="放弃" height="25" color="#000000" click="closeimg()" />
+		<s:Spacer width="5" />
+	</s:HGroup>
+	<uicontrol:CProgressBar id="bar" width="100%" height="100%" visible="false" />
+</window:EfficientTitleWindow>

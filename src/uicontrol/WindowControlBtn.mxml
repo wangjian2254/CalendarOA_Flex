@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:HGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()"  gap="2" height="100%" verticalAlign="top" horizontalCenter="right">
+	<fx:Script>
+		<![CDATA[
+			import spark.components.Window;
+			
+			[Bindable]
+			public var window:Window;
+			
+			[Bindable]
+			public var minshow:Boolean=true;
+			
+			[Bindable]
+			public var maxshow:Boolean=true;
+			
+			private function init():void{
+				if(maxshow){
+					max.visible=true;
+					restore.visible = false;
+				}else{
+					max.visible=false;
+					restore.visible = false;
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:Button skinClass="skins.BtnMinSkin" width="28.5" height="28.5" visible="{minshow}" buttonMode="true" toolTip="最小化" click="window.minimize()" />
+	<s:Button skinClass="skins.BtnMaxSkin" width="28.5" height="28.5" buttonMode="true" toolTip="最大化" id="max"  includeInLayout="{max.visible}" click="{window.maximize();max.visible=false;}" />
+	<s:Button skinClass="skins.BtnRestorSkin" width="28.5" height="28.5" buttonMode="true" toolTip="恢复" id="restore" visible="{!max.visible}" includeInLayout="{restore.visible}" click="{window.restore();max.visible=true;}" />
+	<s:Button skinClass="skins.BtnCloseSkin" width="28.5" height="28.5" buttonMode="true" toolTip="关闭" click="window.close()" />
+	
+</s:HGroup>

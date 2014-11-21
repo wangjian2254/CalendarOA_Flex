@@ -37,6 +37,8 @@
 				
 			}
 			private var _source:Object;
+			
+			public var issuccess:Boolean=false;
 		]]>
 	</fx:Script>
 	<fx:Declarations>

@@ -146,5 +146,5 @@
         <!-- 将非可视元素（例如服务、值对象）放在此处 -->
 
     </fx:Declarations>
-    <s:TextInput id="input" prompt="搜索日程、任务、成员或文件" change="checkInput0()" width="100%" height="100%"/>
+    <s:TextInput id="input" prompt="搜索日程、任务、成员或文件" change="checkInput0()" width="100%" height="100%" borderColor="#d6d6d6"  />
 </s:Group>

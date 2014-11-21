@@ -3,23 +3,27 @@
   Created by wangjian2254 on 14-8-10.
 -->
 <s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
-         xmlns:uicontrol="uicontrol.*" creationComplete="init()" gap="3">
+         xmlns:uicontrol="uicontrol.*" creationComplete="init()" gap="-1">
     <fx:Metadata>
         [Event(name="listItemClick",type="events.ListClickEvent")]
         [Event(name="unsubscribe",type="events.ListClickEvent")]
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
-        import events.ListClickEvent;
-
-        import model.ChatChannel;
-
-        import mx.collections.ArrayCollection;
-        import mx.events.CollectionEvent;
-        import mx.utils.ObjectUtil;
-
-        import util.ChatManager;
-        import util.ToolUtil;
+		import assets.btnimg.ContactList;
+		import assets.btnimg.CurrentContact;
+		import assets.btnimg.Department;
+		
+		import events.ListClickEvent;
+		
+		import model.ChatChannel;
+		
+		import mx.collections.ArrayCollection;
+		import mx.events.CollectionEvent;
+		import mx.utils.ObjectUtil;
+		
+		import util.ChatManager;
+		import util.ToolUtil;
 
         [Bindable]
         private var addressMember:ArrayCollection = new ArrayCollection();
@@ -30,10 +34,11 @@
         public var userMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var btnlist:ArrayCollection = new ArrayCollection([{label: "最近联系", mod: "group"}, {
+        private var btnlist:ArrayCollection = new ArrayCollection([{icon:new CurrentContact(), label: "最近联系", mod: "group"},
+			{icon:new Department(), 
             label: "部门",
             mod: "org"
-        }, {label: "常用联系人", mod: "user"}]);
+        }, {icon:new ContactList(), label: "常用联系人", mod: "user"}]);
         ;
 
         public var type:String = "org";
@@ -276,22 +281,28 @@
         }
         ]]></fx:Script>
 
-    <s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100%" height="25" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
-    <s:HGroup id="liyuwangBtn" click="chatliyu()"  verticalAlign="middle"   width="100%" height="50" buttonMode="true"  >
-        <uicontrol:HeadImage id="head" isPerson="true" width="45" height="45" />
-        <s:Label id="nameLabel" ></s:Label>
-        <s:BorderContainer id="num" visible="{ChatManager.liyuShow}" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
-            <s:layout>
-                <s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"></s:HorizontalLayout>
-            </s:layout>
-            <s:Label id="numLabel" text="{ChatManager.liyuunread}" fontSize="12" color="#ffffff" ></s:Label>
-        </s:BorderContainer>
-
-    </s:HGroup>
-    <uicontrol:AddressList id="addressList" dataProvider="{departMember}" borderVisible="{borderVisible}}"
+	<uicontrol:SearchControl width="100%" height="22" />
+	<s:Spacer height="4">
+		
+	</s:Spacer>
+    <s:ButtonBar id="showModel" change="changeShowModel()" skinClass="skins.BtnChatBarSkin" dataProvider="{btnlist}" width="100%" height="48" selectedIndex="0" labelField="label" />
+    
+    <uicontrol:AddressList id="addressList" borderColor="#d6d6d6" dataProvider="{departMember}" borderVisible="{borderVisible}}"
                            listItemZhanKai="listItemZhanKai_handler(event)"
                            horizontalScrollPolicy="off"
                            itemRenderer="uicontrol.renderer.AddressItemRenderer" width="100%" height="100%">
 
     </uicontrol:AddressList>
+	<s:HGroup id="liyuwangBtn" click="chatliyu()"  verticalAlign="middle"   width="100%" height="50" buttonMode="true"  >
+		<s:Spacer width="10" />
+		<uicontrol:HeadImage id="head" isPerson="true" width="45" height="45" />
+		<s:Label id="nameLabel" ></s:Label>
+		<s:BorderContainer id="num" visible="{ChatManager.liyuShow}" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"></s:HorizontalLayout>
+			</s:layout>
+			<s:Label id="numLabel" text="{ChatManager.liyuunread}" fontSize="12" color="#ffffff" ></s:Label>
+		</s:BorderContainer>
+		
+	</s:HGroup>
 </s:VGroup>

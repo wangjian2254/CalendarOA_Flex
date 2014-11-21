@@ -1,8 +1,11 @@
+import events.UploadFileEvent;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.Loader;
 import flash.events.DataEvent;
 import flash.events.Event;
+import flash.events.IOErrorEvent;
 import flash.events.MouseEvent;
 import flash.events.ProgressEvent;
 import flash.net.FileReference;
@@ -20,11 +23,15 @@ import mx.managers.CursorManager;
 
 import spark.components.Image;
 
+import uicontrol.CProgressBar;
+
 private var upload_file:FileReference;
 private var upload_byteArray:ByteArray;
-private var upload_bitmapData:BitmapData;
+//private var upload_bitmapData:BitmapData;
 private var upload_loader:Loader = new Loader();
 
+
+private var bar:CProgressBar;
 
 private function uploadFile(filetype:String):void{
 	
@@ -35,73 +42,86 @@ private function uploadFile(filetype:String):void{
 	upload_file.browse();
 	
 }
-
-private function toUpload():void {
-	if (upload_bitmapData == null) {
-		Alert.show("请您先选择要上传的图片");
-	}
-	else {
-		Alert.show("上传 " + upload_file.name + " (共 " + Math.round(upload_file.size) + " 字节)?", "确认上传", Alert.YES | Alert.NO, null, proceedWithUpload);
-	}
-}
+//
+//private function toUpload():void {
+//	if (upload_bitmapData == null) {
+//		Alert.show("请您先选择要上传的图片");
+//	}
+//	else {
+//		Alert.show("上传 " + upload_file.name + " (共 " + Math.round(upload_file.size) + " 字节)?", "确认上传", Alert.YES | Alert.NO, null, proceedWithUpload);
+//	}
+//}
 
 //监听文件上传状态
 private function onProgress(e:ProgressEvent):void {
 	//				lbProgress.text=" 已上传 " + e.bytesLoaded + " 字节，共 " + e.bytesTotal + " 字节";
 	var proc:uint = e.bytesLoaded / e.bytesTotal * 100;
-//	bar.setProgress(proc, 100);
-//	bar.label = "当前进度: " + " " + proc + "%";
+	bar.setProgress(proc, 100);
+	bar.label = "当前进度: " + " " + proc + "%";
 	if (e.bytesLoaded == e.bytesTotal) {
 		CursorManager.removeBusyCursor();
 	}
 }
 
+private function uploadError(event:IOErrorEvent):void{
+	bar.issuccess=false;
+	bar.visible = false;
+	Alert.show("上传失败，请稍后重新上传。","提示");
+	
+}
+
 //上传图片到服务器
-private function proceedWithUpload():void {
+private function proceedWithUpload(event:UploadFileEvent):void {
 	
 	//进度监听
 	upload_file.addEventListener(ProgressEvent.PROGRESS, onProgress);
+	upload_file.addEventListener(IOErrorEvent.IO_ERROR,uploadError );
 	var request:URLRequest = new URLRequest(CHTTPService.baseUrl+"/ca/upload_files");
 	request.method = URLRequestMethod.POST;
-	
 	request.contentType = "multipart/form-data";
 	request.data = new URLVariables();
+	request.data.status = event.data.status;
+	request.data.filename = event.data.filename;
+	if(event.data.hasOwnProperty("channel")){
+		request.data.channel = event.data.channel;
+	}
+	if(event.data.hasOwnProperty("scheduleid")){
+		request.data.schedule = event.data.scheduleid;
+	}
 	
 	
 	
-//	bar.visible = true;
+	bar = event.bar;
+	bar.visible = true;
 	
 	
 	//设置鼠标忙状态
 	CursorManager.setBusyCursor();
 	try {
-		upload_file.upload(request, 'file', true);
-		
+		upload_file.upload(request, 'file');
+		bar.issuccess=true;
 	}
 	catch (error:Error) {
 		Alert.show("上传失败");
-//		bar.visible = false;
+		bar.visible = false;
 	}
 	
 	
 }
 
-//上传完成调用
-private function completeHandle(event:Event):void {
-	upload_byteArray = null;
-//	bar.visible = false;
-//	img.source = null;
-	
-}
+
 
 private function uploadImageResult(e:DataEvent):void {
 	try {
 		var result:Object = JParser.decode(e.data);
 		if (result.success == true) {
-			
-			
-			
+			bar.issuccess = true;
+			Alert.show("上传成功","提示",0x4,this);
+		}else{
+			bar.issuccess=false;
+			Alert.show("上传成功","提示",0x4,this);
 		}
+		bar.visible = false;
 	} catch (error:Error) {
 		
 		var i:Number = 1;
@@ -121,10 +141,10 @@ private function fileReferenceCompleteHandler(e:Event):void {
 private function loaderCompleteHandler(e:Event):void {
 	try{
 		var bitmap:Bitmap = Bitmap(upload_loader.content);
-		upload_bitmapData = bitmap.bitmapData;
-		showPic(upload_bitmapData);
+//		upload_bitmapData = bitmap.bitmapData;
+		showPic(bitmap, upload_file.name);
 	}catch(err:Error){
-		
+//		showPic("");
 	}
 	
 //	img.source = bitmap;
@@ -137,12 +157,3 @@ private function fileReferenceSelectHandler(e:Event):void {
 	upload_file.load();
 }
 
-private function bigImage(event:MouseEvent):void {
-	if (event.currentTarget is Image) {
-		//					Alert.show(event.currentTarget.source,"图片地址");
-//		var s:BigImage = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, BigImage, true) as BigImage;
-//		s.imgurl = event.currentTarget.source;
-	}
-	
-	
-}
