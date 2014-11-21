@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" xmlns:uicontrol="uicontrol.*">
+	<fx:Script>
+		<![CDATA[
+			import httpcontrol.CHTTPService;
+			private var _imgurl:Object = null;
+			
+			[Bindable]
+			public function get imgurl():Object
+			{
+				return _imgurl;
+			}
+
+			public function set imgurl(value:Object):void
+			{
+				if(value is String){
+					if(value.toLocaleLowerCase().indexOf("http")!=0){
+						_imgurl = CHTTPService.baseUrl + value;
+						return;
+					}
+				}
+				
+				_imgurl = value;
+			}
+			
+			private function movePos():void {
+				var window:NativeWindow=stage.nativeWindow;
+				if(window.width>Capabilities.screenResolutionX){
+					window.width = Capabilities.screenResolutionX-20;
+				}
+				if(window.height>Capabilities.screenResolutionY){
+					window.height = Capabilities.screenResolutionY -50;
+				}
+				window.x = (Capabilities.screenResolutionX-window.width)/2;
+				window.y = (Capabilities.screenResolutionY-window.height)/2;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:HGroup verticalAlign="top" height="100%">
+		<s:Button skinClass="skins.MinBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="最小化" click="{this.minimize()}" />
+		<s:Button skinClass="skins.MaxBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="最大化" click="{this.maximize()}" />
+		<s:Button skinClass="skins.MaxBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="恢复" click="{this.restore()}" />
+		<s:Button skinClass="skins.CloseBtnSkin" width="28.5" height="28.5" buttonMode="true" toolTip="关闭" click="{this.close()}" />
+	</s:HGroup>
+	<s:Image id="img" width="100%" complete="movePos()" resize="movePos()">
+		
+	</s:Image>
+</s:Window>
