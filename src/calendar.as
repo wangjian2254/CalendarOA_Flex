@@ -136,7 +136,7 @@ private function currentUser(result:Object, e:ResultEvent):void {
 
 		}
 		menuXML.send();
-		ToolUtil.init();
+//		ToolUtil.init();
 		for (var i:Number = 0; i < gongNengStack.numElements; i++) {
 			var c:CBorderContainer = gongNengStack.getElementAt(i) as CBorderContainer;
 			c.init(null);
@@ -144,19 +144,6 @@ private function currentUser(result:Object, e:ResultEvent):void {
 	}
 }
 
-
-private function resultUser(evt:ResultEvent, token:Object = null):void {
-	if (evt.result.success == true) {
-		var user:User = new User();
-		user.id = evt.result.result.id;
-		user.username = evt.result.result.username;
-		user.fullname = evt.result.result.last_name + evt.result.result.first_name;
-		user.user_permissions = new ArrayCollection(evt.result.result.user_permissions as Array);
-		user.groups = new ArrayCollection(evt.result.result.groups as Array);
-		UserUtil.user = user;
-	}
-	
-}
 
 
 private function iconFun(item:Object):Class {

@@ -92,11 +92,15 @@
 			}
 			private function showPic(s:Bitmap, defaultfilename:String=""):void{
 				var notice:ImagePanel = PopUpManager.createPopUp(this,ImagePanel,false) as ImagePanel;
-				
+				if(chatUser.type == 'p' || chatUser.type == 'g'){
+					notice.status = 0;
+				}
 				notice.imagedata = s;
 				notice.imgname = defaultfilename;
 				notice.addEventListener(UploadFileEvent.UPLOAD,function(event:UploadFileEvent):void{
-					event.data.channel = chatUser.channel;
+					event.data.ownertype = chatUser.type;
+					event.data.ownername = chatUser.name.substr(0,60);
+					event.data.ownerpk = chatUser.id;
 					proceedWithUpload(event);
 				});
 			}
@@ -141,10 +145,9 @@
 			<!--/>-->
 			<s:HGroup width="100%" height="41" horizontalAlign="left" verticalAlign="middle" gap="3">
 				<mx:ColorPicker id="cp"/>
-				<s:Button skinClass="skins.BtnJiePingSkin" buttonMode="true" />
-				<s:Button skinClass="skins.BtnTuPianSkin" buttonMode="true" click="uploadFile('pic')" />
-				<s:Button skinClass="skins.BtnWenJianSkin" buttonMode="true"  click="uploadFile('file')" />
-				<s:Button skinClass="skins.BtnShangChuanSkin" buttonMode="true" />
+				<s:Button skinClass="skins.BtnTuPianSkin" buttonMode="true" toolTip="上传图片" click="uploadFile('pic')" />
+				<s:Button skinClass="skins.BtnWenJianSkin" buttonMode="true" toolTip="发送文件" click="uploadFile('file')" />
+				<s:Button skinClass="skins.BtnShangChuanSkin" buttonMode="true" toolTip="上传文件"  click="uploadFile('file')" />
 				<s:Spacer width="100%">
 					
 				</s:Spacer>

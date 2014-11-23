@@ -125,6 +125,7 @@ public class ToolUtil
 //            currentOrgRefresh();
             contactsRefresh();
             allProjectListRefresh();
+            filesRefresh();
         }else{
             sessionUser=false;
         }
@@ -545,6 +546,41 @@ public class ToolUtil
     public static function resultAllContacts(result:Object,e:ResultEvent):void{
         if(result.success==true){
             ArrayTools.createArray(contactsList,result.result);
+
+
+        }
+    }
+
+    [Bindable]
+    public static var filesList:ArrayCollection=new ArrayCollection();
+    [Bindable]
+    public static var imagesList:ArrayCollection=new ArrayCollection();
+
+    public static function filesRefresh(fun:*=null,e:*=null):void{
+
+        if(!(fun is Function)){
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_all_my_files",resultAllFiles,"POST").send();
+        }else{
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_all_my_files",resultAllFiles,"POST");
+            http.resultFunArr.addItem(fun);
+            http.send();
+
+        }
+
+    }
+    public static function resultAllFiles(result:Object, e:ResultEvent):void{
+        if(result.success==true && result.result){
+            var fileslist:Array = new Array();
+            var imageslist:Array = new Array();
+            for each(var obj:Object in result.result){
+                if(obj['filetype']=="gif"||obj['filetype']=="png"||obj['filetype']=="jpg"||obj['filetype']=="jpeg"||obj['filetype']=="bmp"){
+                    imageslist.push(obj);
+                }else{
+                    fileslist.push(obj);
+                }
+            }
+            ArrayTools.createArray(filesList,fileslist);
+            ArrayTools.createArray(imagesList,imageslist);
 
 
         }

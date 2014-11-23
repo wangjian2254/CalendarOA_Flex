@@ -1,6 +1,7 @@
 import control.CBorderContainer;
 import control.CalendarControl;
 import control.DepartmentControl;
+import control.FilesControl;
 import control.ProjectControl;
 import control.window.AddPersonPanel;
 import control.window.CheckApplyPanel;
@@ -175,11 +176,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 	menuflag = null;
 	var xml:XML = event.item as XML;
 	var mod:String = xml.attribute('mod').toString();
-    if(mod == 'calendar'){
-        scheduleComb.visible = true;
-    }else{
-        scheduleComb.visible = false;
-    }
+
 	var c:CBorderContainer;
 	c = cbar.getView(mod);
 	if (c == null) {
@@ -191,6 +188,9 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 				break;
 			case 'group':
 				c = new DepartmentControl();
+				break;
+			case 'files':
+				c = new FilesControl();
 				break;
 			case 'message':
 				var im:Object = openChatWindow();
@@ -234,6 +234,11 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 			cbar.addView(c);
 		}
 		website.text = c.label;
+	}
+	if(mod == 'calendar'){
+		scheduleComb.visible = true;
+	}else{
+		scheduleComb.visible = false;
 	}
 	
 }

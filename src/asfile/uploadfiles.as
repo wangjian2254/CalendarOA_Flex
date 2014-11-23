@@ -19,11 +19,11 @@ import httpcontrol.CHTTPService;
 import json.JParser;
 
 import mx.controls.Alert;
-import mx.managers.CursorManager;
-
 import spark.components.Image;
 
 import uicontrol.CProgressBar;
+
+import util.ToolUtil;
 
 private var upload_file:FileReference;
 private var upload_byteArray:ByteArray;
@@ -58,9 +58,7 @@ private function onProgress(e:ProgressEvent):void {
 	var proc:uint = e.bytesLoaded / e.bytesTotal * 100;
 	bar.setProgress(proc, 100);
 	bar.label = "当前进度: " + " " + proc + "%";
-	if (e.bytesLoaded == e.bytesTotal) {
-		CursorManager.removeBusyCursor();
-	}
+
 }
 
 private function uploadError(event:IOErrorEvent):void{
@@ -72,7 +70,8 @@ private function uploadError(event:IOErrorEvent):void{
 
 //上传图片到服务器
 private function proceedWithUpload(event:UploadFileEvent):void {
-	
+
+	// todo:修改成 从服务器端获取 两个 url，向bcs 提交
 	//进度监听
 	upload_file.addEventListener(ProgressEvent.PROGRESS, onProgress);
 	upload_file.addEventListener(IOErrorEvent.IO_ERROR,uploadError );
@@ -82,21 +81,16 @@ private function proceedWithUpload(event:UploadFileEvent):void {
 	request.data = new URLVariables();
 	request.data.status = event.data.status;
 	request.data.filename = event.data.filename;
-	if(event.data.hasOwnProperty("channel")){
-		request.data.channel = event.data.channel;
-	}
-	if(event.data.hasOwnProperty("scheduleid")){
-		request.data.schedule = event.data.scheduleid;
-	}
-	
-	
-	
+	request.data.pid=ToolUtil.sessionUser.pid;
+	request.data.oid = ToolUtil.sessionUser.oid;
+	request.data.chatflag = ToolUtil.sessionUser.chatflag;
+	request.data.ownertype = event.data.ownertype;
+	request.data.ownerpk = event.data.ownerpk;
+
 	bar = event.bar;
 	bar.visible = true;
 	
 	
-	//设置鼠标忙状态
-	CursorManager.setBusyCursor();
 	try {
 		upload_file.upload(request, 'file');
 		bar.issuccess=true;

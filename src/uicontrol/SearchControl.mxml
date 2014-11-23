@@ -46,6 +46,7 @@
         private var queryFlag:String=null;
         private function checkInput0():void {
 
+            //todo: 讨论组 搜索，只能是自己存在的讨论组。自己不存在的部门，可以搜索到，但是无法打开聊天。
             var str:String = input.text;
             if (str == "") {
                 PopUpManager.removePopUp(l);
