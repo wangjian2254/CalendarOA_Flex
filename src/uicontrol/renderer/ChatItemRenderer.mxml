@@ -11,18 +11,28 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
-        import events.ListClickEvent;
-
-        import flash.filters.BevelFilter;
-        import flash.filters.DropShadowFilter;
-        import flash.filters.GlowFilter;
-
-        import model.Schedule;
-
-        import uicontrol.AddressList;
-
-        import util.ScheduleUtil;
-        import util.ToolUtil;
+		import events.ListClickEvent;
+		import events.UploadFileEvent;
+		
+		import flash.filters.BevelFilter;
+		import flash.filters.DropShadowFilter;
+		import flash.filters.GlowFilter;
+		import flash.net.navigateToURL;
+		
+		import httpcontrol.HttpServiceUtil;
+		
+		import model.Schedule;
+		
+		import mx.rpc.events.ResultEvent;
+		
+		import uicontrol.AddressList;
+		
+		import util.ScheduleUtil;
+		import util.ToolUtil;
+		
+		[Bindable]
+		[Embed("/assets/img/yasuo.png")]
+		public static var yasuo:Class;
 
         [Bindable]
         private var dropBevelFilter:BevelFilter = new BevelFilter(10, 270, 0, 0, 0xffffff, .5, 8, 8, 8, 8);
@@ -77,16 +87,45 @@
                     chatstatus.horizontalAlign = "left";
                 }
             }
-            contentLabel.text = data.te;
-            contentLabel.setStyle("fontFamily", "simsun,MINGLIU");
-            contentLabel.setStyle("alignmentBaseline", "ideographicCenter");
-            contentLabel.setStyle("color", data.co);
-            contentLabel.validateNow();
+            
+			if(data.hasOwnProperty("filetype")){
+				contentLabel.visible = false;
+				imagefile.visible = false;
+				file.visible = false;
+				if(ToolUtil.filetypemap[data["filetype"]]){
+					imagefile.visible = true;
+					imagefile.source = data.shareurl;
+				}else{
+					file.visible = true;
+					file.label = data.te;
+				}
+			}else{
+				imagefile.visible = false;
+				file.visible = false;
+				contentLabel.visible = true;
+				contentLabel.text = data.te;
+				contentLabel.setStyle("fontFamily", "simsun,MINGLIU");
+				contentLabel.setStyle("alignmentBaseline", "ideographicCenter");
+				contentLabel.setStyle("color", data.co);
+				contentLabel.validateNow();
+			}
             back1.validateNow();
             showChatImg();
-
-
         }
+		
+		private function showbig():void{
+			var event:UploadFileEvent = new UploadFileEvent(UploadFileEvent.SHOWBIGIMAGE, data.shareurl,null);
+			dispatchEvent(event);
+		}
+		
+		private function filedown():void{
+
+			HttpServiceUtil.getCHTTPServiceAndResult("/ca/"+data.shareurl, function (result:Object, e:ResultEvent):void {
+				if (result.success) {
+					navigateToURL(new URLRequest(result.result),"_blank");
+				}
+			}, "POST").send();
+		}
 
         private function showChatImg():void {
             var person:Object = ToolUtil.getAnyPersonById(data.f);
@@ -257,8 +296,11 @@
                             <s:SolidColor  id="back20" color="#b0e861" alpha="1"/>
                         </s:backgroundFill>
                     </s:BorderContainer>
-                    <s:Label id="contentLabel" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
-                    <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
+                    <s:Label id="contentLabel" includeInLayout="{contentLabel.visible}" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
+                    <s:Image id="imagefile" includeInLayout="{imagefile.visible}" maxHeight="300" doubleClickEnabled="true" doubleClick="showbig()" />
+					<mx:LinkButton id="file" icon="{yasuo}" includeInLayout="{file.visible}"   textDecoration="underline" click="filedown()" ></mx:LinkButton>
+					
+					<s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
                         <mx:LinkButton id="myFZRButton" label="我来做" textDecoration="underline" click="mySchedule()" ></mx:LinkButton>
                         <mx:LinkButton id="selectFZRButton" label="我来审核"  textDecoration="underline" click="myCheckerSchedule()" ></mx:LinkButton>
                     </s:HGroup>

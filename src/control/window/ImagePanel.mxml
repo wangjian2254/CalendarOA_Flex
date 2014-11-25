@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-							 creationComplete="init()"  minWidth="600" minHeight="300" 
+							 creationComplete="init()"  minWidth="600" minHeight="300"  close="closePannel()"
 							 xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*" title="创建讨论组"> 
 
 	<fx:Script source="../../asfile/imageWindowAs.as" />
 <fx:Script><![CDATA[
+	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
 	import mx.managers.PopUpManager;
 
@@ -15,6 +16,14 @@
 	override public function releaseListener(e:CloseEvent):void {
 	}
 
+	private function imgshowcomplete(e:Event):void{
+		this.width = img.width;
+		this.height = img.height;
+		this.x = (FlexGlobals.topLevelApplication.width - img.width) / 2;
+		this.y = (FlexGlobals.topLevelApplication.height - img.height) / 2;
+		FlexGlobals.topLevelApplication.addEventListener(MouseEvent.CLICK, closePannel);
+	}
+	
 	private function closePannel():void{
 		PopUpManager.removePopUp(this);
 	}
@@ -24,10 +33,10 @@
 		<s:RadioButtonGroup id="statusRadio" >
 		</s:RadioButtonGroup>
 	</fx:Declarations>
-	<s:Image id="img" top="29"  >
+	<s:Image id="img" top="{editfilename?29:0}"  >
 		
 	</s:Image>
-	<s:HGroup left="10" top="3" height="28" verticalAlign="middle">
+	<s:HGroup left="10" top="3" height="28" verticalAlign="middle" visible="{editfilename}">
 		<s:Label text="文件名称：" />
 		<s:TextInput id="filename" width="150" text="{imgname}" >
 		</s:TextInput>

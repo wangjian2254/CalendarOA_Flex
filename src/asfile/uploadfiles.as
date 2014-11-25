@@ -15,10 +15,12 @@ import flash.net.URLVariables;
 import flash.utils.ByteArray;
 
 import httpcontrol.CHTTPService;
+import httpcontrol.HttpServiceUtil;
 
 import json.JParser;
 
 import mx.controls.Alert;
+
 import spark.components.Image;
 
 import uicontrol.CProgressBar;
@@ -72,6 +74,16 @@ private function uploadError(event:IOErrorEvent):void{
 private function proceedWithUpload(event:UploadFileEvent):void {
 
 	// todo:修改成 从服务器端获取 两个 url，向bcs 提交
+//	var param:Object = new Object();
+//	param.status = event.data.status;
+//	param.filename = event.data.filename;
+//	param.ownertype = event.data.ownertype;
+//	param.ownerpk = event.data.ownerpk;
+//	param.size = upload_file.size;
+//	param.name = upload_file.name;
+//	HttpServiceUtil.getCHTTPServiceAndResult("/ca/upload_files", function (result:Object, event:ResultEvent):void {
+//		ToolUtil.contactsRefresh();
+//	}, "POST").send(param);
 	//进度监听
 	upload_file.addEventListener(ProgressEvent.PROGRESS, onProgress);
 	upload_file.addEventListener(IOErrorEvent.IO_ERROR,uploadError );
@@ -110,10 +122,16 @@ private function uploadImageResult(e:DataEvent):void {
 		var result:Object = JParser.decode(e.data);
 		if (result.success == true) {
 			bar.issuccess = true;
+			if(ToolUtil.filetypemap[result.result["filetype"]]){
+				ToolUtil.imagesList.addItem(result.result);
+			}else{
+				ToolUtil.filesList.addItem(result.result);
+			}
+			uploadResult(result);
 			Alert.show("上传成功","提示",0x4,this);
 		}else{
 			bar.issuccess=false;
-			Alert.show("上传成功","提示",0x4,this);
+			Alert.show("上传失败","提示",0x4,this);
 		}
 		bar.visible = false;
 	} catch (error:Error) {

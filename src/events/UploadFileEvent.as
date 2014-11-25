@@ -11,6 +11,7 @@ public class UploadFileEvent extends Event {
 
     public static var UPLOAD:String = "upload_file";
     public static var CLOSED:String = "closed_file_upload";
+    public static var SHOWBIGIMAGE:String = "closed_file_upload";
 	
 	public var bar:CProgressBar=null;
 

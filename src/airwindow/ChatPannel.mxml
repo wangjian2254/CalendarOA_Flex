@@ -14,6 +14,7 @@
 			
 			private function init_owner():void{
 				chatTitleContainer.addEventListener(MouseEvent.MOUSE_DOWN, pushApp);
+				chatList.addEventListener(UploadFileEvent.SHOWBIGIMAGE, showBigImage);
 			}
 			
 			
@@ -40,7 +41,7 @@
 //			notice.type = NativeWindowType.UTILITY;
 			notice.systemChrome = NativeWindowSystemChrome.NONE;
 			if(chatUser.type == 'p' || chatUser.type == 'g'){
-				notice.status = 0;
+				notice.filestatus = 0;
 			}
 
 			notice.imagedata = s;
@@ -53,6 +54,12 @@
 				proceedWithUpload(event);
 			});
 		}
+			
+			private function showBigImage():void{
+				
+			}
+			
+			
 			
 		]]>
 	</fx:Script>

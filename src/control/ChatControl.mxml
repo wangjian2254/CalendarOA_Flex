@@ -93,7 +93,7 @@
 			private function showPic(s:Bitmap, defaultfilename:String=""):void{
 				var notice:ImagePanel = PopUpManager.createPopUp(this,ImagePanel,false) as ImagePanel;
 				if(chatUser.type == 'p' || chatUser.type == 'g'){
-					notice.status = 0;
+					notice.filestatus = 0;
 				}
 				notice.imagedata = s;
 				notice.imgname = defaultfilename;

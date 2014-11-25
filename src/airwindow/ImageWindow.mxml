@@ -7,12 +7,17 @@
 	</fx:Script>
 	<fx:Script><![CDATA[
 
+		
 		private function pushApp(e:MouseEvent):void{
 			if(this.nativeWindow.displayState== NativeWindowDisplayState.NORMAL){
 				this.nativeWindow.startMove();
 			}
 		}
 
+		private function imgshowcomplete(e:Event):void{
+			this.width = img.width;
+			this.height = img.height;
+		}
 		private function closePannel():void{
 			close();
 		}
@@ -23,10 +28,10 @@
 		<s:RadioButtonGroup id="statusRadio" >
 		</s:RadioButtonGroup>
 	</fx:Declarations>
-		<s:Image id="img" top="29"  >
+		<s:Image id="img" top="{editfilename?29:0}"  >
 			
 		</s:Image>
-		<s:HGroup left="10" top="3" height="28" verticalAlign="middle">
+		<s:HGroup left="10" top="3" height="28" verticalAlign="middle" visible="{editfilename}">
 			<s:Label text="文件名称：" />
 			<s:TextInput id="filename" width="150" text="{imgname}" >
 			</s:TextInput>

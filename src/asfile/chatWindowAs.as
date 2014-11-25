@@ -401,6 +401,14 @@ protected function sendBTN_clickHandler(event:MouseEvent = null):void {
 	//            chat['si'] =ns.value ;
 	chat['d'] = DateUtil.dateLblChat(new Date());
 	
+	sendChat(chat);
+	
+	
+	ti.text = '';
+	ti.setFocus();
+}
+
+private function sendChat(chat:Object):void{
 	if (chatUser.members == null) {
 		ChatManager.sendMessageToPerson(Number(chatUser.id), chat, function (data:Object):void {
 			al(data, chat);
@@ -417,10 +425,6 @@ protected function sendBTN_clickHandler(event:MouseEvent = null):void {
 		}
 		
 	}
-	
-	
-	ti.text = '';
-	ti.setFocus();
 }
 
 private function al(data:Object, chat:Object):void {
@@ -458,4 +462,16 @@ private function showSchedule():void {
 			closeContainer(null);
 		}
 	}, "POST").send(obj);
+}
+
+private function uploadResult(result:Object):void{
+	var chat:Object = new Object();
+	
+	chat['id'] = UUIDUtil.create();
+	chat['te'] = ToolUtil.sessionUser.name+"上传文件："+result.result.name;
+	chat['co'] = 0x000000;
+	chat['filetype'] = result.result.filetype;
+	chat['shareurl'] = result.result.shareurl;
+	chat['d'] = DateUtil.dateLblChat(new Date());
+	sendChat(chat);
 }

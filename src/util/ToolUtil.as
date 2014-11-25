@@ -46,6 +46,7 @@ public class ToolUtil
 
     public static var projectstatus:ArrayCollection=new ArrayCollection([{id:"unstart",label:"未开始"},{id:"runing",label:"正在进行"},{id:"finished",label:"已完成"},{id:"closed",label:"已关闭"}]);
     public static var taskstatusmap:Object = {"1":"未开始", "2":"正在进行", "3":"待审核", "4":"完成"};
+    public static var filetypemap:Object = {"gif":true, "png":true, "jpg":true, "jpeg":true, "bmp":true};
 //    public static var taskstatuslist:ArrayCollection=new ArrayCollection([{id:1,label:"未开始"},{id:2,label:"正在进行"},{id:3,label:"待审核"},{id:4,label:"完成"}]);
     public static var taskurgentlist:ArrayCollection=new ArrayCollection([{id:1,label:"普通"},{id:2,label:"优先"},{id:3,label:"紧急"}]);
 
@@ -573,7 +574,7 @@ public class ToolUtil
             var fileslist:Array = new Array();
             var imageslist:Array = new Array();
             for each(var obj:Object in result.result){
-                if(obj['filetype']=="gif"||obj['filetype']=="png"||obj['filetype']=="jpg"||obj['filetype']=="jpeg"||obj['filetype']=="bmp"){
+                if(filetypemap[obj['filetype']]){
                     imageslist.push(obj);
                 }else{
                     fileslist.push(obj);
