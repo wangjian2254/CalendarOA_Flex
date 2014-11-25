@@ -8,6 +8,51 @@
 	<fx:Script><![CDATA[
 
 		
+		private function init():void{
+			addEventListener(MouseEvent.MOUSE_DOWN,pushApp);
+			if(imagedata!=null){
+				var w:int=imagedata.width;
+				var scalex:Number=1;
+				var scaley:Number=1;
+				var scale:Number=1;
+				if(Capabilities.screenResolutionX < imagedata.width){
+					w = Capabilities.screenResolutionX;
+					
+					scalex = w / imagedata.width;
+				}
+				
+				var h:int = imagedata.height;
+				if(Capabilities.screenResolutionY < imagedata.height+29){
+					h = Capabilities.screenResolutionY - 29;
+					scaley = h / imagedata.height;
+				}
+				
+				if(scaley>scalex){
+					scale = scalex;
+				}else{
+					scale = scaley;
+				}
+				
+				imagedata.width *= scale;
+				imagedata.height *= scale;
+				if(imagedata.width>600){
+					this.width = imagedata.width;
+				}
+				if(imagedata.height>270){
+					this.height  = imagedata.height+29;
+				}
+				
+				
+				img.source = imagedata;
+				statusRadio.selectedValue=filestatus;
+			}else{
+				img.addEventListener(Event.COMPLETE,imgshowcomplete);
+				img.source = imagesrc;
+			}
+			
+			
+		}
+		
 		private function pushApp(e:MouseEvent):void{
 			if(this.nativeWindow.displayState== NativeWindowDisplayState.NORMAL){
 				this.nativeWindow.startMove();
@@ -15,7 +60,7 @@
 		}
 
 		private function imgshowcomplete(e:Event):void{
-			this.width = img.width;
+			this.width = img.width+10;
 			this.height = img.height;
 		}
 		private function closePannel():void{
@@ -28,7 +73,7 @@
 		<s:RadioButtonGroup id="statusRadio" >
 		</s:RadioButtonGroup>
 	</fx:Declarations>
-		<s:Image id="img" top="{editfilename?29:0}"  >
+		<s:Image id="img" top="{editfilename?29:0}" right="5" left="5" bottom="5" >
 			
 		</s:Image>
 		<s:HGroup left="10" top="3" height="28" verticalAlign="middle" visible="{editfilename}">

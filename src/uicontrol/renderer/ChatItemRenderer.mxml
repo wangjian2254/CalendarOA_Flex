@@ -107,8 +107,11 @@
 				contentLabel.setStyle("fontFamily", "simsun,MINGLIU");
 				contentLabel.setStyle("alignmentBaseline", "ideographicCenter");
 				contentLabel.setStyle("color", data.co);
-				contentLabel.validateNow();
+				
 			}
+			file.validateNow();
+			imagefile.validateNow();
+			contentLabel.validateNow();
             back1.validateNow();
             showChatImg();
         }
@@ -250,32 +253,37 @@
         protected function m_over():void {
             if ((data.hasOwnProperty('f') && data.f != 0 && !data.hasOwnProperty('t')) || (data.hasOwnProperty('t') && data.t != 0)) {
                 chatstatus.visible = true;
+				
             }
+			horizontalLayout.validateNow();
+			showChatImg();
 
 //            solidColor.color = 0x7ae7bf;
         }
 
         protected function m_out():void {
             chatstatus.visible = false;
+			horizontalLayout.validateNow();
+			showChatImg();
 //            solidColor.color = 0xffffff;
         }
         ]]></fx:Script>
 
-    <s:BorderContainer id="borderContainer" width="100%" minHeight="15" click="select_handler(event)" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()">
+	<!--<s:BorderContainer id="borderContainer" width="100%" minHeight="15" click="select_handler(event)" borderVisible="false" >-->
 
 
-        <!--<s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">-->
+	<!--<s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">-->
             <!--<s:fill>-->
                 <!--<s:SolidColor color="0xdbdbdb" />-->
             <!--</s:fill>-->
         <!--</s:Rect>-->
-        <s:Rect left="0" right="0" top="0" bottom="0">
-            <s:fill>
-                <s:SolidColor id="solidColor" color="0xe8e8e8"  />
-            </s:fill>
-        </s:Rect>
-        <s:VGroup width="100%" gap="0">
-        <s:HGroup id="dateGroup" width="100%"  horizontalAlign="center" verticalAlign="middle" >
+	<!--<s:Rect left="0" right="0" top="0" bottom="0">-->
+	<!-- <s:fill>-->
+	<!--     <s:SolidColor id="solidColor" color="0xe8e8e8"  />-->
+	<!--  </s:fill>-->
+	<!--  </s:Rect>-->
+        <s:VGroup width="100%" gap="0" mouseOut="m_out()" mouseOver="m_over()">
+        <s:HGroup id="dateGroup" width="100%" includeInLayout="{dateGroup.visible}"  horizontalAlign="center" verticalAlign="middle" >
             <s:Label id="dateLabel" color="#000000"></s:Label>
         </s:HGroup>
         <s:HGroup  verticalAlign="bottom" horizontalAlign="center" width="100%" gap="0" paddingRight="5" paddingLeft="5">
@@ -283,7 +291,7 @@
                 <uicontrol:HeadImage id="head"  width="25" height="25"/>
                 <s:Label id="nameLabel"  color="#000000"></s:Label>
             </s:VGroup>
-            <s:VGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="5" paddingLeft="5" paddingBottom="5">
+            <s:VGroup id="horizontalLayout" verticalAlign="top" width="100%" paddingRight="5" paddingLeft="5" paddingBottom="5" gap="0">
                 <s:BorderContainer id="back1"  cornerRadius="12" borderColor="#b0e861" borderStyle="solid"  filters="{[dropShadow,Inner]}" render="showChatImg()">
                     <s:backgroundFill>
                         <s:SolidColor  id="back10" color="#b0e861" alpha="1"/>
@@ -296,11 +304,12 @@
                             <s:SolidColor  id="back20" color="#b0e861" alpha="1"/>
                         </s:backgroundFill>
                     </s:BorderContainer>
-                    <s:Label id="contentLabel" includeInLayout="{contentLabel.visible}" maxDisplayedLines="-1" maxWidth="{borderContainer.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
-                    <s:Image id="imagefile" includeInLayout="{imagefile.visible}" maxHeight="300" doubleClickEnabled="true" doubleClick="showbig()" />
-					<mx:LinkButton id="file" icon="{yasuo}" includeInLayout="{file.visible}"   textDecoration="underline" click="filedown()" ></mx:LinkButton>
-					
-					<s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false">
+					<s:Group>
+						<s:Label id="contentLabel" includeInLayout="{contentLabel.visible}" maxDisplayedLines="-1" maxWidth="{this.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
+						<s:Image id="imagefile" includeInLayout="{imagefile.visible}" maxHeight="100" doubleClickEnabled="true" doubleClick="showbig()" />
+						<mx:LinkButton id="file"  includeInLayout="{file.visible}"   textDecoration="underline" click="filedown()" ></mx:LinkButton>
+					</s:Group>
+                    <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false" includeInLayout="{chatstatus.visible}">
                         <mx:LinkButton id="myFZRButton" label="我来做" textDecoration="underline" click="mySchedule()" ></mx:LinkButton>
                         <mx:LinkButton id="selectFZRButton" label="我来审核"  textDecoration="underline" click="myCheckerSchedule()" ></mx:LinkButton>
                     </s:HGroup>
@@ -313,5 +322,5 @@
 
         </s:HGroup>
         </s:VGroup>
-    </s:BorderContainer>
+	<!--</s:BorderContainer>-->
 </s:ItemRenderer>
