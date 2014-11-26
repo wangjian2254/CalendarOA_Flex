@@ -46,7 +46,11 @@ public class ToolUtil
 
     public static var projectstatus:ArrayCollection=new ArrayCollection([{id:"unstart",label:"未开始"},{id:"runing",label:"正在进行"},{id:"finished",label:"已完成"},{id:"closed",label:"已关闭"}]);
     public static var taskstatusmap:Object = {"1":"未开始", "2":"正在进行", "3":"待审核", "4":"完成"};
-    public static var filetypemap:Object = {"gif":true, "png":true, "jpg":true, "jpeg":true, "bmp":true};
+    public static var filetypemap:Object = {"gif":true, "png":true, "jpg":true, "jpeg":true};
+	public static var sizedw:int = 1024 * 1024;
+	public static var imgsize:int = 3;
+	public static var filesize:int = 10
+		
 //    public static var taskstatuslist:ArrayCollection=new ArrayCollection([{id:1,label:"未开始"},{id:2,label:"正在进行"},{id:3,label:"待审核"},{id:4,label:"完成"}]);
     public static var taskurgentlist:ArrayCollection=new ArrayCollection([{id:1,label:"普通"},{id:2,label:"优先"},{id:3,label:"紧急"}]);
 

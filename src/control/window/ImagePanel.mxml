@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
-							 creationComplete="init()"  minWidth="600" minHeight="300"  close="closePannel()"
+							 creationComplete="init()"  minWidth="700" minHeight="40"  close="closePannel()"
 							 xmlns:uicontrol="uicontrol.*" xmlns:window="control.window.*" title="创建讨论组"> 
 
 	<fx:Script source="../../asfile/imageWindowAs.as" />
@@ -40,16 +40,20 @@
 			if(imagedata.width>600){
 				this.width = imagedata.width;
 			}
-			if(imagedata.height>270){
+			if(imagedata.height>40){
 				this.height  = imagedata.height+29;
 			}
 			
 			
 			img.source = imagedata;
 			statusRadio.selectedValue=filestatus;
-		}else{
+		}
+		if(imagesrc!=null){
 			img.addEventListener(Event.COMPLETE,imgshowcomplete);
 			img.source = imagesrc;
+		}
+		if(imagesrc==null&&imagedata==null){
+			this.height = 40;
 		}
 		
 		
@@ -67,7 +71,7 @@
 	}
 	
 	private function closePannel():void{
-		PopUpManager.removePopUp(this);
+		closeWin();
 	}
 	]]></fx:Script>
 	<fx:Declarations>

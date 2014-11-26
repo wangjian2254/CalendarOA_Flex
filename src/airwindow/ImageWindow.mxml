@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:Window xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		  xmlns:s="library://ns.adobe.com/flex/spark" 
-		  xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" showStatusBar="false" minWidth="600" minHeight="300" xmlns:uicontrol="uicontrol.*" skinClass="skins.WindowChannelSkin">
+		  xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="init()" showStatusBar="false" minWidth="700" minHeight="40" xmlns:uicontrol="uicontrol.*" skinClass="skins.WindowChannelSkin">
 	<fx:Script source="../asfile/imageWindowAs.as">
 		
 	</fx:Script>
@@ -35,19 +35,23 @@
 				
 				imagedata.width *= scale;
 				imagedata.height *= scale;
-				if(imagedata.width>600){
+				if(imagedata.width>700){
 					this.width = imagedata.width;
 				}
-				if(imagedata.height>270){
+				if(imagedata.height>40){
 					this.height  = imagedata.height+29;
 				}
 				
 				
 				img.source = imagedata;
 				statusRadio.selectedValue=filestatus;
-			}else{
+			}
+			if(imagesrc!=null){
 				img.addEventListener(Event.COMPLETE,imgshowcomplete);
 				img.source = imagesrc;
+			}
+			if(imagesrc==null&&imagedata==null){
+				this.height = 40;
 			}
 			
 			
@@ -60,8 +64,8 @@
 		}
 
 		private function imgshowcomplete(e:Event):void{
-			this.width = img.width+10;
-			this.height = img.height;
+			this.width = img.imageDisplay.bitmapData.width+10;
+			this.height = img.imageDisplay.bitmapData.height;
 		}
 		private function closePannel():void{
 			close();
@@ -73,7 +77,7 @@
 		<s:RadioButtonGroup id="statusRadio" >
 		</s:RadioButtonGroup>
 	</fx:Declarations>
-		<s:Image id="img" top="{editfilename?29:0}" right="5" left="5" bottom="5" >
+		<s:Image id="img" top="29" right="5" left="5" bottom="5" >
 			
 		</s:Image>
 		<s:HGroup left="10" top="3" height="28" verticalAlign="middle" visible="{editfilename}">

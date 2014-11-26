@@ -472,6 +472,10 @@ private function uploadResult(result:Object):void{
 	chat['co'] = 0x000000;
 	chat['filetype'] = result.result.filetype;
 	chat['shareurl'] = result.result.shareurl;
+	if(result.result.hasOwnProperty("height")){
+		chat["height"]=result.result.height;
+	}
 	chat['d'] = DateUtil.dateLblChat(new Date());
 	sendChat(chat);
+	closeImage();
 }

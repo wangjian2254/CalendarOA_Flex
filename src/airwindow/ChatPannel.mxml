@@ -9,12 +9,23 @@
 	<fx:Script source="../asfile/chatWindowAs.as" />
 	<fx:Script>
 		<![CDATA[
+			import airwindow.tools.ScreenShot;
+			
+			import control.Loading;
+			
 			import events.CloseContainerEvent;
 			
+			import mx.graphics.codec.JPEGEncoder;
+			import mx.utils.Base64Encoder;
+			private var ss:ScreenShot = new ScreenShot();
 			
 			private function init_owner():void{
 				chatTitleContainer.addEventListener(MouseEvent.MOUSE_DOWN, pushApp);
 				chatList.addEventListener(UploadFileEvent.SHOWBIGIMAGE, showBigImage);
+				
+				stage.addEventListener(KeyboardEvent.KEY_DOWN, onKDown);
+				ss.addEventListener(ScreenShot.SHOT_COMPLETE,onComplete);
+				
 			}
 			
 			
@@ -35,8 +46,23 @@
 				var event:CloseEvent = new CloseEvent(CloseEvent.CLOSE);
 				dispatchEvent(event);
 			}
+			private var notice:ImageWindow;
+			private function closeImage():void{
+				if(notice==null){
+					return;
+				}
+				notice.close();
+			}
 		private function showPic(s:Bitmap, defaultfilename:String=""):void{
-			var notice:ImageWindow = new ImageWindow();
+			if(s==null){
+				var event:UploadFileEvent = new UploadFileEvent(UploadFileEvent.UPLOAD,{filename:defaultfilename,status:1},bar);
+				event.data.ownertype = chatUser.type;
+				event.data.ownername = chatUser.name.substr(0,60);
+				event.data.ownerpk = chatUser.id;
+				proceedWithUpload(event);
+				return;
+			}
+			notice = new ImageWindow();
 			notice.transparent = true;
 //			notice.type = NativeWindowType.UTILITY;
 			notice.systemChrome = NativeWindowSystemChrome.NONE;
@@ -44,8 +70,11 @@
 				notice.filestatus = 0;
 			}
 
+
 			notice.imagedata = s;
 			notice.imgname = defaultfilename;
+
+			
 			notice.open();
 			notice.addEventListener(UploadFileEvent.UPLOAD,function(event:UploadFileEvent):void{
 				event.data.ownertype = chatUser.type;
@@ -55,18 +84,64 @@
 			});
 		}
 			
-			private function showBigImage():void{
+			private function showBigImage(e:UploadFileEvent):void{
+				var notice:ImageWindow = new ImageWindow();
+				notice.transparent = true;
+				//			notice.type = NativeWindowType.UTILITY;
+				notice.systemChrome = NativeWindowSystemChrome.NONE;
 				
+				
+				notice.imagesrc = e.data.toString();
+				notice.editfilename = false;
+				notice.open();
 			}
 			
+			private function screenshot():void{
+				ss.shot();
+			}
 			
+			private function onKDown(e:KeyboardEvent):void {
+				if (e.altKey && e.ctrlKey && e.keyCode == 65) {
+					ss.shot();
+				}
+			}
+			
+			protected function onComplete(event:Event):void
+			{
+				var j:JPEGEncoder = new JPEGEncoder();
+				var base:Base64Encoder=new Base64Encoder();
+				base.encodeBytes(j.encode(ss.bitmapData));
+				var data:Object = new Object();
+				data.status = 1;
+				data.filename = "liyu-"+DateUtil.dateLbl3(new Date())+".jpg";
+				data.pid=ToolUtil.sessionUser.pid;
+				data.oid = ToolUtil.sessionUser.oid;
+				data.chatflag = ToolUtil.sessionUser.chatflag;
+				data.ownertype = chatUser.type;
+				data.ownername = chatUser.name.substr(0,60)
+				data.ownerpk = chatUser.id;
+				if(ss.bitmapData.height>300){
+					data.height=300;
+				}else{
+					data.height=ss.bitmapData.height;
+				}
+				data.file = base.toString();
+				
+				var h:CHTTPService = HttpServiceUtil.getCHTTPServiceAndResult("/ca/upload_files", function (result:Object, event:ResultEvent):void {
+					uploadResult(result);
+				}, "POST");
+				h.loading = new Loading();
+				h.loading.fatherDisplay = this;
+				h.send(data);
+				
+			}
 			
 		]]>
 	</fx:Script>
 	<fx:Script source="../asfile/uploadfiles.as" />
-	<airwindow:layout>
-		<s:VerticalLayout gap="2" paddingBottom="10" paddingRight="10" paddingLeft="10" paddingTop="0" />
-	</airwindow:layout>
+
+	<s:VGroup gap="2" paddingBottom="10" paddingRight="10" paddingLeft="10" paddingTop="0" width="100%" height="100%">
+		
 	<s:HGroup id="chatTitleContainer" width="100%" height="41" verticalAlign="middle"  >
 
 		<uicontrol:HeadImage id="head" width="35" height="35"/>
@@ -101,10 +176,10 @@
 			<!--/>-->
 			<s:HGroup width="100%" height="41" horizontalAlign="left" verticalAlign="middle" gap="3">
 				<mx:ColorPicker id="cp"/>
-				<s:Button skinClass="skins.BtnJiePingSkin" buttonMode="true" toolTip="截屏" />
+				<s:Button skinClass="skins.BtnJiePingSkin" buttonMode="true" toolTip="截屏" click="screenshot()" />
 				<s:Button skinClass="skins.BtnTuPianSkin" buttonMode="true" toolTip="上传图片" click="uploadFile('pic')" />
-				<s:Button skinClass="skins.BtnWenJianSkin" buttonMode="true" toolTip="传输文件(服务器保存7天)"/>
-				<s:Button skinClass="skins.BtnShangChuanSkin" buttonMode="true" toolTip="上传文件(永久保存)"  click="uploadFile('file')" />
+				<!--<s:Button skinClass="skins.BtnWenJianSkin" buttonMode="true"  toolTip="传输文件(服务器保存7天)"/>-->
+				<s:Button skinClass="skins.BtnShangChuanSkin" buttonMode="true" toolTip="上传文件"  click="uploadFile('file')" />
 				<s:Spacer width="100%">
 
 				</s:Spacer>
@@ -130,5 +205,6 @@
 
 
 	</s:HGroup>
-
+	</s:VGroup>
+	<uicontrol:CProgressBar id="bar" width="100%" height="100%" visible="false" />
 </airwindow:CWindow>

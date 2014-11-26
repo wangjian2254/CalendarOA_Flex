@@ -57,7 +57,8 @@
 			
 
 			private function init_owner():void{
-				
+				chatList.addEventListener(UploadFileEvent.SHOWBIGIMAGE, showBigImage);
+
 			}
 			
 			
@@ -90,7 +91,23 @@
 					isread = false;
 				}
 			}
+			private var notice:ImagePanel;
+			private function closeImage():void{
+				if(notice==null){
+					return;
+				}
+				notice.closeWin();
+			}
+			
 			private function showPic(s:Bitmap, defaultfilename:String=""):void{
+				if(s==null){
+					var event:UploadFileEvent = new UploadFileEvent(UploadFileEvent.UPLOAD,{filename:defaultfilename,status:1},bar);
+					event.data.ownertype = chatUser.type;
+					event.data.ownername = chatUser.name.substr(0,60);
+					event.data.ownerpk = chatUser.id;
+					proceedWithUpload(event);
+					return;
+				}
 				var notice:ImagePanel = PopUpManager.createPopUp(this,ImagePanel,false) as ImagePanel;
 				if(chatUser.type == 'p' || chatUser.type == 'g'){
 					notice.filestatus = 0;
@@ -105,15 +122,23 @@
 				});
 			}
 			
+			private function showBigImage(e:UploadFileEvent):void{
+				var notice:ImagePanel = PopUpManager.createPopUp(this,ImagePanel,false) as ImagePanel;
+								
+				
+				notice.imagesrc = e.data.toString();
+				notice.editfilename = false;
+			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
 	<fx:Script source="../asfile/uploadfiles.as" />
-	<control:layout>
-		<s:VerticalLayout gap="2" paddingBottom="10" paddingRight="10" paddingLeft="10" paddingTop="0" />
-	</control:layout>
+
+	<s:VGroup gap="2" paddingBottom="10" paddingRight="10" paddingLeft="10" paddingTop="0" width="100%" height="100%">
+		
 	<s:HGroup id="chatTitleContainer" width="100%" height="41" verticalAlign="middle"  >
 		
 		<uicontrol:HeadImage id="head" width="35" height="35"/>
@@ -173,6 +198,7 @@
 		
 		
 	</s:HGroup>
-
+	</s:VGroup>
+	<uicontrol:CProgressBar id="bar" width="100%" height="100%" visible="false" />
 
 </control:CBorderContainer>

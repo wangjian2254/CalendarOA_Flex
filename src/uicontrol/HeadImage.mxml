@@ -19,7 +19,12 @@
 
 		public function set source(s:Object):void {
 			if (s is String) {
-				_source = CHTTPService.baseUrl + s;
+				if(s.indexOf("http")!=0){
+					_source = CHTTPService.baseUrl + s;
+				}else{
+					_source = s;
+				}
+				
 			} else {
 				_source = s;
 			}

@@ -33,14 +33,13 @@ private var upload_byteArray:ByteArray;
 private var upload_loader:Loader = new Loader();
 
 
-private var bar:CProgressBar;
+private var tempbar:CProgressBar;
+
 
 private function uploadFile(filetype:String):void{
-	
 	upload_file = new FileReference();
 	upload_file.addEventListener(Event.SELECT, fileReferenceSelectHandler);
 	upload_file.addEventListener(DataEvent.UPLOAD_COMPLETE_DATA, uploadImageResult);
-	
 	upload_file.browse();
 	
 }
@@ -58,14 +57,14 @@ private function uploadFile(filetype:String):void{
 private function onProgress(e:ProgressEvent):void {
 	//				lbProgress.text=" 已上传 " + e.bytesLoaded + " 字节，共 " + e.bytesTotal + " 字节";
 	var proc:uint = e.bytesLoaded / e.bytesTotal * 100;
-	bar.setProgress(proc, 100);
-	bar.label = "当前进度: " + " " + proc + "%";
+	tempbar.setProgress(proc, 100);
+	tempbar.label = "当前进度: " + " " + proc + "%";
 
 }
 
 private function uploadError(event:IOErrorEvent):void{
-	bar.issuccess=false;
-	bar.visible = false;
+	tempbar.issuccess=false;
+	tempbar.visible = false;
 	Alert.show("上传失败，请稍后重新上传。","提示");
 	
 }
@@ -84,6 +83,18 @@ private function proceedWithUpload(event:UploadFileEvent):void {
 //	HttpServiceUtil.getCHTTPServiceAndResult("/ca/upload_files", function (result:Object, event:ResultEvent):void {
 //		ToolUtil.contactsRefresh();
 //	}, "POST").send(param);
+	var filetype:String = upload_file.name.split(".")[upload_file.name.split(".").length-1];
+	if(!ToolUtil.filetypemap[filetype]){
+		if(upload_file.size>ToolUtil.imgsize * ToolUtil.sizedw){
+			Alert.show("图片文件，大小不能超过3MB。","提示",0x4,this);
+			return;
+		}
+	}else{
+		if(upload_file.size>ToolUtil.filesize * ToolUtil.sizedw){
+			Alert.show("文件大小不能超过10MB。","提示",0x4,this);
+			return;
+		}
+	}
 	//进度监听
 	upload_file.addEventListener(ProgressEvent.PROGRESS, onProgress);
 	upload_file.addEventListener(IOErrorEvent.IO_ERROR,uploadError );
@@ -98,18 +109,22 @@ private function proceedWithUpload(event:UploadFileEvent):void {
 	request.data.chatflag = ToolUtil.sessionUser.chatflag;
 	request.data.ownertype = event.data.ownertype;
 	request.data.ownerpk = event.data.ownerpk;
+	if(event.data.hasOwnProperty("height")){
+		request.data.height = event.data.height;
+	}
+	
 
-	bar = event.bar;
-	bar.visible = true;
+	tempbar = event.bar;
+	tempbar.visible = true;
 	
 	
 	try {
 		upload_file.upload(request, 'file');
-		bar.issuccess=true;
+		tempbar.issuccess=true;
 	}
 	catch (error:Error) {
 		Alert.show("上传失败");
-		bar.visible = false;
+		tempbar.visible = false;
 	}
 	
 	
@@ -121,7 +136,7 @@ private function uploadImageResult(e:DataEvent):void {
 	try {
 		var result:Object = JParser.decode(e.data);
 		if (result.success == true) {
-			bar.issuccess = true;
+			tempbar.issuccess = true;
 			if(ToolUtil.filetypemap[result.result["filetype"]]){
 				ToolUtil.imagesList.addItem(result.result);
 			}else{
@@ -130,10 +145,10 @@ private function uploadImageResult(e:DataEvent):void {
 			uploadResult(result);
 			Alert.show("上传成功","提示",0x4,this);
 		}else{
-			bar.issuccess=false;
+			tempbar.issuccess=false;
 			Alert.show("上传失败","提示",0x4,this);
 		}
-		bar.visible = false;
+		tempbar.visible = false;
 	} catch (error:Error) {
 		
 		var i:Number = 1;
@@ -144,19 +159,32 @@ private function uploadImageResult(e:DataEvent):void {
 private function fileReferenceCompleteHandler(e:Event):void {
 	upload_file.removeEventListener(Event.COMPLETE,fileReferenceCompleteHandler);
 //	upload_byteArray = ;
-	upload_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleteHandler);
-	upload_loader.loadBytes(upload_file.data);
+	var filetype:String = upload_file.name.split(".")[upload_file.name.split(".").length-1];
+	if(!ToolUtil.filetypemap[filetype]){
+		//		upload_bitmapData = bitmap.bitmapData;
+		showPic(null, upload_file.name);
+	}else{
+		upload_loader.contentLoaderInfo.addEventListener(Event.COMPLETE, loaderCompleteHandler);
+		upload_loader.loadBytes(upload_file.data);
+	}
+	
 	
 }
 
 //图片载入完成显示在预览框中
 private function loaderCompleteHandler(e:Event):void {
 	try{
-		var bitmap:Bitmap = Bitmap(upload_loader.content);
-//		upload_bitmapData = bitmap.bitmapData;
-		showPic(bitmap, upload_file.name);
+		var filetype:String = upload_file.name.split(".")[upload_file.name.split(".").length-1];
+		if(ToolUtil.filetypemap[filetype]){
+			var bitmap:Bitmap = Bitmap(upload_loader.content);
+			//		upload_bitmapData = bitmap.bitmapData;
+			showPic(bitmap, upload_file.name);
+		}else{
+			showPic(null, upload_file.name);
+		}
+		
 	}catch(err:Error){
-//		showPic("");
+		
 	}
 	
 //	img.source = bitmap;

@@ -87,7 +87,7 @@
                     chatstatus.horizontalAlign = "left";
                 }
             }
-            
+			imagefile.height = 0;
 			if(data.hasOwnProperty("filetype")){
 				contentLabel.visible = false;
 				imagefile.visible = false;
@@ -95,6 +95,9 @@
 				if(ToolUtil.filetypemap[data["filetype"]]){
 					imagefile.visible = true;
 					imagefile.source = data.shareurl;
+					if(data.hasOwnProperty("height")){
+						imagefile.height = new Number(data.height);
+					}
 				}else{
 					file.visible = true;
 					file.label = data.te;
@@ -306,10 +309,10 @@
                     </s:BorderContainer>
 					<s:Group>
 						<s:Label id="contentLabel" includeInLayout="{contentLabel.visible}" maxDisplayedLines="-1" maxWidth="{this.width*0.8}" paddingTop="2" paddingLeft="10" paddingRight="10"  ></s:Label>
-						<s:Image id="imagefile" includeInLayout="{imagefile.visible}" maxHeight="100" doubleClickEnabled="true" doubleClick="showbig()" />
+						<uicontrol:HeadImage id="imagefile" includeInLayout="{imagefile.visible}" maxHeight="300" maxWidth="500" doubleClickEnabled="true" doubleClick="showbig()" />
 						<mx:LinkButton id="file"  includeInLayout="{file.visible}"   textDecoration="underline" click="filedown()" ></mx:LinkButton>
 					</s:Group>
-                    <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false" includeInLayout="{chatstatus.visible}">
+                    <s:HGroup id="chatstatus" verticalAlign="top" width="100%" paddingRight="10" paddingLeft="10" visible="false" >
                         <mx:LinkButton id="myFZRButton" label="我来做" textDecoration="underline" click="mySchedule()" ></mx:LinkButton>
                         <mx:LinkButton id="selectFZRButton" label="我来审核"  textDecoration="underline" click="myCheckerSchedule()" ></mx:LinkButton>
                     </s:HGroup>

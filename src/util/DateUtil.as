@@ -19,6 +19,10 @@ public class DateUtil
 		myDateFormatter1.formatString="YYYYMMDD";
         public static var myDateFormatter2:DateFormatter=new DateFormatter();
         myDateFormatter2.formatString="YYYY/MM/DD HH:NN:SS";
+		
+		public static var myDateFormatter3:DateFormatter=new DateFormatter();
+		myDateFormatter3.formatString="YYYY-MM-DD-HH-NN-SS";
+		
 		public static function dateLblChat(currentDate:Date):String{
 			return myDateFormatter2.format(currentDate);
 		}
@@ -29,6 +33,10 @@ public class DateUtil
         public static function dateLbl1(currentDate:Date):String{
             return myDateFormatter1.format(currentDate);
         }
+		public static function dateLbl3(currentDate:Date):String{
+			return myDateFormatter3.format(currentDate);
+		}
+		
         public static function parseLblDate(value:String):Date{
             if (!value){
                 return new Date();

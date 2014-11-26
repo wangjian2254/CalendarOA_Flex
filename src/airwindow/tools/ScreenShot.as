@@ -10,6 +10,7 @@ package airwindow.tools
 	import flash.events.NativeProcessExitEvent;
 	import flash.external.ExtensionContext;
 	import flash.filesystem.File;
+	import flash.system.Capabilities;
 
 	public class ScreenShot extends EventDispatcher
 	{
@@ -19,15 +20,25 @@ package airwindow.tools
 		private var _nativeProcessStartupInfo:NativeProcessStartupInfo = null;
 		private var _process:NativeProcess = null;
 		private var _bitmapData:BitmapData = null;
+		protected var os:String = Capabilities.os.toLowerCase();
 		
 		public function ScreenShot()
 		{
-			_file = File.applicationDirectory.resolvePath("capture.app/Contents/MacOS/applet");
-//			_file = File.applicationDirectory.resolvePath("capture.scpt");
+			if (os.indexOf("mac") > -1)
+			{
+				_file = File.applicationDirectory.resolvePath("capture.app/Contents/MacOS/applet");
+				//			_file = File.applicationDirectory.resolvePath("capture.scpt");
+				
+			}
+			if (os.indexOf("win") > -1)
+			{
+				_file = File.applicationDirectory.resolvePath("SnapShot.exe");
+			}
 			_nativeProcessStartupInfo = new NativeProcessStartupInfo();
 			_nativeProcessStartupInfo.executable = _file;
 			_process = new NativeProcess();
 			_shotCompleteEvent = new Event(SHOT_COMPLETE);
+			
 		}
 		
 		

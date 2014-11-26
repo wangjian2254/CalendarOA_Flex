@@ -58,8 +58,8 @@ public function openChatWindow():Object
 }
 
 public function initAir():void{
-    CHTTPService.baseUrl = "http://192.168.101.18:8000";
-//    CHTTPService.baseUrl = "http://liyuoa.duapp.com";
+//    CHTTPService.baseUrl = "http://192.168.101.18:8000";
+    CHTTPService.baseUrl = "http://liyuoa.duapp.com";
 	header.addEventListener(MouseEvent.MOUSE_DOWN,pushApp);
 	
 	callLater(moveCenter);

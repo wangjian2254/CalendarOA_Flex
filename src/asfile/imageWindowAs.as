@@ -19,7 +19,13 @@ public var imgname:String = "";
 
 
 private function save():void{
-	dispatchEvent(new UploadFileEvent(UploadFileEvent.UPLOAD,{filename:filename.text,status:statusRadio.selectedValue},bar));
+	var data:Object = {filename:filename.text,status:statusRadio.selectedValue};
+	if(img.height>300){
+		data.height=300;
+	}else{
+		data.height=img.height;
+	}
+	dispatchEvent(new UploadFileEvent(UploadFileEvent.UPLOAD,data,bar));
 }
 private function closeimg():void{
 	dispatchEvent(new UploadFileEvent(UploadFileEvent.CLOSED,null,null));

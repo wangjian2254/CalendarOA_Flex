@@ -29,11 +29,18 @@ public class CHTTPService extends HTTPService
 
 		public function get loading():Loading
 		{
+			if(_loading!=null){
+				return _loading;
+			}
 			if(LoadingUtil.loading==null){
 				throw "没有遮罩层……";
 			}
 			return LoadingUtil.loading;
 //			return _loading;
+		}
+		
+		public function set loading(l:Loading):void{
+			_loading=l;
 		}
 		
 		override public function send(parameters:Object = null):AsyncToken

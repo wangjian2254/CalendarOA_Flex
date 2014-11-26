@@ -7,19 +7,33 @@
 		<![CDATA[
 		import mx.core.FlexGlobals;
 		import mx.managers.PopUpManager;
+			public var fatherDisplay:DisplayObject;
 
 		private var num:int = 0;
 
 		public function showIn():void {
-			this.width = FlexGlobals.topLevelApplication.width;
-			this.height = FlexGlobals.topLevelApplication.height;
 			num++;
 			this.visible = true;
-			if (this.parent == null) {
-				PopUpManager.addPopUp(this, FlexGlobals.topLevelApplication as DisplayObject, true);
+			if(fatherDisplay==null){
+				this.width = FlexGlobals.topLevelApplication.width;
+				this.height = FlexGlobals.topLevelApplication.height;
+				
+				
+				if (this.parent == null) {
+					PopUpManager.addPopUp(this, FlexGlobals.topLevelApplication as DisplayObject, true);
+				}
+				PopUpManager.bringToFront(this);
+				PopUpManager.centerPopUp(this);
+			}else{
+				this.width = fatherDisplay.width;
+				this.height = fatherDisplay.height;
+				if (this.parent == null) {
+					PopUpManager.addPopUp(this, fatherDisplay, true);
+				}
+				PopUpManager.bringToFront(this);
+				PopUpManager.centerPopUp(this);
 			}
-			PopUpManager.bringToFront(this);
-			PopUpManager.centerPopUp(this);
+			
 //				if(num>0){
 
 //				}
