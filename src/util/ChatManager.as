@@ -33,7 +33,7 @@ import uicontrol.NewsPannel;
 [Event(name="sys", type = "org.idream.pomelo.PomeloEvent")]
 
 public class ChatManager {
-    private static var time:Timer = new Timer(1000*30,1);
+    private static var time:Timer = new Timer(1000*10,1);
     public static var type:String = "flex";
 
     [Bindable]
@@ -142,12 +142,12 @@ public class ChatManager {
             pomelo_online=false;
             loginChat(null);
         }else{
-            if(pomelo_error){
-                Alert.show("即时通信服务正在维护中，目前不可使用。");
-            }
+//            if(pomelo_error){
+//                Alert.show("即时通信服务正在维护中，目前不可使用。");
+//            }
             time.start();
         }
-        pomelo_error = true;
+//        pomelo_error = true;
     }
     static private function not_pomelo_handler(e:Event):void{
         pomelo_online=false;
