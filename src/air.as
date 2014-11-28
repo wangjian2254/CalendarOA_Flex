@@ -14,6 +14,7 @@ import mx.events.CloseEvent;
 
 import org.idream.pomelo.Pomelo;
 
+import util.ChatManager;
 import util.ToolUtil;
 
 public function quite(e:*=null):void {
@@ -76,6 +77,9 @@ public function initAir():void{
 public function openChatManager():void{
 	
 	callLater(openChatWindow);
+	if(chatWindow!=null){
+		chatWindow.init();
+	}
 }
 
 public function moveCenter():void

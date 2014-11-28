@@ -52,7 +52,12 @@
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-            regetSchedule();
+            //todo:日历界面，的用户改变事件，涉及到全局任务的变化，所以由clandar.as 监听
+//            var parm:Object = getShowDateRange();
+//            if(parm==null){
+//                return;
+//            }
+//            ToolUtil.getScheduleByDate(parm.start,parm.end);
         }
 
         override public function closeContainer(e:CloseContainerEvent):void {

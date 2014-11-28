@@ -12,6 +12,7 @@ import mx.rpc.events.ResultEvent;
 import mx.rpc.http.HTTPService;
 
 import util.LoadingUtil;
+import util.ToolUtil;
 
 public class CHTTPService extends HTTPService
 	{
@@ -50,11 +51,14 @@ public class CHTTPService extends HTTPService
                 if(this.url.indexOf(baseUrl)<0){
                     this.url=baseUrl+this.url;
                 }
-//				if(this.url.indexOf("?")!=-1){
-//					this.url+="&requesttimestr="+(new Date()).toString();
-//				}else{
-//					this.url+="?requesttimestr="+(new Date()).toString();
-//				}
+				if( ToolUtil.sessionUser && ToolUtil.sessionUser.hasOwnProperty("oid")){
+					if(this.url.indexOf("?")!=-1 ){
+						this.url+="&oid="+ToolUtil.sessionUser.oid;
+					}else{
+						this.url+="?oid="+ToolUtil.sessionUser.oid;
+					}
+				}
+
 				return super.send(parameters);
 			}catch(e:Error){
 				this.loading.showOut();

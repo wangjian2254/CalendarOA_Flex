@@ -1059,7 +1059,7 @@
             </mx:ControlBar>
         </s:Form>
 
-        <control:ChatControl id="chatControl" width="500" height="{schedulePanel.height}"  bigPanel="false"  visible="false" includeInLayout="{chatControl.visible}">
+        <control:ChatControl id="chatControl" width="600" height="{schedulePanel.height}"  bigPanel="false"  visible="false" includeInLayout="{chatControl.visible}">
 
         </control:ChatControl>
     </s:HGroup>

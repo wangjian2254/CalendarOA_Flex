@@ -122,6 +122,9 @@ public class ToolUtil
     public static function resultFinduser(result:Object,e:ResultEvent):void{
         if(result.success==true){
             if(sessionUser==null||sessionUser["pid"]!=result.result["pid"]){
+                clearScheduleTarget();
+                clearOutScheduleMap();
+                clearGroupList();
                 FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr,result.result,true));
             }
             sessionUser=result.result;
@@ -175,9 +178,10 @@ public class ToolUtil
 
     public static function changeProjectByDepart(depart_id:int,person_id:int,membersDownList:DropDownList,projectDownList:DropDownList):void{
         membersByDepart.removeAll();
-        membersByDepart.addItem({id:-1, name:"所有人"});
+
         for each(var d:Object in departMentList){
             if(d.id == depart_id){
+                membersByDepart.addItem({id:-1, name:d.name+" 所有人"});
                 for each(var i:int in d.members){
                     if(getActivePersonById(i)!=null){
                         membersByDepart.addItem(getActivePersonById(i));
@@ -259,7 +263,7 @@ public class ToolUtil
                     }
                 }
             }
-
+            ToolUtil.groupList.refresh();
 //            myDepartmentList.removeAll();
             var l:ArrayCollection = ObjectUtil.copy(ToolUtil.departMentList) as ArrayCollection;
             var mydepartlist:ArrayCollection = new ArrayCollection();
@@ -418,6 +422,10 @@ public class ToolUtil
 
     [Bindable]
     public static var groupList:ArrayCollection=new ArrayCollection();
+
+    public static function clearGroupList():void{
+        ArrayTools.createArray(groupList,new Array());
+    }
 
     [Bindable]
     public static var projectList:ArrayCollection=new ArrayCollection();
@@ -673,6 +681,11 @@ public class ToolUtil
 
 
     private static var queryScheduleTargetObj:Object={pid:null,depart_id:null,project_id:null};
+    public static function clearScheduleTarget():void{
+        queryScheduleTargetObj.pid = null;
+        queryScheduleTargetObj.depart_id = null;
+        queryScheduleTargetObj.project_id = null;
+    }
     public static function getScheduleByDate(start:String,end:String,pid:int=-1,departid:int=-1,projectid:int=-1):void{
         var obj:Object = new Object();
         obj["startdate"] = start;
@@ -726,9 +739,7 @@ public class ToolUtil
                 ScheduleUtil.updateSchedulePanel(schedule.id);
             }
             if(result.result.hasOwnProperty("out_schedulelist")){
-                outScheduleMap= new Object();
-                outScheduleMap['out_schedule_list']=new Array();
-                outScheduleMap['schedulemap']=new Object();
+                clearOutScheduleMap();
                 for each(obj in result.result.out_schedulelist){
                     schedule = new Schedule(obj);
                     outScheduleMap['schedulemap'][schedule.id] = schedule;
@@ -742,6 +753,12 @@ public class ToolUtil
 
             FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
         }
+    }
+
+    public static function clearOutScheduleMap():void{
+        outScheduleMap= new Object();
+        outScheduleMap['out_schedule_list']=new Array();
+        outScheduleMap['schedulemap']=new Object();
     }
 
     public static function updateSchedul(id:String, schedule:Schedule):void{

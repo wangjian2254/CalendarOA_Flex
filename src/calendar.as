@@ -1,6 +1,7 @@
 // ActionScript file
 import control.CBorderContainer;
 import control.window.ChangePasswordPanel;
+import control.window.SelectOrgPanel;
 import control.window.UserInfoPanel;
 
 import events.ChangeMenuEvent;
@@ -98,6 +99,9 @@ public function init():void {
 
         }
         ToolUtil.getScheduleByDate(e.start,e.end,e.pid,e.depart_id,e.project_id);
+    });
+    FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,function(event:ChangeUserEvent):void{
+        queryMySchedule();
     });
 }
 
@@ -209,4 +213,10 @@ public function searcher():void{
 
 public function reLogin():void {
 	FlexGlobals.topLevelApplication.dispatchEvent(new ChangeUserEvent(ChangeUserEvent.ChangeUser_EventStr, ToolUtil.sessionUser, true));
+}
+
+public function reSelectOrg():void{
+	ToolUtil.selectOrg.loginNickname = ToolUtil.sessionUser.uname;
+	PopUpManager.addPopUp(ToolUtil.selectOrg, FlexGlobals.topLevelApplication as DisplayObject, true);
+	return;
 }

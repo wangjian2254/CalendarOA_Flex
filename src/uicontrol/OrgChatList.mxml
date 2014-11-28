@@ -64,7 +64,7 @@
 
             head.source = ChatManager.liyu['icon'];
             nameLabel.text = ChatManager.liyu['name'];
-
+            (addressList.dataProvider as ArrayCollection).refresh();
         }
 
 

@@ -215,7 +215,7 @@ public class ChatManager {
             Pomelo.getIns().addEventListener('joinChannel', joinChannelHandler);
 //            clearUser();
 
-            var groups:ArrayCollection=new ArrayCollection();
+            var groups:Array=new Array();
             var channels:Array = new Array();
             var g:ChatChannel;
             for each(var channel:Object in data.channels){
@@ -228,7 +228,7 @@ public class ChatManager {
                 }
                 g=new ChatChannel(channel);
                 g.delable = true;
-                groups.addItem(g);
+                groups.push(g);
 //                if(channel.channel.substr(0,1)=="g"){
 //                    g['id']=channel.channel.substr(1, channel.channel.length - 1);
 //                    g['icon']='/static/smalloaicon/group.png';
@@ -282,7 +282,7 @@ public class ChatManager {
 
 
             }
-            ToolUtil.groupList = groups;
+            ArrayTools.createArray(ToolUtil.groupList,groups);
             Pomelo.getIns().on("channelCount",function(msg:PomeloEvent):void{
                 if(msg.message.channel.substr(0,1)=='0'){
                     liyuunread=msg.message.count;

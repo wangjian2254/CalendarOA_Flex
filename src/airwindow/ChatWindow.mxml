@@ -272,7 +272,7 @@
 		<uicontrol:HeadImage id="myhead" isPerson="true"  width="45" height="45">
 			
 		</uicontrol:HeadImage>
-		<s:Label text="{ToolUtil.sessionUser.name}" />
+		<s:Label text="{ToolUtil.sessionUser.name}|{ToolUtil.sessionUser.org_name}" />
 		<s:Spacer width="100%">
 			
 		</s:Spacer>

@@ -55,6 +55,8 @@
 				</s:layout>
 				
 				
+				<mx:LinkButton x="0" y="2" height="25" label="切换组织或公司" styleName="textStyle1" click="reSelectOrg()"/>
+				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>

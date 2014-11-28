@@ -36,7 +36,7 @@
         }
 
         override public function changeCurrentUser(e:ChangeUserEvent):void {
-
+            addressList.init();
         }
 
         override public function closeContainer(e:CloseContainerEvent):void {
