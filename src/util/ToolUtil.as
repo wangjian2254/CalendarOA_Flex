@@ -691,8 +691,11 @@ public class ToolUtil
         obj["startdate"] = start;
         obj["enddate"] = end;
         obj["pid"] = pid;
-        obj["depart_id"] = departid;
-        obj["project_id"] = projectid;
+        if(pid!=sessionUser.pid){
+            obj["depart_id"] = departid;
+            obj["project_id"] = projectid;
+        }
+
 
         if(queryScheduleTargetObj.pid!=pid||queryScheduleTargetObj.depart_id!=departid||queryScheduleTargetObj.project_id!=projectid){
             queryScheduleTargetObj.pid = pid;

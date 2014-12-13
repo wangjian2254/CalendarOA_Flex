@@ -577,7 +577,7 @@
             var dayItem:DayItem = null;
             var row:Number = 0;
             var dayHeight:Number;
-            dayHeight =this.height - 60;
+            dayHeight =this.height - 51;
             dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 -17) / 7;
             weekHead.height = 0;
             dayHead.height = 25;
@@ -593,24 +593,25 @@
 
             }
             if (showModel.selectedItem.value == "weekly") {
-                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 15 - 72) / 7;
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 15 - 53) / 7;
                 weekHead.height = 25;
                 dayHead.height = 0;
                 onedayHead.height=0;
-                calendarBorder.width = dayWidth * 7 + 4 + 31;
+//                calendarBorder.width = dayWidth * 7 + 4 + 31;
 
             }
             if (showModel.selectedItem.value == "daily") {
-                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 65) / 5;
-                calendarBorder.width = dayWidth * 5 + 4 + 31;
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 46) / 5;
+//                calendarBorder.width = dayWidth * 5 + 4 + 31;
                 weekHead.height = 0;
                 dayHead.height = 25;
                 onedayHead.height=0;
 
             }
             if (showModel.selectedItem.value == "oneday") {
-                dayWidth =(this.width - 12 - taskPanel.width - datePanel.width -18 - 4 - 65);
-                calendarBorder.width = dayWidth +4 + 31;
+//                dayWidth =(this.width - 12 - taskPanel.width - datePanel.width -18 - 4 - 52);
+                dayWidth =(this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 46);
+//                calendarBorder.width = dayWidth+51;
                 weekHead.height = 0;
                 dayHead.height = 0;
                 onedayHead.height=25;
@@ -651,6 +652,7 @@
                         dayItem = calendarBorder.getElementAt(i) as DayItem;
                         if(i==0){
                             dayItem.height = dayHeight-100;
+                            dayItem.width=50;
                             dayItem.invalidateSize();
                         }else{
                             dayItem.height = dayHeight-100;
@@ -676,15 +678,15 @@
                 if (flag) {
                     var now:Date = new Date();
                     var y:Number = (now.hours - 3) * 80;
-                    calendarScroller.viewport.verticalScrollPosition = y;
+//                    calendarScroller.viewport.verticalScrollPosition = y;
                 }
             }
             calendarPanel.invalidateSize();
             calendarPanel.invalidateDisplayList();
             calendayGroup.invalidateSize();
             calendayGroup.invalidateDisplayList();
-            calendarScroller.invalidateSize();
-            calendarScroller.invalidateDisplayList();
+//            calendarScroller.invalidateSize();
+//            calendarScroller.invalidateDisplayList();
 
 
         }
@@ -797,6 +799,7 @@
 						
 					</s:HorizontalLayout>
 				</s:layout>
+				<s:Label  width="50" height="25" fontSize="18"  text="" visible="{calendarBorder.visible}" includeInLayout="{calendarBorder.visible}" textAlign="center" verticalAlign="middle" />
 				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期日" textAlign="center" verticalAlign="middle" />
 				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期一" textAlign="center" verticalAlign="middle" />
 				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期二" textAlign="center" verticalAlign="middle" />
@@ -842,20 +845,16 @@
 					</s:VerticalLayout>
 					
 				</s:layout>
-				<s:Scroller id="calendarScroller" width="100%" height="100%">
+				<!--<s:Scroller id="calendarScroller" width="100%" height="100%">-->
 					<s:Group id="calendayGroup"  width="100%" height="100%">
-						<s:TileGroup id="calendarPanel" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
+						<s:TileGroup id="calendarPanel" includeInLayout="{calendarPanel.visible}" height="100%" requestedColumnCount="7" horizontalGap="1" verticalGap="1"   >
 							
 						</s:TileGroup>
-						<s:BorderContainer id="calendarBorder"  borderVisible="false" backgroundAlpha="0">
-							<s:layout>
-								<s:HorizontalLayout gap="1">
-									
-								</s:HorizontalLayout>
-							</s:layout>
-						</s:BorderContainer>
+						<s:HGroup id="calendarBorder" includeInLayout="{calendarBorder.visible}" gap="1" >
+
+						</s:HGroup>
 					</s:Group>
-				</s:Scroller>
+				<!--</s:Scroller>-->
 			</s:BorderContainer>
 			
 				

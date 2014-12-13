@@ -14,6 +14,7 @@
 
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
+        import mx.utils.ObjectUtil;
 
         import spark.layouts.BasicLayout;
         import spark.skins.spark.BorderContainerSkin;
@@ -94,24 +95,10 @@
                 return;
             }
             if (is_all_day == 2) {
-                var y:String = Number(e.localY / 40) + "";
-                var h:String = y.substring(0, y.indexOf("."));
-                if (Number(h) % 2 == 1) {
-                    var m:String = "30";
-                } else {
-                    m = "00";
-                }
-                if (Number(h) < 20) {
-                    h = "0" + (Number(h) / 2);
-                } else {
-                    h = "" + (Number(h) / 2);
-                }
-                if (h.indexOf(".") > 0) {
-                    h = h.substring(0, h.indexOf("."));
-                }
 
-                var d:Date = DateUtil.parseDate(date + h + m);
-                var ed:Date = DateUtil.parseDate(date + h + m);
+
+                var d:Date = getTimeByY(e.localY);
+                var ed:Date = getTimeByY(e.localY);
                 ed.minutes += 30;
                 if (d.date != ed.date) {
                     ed.minutes -= 1;
@@ -172,7 +159,7 @@
                     if (is_all_day == 2 && !obj.is_all_day) {
                         var x:Number = 2;
                         var y:Number = 0;
-                        y = Number(obj.time_start.substr(0, 2)) * this.height / 24 + (Number(obj.time_start.substr(2, 2)) / 60 * this.height / 24) + 2;
+                        y = getY(Number(obj.time_start.substr(0, 2))*2)+getYbyMin(Number(obj.time_start.substr(2, 2))) + 2;
                         while (schedulePos.hasOwnProperty(y.toString())) {
                             y += 20;
                             if (this.width < 300) {
@@ -190,7 +177,7 @@
                         scheduleItem.x = x;
                         scheduleItem.y = y;
                         scheduleItem.width = this.width - 1 - x;
-                        scheduleItem.height = Number(obj.time_end.substr(0, 2)) * this.height / 24 + (Number(obj.time_end.substr(2, 2)) / 60 * this.height / 24) - y - 1;
+                        scheduleItem.height = getY(Number(obj.time_end.substr(0, 2))*2) +getYbyMin(Number(obj.time_end.substr(2, 2)) )- y - 1;
 
 
                         scheduleItem.descShow = true;
@@ -221,15 +208,15 @@
         public function showTimeLine(w:Number, flag:Boolean):void {
             this.contentGroup.graphics.clear();
             if (this.height > 200 && flag) {
-                for (var i:Number = 0; i < 27; i++) {
+                for (var i:Number = 0; i < 48; i++) {
                     drawline(w, i);
                 }
 
             }
             var d:Date = new Date();
             this.contentGroup.graphics.lineStyle(2, 0xFF0000);
-            this.contentGroup.graphics.moveTo(0, getY(d.hours*2) + getYbyMin(d.hours,d.minutes));
-            this.contentGroup.graphics.lineTo(w, getY(d.hours*2) + getYbyMin(d.hours,d.minutes));
+            this.contentGroup.graphics.moveTo(0, getY(d.hours*2) + getYbyMin(d.minutes));
+            this.contentGroup.graphics.lineTo(w, getY(d.hours*2) + getYbyMin(d.minutes));
         }
 
         private function drawline(w:Number, i:Number):void {
@@ -250,36 +237,72 @@
         }
 
         private function showTime():void {
-            var d:Date = DateUtil.parseDate("201401010530");
+            var d:Date =null;
+
             var lbl:Label = null;
-            for (var i:Number = 0; i < 28; i++) {
-                d.minutes += 30;
+            d= DateUtil.parseDate("201401010000");
+            lbl = new Label();
+            lbl.text = timestr2.format(d);
+            lbl.x = 10;
+            lbl.y = getY(1);
+            scheduleList.addElement(lbl);
+            for (var i:Number = 13; i < 40; i++) {
+                d= DateUtil.parseDate("201401010000");
+                d.minutes += (i+1)*30;
                 lbl = new Label();
                 lbl.text = timestr2.format(d);
                 lbl.x = 10;
-                lbl.y = (this.height / 28) * i + 30;
+                lbl.y = getY(i+1);
                 scheduleList.addElement(lbl);
-
-
             }
+            d= DateUtil.parseDate("201401010000");
+            d.minutes += (47+1)*30-1;
+            lbl = new Label();
+            lbl.text = timestr2.format(d);
+            lbl.x = 10;
+            lbl.y = getY(47)-15;
+            scheduleList.addElement(lbl);
+        }
+
+        private function getTimeByY(y:int):Date{
+            if(y<=getY(14)){
+                d= DateUtil.parseDate(date);
+                d.minutes+=30*12;
+                return d;
+            }
+            var d:Date=null;
+            for(var i:int=14;i<41;i++){
+                if(y>getY(i)&&y<getY(i+1)){
+                    d=DateUtil.parseDate(date);
+                    d.minutes+=i*30;
+                    return d;
+                }
+            }
+            return DateUtil.parseDate(date + 7);
         }
 
         private function getY(index:int):Number{
-            var yitem:int=this.height/28;
-            if(index<=12){
-                return yitem;
+            var yitem:int=this.height/30;
+            if(index<14){
+                return -1;
             }
-            if(index>12&&index<=38){
-                return yitem+(index-16)*yitem;
+            if(index==14){
+                return yitem*2;
             }
-            if(index>38){
-                return yitem+(22*yitem)+yitem;
+            if(index>14&&index<=39){
+                return yitem*2+(index-14)*yitem;
             }
-            return 0;
+            if(index==40){
+                return yitem*28;
+            }
+            if(index>40){
+                return this.height;
+            }
+            return yitem*index;
         }
 
-        private function getYbyMin(h:int,m:int):Number{
-            var yitem:int=this.height/28;
+        private function getYbyMin(m:int):Number{
+            var yitem:int=this.height/30;
 
             return yitem/60*m*2;
         }
