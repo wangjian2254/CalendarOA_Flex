@@ -36,7 +36,8 @@
         private var list:ArrayCollection = new ArrayCollection();
         [Bindable]
         private var btnlist:ArrayCollection = new ArrayCollection([
-            {"label": "日", "value": "daily"},
+            {"label": "日", "value": "oneday"},
+//            {"label": "日", "value": "daily"},
             {"label": "周", "value": "weekly"},
             {"label": "月", "value": "monthly"}
         ]);
@@ -415,6 +416,60 @@
             }
         }
 
+        private function showCalendar_Oneday(date:Date = null):void {
+            var fr:DateFormatter = new DateFormatter();
+            fr.formatString = "YYYYMMDD";
+            //				calendarPanel.removeAllElements();
+            var dayItem:DayItem = null;
+            var newDayItem:DayItem = null;
+            var f:Boolean = true;
+            var count:Number = 0;
+            for (var i:Number = 1; i < 100; i++) {
+                if (calendarBorder.numElements - 1 < i) {
+                    dayItem = new DayItem();
+                    newDayItem = dayItem;
+                    dayItem.is_all_day = 2;
+                    calendarBorder.addElement(dayItem);
+                    f = true;
+                } else {
+                    dayItem = calendarBorder.getElementAt(i) as DayItem;
+                    dayItem.is_all_day = 2;
+                    f = false;
+                }
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+
+                if (!f) {
+                    dayItem.init();
+                }
+                dayItem = new DayItem();
+                dayItem.is_all_day = 3;
+                dayItem.date = fr.format(date);
+                dayItem.nowdate = fr.format(dateChooser.selectedDate);
+                daySchedule.addElement(dayItem);
+                date.date += 1;
+
+                count = i + 1;
+                if (count == 2) {
+                    break;
+                }
+
+            }
+
+
+            for (i = calendarBorder.numElements - 1; i >= count; i--) {
+                calendarBorder.removeElementAt(i);
+            }
+            if (calendarBorder.numElements > 0) {
+//                ToolUtil.getScheduleByDate((calendarBorder.getElementAt(1) as DayItem).date, (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date);
+                querySchedule();
+            }
+            resize();
+            if (newDayItem != null) {
+                newDayItem.addEventListener(FlexEvent.CREATION_COMPLETE, resize);
+            }
+        }
+
         private function showCalendar(date:Date = null):void {
             if (date == null) {
                 date = new Date();
@@ -454,6 +509,13 @@
                 }
 
             }
+            if (showModel.selectedItem.value == "oneday") {
+                onedayLabel.text="星期"+DateUtil.dayNames[date.day];
+                if (currentMonth == date.month && currentDaily == date.date) {
+                    return;
+                }
+
+            }
 
             currentWeek = date.date;
             currentDaily = date.date;
@@ -471,7 +533,7 @@
                     var timeline:DayItem = new DayItem();
                     timeline.width = 50;
                     timeline.is_all_day = 2;
-                    timeline.height = 80 * 24;
+                    timeline.height = calendarBorder.height;
                     calendarBorder.addElement(timeline);
                 }
                 if (daySchedule.numElements == 0) {
@@ -497,6 +559,13 @@
                 calendarPanel.visible = false;
                 showCalendar_Daily(date);
             }
+            if (showModel.selectedItem.value == "oneday") {
+                daySchedule.height = 100;
+                daySchedule.visible = true;
+                calendarBorder.visible = true;
+                calendarPanel.visible = false;
+                showCalendar_Oneday(date);
+            }
 
 
         }
@@ -508,30 +577,43 @@
             var dayItem:DayItem = null;
             var row:Number = 0;
             var dayHeight:Number;
-            dayHeight = 80 * 24;
-            dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1) / 7;
+            dayHeight =this.height - 60;
+            dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 -17) / 7;
             weekHead.height = 0;
             dayHead.height = 25;
             if (showModel.selectedItem.value == "monthly") {
                 row = calendarPanel.numElements / 7;
-                dayHeight = (this.height - 27 - row + 1 - 2 - 11) / row;
+                dayHeight = (this.height - 27 - row + 1 - 3 - 11-10) / row;
 
                 calendarPanel.requestedColumnCount = 7;
 
                 weekHead.height = 25;
                 dayHead.height = 0;
+                onedayHead.height=0;
 
             }
             if (showModel.selectedItem.value == "weekly") {
-                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 15 - 51) / 7;
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 15 - 72) / 7;
                 weekHead.height = 25;
                 dayHead.height = 0;
-                calendarBorder.width = dayWidth * 7 + 6 + 51;
+                onedayHead.height=0;
+                calendarBorder.width = dayWidth * 7 + 4 + 31;
 
             }
             if (showModel.selectedItem.value == "daily") {
-                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 51) / 5;
-                calendarBorder.width = dayWidth * 5 + 4 + 51;
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 65) / 5;
+                calendarBorder.width = dayWidth * 5 + 4 + 31;
+                weekHead.height = 0;
+                dayHead.height = 25;
+                onedayHead.height=0;
+
+            }
+            if (showModel.selectedItem.value == "oneday") {
+                dayWidth =(this.width - 12 - taskPanel.width - datePanel.width -18 - 4 - 65);
+                calendarBorder.width = dayWidth +4 + 31;
+                weekHead.height = 0;
+                dayHead.height = 0;
+                onedayHead.height=25;
 
             }
 
@@ -562,17 +644,21 @@
 
                     }
                 }
-                for (i = 1; i < 100; i++) {
+                for (i = 0; i < 100; i++) {
                     if (calendarBorder.numElements - 1 < i) {
                         break;
                     } else {
                         dayItem = calendarBorder.getElementAt(i) as DayItem;
-                        dayItem.height = dayHeight;
-                        dayItem.width = dayWidth;
-                        dayItem.invalidateSize();
-                        dayItem.showTimeLine(dayWidth, row == 0 ? true : false);
-                        dayItem.invalidateDisplayList();
-
+                        if(i==0){
+                            dayItem.height = dayHeight-100;
+                            dayItem.invalidateSize();
+                        }else{
+                            dayItem.height = dayHeight-100;
+                            dayItem.width = dayWidth;
+                            dayItem.invalidateSize();
+                            dayItem.showTimeLine(dayWidth, row == 0 ? true : false);
+                            dayItem.invalidateDisplayList();
+                        }
                     }
                 }
                 for (i = 1; i < 9; i++) {
@@ -720,7 +806,7 @@
 				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期六" textAlign="center" verticalAlign="middle" />
 					
 			</s:BorderContainer>
-			<s:BorderContainer id="dayHead" width="100%" height="0" borderVisible="false" backgroundAlpha="0">
+			<s:BorderContainer id="dayHead" width="100%" height="0"  visible="{dayHead.height==0?false:true}" borderVisible="false" backgroundAlpha="0">
 				<s:layout>
 					<s:HorizontalLayout gap="1" verticalAlign="middle" >
 						
@@ -733,6 +819,14 @@
 				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期五" textAlign="center" verticalAlign="middle" />
 				
 			</s:BorderContainer>
+            <s:BorderContainer id="onedayHead" width="100%" height="0"  visible="{onedayHead.height==0?false:true}" borderVisible="false" backgroundAlpha="0">
+                <s:layout>
+                    <s:HorizontalLayout gap="1" verticalAlign="middle" horizontalAlign="center" >
+                    </s:HorizontalLayout>
+                </s:layout>
+                <s:Label   id="onedayLabel" height="25" fontSize="18" textAlign="center" verticalAlign="middle" />
+
+            </s:BorderContainer>
 			<s:BorderContainer id="daySchedule" minWidth="100" height="0" borderVisible="false"   backgroundColor="#999999">
 				<s:layout>
 					<s:HorizontalLayout gap="1" verticalAlign="middle" paddingBottom="1" paddingRight="1" paddingLeft="1" paddingTop="1">

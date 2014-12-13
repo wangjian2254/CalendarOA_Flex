@@ -221,28 +221,28 @@
         public function showTimeLine(w:Number, flag:Boolean):void {
             this.contentGroup.graphics.clear();
             if (this.height > 200 && flag) {
-                for (var i:Number = 0; i < 47; i++) {
+                for (var i:Number = 0; i < 27; i++) {
                     drawline(w, i);
                 }
 
             }
             var d:Date = new Date();
             this.contentGroup.graphics.lineStyle(2, 0xFF0000);
-            this.contentGroup.graphics.moveTo(0, this.height / 24 * (d.hours) + (d.minutes / 60 * this.height / 24));
-            this.contentGroup.graphics.lineTo(w, this.height / 24 * (d.hours) + (d.minutes / 60 * this.height / 24));
+            this.contentGroup.graphics.moveTo(0, getY(d.hours*2) + getYbyMin(d.hours,d.minutes));
+            this.contentGroup.graphics.lineTo(w, getY(d.hours*2) + getYbyMin(d.hours,d.minutes));
         }
 
         private function drawline(w:Number, i:Number):void {
 
             this.contentGroup.graphics.lineStyle(1, 0x000000);
             if (i % 2 == 1) {
-                this.contentGroup.graphics.moveTo(0, this.height / 48 * (i + 1));
-                this.contentGroup.graphics.lineTo(w, this.height / 48 * (i + 1));
+                this.contentGroup.graphics.moveTo(0, getY(i+1));
+                this.contentGroup.graphics.lineTo(w, getY(i+1));
             } else {
                 for (var s:Number = 0; s < w / 5; s++) {
                     if (s % 2 == 0) {
-                        this.contentGroup.graphics.moveTo(s * 5, this.height / 48 * (i + 1));
-                        this.contentGroup.graphics.lineTo(s * 5 + 5, this.height / 48 * (i + 1));
+                        this.contentGroup.graphics.moveTo(s * 5, getY(i+1));
+                        this.contentGroup.graphics.lineTo(s * 5 + 5, getY(i+1));
                     }
                 }
             }
@@ -250,18 +250,38 @@
         }
 
         private function showTime():void {
-            var d:Date = DateUtil.parseDate("201401010000");
+            var d:Date = DateUtil.parseDate("201401010530");
             var lbl:Label = null;
-            for (var i:Number = 0; i < 48; i++) {
+            for (var i:Number = 0; i < 28; i++) {
                 d.minutes += 30;
                 lbl = new Label();
                 lbl.text = timestr2.format(d);
                 lbl.x = 10;
-                lbl.y = (this.height / 48) * i + 30;
+                lbl.y = (this.height / 28) * i + 30;
                 scheduleList.addElement(lbl);
 
 
             }
+        }
+
+        private function getY(index:int):Number{
+            var yitem:int=this.height/28;
+            if(index<=12){
+                return yitem;
+            }
+            if(index>12&&index<=38){
+                return yitem+(index-16)*yitem;
+            }
+            if(index>38){
+                return yitem+(22*yitem)+yitem;
+            }
+            return 0;
+        }
+
+        private function getYbyMin(h:int,m:int):Number{
+            var yitem:int=this.height/28;
+
+            return yitem/60*m*2;
         }
         ]]>
 	</fx:Script>
