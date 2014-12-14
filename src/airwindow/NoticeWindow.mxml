@@ -5,13 +5,18 @@
 		  xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
-		import events.PaoPaoEvent;
-
-		import model.ChatChannel;
-
-		import org.idream.pomelo.Pomelo;
-
-		import util.ToolUtil;
+			import events.PaoPaoEvent;
+			
+			import model.ChatChannel;
+			import model.Schedule;
+			
+			import mx.core.FlexGlobals;
+			import mx.core.WindowedApplication;
+			
+			import org.idream.pomelo.Pomelo;
+			
+			import util.ScheduleUtil;
+			import util.ToolUtil;
 
 		//定时器淡入
 		private var Timer1:Timer = new Timer(1);
@@ -31,46 +36,52 @@
 
 		public function init():void {
 			nativeWindow.alwaysInFront = true;
-			if (message != null && message.hasOwnProperty("te")) {
-				contentLabel.text = message.te;
-				if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
-					var f:Boolean = false;
-					for each(var g:ChatChannel in ToolUtil.groupList) {
-						if (g.channel == message.channel) {
-							f = true;
-							nameLabel.text = g.name;
-						}
-					}
-					if (!f) {
-						Pomelo.getIns().request("connector.entryHandler.queryChannelInfo", {channel: message.channel}, function (data:Object):void {
-							if (data.code == 200 && data.channel != null) {
-								ToolUtil.groupList.addItem(new ChatChannel(data.channel));
-								nameLabel.text = data.channel.name;
-							}
-						});
-					}
-					head.source = "/static/smalloaicon/group.png";
-				} else {
-					if (message.channel.substr(0, 1) == "d") {
-						var did:String = message.channel.substr(1, message.channel.length - 1);
-						for each(var depat:Object in ToolUtil.departMentList) {
-							if (did == depat.id) {
-								head.source = depat.icon;
-								nameLabel.text = depat.name;
+			if(message is Schedule){
+				contentLabel.text = message.title;
+				nameLabel.text = "任务提醒";
+			}else{
+				if (message != null && message.hasOwnProperty("te")) {
+					contentLabel.text = message.te;
+					if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
+						var f:Boolean = false;
+						for each(var g:ChatChannel in ToolUtil.groupList) {
+							if (g.channel == message.channel) {
+								f = true;
+								nameLabel.text = g.name;
 							}
 						}
+						if (!f) {
+							Pomelo.getIns().request("connector.entryHandler.queryChannelInfo", {channel: message.channel}, function (data:Object):void {
+								if (data.code == 200 && data.channel != null) {
+									ToolUtil.groupList.addItem(new ChatChannel(data.channel));
+									nameLabel.text = data.channel.name;
+								}
+							});
+						}
+						head.source = "/static/smalloaicon/group.png";
 					} else {
-						var pids:Array = message.channel.split("p");
-						for each(var pid:String in pids) {
-							if (pid != ToolUtil.sessionUser.pid) {
-								var person:Object = ToolUtil.getAnyPersonById(pid);
-								head.source = person.icon;
-								nameLabel.text = person.name;
+						if (message.channel.substr(0, 1) == "d") {
+							var did:String = message.channel.substr(1, message.channel.length - 1);
+							for each(var depat:Object in ToolUtil.departMentList) {
+								if (did == depat.id) {
+									head.source = depat.icon;
+									nameLabel.text = depat.name;
+								}
+							}
+						} else {
+							var pids:Array = message.channel.split("p");
+							for each(var pid:String in pids) {
+								if (pid != ToolUtil.sessionUser.pid) {
+									var person:Object = ToolUtil.getAnyPersonById(pid);
+									head.source = person.icon;
+									nameLabel.text = person.name;
+								}
 							}
 						}
 					}
 				}
 			}
+			
 			this.startPosition();
 			this.Timer1.addEventListener(TimerEvent.TIMER, scorllUp);
 			this.Timer1.start();
@@ -89,10 +100,16 @@
 		}
 
 		private function openW():void {
-			var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
-			event.msg = message;
-			event.channel = message.channel;
-			dispatchEvent(event);
+			if(message is Schedule){
+				(FlexGlobals.topLevelApplication as WindowedApplication).orderToFront();
+				ScheduleUtil.showSchedulePanel(message.id);
+			}else{
+				var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
+				event.msg = message;
+				event.channel = message.channel;
+				dispatchEvent(event);
+			}
+			
 			closeW();
 
 

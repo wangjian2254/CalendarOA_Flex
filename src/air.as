@@ -1,14 +1,19 @@
 import airwindow.ChatWindow;
+import airwindow.NoticeWindow;
 
 import events.PaoPaoEvent;
+import events.ScheduleNotifyEvent;
 
 import flash.desktop.NativeApplication;
+import flash.display.NativeWindowSystemChrome;
+import flash.display.NativeWindowType;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.system.Capabilities;
 
 import httpcontrol.CHTTPService;
 
+import mx.core.FlexGlobals;
 import mx.events.AIREvent;
 import mx.events.CloseEvent;
 
@@ -72,8 +77,19 @@ public function initAir():void{
 //	this.stage.nativeWindow.y=(Capabilities.screenResolutionY=this.nativeWindow.height)/2;
 	
 //	this.maximize();
+	FlexGlobals.topLevelApplication.addEventListener(ScheduleNotifyEvent.SCHEDULE_NOTIFY, scheduleNotify);
+	
 }
 
+public function scheduleNotify(e:ScheduleNotifyEvent):void{
+	
+	var notice:NoticeWindow = new NoticeWindow();
+	notice.transparent = true;
+	notice.type = NativeWindowType.UTILITY;
+	notice.systemChrome = NativeWindowSystemChrome.NONE;
+	notice.message = e.s;
+	notice.open();
+}
 public function openChatManager():void{
 	
 	callLater(openChatWindow);

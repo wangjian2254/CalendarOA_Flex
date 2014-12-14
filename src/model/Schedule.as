@@ -16,6 +16,7 @@ public class Schedule {
     private var _time_end:String;
     private var _repeat_type:String;
     private var _repeat_date:Array;
+    private var _notifyArr:Array;
     private var _color:uint;
     private var _department:int;
     private var _project:int;
@@ -29,6 +30,7 @@ public class Schedule {
     private var _group:String;
     private var _date:String;
     private var _used:Boolean=false;
+    private var _notify:Boolean=false;
     private var _author:int=0;
     private var _v:int=0;
     private var _cv:int=0;
@@ -374,6 +376,22 @@ public class Schedule {
 
     public function set cv(value:int):void {
         _cv = value;
+    }
+
+    public function get notify():Boolean {
+        return _notify;
+    }
+
+    public function set notify(value:Boolean):void {
+        _notify = value;
+    }
+
+    public function get notifyArr():Array {
+        return _notifyArr;
+    }
+
+    public function set notifyArr(value:Array):void {
+        _notifyArr = value;
     }
 }
 }

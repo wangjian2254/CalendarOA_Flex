@@ -350,7 +350,6 @@ public class ChatManager {
 
         if(event.message.msg.channel!=ToolUtil.currentChannel){
             event.message.msg.unread=true;
-
             var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
             s.message = event.message.msg;
             s.y = 0 - s.height - 10;

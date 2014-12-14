@@ -9,6 +9,7 @@ import events.ChangeScheduleEvent;
 import events.ChangeUserEvent;
 import events.InitDefaultMemberProjectEvent;
 import events.QueryScheduleEvent;
+import events.ScheduleNotifyEvent;
 
 import flash.events.TimerEvent;
 import flash.utils.Timer;
@@ -20,6 +21,7 @@ import model.ChatChannel;
 import model.Schedule;
 
 import mx.collections.ArrayCollection;
+import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
@@ -46,6 +48,8 @@ public class ToolUtil
 
     public static var projectstatus:ArrayCollection=new ArrayCollection([{id:"unstart",label:"未开始"},{id:"runing",label:"正在进行"},{id:"finished",label:"已完成"},{id:"closed",label:"已关闭"}]);
     public static var taskstatusmap:Object = {"1":"未开始", "2":"正在进行", "3":"待审核", "4":"完成"};
+    public static var notifytime:Array=[0,5,10,15,30,45,60,120,240,60*24,60*48,60*24*7];
+    public static var notifyschedule:Object=new Object();
     public static var filetypemap:Object = {"gif":true, "png":true, "jpg":true, "jpeg":true};
 	public static var sizedw:int = 1024 * 1024;
 	public static var imgsize:int = 3;
@@ -56,6 +60,7 @@ public class ToolUtil
 
     public static var currentChannel:String="";
     private static var time:Timer = new Timer(1000*60*5,0);
+    private static var timerNotify:Timer = new Timer(1000*60,0);
 
     public static function getTaskStatus(i:int):String{
         if(taskstatusmap.hasOwnProperty(i.toString())){
@@ -92,6 +97,7 @@ public class ToolUtil
 
 //        unreadMessageRefresh();
         time.addEventListener(TimerEvent.TIMER,unreadMessageRefresh);
+
         if(!time.running){
 //            time.start();
         }
@@ -134,6 +140,9 @@ public class ToolUtil
             contactsRefresh();
             allProjectListRefresh();
             filesRefresh();
+            notifyScheduleRefresh();
+            timerNotify.addEventListener(TimerEvent.TIMER, scheduleNotify);
+            timerNotify.start();
         }else{
             sessionUser=false;
         }
@@ -162,6 +171,48 @@ public class ToolUtil
     public static function resultUnReadMessageRefresh(result:Object,e:ResultEvent):void{
         if(result.success==true){
             unreadMessageNum = result.result+"未读消息";
+        }
+    }
+
+    public static function notifyScheduleRefresh(fun:*=null):void{
+        if(fun==null||!(fun is Function)){
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/getNotificationSchedule",resultNotifyScheduleRefresh,"POST").send()
+        }else{
+            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getNotificationSchedule",resultNotifyScheduleRefresh,"POST");
+            http.resultFunArr.addItem(fun);
+            http.send();
+        }
+    }
+    public static function resultNotifyScheduleRefresh(result:Object,e:ResultEvent):void{
+        if(result.success==true){
+            var sl:ArrayCollection = new ArrayCollection(result.result as Array);
+            var s:Schedule=null;
+            for each(var item:Object in sl){
+                s = new Schedule(item);
+                notifyschedule[s.id]=s;
+            }
+        }
+    }
+
+    public static function scheduleNotify(e:TimerEvent):void{
+        var d:String = DateUtil.dateLbl4(new Date());
+        var now:Date = null;
+        var s:Schedule=null;
+        for(var id:String in notifyschedule){
+            s=notifyschedule[id];
+            if(!s.is_all_day&&s.notify && s.notifyArr!=null&&s.notifyArr.length>0){
+                for each(var n:int in s.notifyArr){
+                    d=s.startdate+s.time_start;
+                    now = new Date();
+                    now.minutes+=n;
+//                    var str:String = DateUtil.dateLbl4(now);
+                    if(DateUtil.dateLbl4(now)==d){
+                       FlexGlobals.topLevelApplication.dispatchEvent(new ScheduleNotifyEvent(ScheduleNotifyEvent.SCHEDULE_NOTIFY,s));
+                    }
+                }
+
+
+            }
         }
     }
 
@@ -675,6 +726,9 @@ public class ToolUtil
 		if(ToolUtil.outScheduleMap.hasOwnProperty("schedulemap")&&ToolUtil.outScheduleMap.schedulemap.hasOwnProperty(id)){
 			return ToolUtil.outScheduleMap.schedulemap[id];
 		}
+        if(ToolUtil.notifyschedule.hasOwnProperty(id)){
+            return ToolUtil.notifyschedule[id];
+        }
         return null;
     }
 
@@ -726,6 +780,7 @@ public class ToolUtil
             for each(var obj:Object in result.result.schedulelist){
                 //schedulelist schedulemap
                 schedule = new Schedule(obj);
+                updateNotifySchedule(schedule);
 //                scheduleMap['scheduleall'].push(schedule.id);
                 scheduleMap['schedulemap'][schedule.id] = schedule;
                 if(schedule.repeat_type != 'none'){
@@ -745,6 +800,7 @@ public class ToolUtil
                 clearOutScheduleMap();
                 for each(obj in result.result.out_schedulelist){
                     schedule = new Schedule(obj);
+                    updateNotifySchedule(schedule);
                     outScheduleMap['schedulemap'][schedule.id] = schedule;
                     if(!scheduleMap['schedulemap'].hasOwnProperty(schedule.id)){
                         scheduleMap['schedulemap'][schedule.id] = schedule;
@@ -758,6 +814,12 @@ public class ToolUtil
         }
     }
 
+    public static function updateNotifySchedule(schedule:Schedule):void{
+        if(notifyschedule.hasOwnProperty(schedule.id)||schedule.notify){
+            notifyschedule[schedule.id]=schedule;
+        }
+    }
+
     public static function clearOutScheduleMap():void{
         outScheduleMap= new Object();
         outScheduleMap['out_schedule_list']=new Array();
@@ -766,6 +828,7 @@ public class ToolUtil
 
     public static function updateSchedul(id:String, schedule:Schedule):void{
         if(schedule){
+            updateNotifySchedule(schedule);
             scheduleMap['schedulemap'][id] = schedule;
 //            scheduleMap['scheduleall']
 

@@ -6,6 +6,7 @@ public class DateUtil
 	{
 		public function DateUtil()
 		{
+
 		}
 		
 		[Bindable]
@@ -14,15 +15,23 @@ public class DateUtil
 		public static var monthNames:Array=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
 	
 		public static var myDateFormatter:DateFormatter=new DateFormatter();
-		myDateFormatter.formatString="YYYY/MM/DD";
+
         public static var myDateFormatter1:DateFormatter=new DateFormatter();
-		myDateFormatter1.formatString="YYYYMMDD";
+
         public static var myDateFormatter2:DateFormatter=new DateFormatter();
-        myDateFormatter2.formatString="YYYY/MM/DD HH:NN:SS";
+
 		
 		public static var myDateFormatter3:DateFormatter=new DateFormatter();
+
+
+		public static var myDateFormatter4:DateFormatter=new DateFormatter();
+
+		myDateFormatter.formatString="YYYY/MM/DD";
+		myDateFormatter1.formatString="YYYYMMDD";
+		myDateFormatter2.formatString="YYYY/MM/DD HH:NN:SS";
 		myDateFormatter3.formatString="YYYY-MM-DD-HH-NN-SS";
-		
+		myDateFormatter4.formatString="YYYYMMDDHHNN";
+
 		public static function dateLblChat(currentDate:Date):String{
 			return myDateFormatter2.format(currentDate);
 		}
@@ -36,7 +45,11 @@ public class DateUtil
 		public static function dateLbl3(currentDate:Date):String{
 			return myDateFormatter3.format(currentDate);
 		}
-		
+		public static function dateLbl4(currentDate:Date):String{
+			return myDateFormatter4.format(currentDate);
+		}
+
+
         public static function parseLblDate(value:String):Date{
             if (!value){
                 return new Date();

@@ -191,6 +191,61 @@
                 levleStepper.value = schedulData.level;
                 urgentDownList.selectedIndex = schedulData.urgent - 1;
 //                statusDownList.selectedIndex = schedulData.status-1;
+                boxTiXing.selected = !schedulData.notify;
+                if(schedulData.notifyArr!=null&&schedulData.notifyArr.length>0){
+                    alertBox0.selected=false;
+                    alertBox1.selected=false;
+                    alertBox2.selected=false;
+                    alertBox3.selected=false;
+                    alertBox4.selected=false;
+                    alertBox5.selected=false;
+                    alertBox6.selected=false;
+                    alertBox7.selected=false;
+                    alertBox8.selected=false;
+                    alertBox9.selected=false;
+                    alertBox10.selected=false;
+                    alertBox11.selected=false;
+                    for each(var tmin:int in schedulData.notifyArr){
+                        switch (ToolUtil.notifytime.indexOf(tmin)){
+                            case 0:
+                                alertBox0.selected=true;
+                                break;
+                            case 1:
+                                alertBox1.selected=true;
+                                break;
+                            case 2:
+                                alertBox2.selected=true;
+                                break;
+                            case 3:
+                                alertBox3.selected=true;
+                                break;
+                            case 4:
+                                alertBox4.selected=true;
+                                break;
+                            case 5:
+                                alertBox5.selected=true;
+                                break;
+                            case 6:
+                                alertBox6.selected=true;
+                                break;
+                            case 7:
+                                alertBox7.selected=true;
+                                break;
+                            case 8:
+                                alertBox8.selected=true;
+                                break;
+                            case 9:
+                                alertBox9.selected=true;
+                                break;
+                            case 10:
+                                alertBox10.selected=true;
+                                break;
+                            case 11:
+                                alertBox11.selected=true;
+                                break;
+                        }
+                    }
+                }
                 if (schedulData.repeat_type != 'none') {
                     titlestr = schedulData.title + "--" + schedulData.date.substr(0, 4) + "/" + schedulData.date.substr(4, 6) + "/" + schedulData.date.substr(6, 8) + " --(" + ToolUtil.getTaskUrgent(schedulData.urgent) + ")" + " --[" + ToolUtil.getTaskStatus(schedulData.status) + "]";
                 } else {
@@ -399,6 +454,50 @@
             } else {
                 obj.checker = null;
             }
+            if(is_all_day.selected){
+                obj.notify=!boxTiXing.selected;
+                if(!boxTiXing.selected){
+                    obj.notifyArr = new Array();
+                    if(alertBox0.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[0]);
+                    }
+                    if(alertBox1.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[1]);
+                    }
+                    if(alertBox2.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[2]);
+                    }
+                    if(alertBox3.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[3]);
+                    }
+                    if(alertBox4.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[4]);
+                    }
+                    if(alertBox5.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[5]);
+                    }
+                    if(alertBox6.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[6]);
+                    }
+                    if(alertBox7.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[7]);
+                    }
+                    if(alertBox8.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[8]);
+                    }
+                    if(alertBox9.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[9]);
+                    }
+                    if(alertBox10.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[10]);
+                    }
+                    if(alertBox11.selected){
+                        obj.notifyArr.push(ToolUtil.notifytime[11]);
+                    }
+
+                }
+            }
+
             obj.level = levleStepper.value;
             obj.urgent = urgentDownList.selectedItem.id;
 
@@ -498,7 +597,7 @@
         }
 
         private function changeTiXing():void {
-            if (boxTiXing.selected) {
+            if (!is_all_day.selected||boxTiXing.selected) {
                 itemTixing.visible = false;
                 itemTixing.height = 0;
             } else {
@@ -912,7 +1011,7 @@
                     </s:HorizontalLayout>
                 </s:layout>
                 <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-                <s:CheckBox label="设置具体时刻" id="is_all_day" selected="true">
+                <s:CheckBox label="设置具体时刻" id="is_all_day" selected="true" change="changeTiXing()">
                 </s:CheckBox>
                 <mx:ComboBox id="startTime" visible="{is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
 

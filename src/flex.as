@@ -1,5 +1,9 @@
 import control.IMControl;
 
+import events.ScheduleNotifyEvent;
+
+import flash.display.DisplayObject;
+
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
@@ -7,9 +11,15 @@ import flash.net.navigateToURL;
 import httpcontrol.HttpServiceUtil;
 
 import mx.controls.Alert;
+import mx.core.FlexGlobals;
 import mx.events.CloseEvent;
+import mx.managers.PopUpManager;
 
 import org.idream.pomelo.Pomelo;
+
+import uicontrol.NewsPannel;
+
+import util.ChatManager;
 
 import util.ToolUtil;
 
@@ -53,6 +63,19 @@ public function initFlex():void{
         }
 
     }
+    FlexGlobals.topLevelApplication.addEventListener(ScheduleNotifyEvent.SCHEDULE_NOTIFY, scheduleNotify);
+
+}
+
+public function scheduleNotify(e:ScheduleNotifyEvent):void{
+
+    ExternalInterface.call("notify","/static/swf/assets/login_icon.png", "任务提醒", e.s.title);
+    var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+    s.message = e.s;
+    s.y = 0 - s.height - 10;
+    s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+    s.unReadMessage = ChatManager.unReadMessage;
+    ChatManager.unReadMessage.addItem(s);
 }
 
 private function downloadAir():void{
