@@ -272,7 +272,7 @@
         }
         ]]></fx:Script>
 
-	<!--<s:BorderContainer id="borderContainer" width="100%" minHeight="15" click="select_handler(event)" borderVisible="false" >-->
+	<!--<s:BorderContainer id="borderContainer" width="100%" minHeight="15" click="select_handler(event)"  >-->
 
 
 	<!--<s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">-->

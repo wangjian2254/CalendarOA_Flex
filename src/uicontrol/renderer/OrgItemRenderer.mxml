@@ -138,7 +138,7 @@
     <fx:Declarations>
     </fx:Declarations>
 
-    <s:BorderContainer width="100%" height="50" click="select_handler(event)" buttonMode="true" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()">
+    <s:BorderContainer width="100%" height="50" click="select_handler(event)" buttonMode="true"  mouseOut="m_out()" mouseOver="m_over()">
 
 
         <s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">

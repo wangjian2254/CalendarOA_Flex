@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700" borderVisible="false" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
+						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700"  xmlns:uicontrol="uicontrol.*">
 	<fx:Script>
 		<![CDATA[
         import events.ChangeUserEvent;
@@ -331,13 +331,13 @@
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-	<s:BorderContainer top="5" bottom="5" left="5" right="5"  borderVisible="false" color="0x333333" skinClass="skins.contentBoxSkin">
+	<s:BorderContainer top="5" bottom="5" left="5" right="5"   color="0x333333"  styleName="customBorderContainer">
 		<s:layout>
 			<s:VerticalLayout>
 				
 			</s:VerticalLayout>
 		</s:layout>
-		<s:BorderContainer left="0" top="0" height="45" width="100%" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+		<s:BorderContainer left="0" top="0" height="45" width="100%"  backgroundImage="{CBorderContainer.toolbgimg}">
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle" paddingLeft="20">
 					
@@ -352,7 +352,7 @@
 			<s:ButtonBar id="ba1" dataProvider="{buttonArr1}" selectedIndex="0" doubleClickEnabled="true"  chromeColor="#faf0cc"  labelField="label" iconField="ico"  height="30"  requireSelection="true" click="clickHander(event)">
 			</s:ButtonBar>
 		</s:BorderContainer>
-		<s:BorderContainer height="100%" width="100%" borderVisible="false">
+		<s:BorderContainer height="100%" width="100%" >
 			<s:layout>
 				<s:HorizontalLayout gap="2">
 					

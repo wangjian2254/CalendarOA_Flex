@@ -414,14 +414,14 @@
 			
 		</s:HorizontalLayout>
 	</s:layout>
-	<s:BorderContainer width="400" id="schedulePanel" borderVisible="false" >
+	<s:BorderContainer width="400" id="schedulePanel"  >
 		<s:layout>
 			<s:VerticalLayout gap="0"/>
 		</s:layout>
 	
 	<s:TextInput id="taskTitle" width="100%" text="备忘标题">
 	</s:TextInput>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
+	<s:BorderContainer width="100%" height="30"  >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
@@ -432,14 +432,14 @@
 		<mx:DateField id="endDate" width="100"  selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
 		
 	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="100" borderVisible="false" >
+	<s:BorderContainer width="100%" height="100"  >
 		<s:layout>
 			<s:HorizontalLayout gap="5" />
 		</s:layout>
 		<s:Label text="说明：" width="80" textAlign="right" height="30" verticalAlign="middle" />
 		<s:TextArea id="desc" width="100%" height="100%" />
 	</s:BorderContainer>
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
+	<s:BorderContainer width="100%" height="30"  >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
@@ -475,7 +475,7 @@
 	</s:BorderContainer>
 	
 	
-	<s:BorderContainer width="100%" height="30" borderVisible="false" >
+	<s:BorderContainer width="100%" height="30"  >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
@@ -485,7 +485,7 @@
 		<s:CheckBox id="cbemail" label="email"  change="warningChange()" />
 	</s:BorderContainer>
 	
-	<s:BorderContainer  id="alldaywarning1" width="100%" height="30" borderVisible="false"  >
+	<s:BorderContainer  id="alldaywarning1" width="100%" height="30"   >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
@@ -499,7 +499,7 @@
 		<s:Label text="分"  height="25" verticalAlign="middle" />
 		
 	</s:BorderContainer>
-	<s:BorderContainer id="alldaywarning2" width="100%" height="30" borderVisible="false"  >
+	<s:BorderContainer id="alldaywarning2" width="100%" height="30"   >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>
@@ -514,7 +514,7 @@
 		<s:Label text="分"  height="25" verticalAlign="middle" />
 		<s:CheckBox  id="needSecond2" selected="false"/>
 	</s:BorderContainer>
-	<s:BorderContainer id="dopanel"  width="100%" height="30" borderVisible="false"  >
+	<s:BorderContainer id="dopanel"  width="100%" height="30"   >
 		<s:layout>
 			<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 		</s:layout>

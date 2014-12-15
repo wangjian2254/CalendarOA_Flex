@@ -3,12 +3,10 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark"
 			   xmlns:mx="library://ns.adobe.com/flex/mx"
 			   preloader="uicontrol.LoadingExampleProgressBar"
-			   creationComplete="init()" minWidth="955" minHeight="600" skinClass="skins.ApplicationSkinBlue"
+			   creationComplete="init()" minWidth="955" minHeight="600"
 			   xmlns:httpcontrol="httpcontrol.*"
 			   xmlns:uicontrol="uicontrol.*">
-	<fx:Style source="/assets/customrControls.css">
-		
-	</fx:Style>
+
 	
 	
 	<fx:Script source="calendar.as">
@@ -20,11 +18,11 @@
 	<fx:Script source="flex.as">
 		
 	</fx:Script>
+
 	<fx:Declarations>
 		<httpcontrol:CHTTPService id="menuXML" url="{CHTTPService.baseUrl}/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
-		
+
 	</fx:Declarations>
-	<fx:Style source="/assets/style.css"/>
 	<s:Group id="header" width="100%" height="109">
 		<s:layout>
 			<s:BasicLayout/>
@@ -38,7 +36,7 @@
 			</s:layout>	
 			<mx:LinkButton icon="{CBorderContainer.refreshimg}" label="{ToolUtil.unreadMessageNum}" click="openMessage()" styleName="textStyle2" textDecoration="underline" />
 			<s:Label text="{ToolUtil.sessionUser.name} | {ToolUtil.sessionUser.org_name}" styleName="textStyle2"/>
-			<s:SkinnableContainer  id="loginBtnPanel"  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
+			<s:SkinnableContainer  id="loginBtnPanel"  height="26" styleName="userinfoclass"   visible="true">
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
@@ -60,7 +58,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
-			<s:SkinnableContainer  id="loginBtnPanel2" height="26"  skinClass="skins.topLinksBoxSkin" visible="true">
+			<s:SkinnableContainer  id="loginBtnPanel2" height="26" styleName="userinfoclass"  visible="true">
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
@@ -84,7 +82,7 @@
 			<s:Button width="130" height="29" label="请假申请" styleName="menuBtn" mouseOver="showHandler(event)"/>-->
 		</s:Group>	
 		
-		<s:SkinnableContainer  height="35" top="77" left="0" right="0" skinClass="skins.locGroupSkin" id="locGroup" visible="true">
+		<s:SkinnableContainer  height="35" top="77" left="0" right="0" styleName="statusbar" id="locGroup" visible="true">
 			<s:layout>
 				<s:HorizontalLayout paddingLeft="20" paddingRight="20" verticalAlign="middle"/>
 			</s:layout>

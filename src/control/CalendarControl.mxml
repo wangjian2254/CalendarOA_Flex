@@ -3,7 +3,7 @@
 						  xmlns:s="library://ns.adobe.com/flex/spark" 
 						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
 						  xmlns:uicontrol="uicontrol.*"
-						  width="700" height="500" borderVisible="false" backgroundAlpha="0">
+						  width="700" height="500" >
 	<fx:Script>
 		<![CDATA[
         import events.ChangeMenuEvent;
@@ -756,12 +756,12 @@
 			</s:HorizontalLayout>
 		</control:layout>
 
-        <s:BorderContainer id="datePanel" width="230" height="100%" borderVisible="false" >
+        <s:BorderContainer id="datePanel" width="230" height="100%"  >
             <s:layout>
                 <s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
                 </s:VerticalLayout>
             </s:layout>
-            <s:BorderContainer width="100%" height="30" borderVisible="false">
+            <s:BorderContainer width="100%" height="30" >
                 <s:layout>
                     <s:HorizontalLayout gap="5" verticalAlign="middle">
 
@@ -786,51 +786,51 @@
 
         </s:BorderContainer>
 
-		<s:BorderContainer id="rightContainner" width="100%" height="100%" backgroundAlpha="0"  borderVisible="false">
+		<s:BorderContainer id="rightContainner" width="100%" height="100%"   >
 			<s:layout>
 				<s:VerticalLayout gap="1">
 					
 				</s:VerticalLayout>
 				
 			</s:layout>
-			<s:BorderContainer id="weekHead" width="100%" height="25" visible="{weekHead.height==0?false:true}" borderVisible="false" backgroundAlpha="0">
+			<s:BorderContainer id="weekHead" width="100%" height="25" visible="{weekHead.height==0?false:true}" >
 				<s:layout>
 					<s:HorizontalLayout gap="1" verticalAlign="middle" >
 						
 					</s:HorizontalLayout>
 				</s:layout>
-				<s:Label  width="50" height="25" fontSize="18"  text="" visible="{calendarBorder.visible}" includeInLayout="{calendarBorder.visible}" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期日" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期一" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期二" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期三" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期四" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期五" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期六" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="50" height="25" styleName="weeklabel"  text="" visible="{calendarBorder.visible}" includeInLayout="{calendarBorder.visible}"  />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期日" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期一" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期二" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期三" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期四" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期五" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期六" />
 					
 			</s:BorderContainer>
-			<s:BorderContainer id="dayHead" width="100%" height="0"  visible="{dayHead.height==0?false:true}" borderVisible="false" backgroundAlpha="0">
+			<s:BorderContainer id="dayHead" width="100%" height="0"  visible="{dayHead.height==0?false:true}" >
 				<s:layout>
 					<s:HorizontalLayout gap="1" verticalAlign="middle" >
 						
 					</s:HorizontalLayout>
 				</s:layout>
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期一" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期二" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期三" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期四" textAlign="center" verticalAlign="middle" />
-				<s:Label  width="{dayWidth}" height="25" fontSize="18"  text="星期五" textAlign="center" verticalAlign="middle" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期一" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期二" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期三" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期四" />
+				<s:Label  width="{dayWidth}" height="25" styleName="weeklabel"  text="星期五" />
 				
 			</s:BorderContainer>
-            <s:BorderContainer id="onedayHead" width="100%" height="0"  visible="{onedayHead.height==0?false:true}" borderVisible="false" backgroundAlpha="0">
+            <s:BorderContainer id="onedayHead" width="100%" height="0"  visible="{onedayHead.height==0?false:true}" >
                 <s:layout>
                     <s:HorizontalLayout gap="1" verticalAlign="middle" horizontalAlign="center" >
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:Label   id="onedayLabel" height="25" fontSize="18" textAlign="center" verticalAlign="middle" />
+                <s:Label   id="onedayLabel" height="25" styleName="weeklabel" textAlign="center" verticalAlign="middle" />
 
             </s:BorderContainer>
-			<s:BorderContainer id="daySchedule" minWidth="100" height="0" borderVisible="false"   backgroundColor="#999999">
+			<s:BorderContainer id="daySchedule" minWidth="100" height="0"    backgroundAlpha="1" backgroundColor="#999999">
 				<s:layout>
 					<s:HorizontalLayout gap="1" verticalAlign="middle" paddingBottom="1" paddingRight="1" paddingLeft="1" paddingTop="1">
 						
@@ -838,7 +838,7 @@
 				</s:layout>
 				
 			</s:BorderContainer>
-			<s:BorderContainer width="100%" height="100%" borderVisible="false"  backgroundColor="#999999">
+			<s:BorderContainer width="100%" height="100%"   backgroundAlpha="1" backgroundColor="#999999">
 				<s:layout>
 					<s:VerticalLayout gap="0"  paddingBottom="1" paddingRight="1" paddingLeft="1" paddingTop="1">
 						
@@ -861,12 +861,12 @@
 		</s:BorderContainer>
 		<s:Scroller id="taskPanel"  width="250" height="100%">
 			<s:Group width="100%" height="100%">
-				<s:BorderContainer width="100%" borderVisible="false" >
+				<s:BorderContainer width="100%"  >
 					<s:layout>
 						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
 						</s:VerticalLayout>
 					</s:layout>
-					<s:BorderContainer width="100%" height="25"  borderVisible="false" backgroundAlpha="0">
+					<s:BorderContainer width="100%" height="25"  >
 						<s:layout>
 							<s:HorizontalLayout gap="1" verticalAlign="middle">
 								
@@ -882,7 +882,7 @@
 					<s:VGroup id="taskunpanel" width="100%">
 
 					</s:VGroup>
-					<!--<s:BorderContainer id="taskunpanel" width="100%" borderVisible="false"  >-->
+					<!--<s:BorderContainer id="taskunpanel" width="100%"   >-->
 						<!--<s:layout>-->
 							<!--<s:VerticalLayout>-->
 							<!--</s:VerticalLayout>-->

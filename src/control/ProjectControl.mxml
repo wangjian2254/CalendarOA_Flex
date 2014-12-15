@@ -2,7 +2,7 @@
 <control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
                           xmlns:s="library://ns.adobe.com/flex/spark"
                           xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" width="700" height="700"
-                          borderVisible="false" backgroundAlpha="0">
+                          >
     <fx:Script>
 		<![CDATA[
         import control.window.CreateProjectPanel;
@@ -220,7 +220,7 @@
 	</control:layout>
 
         <s:VGroup  width="100%" height="100%">
-            <s:BorderContainer width="100%" height="45" borderVisible="false" backgroundImage="{CBorderContainer.toolbgimg}">
+            <s:BorderContainer width="100%" height="45"  backgroundImage="{CBorderContainer.toolbgimg}">
                 <s:layout>
                     <s:HorizontalLayout verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>

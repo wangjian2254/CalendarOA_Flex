@@ -4,7 +4,7 @@
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    cornerRadius="12"
-                   borderColor="#000000" borderStyle="solid" width="250" height="60" skinClass="skins.PaoPaoSkin"
+                   borderColor="#000000" borderStyle="solid" width="250" height="60" styleName="paopaonotify"
                    creationComplete="init()">
     <!--<s:backgroundFill>-->
     <!--<s:SolidColor  id="back10" color="#b0e861" alpha="1"/>-->

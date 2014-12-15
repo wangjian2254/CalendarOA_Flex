@@ -48,7 +48,8 @@ public class CBorderContainer extends BorderContainer implements INavigatorConte
 //            this.skin
 //            this.skin = skins.contentBoxSkin;
 			this.setStyle("borderVisible",false);
-			this.setStyle("skinClass",contentBoxSkin);
+//			this.setStyle("skinClass",contentBoxSkin);
+			this.styleName = "customBorderContainer";
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,init);
 			this.addEventListener(FlexEvent.CREATION_COMPLETE,reloadParamData);
 			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr,changeCurrentUser);

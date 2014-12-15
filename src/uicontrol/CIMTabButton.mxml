@@ -4,7 +4,7 @@
 -->
 <uicontrol:CTabButton xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:uicontrol="uicontrol.*"
                       xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
-                      backgroundAlpha="0" creationComplete="mouseU()" borderVisible="false" width="{btnLabel2.width>80?btnLabel2.width:80}"  click="clickBtn()" mouseDown="mouseD()" mouseUp="mouseU()" mouseOut="mouseU()" buttonMode="true" height="31"
+                       creationComplete="mouseU()"  width="{btnLabel2.width>80?btnLabel2.width:80}"  click="clickBtn()" mouseDown="mouseD()" mouseUp="mouseU()" mouseOut="mouseU()" buttonMode="true" height="31"
         >
     <uicontrol:states>
         <s:State name="unSelected" />

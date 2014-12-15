@@ -3,7 +3,7 @@
 @namespace mx "library://ns.adobe.com/flex/mx";
 
 s|Application{
-	
+	skinClass:ClassReference("skins.ApplicationSkinBlue")
 }
 
 .fliterComboBox{
@@ -51,7 +51,7 @@ global
 
 .menuBtn{
 	fontSize:14;
-	skin-class:ClassReference('skins.menuBtnSkin');
+	skinClass:ClassReference('skins.menuBtnSkin');
 }
 
 s|Form s|FormItem{
@@ -72,4 +72,57 @@ s|Form s|FormItem s|TextArea{
 
 s|Form s|FormItem mx|DateField{
 	textAlign:left;
+}
+
+.userinfoclass{
+	skinClass:ClassReference("skins.topLinksBoxSkin");
+}
+.statusbar{
+	skinClass:ClassReference("skins.locGroupSkin");
+}
+
+.btnTuPian{
+	skinClass:ClassReference("skins.BtnTuPianSkin");
+}
+.btnWenJian{
+	skinClass:ClassReference("skins.BtnWenJianSkin");
+}
+.btnShangChuan{
+	skinClass:ClassReference("skins.BtnShangChuanSkin");
+}
+.btnChat2{
+	skinClass:ClassReference("skins.Chat2BtnSkin");
+
+}
+.btnChat{
+	skinClass:ClassReference("skins.ChatBtnSkin");
+
+}
+
+.customBorderContainer{
+	skinClass: ClassReference("skins.contentBoxSkin");
+}
+
+.paopaonotify{
+	skinClass: ClassReference("skins.PaoPaoSkin");
+}
+
+
+.orgchatlist{
+	skinClass: ClassReference("skins.BtnChatBarSkin");
+}
+
+.btnRight{
+	skinClass: ClassReference("skins.RightBtnSkin");
+}
+
+.weeklabel{
+	fontSize: 18px;
+	textAlign: center;
+	verticalAlign: middle;
+
+}
+s|BorderContainer{
+	backgroundAlpha: 0;
+	borderVisible: false;
 }

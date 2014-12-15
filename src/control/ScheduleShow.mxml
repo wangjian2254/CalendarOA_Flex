@@ -384,11 +384,11 @@
 			
 		</s:HorizontalLayout>
 	</s:layout>
-	<s:BorderContainer width="400" id="schedulePanel" borderVisible="false" >
+	<s:BorderContainer width="400" id="schedulePanel"  >
 		<s:layout>
 			<s:VerticalLayout gap="0"/>
 		</s:layout>
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -398,7 +398,7 @@
 			</s:Label>
 		</s:BorderContainer>
 		
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -407,7 +407,7 @@
 			<s:Label id="startdate" text="" height="100%" verticalAlign="middle" />
 			
 		</s:BorderContainer>
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -416,7 +416,7 @@
 			</s:Label>
 			
 		</s:BorderContainer>
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -424,7 +424,7 @@
 			<s:Label id="repeatType" width="80"  height="25"  />
 			
 		</s:BorderContainer>
-		<s:BorderContainer id="dayPanel" width="100%" height="0" borderVisible="false" >
+		<s:BorderContainer id="dayPanel" width="100%" height="0"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" />
 			</s:layout>
@@ -439,7 +439,7 @@
 				<s:Label text="日" />
 			</s:TileGroup>
 		</s:BorderContainer>
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -447,14 +447,14 @@
 			
 			<s:Label id="forever" text="永远"  />
 		</s:BorderContainer>
-		<s:BorderContainer width="100%" height="100" borderVisible="false" >
+		<s:BorderContainer width="100%" height="100"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" />
 			</s:layout>
 			<s:Label text="说明：" width="80" textAlign="right" height="30" verticalAlign="middle" />
 			<s:TextArea id="desc" width="100%" height="100%" editable="false" />
 		</s:BorderContainer>
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -464,7 +464,7 @@
 			</s:BorderContainer>
 			
 		</s:BorderContainer>
-		<s:BorderContainer id="groupPanel" width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer id="groupPanel" width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -474,7 +474,7 @@
 			
 		</s:BorderContainer>
 	
-		<s:BorderContainer width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -483,7 +483,7 @@
 			<s:Label id="cbsms" text="手机短信"   />
 			<s:Label id="cbemail" text="email"   />
 		</s:BorderContainer>
-		<s:BorderContainer id="alldaywarning" width="100%" height="30" borderVisible="false"  visible="{!schedulData.is_all_day}">
+		<s:BorderContainer id="alldaywarning" width="100%" height="30"   visible="{!schedulData.is_all_day}">
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -491,7 +491,7 @@
 			<s:Label id="firstWarning" text="提前"  height="25" verticalAlign="middle" />
 			
 		</s:BorderContainer>
-		<s:BorderContainer id="alldaywarning0" width="100%" height="30" borderVisible="false"  visible="{!schedulData.is_all_day}">
+		<s:BorderContainer id="alldaywarning0" width="100%" height="30"   visible="{!schedulData.is_all_day}">
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -499,7 +499,7 @@
 			<s:Label text="第二次提醒：" width="80" textAlign="right" height="25" verticalAlign="middle" />
 			<s:Label id="secondWarning" text="提前"  height="25" verticalAlign="middle" />
 		</s:BorderContainer>
-		<s:BorderContainer id="authorpanel" width="100%" height="30" borderVisible="false" >
+		<s:BorderContainer id="authorpanel" width="100%" height="30"  >
 			<s:layout>
 				<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 			</s:layout>
@@ -510,14 +510,14 @@
 		</s:BorderContainer>
 	</s:BorderContainer>
 		
-		<s:BorderContainer width="1" borderVisible="false" backgroundColor="#CCCCCC" height="100%"  visible="{contactPanel.visible}">
+		<s:BorderContainer width="1"  backgroundColor="#CCCCCC" height="100%"  visible="{contactPanel.visible}">
 			
 		</s:BorderContainer>
-	<s:BorderContainer id="contactPanel" width="100%" height="100%" borderVisible="false"  >
+	<s:BorderContainer id="contactPanel" width="100%" height="100%"   >
 		<s:layout>
 			<s:VerticalLayout gap="5"/>
 		</s:layout>
-			<s:BorderContainer  width="100%" height="30" borderVisible="false"  >
+			<s:BorderContainer  width="100%" height="30"   >
 				<s:layout>
 					<s:HorizontalLayout gap="5" verticalAlign="middle"/>
 				</s:layout>

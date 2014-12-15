@@ -8,9 +8,7 @@
 					   width="80%" height="80%" minWidth="955" minHeight="600"
 					   creationComplete="init()" showStatusBar="false"
 					   skinClass="skins.WindowApplicationSkinBlue2">
-	<fx:Style source="/assets/customrControls.css">
-		
-	</fx:Style>
+
 	
 	
 	<fx:Script source="calendar.as">

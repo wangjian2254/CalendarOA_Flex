@@ -68,16 +68,16 @@
 
 		]]>
 	</fx:Script> 
-	<s:BorderContainer  id="borderC"   width="100%" borderVisible="false" >
+	<s:BorderContainer  id="borderC"   width="100%"  >
 		<s:layout>
 			<s:VerticalLayout gap="0" />
 		</s:layout>
-	<s:BorderContainer   id="sc1" width="100%"     borderVisible="false"  >	
+	<s:BorderContainer   id="sc1" width="100%"       >
 		<s:Label id="type"  paddingLeft="5" fontSize="10">
 			
 		</s:Label>
 	</s:BorderContainer>
-	<s:BorderContainer   id="sc2" width="100%"     borderVisible="false" mouseOver="m_over()" mouseOut=" m_out()"   >
+	<s:BorderContainer   id="sc2" width="100%"      mouseOver="m_over()" mouseOut=" m_out()"   >
 		<s:Rect left="0" right="0" top="0" bottom="0">
 			<s:fill>
 				<s:SolidColor id="solidColor" color="0xffffff"/>

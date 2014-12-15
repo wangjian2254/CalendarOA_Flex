@@ -1068,28 +1068,28 @@
 
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:BorderContainer id="color0" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color0" backgroundAlpha="1" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
                 <s:Label text="|" fontWeight="bold" fontSize="18" textAlign="center"  width="10" height="25" verticalAlign="middle"/>
-                <s:BorderContainer id="color1" click="colorClick(0xaecfea)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color1" click="colorClick(0xaecfea)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color2" click="colorClick(0x5484ed)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#5484ed" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color2" click="colorClick(0x5484ed)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#5484ed" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color3" click="colorClick(0xa4bdfc)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#a4bdfc" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color3" click="colorClick(0xa4bdfc)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#a4bdfc" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color4" click="colorClick(0x46d6db)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#46d6db" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color4" click="colorClick(0x46d6db)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#46d6db" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color5" click="colorClick(0x7ae7bf)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#7ae7bf" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color5" click="colorClick(0x7ae7bf)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#7ae7bf" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color6" click="colorClick(0x51b749)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#51b749" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color6" click="colorClick(0x51b749)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#51b749" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color7" click="colorClick(0xfbd75b)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#fbd75b" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color7" click="colorClick(0xfbd75b)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#fbd75b" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color8" click="colorClick(0xffb878)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ffb878" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color8" click="colorClick(0xffb878)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#ffb878" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color9" click="colorClick(0xff887c)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#ff887c" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color9" click="colorClick(0xff887c)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#ff887c" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+                <s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
                 <mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange()"
                                 symbolColor="#030002">

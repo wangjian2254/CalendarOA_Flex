@@ -69,7 +69,7 @@
     <fx:Declarations>
     </fx:Declarations>
 
-    <s:BorderContainer width="100%" height="25"  buttonMode="true" borderVisible="false" >
+    <s:BorderContainer width="100%" height="25"  buttonMode="true"  >
         <s:Rect id="backgroundRect" left="0" right="0" top="0" bottom="0">
             <s:fill>
                 <s:SolidColor color="0xdbdbdb" />
@@ -82,7 +82,7 @@
         </s:Rect>
         <s:HGroup id="horizontalLayout" verticalAlign="middle" width="100%" height="25" gap="5" paddingRight="5" paddingLeft="5">
             <s:CheckBox id="finishBox" change="selectTask()" ></s:CheckBox>
-            <s:TextInput id="taskInput" width="100%" change="selectTask()" borderVisible="false" mouseOut="m_out()" mouseOver="m_over()"></s:TextInput>
+            <s:TextInput id="taskInput" width="100%" change="selectTask()"  mouseOut="m_out()" mouseOver="m_over()"></s:TextInput>
             <uicontrol:BtnDel id="delBtn" clickFun="{delTask}" ></uicontrol:BtnDel>
         </s:HGroup>
     </s:BorderContainer>

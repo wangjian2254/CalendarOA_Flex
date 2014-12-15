@@ -285,7 +285,7 @@
 	<s:Spacer height="4">
 		
 	</s:Spacer>
-    <s:ButtonBar id="showModel" change="changeShowModel()" skinClass="skins.BtnChatBarSkin" dataProvider="{btnlist}" width="100%" height="48" selectedIndex="0" labelField="label" />
+    <s:ButtonBar id="showModel" change="changeShowModel()" styleName="orgchatlist" dataProvider="{btnlist}" width="100%" height="48" selectedIndex="0" labelField="label" />
     
     <uicontrol:AddressList id="addressList" borderColor="#d6d6d6" dataProvider="{departMember}" borderVisible="{borderVisible}}"
                            listItemZhanKai="listItemZhanKai_handler(event)"
@@ -297,7 +297,7 @@
 		<s:Spacer width="10" />
 		<uicontrol:HeadImage id="head" isPerson="true" width="45" height="45" />
 		<s:Label id="nameLabel" ></s:Label>
-		<s:BorderContainer id="num" visible="{ChatManager.liyuShow}" minWidth="15" height="15" cornerRadius="7" borderVisible="false" backgroundColor="#ff0000">
+		<s:BorderContainer id="num" visible="{ChatManager.liyuShow}" minWidth="15" height="15" cornerRadius="7"  backgroundAlpha="1" backgroundColor="#ff0000">
 			<s:layout>
 				<s:HorizontalLayout verticalAlign="middle" horizontalAlign="center"></s:HorizontalLayout>
 			</s:layout>

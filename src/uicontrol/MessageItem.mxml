@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
                    xmlns:s="library://ns.adobe.com/flex/spark"
-                   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%" borderVisible="false" borderWeight="5"
-                   cornerRadius="7" minHeight="100" borderColor="#CCCCCC" backgroundColor="#ffffff"
+                   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%"  borderWeight="5"
+                   cornerRadius="7" minHeight="100" borderColor="#CCCCCC" backgroundAlpha="1" backgroundColor="#ffffff"
                    creationComplete="init()">
     <s:layout>
 		<s:VerticalLayout gap="2"  paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5"/>
@@ -75,7 +75,7 @@
 		</mx:DateFormatter>
 	</fx:Declarations>
 	<s:HGroup width="100%" height="80" verticalAlign="middle">
-        <s:Form id="messageInfo" width="100%" height="80" backgroundColor="#ffffff" >
+        <s:Form id="messageInfo" width="100%" height="80" backgroundAlpha="1" backgroundColor="#ffffff" >
             <s:layout>
                 <s:FormLayout gap="-14">
 
@@ -98,7 +98,7 @@
 	</s:HGroup>
 
     <s:HGroup width="100%" height="100%">
-	    <s:RichEditableText  id="richText" editable="false" width="100%"  height="100%" text="{message.desc}" backgroundColor="#ffffff" paddingLeft="25"  >
+	    <s:RichEditableText  id="richText" editable="false" width="100%"  height="100%" text="{message.desc}" backgroundAlpha="1" backgroundColor="#ffffff" paddingLeft="25"  >
 	    </s:RichEditableText >
         <s:VScrollBar  id="VS_Chat"  height="100%" viewport="{richText}" visible="{VS_Chat.enabled}" />
     </s:HGroup>

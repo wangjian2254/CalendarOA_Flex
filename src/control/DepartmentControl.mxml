@@ -4,7 +4,7 @@
                           xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*"
                           xmlns:conobj="uicontrol.conobj.*"
 
-                          width="700" height="500" backgroundAlpha="0" xmlns:uicontrol="uicontrol.*">
+                          width="700" height="500"  xmlns:uicontrol="uicontrol.*">
 
     <fx:Script>
 		<![CDATA[
@@ -400,14 +400,14 @@
 
         <s:Scroller id="mainScroller" width="100%" height="100%" mouseWheelChanging="mainScroller_mouseWheelChangingHandler(event)">
             <s:Group width="100%" height="100%">
-                <s:BorderContainer id="orgChart" borderVisible="false">
+                <s:BorderContainer id="orgChart" >
 
                 </s:BorderContainer>
             </s:Group>
         </s:Scroller>
 
         <s:VGroup width="100%" height="300" gap="5">
-            <s:BorderContainer width="100%" height="45" borderVisible="false"  backgroundImage="{CBorderContainer.toolbgimg}">
+            <s:BorderContainer width="100%" height="45"   backgroundImage="{CBorderContainer.toolbgimg}">
                 <s:layout>
                     <s:HorizontalLayout paddingLeft="15" gap="5" horizontalAlign="left" verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>
@@ -423,7 +423,7 @@
             </s:BorderContainer>
             <s:Scroller width="100%"  height="100%" >
                 <s:Group width="100%" height="100%">
-                    <s:BorderContainer id="memebers" width="100%" borderVisible="false">
+                    <s:BorderContainer id="memebers" width="100%" >
                         <s:layout>
                             <s:TileLayout columnAlign="justifyUsingGap" horizontalGap="5" verticalGap="5"></s:TileLayout>
                         </s:layout>
