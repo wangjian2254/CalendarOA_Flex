@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009"
+             xmlns:s="library://ns.adobe.com/flex/spark"
+             minWidth="16" minHeight="16" alpha.disabled="0.5">
+    <fx:Script><![CDATA[
+        [Bindable]
+        [Embed("/assets/btnimg/add_down.png")]
+        public var X_down:Class;
+        [Bindable]
+        [Embed("/assets/btnimg/add_over.png")]
+        public var X_hover:Class;
+        [Bindable]
+        [Embed("/assets/btnimg/add.png")]
+        public var X_out:Class;
+    ]]></fx:Script>
+    <!-- host component -->
+    <fx:Metadata>
+        <![CDATA[
+        /**
+         * @copy spark.skins.spark.ApplicationSkin#hostComponent
+         */
+        [HostComponent("spark.components.Button")]
+        ]]>
+    </fx:Metadata>
+
+    <s:states>
+        <s:State name="up" />
+        <s:State name="over" />
+        <s:State name="down" />
+        <s:State name="disabled" />
+    </s:states>
+        <s:HGroup  width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+            <s:Graphic >
+            <s:Image
+                    source.up="{X_out}"
+                    source.over="{X_hover}"
+                    source.down="{X_down}"
+                    source.disabled="{X_down}"/>
+            </s:Graphic>
+        </s:HGroup>
+
+
+    <s:Label id="labelDisplay"
+             textAlign="center"
+             verticalAlign="middle"
+             maxDisplayedLines="1"
+             horizontalCenter="0" verticalCenter="1"
+             left="10" right="10" top="2" bottom="2">
+
+    </s:Label>
+</s:SparkSkin>

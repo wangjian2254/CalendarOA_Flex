@@ -25,11 +25,9 @@
 
         import uicontrol.DayItem;
         import uicontrol.ScheduleItem;
-        import uicontrol.TaskItem;
 
         import util.DateUtil;
         import util.ScheduleUtil;
-        import util.TaskUtil;
         import util.ToolUtil;
 
         [Bindable]
@@ -718,23 +716,10 @@
         private function taskChange(e:CollectionEvent):void {
 
             taskunpanel.removeAllElements();
-            var taskItem:TaskItem = null;
-//				for each(var obj:Object in ToolUtil.taskUnList){
-//					taskItem=new TaskItem();
-//					taskItem.taskData = obj;
-//					taskItem.taskName = obj.title;
-//					taskItem.color = obj.color;
-//					taskItem.taskId = obj.id;
-//					taskunpanel.addElement(taskItem);
-//
-//				}
+
 
         }
 
-        private function createTask():void {
-            TaskUtil.createTask();
-
-        }
 
         private function createGroup():void {
             var obj:Object = new Object();
@@ -767,9 +752,9 @@
 
                     </s:HorizontalLayout>
                 </s:layout>
+                <uicontrol:Btn styleName="btnRefresh"/>
                 <s:Button chromeColor="red" label="创建任务" color="#ffffff"   height="25" click="createSchedule()" />
                 <s:Spacer width="100%" />
-
                     <s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
 
             </s:BorderContainer>
@@ -860,25 +845,17 @@
 				
 		</s:BorderContainer>
 		<s:Scroller id="taskPanel"  width="250" height="100%">
-			<s:Group width="100%" height="100%">
-				<s:BorderContainer width="100%"  >
-					<s:layout>
-						<s:VerticalLayout gap="5" paddingLeft="5" paddingTop="10">
-						</s:VerticalLayout>
-					</s:layout>
-					<s:BorderContainer width="100%" height="25"  >
-						<s:layout>
-							<s:HorizontalLayout gap="1" verticalAlign="middle">
-								
-							</s:HorizontalLayout>
-						</s:layout>
+			<s:VGroup width="100%" height="100%" gap="5">
+
+					<s:VGroup width="100%" height="25"  >
+
 						<s:Label text="逾期任务"  fontSize="18"  paddingTop="10" >
 						</s:Label>
                         <!--<s:Spacer width="100%"></s:Spacer>-->
                         <!--<uicontrol:BtnAdd clickFun="createTask" />-->
                         <!--<uicontrol:BtnDel clickFun="showTask" />-->
                         <!--<s:Spacer width="20"></s:Spacer>-->
-					</s:BorderContainer>
+					</s:VGroup>
 					<s:VGroup id="taskunpanel" width="100%">
 
 					</s:VGroup>
@@ -888,7 +865,6 @@
 							<!--</s:VerticalLayout>-->
 						<!--</s:layout>-->
 					<!--</s:BorderContainer>-->
-				</s:BorderContainer>
-			</s:Group>
+			</s:VGroup>
 		</s:Scroller>
 </control:CBorderContainer>

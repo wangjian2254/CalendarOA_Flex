@@ -310,9 +310,10 @@
 							<s:layout>
 								<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
 							</s:layout>
-							
-							<uicontrol:BtnSetting clickFun="openAddress" />
-							<uicontrol:BtnRefresh clickFun="ToolUtil.contactsRefresh"  />
+
+							<uicontrol:Btn width="16" height="16" styleName="btnSetting" clickFun="openAddress" />
+
+                            <uicontrol:Btn width="16" height="16" styleName="btnRefresh" clickFun="ToolUtil.contactsRefresh"  />
 							
 						</s:BorderContainer>
 					</s:BorderContainer>
@@ -367,8 +368,8 @@
 								<s:HorizontalLayout gap="5" verticalAlign="middle" horizontalAlign="right" paddingRight="15"/>
 							</s:layout>
 							
-							<uicontrol:BtnSetting clickFun="openAddress" />
-							<uicontrol:BtnRefresh clickFun="ToolUtil.contactsRefresh"  />
+							<uicontrol:Btn width="16" height="16" styleName="btnSetting" clickFun="openAddress" />
+                            <uicontrol:Btn width="16" height="16" styleName="btnRefresh" clickFun="ToolUtil.contactsRefresh"  />
 							
 						</s:BorderContainer>
 					</s:BorderContainer>

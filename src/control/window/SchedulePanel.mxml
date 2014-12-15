@@ -995,7 +995,7 @@
                 <s:DropDownList id="departmentDownList" width="50%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
                 <s:DropDownList id="projectDownList" width="50%" labelField="name" dataProvider="{myproject}"></s:DropDownList>
                 <s:Spacer width="30"></s:Spacer>
-                <uicontrol:BtnAdd clickFun="{addProject}" />
+                <uicontrol:Btn width="16" height="16" styleName="btnAdd" clickFun="{addProject}" />
             </s:FormItem>
             <s:FormItem label="任务描述：" height="150">
                 <s:layout>
@@ -1106,7 +1106,7 @@
                     <s:TileGroup id="usersGroup" width="100%" toolTip="责任人：参与完成任务的员工" columnAlign="justifyUsingGap" >
                     </s:TileGroup>
                 </s:Scroller>
-                <uicontrol:BtnAdd clickFun="{openUserChoice}" />
+                <uicontrol:Btn width="16" height="16" styleName="btnAdd" clickFun="{openUserChoice}" />
             </s:FormItem>
             <s:FormItem id="authorpanel" label="审核人：" height="25"  toolTip="审核人：任务完成后，审核人进行确认。" >
                 <s:layout>

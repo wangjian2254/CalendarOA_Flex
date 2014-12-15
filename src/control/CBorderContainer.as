@@ -9,8 +9,6 @@ import mx.core.INavigatorContent;
 import mx.events.FlexEvent;
 import mx.events.ResizeEvent;
 
-import skins.contentBoxSkin;
-
 import spark.components.BorderContainer;
 
 public class CBorderContainer extends BorderContainer implements INavigatorContent

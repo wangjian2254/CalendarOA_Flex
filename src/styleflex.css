@@ -126,3 +126,18 @@ s|BorderContainer{
 	backgroundAlpha: 0;
 	borderVisible: false;
 }
+.btnSetting{
+	skinClass: ClassReference("skins.BtnSettingSkin");;
+}
+.btnAdd{
+	skinClass: ClassReference("skins.BtnAddSkin");
+}
+.btnDel{
+	skinClass: ClassReference("skins.BtnDelSkin");
+}
+.btnOk{
+	skinClass: ClassReference("skins.BtnOkSkin");
+}
+.btnRefresh{
+	skinClass: ClassReference("skins.BtnRefreshSkin");
+}

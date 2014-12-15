@@ -205,10 +205,9 @@
             </s:BorderContainer>
 
         </s:HGroup>
-        <uicontrol:BtnDel id="btnDel" visible="false" width="15" height="15" right="5" top="15" clickFun="unsubscribe_handler"></uicontrol:BtnDel>
-        <uicontrol:RightBtn id="rightContainer" buttonMode="true" right="0" click="select_handler(event)" width="50" top="0" bottom="1" >
+        <uicontrol:Btn width="16" height="16" styleName="btnDel" id="btnDel" visible="false"  right="5" top="15" clickFun="unsubscribe_handler" />
+        <s:Button id="rightContainer" styleName="btnRight" buttonMode="true" right="0" click="select_handler(event)" width="50" top="0" bottom="1" />
 
-        </uicontrol:RightBtn>
 
     </s:BorderContainer>
 

@@ -70,5 +70,5 @@
         </s:HorizontalLayout>
     </s:layout>
     <s:Label id="personName" buttonMode="true"  ></s:Label>
-    <uicontrol:BtnDel id="btnDel" visible="{showBtn}" clickFun="delPerson"></uicontrol:BtnDel>
+    <uicontrol:Btn width="16" height="16" styleName="btnDel" id="btnDel" visible="{showBtn}" clickFun="delPerson" />
 </s:BorderContainer>

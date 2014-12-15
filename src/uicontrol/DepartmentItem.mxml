@@ -243,8 +243,8 @@
     <uicontrol:HeadImage id="orgHead"  width="45" height="45"/>
     <s:VGroup id="formDepart" width="100%" gap="5">
         <s:HGroup gap="15" id="group" horizontalAlign="right" verticalAlign="middle"  width="100%">
-            <uicontrol:BtnAdd toolTip="添加子部门" visible="{powerAdd}" clickFun="{addChildDepartment}" ></uicontrol:BtnAdd>
-            <uicontrol:BtnDel id="btnDel" toolTip="删除部门" visible="{powerDel}" clickFun="{delDepartment}" ></uicontrol:BtnDel>
+            <uicontrol:Btn width="16" height="16" styleName="btnAdd" toolTip="添加子部门" visible="{powerAdd}" clickFun="{addChildDepartment}" />
+            <uicontrol:Btn width="16" height="16" styleName="btnDel" id="btnDel" toolTip="删除部门" visible="{powerDel}" clickFun="{delDepartment}" />
         </s:HGroup>
         <s:HGroup width="100%"  verticalAlign="middle" >
             <s:Label text="部门名称："></s:Label>

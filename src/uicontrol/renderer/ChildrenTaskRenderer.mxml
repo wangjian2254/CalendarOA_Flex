@@ -83,7 +83,7 @@
         <s:HGroup id="horizontalLayout" verticalAlign="middle" width="100%" height="25" gap="5" paddingRight="5" paddingLeft="5">
             <s:CheckBox id="finishBox" change="selectTask()" ></s:CheckBox>
             <s:TextInput id="taskInput" width="100%" change="selectTask()"  mouseOut="m_out()" mouseOver="m_over()"></s:TextInput>
-            <uicontrol:BtnDel id="delBtn" clickFun="{delTask}" ></uicontrol:BtnDel>
+            <uicontrol:Btn width="16" height="16" styleName="btnDel" id="delBtn" clickFun="{delTask}" />
         </s:HGroup>
     </s:BorderContainer>
 </s:ItemRenderer>
