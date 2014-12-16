@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
-                             xmlns:s="library://ns.adobe.com/flex/spark"
-                             width="350" height="190" title="用户登录"
+                             xmlns:s="library://ns.adobe.com/flex/spark" xmlns:uicontrol="uicontrol.*"
+                             width="350"  title="用户登录"
                              creationComplete="init()" xmlns:window="control.window.*">
     <fx:Script>
 		<![CDATA[
-        import httpcontrol.HttpServiceUtil;
-
-        import mx.controls.Alert;
-        import mx.core.FlexGlobals;
-        import mx.events.CloseEvent;
-        import mx.managers.PopUpManager;
-        import mx.rpc.events.ResultEvent;
-
-        import util.ToolUtil;
+			import events.SocialEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import util.ChatManager;
+			import util.ToolUtil;
 
         override public function releaseListener(e:CloseEvent):void {
         }
@@ -60,12 +63,26 @@
         private function foucePass():void {
             password.setFocus();
         }
+
+        private function loginBySocial(type:String):void{
+			var timeline:Date = new Date();
+			
+            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fsocial_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state="+ChatManager.type;
+            if(ChatManager.type=="flex"){
+				navigateToURL(new URLRequest(url),"_self");
+			}else{
+				var event:SocialEvent = new SocialEvent(SocialEvent.SOCIAL, url);
+				FlexGlobals.topLevelApplication.dispatchEvent(event);
+				closeWin();
+			}
+			
+        }
         ]]>
 	</fx:Script>
 	<fx:Declarations>
 		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
 	</fx:Declarations>
-
+    <s:VGroup width="100%">
 	<s:Form width="100%" id="form" >
 
 		<s:FormItem label="用户名:" textAlign="right">
@@ -93,4 +110,13 @@
 
 		</s:FormItem>
 	</s:Form>
+        <s:HGroup gap="3" width="100%" horizontalAlign="center" paddingBottom="20">
+            <uicontrol:HeadImage source="/static/image/1.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('sinaweibo')" />
+            <uicontrol:HeadImage source="/static/image/2.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('qqdenglu')" />
+            <uicontrol:HeadImage source="/static/image/3.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('renren')" />
+            <uicontrol:HeadImage source="/static/image/4.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('qqweibo')" />
+            <uicontrol:HeadImage source="/static/image/5.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('kaixin')" />
+            <uicontrol:HeadImage source="/static/image/6.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('baidu')" />
+        </s:HGroup>
+    </s:VGroup>
 </window:EfficientTitleWindow>

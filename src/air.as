@@ -1,8 +1,10 @@
 import airwindow.ChatWindow;
 import airwindow.NoticeWindow;
+import airwindow.SocialWindow;
 
 import events.PaoPaoEvent;
 import events.ScheduleNotifyEvent;
+import events.SocialEvent;
 
 import flash.desktop.NativeApplication;
 import flash.display.NativeWindowSystemChrome;
@@ -78,7 +80,17 @@ public function initAir():void{
 	
 //	this.maximize();
 	FlexGlobals.topLevelApplication.addEventListener(ScheduleNotifyEvent.SCHEDULE_NOTIFY, scheduleNotify);
+	FlexGlobals.topLevelApplication.addEventListener(SocialEvent.SOCIAL, social_window);
 	
+}
+
+public function social_window(e:SocialEvent):void{
+	var notice:SocialWindow = new SocialWindow();
+	notice.transparent = true;
+//	notice.type = NativeWindowType.UTILITY;
+	notice.systemChrome = NativeWindowSystemChrome.NONE;
+	notice.social_url = e.url;
+	notice.open();
 }
 
 public function scheduleNotify(e:ScheduleNotifyEvent):void{

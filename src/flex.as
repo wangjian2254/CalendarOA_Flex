@@ -65,7 +65,7 @@ public function initFlex():void{
 
     }
     FlexGlobals.topLevelApplication.addEventListener(ScheduleNotifyEvent.SCHEDULE_NOTIFY, scheduleNotify);
-
+//    ExternalInterface.call("notify_permission");
 }
 
 public function scheduleNotify(e:ScheduleNotifyEvent):void{

@@ -1118,11 +1118,11 @@
                 </s:CheckBox>
             </s:FormItem>
             <s:FormItem id="tixingItem" visible="{is_all_day.selected}" label="提醒：" height="25" includeInLayout="{tixingItem.visible}">
-                <s:CheckBox id="boxTiXing" change="changeTiXing()" selected="true" label="无需提醒" />
+                <s:CheckBox id="boxTiXing" change="changeTiXing()" selected="false" label="无需提醒" />
             </s:FormItem>
             <s:FormItem id="itemTixing" label="提醒：" height="75">
                 <s:TileGroup id="tixingTile" includeInLayout="{tixingTile.visible}" width="100%" height="75"  columnAlign="justifyUsingGap" >
-                <s:CheckBox id="alertBox0" label="到点提醒" ></s:CheckBox>
+                <s:CheckBox id="alertBox0" label="到点提醒" selected="true" ></s:CheckBox>
                 <s:CheckBox id="alertBox1" label="提前5分钟"></s:CheckBox>
                 <s:CheckBox id="alertBox2" label="提前10分钟"></s:CheckBox>
                 <s:CheckBox id="alertBox3" label="提前15分钟"></s:CheckBox>
