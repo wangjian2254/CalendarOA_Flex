@@ -407,7 +407,7 @@
         </s:Scroller>
 
         <s:VGroup width="100%" height="300" gap="5">
-            <s:BorderContainer width="100%" height="45"   backgroundImage="{CBorderContainer.toolbgimg}">
+            <s:BorderContainer width="100%" height="45" backgroundAlpha="1"  backgroundImage="{CBorderContainer.toolbgimg}">
                 <s:layout>
                     <s:HorizontalLayout paddingLeft="15" gap="5" horizontalAlign="left" verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>

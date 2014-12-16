@@ -80,13 +80,17 @@ public class ToolUtil
         return "";
     }
 
+	public static function clearUser():void{
+		loginUser = new LoginUserPanel();
+		regUser = new RegisterUserPanel();
+		selectOrg = new SelectOrgPanel();
+		sessionUser=new Object();
+
+	}
     public static function init():void{
 
-        loginUser = new LoginUserPanel();
-        regUser = new RegisterUserPanel();
-        selectOrg = new SelectOrgPanel();
-
-
+        
+		clearUser();
         sessionUserRefresh();
 
 //        departMentListRefresh();

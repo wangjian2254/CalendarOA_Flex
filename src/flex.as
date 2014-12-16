@@ -32,7 +32,7 @@ public function quiteNoTip():void{
 	ToolUtil.sessionUser=new Object();
 	Pomelo.getIns().disconnect();
     HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", function(result:Object,e:ResultEvent):void{
-		ToolUtil.sessionUser=new Object();
+		ToolUtil.clearUser();
 		currentUser(result,e);
 	}, "POST").send();
 }

@@ -47,7 +47,7 @@ public function quiteNoTip():void{
 
 public function logout_user():void{
 	HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", function(result:Object,e:ResultEvent):void{
-		ToolUtil.sessionUser=new Object();
+		ToolUtil.clearUser();
 		Pomelo.getIns().disconnect();
 		if(chatWindow!=null){
 			chatWindow.nativeWindow.close();
