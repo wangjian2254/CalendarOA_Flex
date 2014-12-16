@@ -66,7 +66,10 @@ public function init():void {
     });
     FlexGlobals.topLevelApplication.addEventListener(QuiteEvent.Quite,logout);
     FlexGlobals.topLevelApplication.addEventListener(QueryScheduleEvent.QuerySchedule_Str,function(e:QueryScheduleEvent):void{
-
+        if(e.justChangeDate){
+            ToolUtil.getScheduleByDate(e.start,e.end,ToolUtil.queryScheduleTargetObj.pid,ToolUtil.queryScheduleTargetObj.depart_id,ToolUtil.queryScheduleTargetObj.project_id);
+            return;
+        }
         if(e.start==null || e.end==null){
             var calendarBordar:CalendarControl = gongNengStack.selectedChild as CalendarControl;
             if(calendarBordar==null){

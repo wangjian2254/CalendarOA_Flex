@@ -738,13 +738,16 @@ public class ToolUtil
 
 
 
-    private static var queryScheduleTargetObj:Object={pid:null,depart_id:null,project_id:null};
+    public static var queryScheduleTargetObj:Object={pid:null,depart_id:null,project_id:null};
     public static function clearScheduleTarget():void{
         queryScheduleTargetObj.pid = null;
         queryScheduleTargetObj.depart_id = null;
         queryScheduleTargetObj.project_id = null;
     }
     public static function getScheduleByDate(start:String,end:String,pid:int=-1,departid:int=-1,projectid:int=-1):void{
+        if(pid>0){
+            departid=-1;
+        }
         var obj:Object = new Object();
         obj["startdate"] = start;
         obj["enddate"] = end;
@@ -753,6 +756,7 @@ public class ToolUtil
             obj["depart_id"] = departid;
             obj["project_id"] = projectid;
         }
+
 
 
         if(queryScheduleTargetObj.pid!=pid||queryScheduleTargetObj.depart_id!=departid||queryScheduleTargetObj.project_id!=projectid){

@@ -100,7 +100,7 @@
                     event.start = (calendarBorder.getElementAt(1) as DayItem).date;
                     event.end = (calendarBorder.getElementAt(calendarBorder.numElements - 1) as DayItem).date;
                 }
-
+                event.justChangeDate = true;
 
                 FlexGlobals.topLevelApplication.dispatchEvent(event);
             }

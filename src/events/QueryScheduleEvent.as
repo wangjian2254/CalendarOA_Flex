@@ -13,6 +13,7 @@ public class QueryScheduleEvent extends Event
         public var project_id:int=-1;
         public var start:String;
         public var end:String;
+        public var justChangeDate:Boolean=false;
 		public function QueryScheduleEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
