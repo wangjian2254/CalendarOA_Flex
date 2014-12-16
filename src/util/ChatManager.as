@@ -375,6 +375,19 @@ public class ChatManager {
             case "org_users_changed":
                 ToolUtil.currentOrgRefresh();
                 break;
+            case "schedule_status_change":
+                    if (ChatManager.type == 'flex'){
+                        var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+                        s.message = event.message.msg;
+                        s.y = 0 - s.height - 10;
+                        s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+                        s.unReadMessage = unReadMessage;
+                        unReadMessage.addItem(s);
+                    }
+                break;
+            case "schedule_create":
+
+                break;
             case "join_apply":
                 Alert.show(event.message.msg.msg,event.message.msg.type);
                 break;

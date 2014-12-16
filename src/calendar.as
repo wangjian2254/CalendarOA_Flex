@@ -90,17 +90,29 @@ public function init():void {
                 ToolUtil.changeProjectByDepart(e.depart_id,-1,membersDownList,projectDownList);
             }
         }
-        if(e.pid==-1&&e.depart_id==-1&&e.project_id==-1){
+        if(e.pid==-1){
             if(membersDownList.selectedItem!=null){
                 e.pid = membersDownList.selectedItem.id;
+                e.depart_id = membersDownList.selectedItem.depart_id;
             }
+
+
+        }
+        if(e.depart_id==-1){
+            if(membersDownList.selectedItem!=null){
+                e.pid = membersDownList.selectedItem.id;
+                e.depart_id = membersDownList.selectedItem.depart_id;
+            }
+        }
+        if(e.project_id==-1){
             if(projectDownList.selectedItem!=null){
                 e.project_id = projectDownList.selectedItem.id;
             }
-            if(e.project_id>0){
-                e.pid = -1;
-            }
 
+        }else{
+            if(e.project_id>0){
+                e.depart_id = -1;
+            }
         }
         ToolUtil.getScheduleByDate(e.start,e.end,e.pid,e.depart_id,e.project_id);
     });

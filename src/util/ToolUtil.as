@@ -236,52 +236,56 @@ public class ToolUtil
 
         for each(var d:Object in departMentList){
             if(d.id == depart_id){
-                membersByDepart.addItem({id:-1, name:d.name+" 所有人"});
+                membersByDepart.addItem({id:-1, name:d.name+" 所有人", depart_id:d.id});
                 for each(var i:int in d.members){
                     if(getActivePersonById(i)!=null){
-                        membersByDepart.addItem(getActivePersonById(i));
+                        var o:Object = getActivePersonById(i);
+                        o.depart_id=d.id
+                        membersByDepart.addItem(o);
                     }
 
                 }
+                projectByDepart.removeAll();
+                projectByDepart.addItem({id:-1,name:"所有任务"});
+                for each(var item:Object in ToolUtil.allProjectList){
+                    if(item.department==depart_id){
+                        projectByDepart.addItem(item);
+                    }
+                }
                 if(person_id<0){
                     membersDownList.selectedIndex=0;
-                    projectByDepart.removeAll();
-                    projectByDepart.addItem({id:-1,name:"所有任务"});
-                    for each(var item:Object in ToolUtil.allProjectList){
-                        if(item.department==depart_id){
-                            projectByDepart.addItem(item);
-                        }
-                    }
-                    projectDownList.selectedIndex=0;
+
+
                 }else{
                     for each(var person:Object in membersByDepart){
                         if(person.id == person_id){
                             membersDownList.selectedItem = person;
-                            initProjectByMember(membersDownList,projectDownList);
+//                            initProjectByMember(membersDownList,projectDownList);
                         }
                     }
                 }
+                projectDownList.selectedIndex=0;
                 break;
             }
 
         }
     }
-
-    private static function initProjectByMember(membersDownList:DropDownList,projectDownList:DropDownList):void{
-        projectByDepart.removeAll();
-        projectByDepart.addItem({id:-1,name:membersDownList.selectedItem.name+"参与的项目"});
-        for each(var item:Object in ToolUtil.allProjectList){
-            if(item.manager==membersDownList.selectedItem.id){
-                projectByDepart.addItem(item);
-            }
-        }
-        projectDownList.selectedIndex=0;
-    }
+//
+//    private static function initProjectByMember(membersDownList:DropDownList,projectDownList:DropDownList):void{
+//        projectByDepart.removeAll();
+//        projectByDepart.addItem({id:-1,name:membersDownList.selectedItem.name+"参与的项目"});
+//        for each(var item:Object in ToolUtil.allProjectList){
+//            if(item.manager==membersDownList.selectedItem.id){
+//                projectByDepart.addItem(item);
+//            }
+//        }
+//        projectDownList.selectedIndex=0;
+//    }
 
     public static function changeProjectByMember(membersDownList:DropDownList,projectDownList:DropDownList):void{
 
         if(membersDownList.selectedItem!=null){
-            initProjectByMember(membersDownList,projectDownList);
+//            initProjectByMember(membersDownList,projectDownList);
             FlexGlobals.topLevelApplication.dispatchEvent(new QueryScheduleEvent(QueryScheduleEvent.QuerySchedule_Str,true));
         }
     }
@@ -738,15 +742,17 @@ public class ToolUtil
 
 
 
-    public static var queryScheduleTargetObj:Object={pid:null,depart_id:null,project_id:null};
+    public static var queryScheduleTargetObj:Object={start:null,end:null,pid:null,depart_id:null,project_id:null};
     public static function clearScheduleTarget():void{
+        queryScheduleTargetObj.start = null;
+        queryScheduleTargetObj.end = null;
         queryScheduleTargetObj.pid = null;
         queryScheduleTargetObj.depart_id = null;
         queryScheduleTargetObj.project_id = null;
     }
     public static function getScheduleByDate(start:String,end:String,pid:int=-1,departid:int=-1,projectid:int=-1):void{
-        if(pid>0){
-            departid=-1;
+        if(pid>0&&departid<=0){
+            departid=queryScheduleTargetObj.depart_id;
         }
         var obj:Object = new Object();
         obj["startdate"] = start;
@@ -838,7 +844,17 @@ public class ToolUtil
         if(schedule){
             updateNotifySchedule(schedule);
             scheduleMap['schedulemap'][id] = schedule;
-//            scheduleMap['scheduleall']
+            if(schedule.repeat_type != 'none'){
+                if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.date)){
+                    scheduleMap['schedulelist'][schedule.date]=new Array();
+                }
+                scheduleMap['schedulelist'][schedule.date].push(schedule.id);
+            }else{
+                if(!scheduleMap['schedulelist'].hasOwnProperty(schedule.startdate)){
+                    scheduleMap['schedulelist'][schedule.startdate]=new Array();
+                }
+                scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
+            }
 
             ScheduleUtil.updateSchedulePanel(schedule.id);
         }else{
