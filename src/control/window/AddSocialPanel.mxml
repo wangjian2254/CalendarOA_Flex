@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+                             xmlns:s="library://ns.adobe.com/flex/spark" xmlns:uicontrol="uicontrol.*"
+                             width="350" creationComplete="init(event)"
+                             xmlns:window="control.window.*">
+
+    <fx:Script>
+		<![CDATA[
+        import events.ChangeMenuEvent;
+        import events.SocialEvent;
+        
+        import httpcontrol.HttpServiceUtil;
+        
+        import mx.collections.ArrayCollection;
+        import mx.controls.Alert;
+        import mx.core.FlexGlobals;
+        import mx.events.CloseEvent;
+        import mx.events.FlexEvent;
+        import mx.rpc.events.ResultEvent;
+        
+        import util.ChatManager;
+        import util.ToolUtil;
+
+        [Bindable]
+        private var sjrArr:ArrayCollection;
+
+        public var message:Object = null;
+        public var type:String = null;
+
+        override public function releaseListener(e:CloseEvent):void {
+        }
+
+        private function init(e:FlexEvent):void {
+			var panel:AddSocialPanel = this;
+            HttpServiceUtil.getCHTTPServiceAndResult('/riliusers/get_user_social_list',function(result:Object,event:ResultEvent):void{
+                var list:ArrayCollection = new ArrayCollection(result.result as Array);
+                for each(var item:Object in list){
+					panel['social_u_'+item.type].visible=false;
+					panel['social_i_'+item.type].visible=true;
+                    if(new Date().time>item.time*1000){
+						panel['social_g_'+item.type].visible=true;
+                    }
+                }
+            }).send();
+            this.title = "绑定社交账号";
+
+        }
+
+
+        private function loginBySocial(type:String):void{
+            var timeline:Date = new Date();
+            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fadd_social_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state="+type+"_user_"+ToolUtil.sessionUser.chatflag;
+            if(ChatManager.type=="flex"){
+                navigateToURL(new URLRequest(url),"_blank");
+            }else{
+                var event:SocialEvent = new SocialEvent(SocialEvent.SOCIAL, url);
+                FlexGlobals.topLevelApplication.dispatchEvent(event);
+
+            }
+            closeWin();
+
+        }
+
+        ]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+
+	<s:VGroup width="100%" gap="5" paddingBottom="10" paddingLeft="10" paddingRight="10" paddingTop="10">
+        <s:Label text="未绑定的社交账号(点击进行绑定)：" />
+        <s:HGroup gap="3" width="100%"  height="50" horizontalAlign="center" paddingBottom="20">
+            <uicontrol:HeadImage source="/static/image/1.jpg"  includeInLayout="{social_u_sinaweibo.visible}"  id="social_u_sinaweibo" width="50" height="50" buttonMode="true" click="loginBySocial('sinaweibo')" />
+            <uicontrol:HeadImage source="/static/image/2.jpg"  includeInLayout="{social_u_qqdenglu.visible}"  id="social_u_qqdenglu" width="50" height="50" buttonMode="true" click="loginBySocial('qqdenglu')" />
+            <uicontrol:HeadImage source="/static/image/3.jpg"  includeInLayout="{social_u_renren.visible}"  id="social_u_renren" width="50" height="50" buttonMode="true" click="loginBySocial('renren')" />
+            <uicontrol:HeadImage source="/static/image/4.jpg"  includeInLayout="{social_u_qqweibo.visible}"  id="social_u_qqweibo" width="50" height="50" buttonMode="true" click="loginBySocial('qqweibo')" />
+            <uicontrol:HeadImage source="/static/image/5.jpg"  includeInLayout="{social_u_kaixin.visible}"  id="social_u_kaixin" width="50" height="50" buttonMode="true" click="loginBySocial('kaixin')" />
+            <uicontrol:HeadImage source="/static/image/6.jpg"  includeInLayout="{social_u_baidu.visible}"  id="social_u_baidu" width="50" height="50" buttonMode="true" click="loginBySocial('baidu')" />
+        </s:HGroup>
+        <s:Label text="已绑定的社交账号：" />
+        <s:HGroup gap="3" width="100%" height="50" horizontalAlign="center" paddingBottom="20">
+            <uicontrol:HeadImage source="/static/image/1.jpg" visible="false" includeInLayout="{social_i_sinaweibo.visible}" id="social_i_sinaweibo" width="50" height="50" buttonMode="true"  />
+            <uicontrol:HeadImage source="/static/image/2.jpg" visible="false" includeInLayout="{social_i_qqdenglu.visible}"  id="social_i_qqdenglu" width="50" height="50" buttonMode="true"  />
+            <uicontrol:HeadImage source="/static/image/3.jpg" visible="false" includeInLayout="{social_i_renren.visible}"  id="social_i_renren" width="50" height="50" buttonMode="true"  />
+            <uicontrol:HeadImage source="/static/image/4.jpg" visible="false" includeInLayout="{social_i_qqweibo.visible}"  id="social_i_qqweibo" width="50" height="50" buttonMode="true"  />
+            <uicontrol:HeadImage source="/static/image/5.jpg" visible="false" includeInLayout="{social_i_kaixin.visible}"  id="social_i_kaixin" width="50" height="50" buttonMode="true"  />
+            <uicontrol:HeadImage source="/static/image/6.jpg" visible="false" includeInLayout="{social_i_baidu.visible}"  id="social_i_baidu" width="50" height="50" buttonMode="true"  />
+        </s:HGroup>
+        <s:Label text="已过期的社交账号(点击重新绑定)：" />
+        <s:HGroup gap="3" width="100%"  height="50" horizontalAlign="center" paddingBottom="20">
+            <uicontrol:HeadImage source="/static/image/1.jpg" visible="false" includeInLayout="{social_g_sinaweibo.visible}"  id="social_g_sinaweibo" width="50" height="50" buttonMode="true" click="loginBySocial('sinaweibo')" />
+            <uicontrol:HeadImage source="/static/image/2.jpg" visible="false" includeInLayout="{social_g_qqdenglu.visible}"  id="social_g_qqdenglu" width="50" height="50" buttonMode="true" click="loginBySocial('qqdenglu')" />
+            <uicontrol:HeadImage source="/static/image/3.jpg" visible="false" includeInLayout="{social_g_renren.visible}"  id="social_g_renren" width="50" height="50" buttonMode="true" click="loginBySocial('renren')" />
+            <uicontrol:HeadImage source="/static/image/4.jpg" visible="false" includeInLayout="{social_g_qqweibo.visible}"  id="social_g_qqweibo" width="50" height="50" buttonMode="true" click="loginBySocial('qqweibo')" />
+            <uicontrol:HeadImage source="/static/image/5.jpg" visible="false" includeInLayout="{social_g_kaixin.visible}"  id="social_g_kaixin" width="50" height="50" buttonMode="true" click="loginBySocial('kaixin')" />
+            <uicontrol:HeadImage source="/static/image/6.jpg" visible="false" includeInLayout="{social_g_baidu.visible}"  id="social_g_baidu" width="50" height="50" buttonMode="true" click="loginBySocial('baidu')" />
+        </s:HGroup>
+	</s:VGroup>
+
+</window:EfficientTitleWindow>

@@ -51,8 +51,9 @@
 				<s:layout>
 					<s:HorizontalLayout gap="0" verticalAlign="middle"/>
 				</s:layout>
-				
-				
+
+				<mx:LinkButton x="0" y="2" height="25" label="绑定第三方账号" styleName="textStyle1" click="bindSocialUser()"/>
+				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="切换组织或公司" styleName="textStyle1" click="reSelectOrg()"/>
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改密码" styleName="textStyle1" click="repassword()"/>

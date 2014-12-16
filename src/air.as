@@ -216,13 +216,14 @@ protected function updater_updateStatusHandler(event:StatusUpdateEvent):void
 		// and switch to the view that gives the user ability to decide if he wants to
 		// install new version of the application.
 		event.preventDefault();
-		Alert.show("检测到有新版本程序发布，是否下载安装？", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
-			if (e.detail == Alert.YES) {
-				updater.addEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, updater_downloadErrorHandler);
-				updater.addEventListener(UpdateEvent.DOWNLOAD_COMPLETE, updater_downloadCompleteHandler);
-				updater.downloadUpdate();
-			}
-		});
+		updater.addEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, updater_downloadErrorHandler);
+		updater.addEventListener(UpdateEvent.DOWNLOAD_COMPLETE, updater_downloadCompleteHandler);
+		updater.downloadUpdate();
+//		Alert.show("检测到有新版本程序发布，是否下载安装？", "提示", Alert.YES | Alert.CANCEL, null, function (e:CloseEvent):void {
+//			if (e.detail == Alert.YES) {
+//				
+//			}
+//		});
 		
 	}
 	else

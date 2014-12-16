@@ -1,5 +1,6 @@
 // ActionScript file
 import control.CBorderContainer;
+import control.window.AddSocialPanel;
 import control.window.ChangePasswordPanel;
 import control.window.SelectOrgPanel;
 import control.window.UserInfoPanel;
@@ -219,4 +220,8 @@ public function reSelectOrg():void{
 	ToolUtil.selectOrg.loginNickname = ToolUtil.sessionUser.uname;
 	PopUpManager.addPopUp(ToolUtil.selectOrg, FlexGlobals.topLevelApplication as DisplayObject, true);
 	return;
+}
+
+public function bindSocialUser():void{
+    PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,AddSocialPanel,true);
 }

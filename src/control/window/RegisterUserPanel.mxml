@@ -7,12 +7,16 @@
                              xmlns:window="control.window.*">
     <fx:Script>
 		<![CDATA[
+        import events.SocialEvent;
+
         import httpcontrol.HttpServiceUtil;
 
         import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.rpc.events.ResultEvent;
+
+        import util.ChatManager;
 
         import util.ToolUtil;
 
@@ -205,6 +209,27 @@
                 Alert.show(result.message, "提示");
             }, "POST").send(data);
         }
+
+        private function loginBySocial(type:String):void{
+            var timeline:Date = new Date();
+
+            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fsocial_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state=";
+
+            if (ToolUtil.joinOrgFlag) {
+                url+=type+"_org_"+ToolUtil.joinOrgFlag;
+            } else {
+                url+=type;
+            }
+
+            if(ChatManager.type=="flex"){
+                navigateToURL(new URLRequest(url),"_self");
+            }else{
+                var event:SocialEvent = new SocialEvent(SocialEvent.SOCIAL, url);
+                FlexGlobals.topLevelApplication.dispatchEvent(event);
+                closeWin();
+            }
+
+        }
         ]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -217,7 +242,7 @@
 	</fx:Declarations>
 
 
-<s:Group>
+<s:Group width="100%">
     <s:Form width="100%" id="loginForm" visible="false" includeInLayout="{loginForm.visible}">
         <s:FormItem  label="是否新用户：" textAlign="right">
             <s:layout>
@@ -230,7 +255,7 @@
             <s:layout>
                 <s:HorizontalLayout gap="5"/>
             </s:layout>
-            <s:TextInput id="loginUsername" prompt="电子邮件/手机号" width="200"  text="" tabIndex="1" enter="foucePass(loginPassword)">
+            <s:TextInput id="loginUsername" prompt="电子邮件" width="200"  text="" tabIndex="1" enter="foucePass(loginPassword)">
 
             </s:TextInput>
         </s:FormItem>
@@ -253,6 +278,14 @@
 
             </s:Button>
         </s:FormItem>
+        <s:HGroup gap="3" width="100%" horizontalAlign="center" paddingBottom="10">
+            <uicontrol:HeadImage source="/static/image/1.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('sinaweibo')" />
+            <uicontrol:HeadImage source="/static/image/2.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('qqdenglu')" />
+            <uicontrol:HeadImage source="/static/image/3.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('renren')" />
+            <uicontrol:HeadImage source="/static/image/4.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('qqweibo')" />
+            <uicontrol:HeadImage source="/static/image/5.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('kaixin')" />
+            <uicontrol:HeadImage source="/static/image/6.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('baidu')" />
+        </s:HGroup>
     </s:Form>
 	<s:Form width="100%" id="form"  includeInLayout="{form.visible}">
         <s:layout>
@@ -265,7 +298,7 @@
             <s:RadioButton label="新用户" selected="true" value="1" group="{userType}"></s:RadioButton>
             <s:RadioButton label="已有账户" value="2" group="{userType}"></s:RadioButton>
 		</s:FormItem>
-        <s:FormItem height="40" visible="true" textAlign="right">
+        <s:FormItem height="40" visible="false" textAlign="right" includeInLayout="false" >
             <s:layout>
                 <s:HorizontalLayout gap="10"></s:HorizontalLayout>
             </s:layout>
@@ -358,6 +391,14 @@
 					
 				</s:Button>
 		</s:FormItem>
+        <s:HGroup gap="3" width="100%" horizontalAlign="center" paddingBottom="10">
+            <uicontrol:HeadImage source="/static/image/1.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('sinaweibo')" />
+            <uicontrol:HeadImage source="/static/image/2.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('qqdenglu')" />
+            <uicontrol:HeadImage source="/static/image/3.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('renren')" />
+            <uicontrol:HeadImage source="/static/image/4.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('qqweibo')" />
+            <uicontrol:HeadImage source="/static/image/5.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('kaixin')" />
+            <uicontrol:HeadImage source="/static/image/6.jpg" width="50" height="50" buttonMode="true" click="loginBySocial('baidu')" />
+        </s:HGroup>
 	</s:Form>
 </s:Group>
 </window:EfficientTitleWindow>
