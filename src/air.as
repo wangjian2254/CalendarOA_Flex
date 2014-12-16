@@ -14,29 +14,46 @@ import flash.events.MouseEvent;
 import flash.system.Capabilities;
 
 import httpcontrol.CHTTPService;
+import httpcontrol.HttpServiceUtil;
 
 import mx.core.FlexGlobals;
 import mx.events.AIREvent;
 import mx.events.CloseEvent;
+import mx.rpc.events.ResultEvent;
 
 import org.idream.pomelo.Pomelo;
 
 import util.ChatManager;
 import util.ToolUtil;
 
-public function quite(e:*=null):void {
-	Alert.show("确定要退出系统吗?","退出系统",3,this,CloseWindow);   
-}
-
-public function quiteNoTip():void{
+public function quiteWindow(e:*=null):void {
 	this.nativeWindow.close();//关闭窗体
 	ToolUtil.sessionUser=new Object();
 	Pomelo.getIns().disconnect();
 	if(chatWindow!=null){
 		chatWindow.nativeWindow.close();
 	}
+}
+
+public function quite(e:*=null):void {
+	Alert.show("确定要退出账号吗?","退出账号",3,this,CloseWindow);   
+}
+
+public function quiteNoTip():void{
+	logout_user();
 	
     
+}
+
+public function logout_user():void{
+	HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", function(result:Object,e:ResultEvent):void{
+		ToolUtil.sessionUser=new Object();
+		Pomelo.getIns().disconnect();
+		if(chatWindow!=null){
+			chatWindow.nativeWindow.close();
+		}
+		currentUser(result,e);
+	}, "POST").send();
 }
 
 private var chatWindow:ChatWindow;
@@ -91,6 +108,7 @@ public function social_window(e:SocialEvent):void{
 	notice.systemChrome = NativeWindowSystemChrome.NONE;
 	notice.social_url = e.url;
 	notice.open();
+
 }
 
 public function scheduleNotify(e:ScheduleNotifyEvent):void{

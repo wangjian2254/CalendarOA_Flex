@@ -752,7 +752,6 @@
 
                     </s:HorizontalLayout>
                 </s:layout>
-                <uicontrol:Btn styleName="btnRefresh"/>
                 <s:Button chromeColor="red" label="创建任务" color="#ffffff"   height="25" click="createSchedule()" />
                 <s:Spacer width="100%" />
                     <s:ButtonBar id="showModel" change="changeShowModel()" dataProvider="{btnlist}" width="100" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />

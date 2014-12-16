@@ -21,6 +21,7 @@
 	
 	</fx:Script>
 	<fx:Script source="airwindow/trayicon.as"/>
+	<fx:Style source="styleflex.css" />
 	<fx:Declarations>
 		<httpcontrol:CHTTPService id="menuXML" url="/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 		<updater:NativeApplicationUpdater id="updater" 
@@ -32,7 +33,6 @@
 										  initialized="updater_initializedHandler(event)"/>
 
 	</fx:Declarations>
-	<fx:Style source="/assets/style.css"/>
 	<s:Group id="header" width="100%" height="109">
 		<s:layout>
 			<s:BasicLayout/>
@@ -59,12 +59,15 @@
 				<s:Label text="|" styleName="textStyle1"/>
 				<mx:LinkButton x="0" y="2" height="25" label="修改个人信息" styleName="textStyle1" click="updateinfo()"/>
 				<s:Label text="|" styleName="textStyle1" />
+				
 				<mx:LinkButton x="0" y="2" height="25" label="最小化"  styleName="textStyle1" click="this.minimize()" />
 				<s:Label text="|" styleName="textStyle1" />
 				
 				<mx:LinkButton x="0" y="2" height="25" label="最大化" id="resizeBtn1"  styleName="textStyle1"  click="this.maxResize()" />
 				<s:Label text="|" styleName="textStyle1"  />
-				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  styleName="textStyle1" visible="true" click="logout()" />
+				<mx:LinkButton x="0" y="2" height="25" label="退出" styleName="textStyle1" click="logout()"/>
+				<s:Label text="|" styleName="textStyle1" />
+				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  styleName="textStyle1" visible="true" click="quiteWindow()" />
 				
 			</s:SkinnableContainer>
 			
@@ -87,7 +90,7 @@
 				
 				<mx:LinkButton x="0" y="2" height="25" label="最大化"  id="resizeBtn2"  styleName="textStyle1"  click="this.maxResize()" />
 				<s:Label text="|" styleName="textStyle1"  />
-				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  styleName="textStyle1" visible="true" click="logout()" />
+				<mx:LinkButton x="0" y="2" height="25" label="关闭程序"  styleName="textStyle1" visible="true" click="quiteWindow()" />
 			</s:SkinnableContainer>
 			
 		</s:Group>

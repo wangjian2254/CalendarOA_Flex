@@ -67,7 +67,7 @@
         private function loginBySocial(type:String):void{
 			var timeline:Date = new Date();
 			
-            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fsocial_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state="+ChatManager.type;
+            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fsocial_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state="+type;
             if(ChatManager.type=="flex"){
 				navigateToURL(new URLRequest(url),"_self");
 			}else{

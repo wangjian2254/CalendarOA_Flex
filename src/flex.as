@@ -31,7 +31,10 @@ public function quite(e:*=null):void {
 public function quiteNoTip():void{
 	ToolUtil.sessionUser=new Object();
 	Pomelo.getIns().disconnect();
-    HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", currentUser, "POST").send();
+    HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/logout", function(result:Object,e:ResultEvent):void{
+		ToolUtil.sessionUser=new Object();
+		currentUser(result,e);
+	}, "POST").send();
 }
 
 public function CloseWindow(event:CloseEvent):void{
