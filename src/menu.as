@@ -22,10 +22,7 @@ import mx.managers.PopUpManager;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 
-import spark.components.List;
-
 import uicontrol.MenuButton;
-import uicontrol.NotifyList;
 
 public function failMenu(evt:FaultEvent):void {
 	Alert.show("获取用户菜单失败。", "提示");
@@ -36,20 +33,6 @@ private function welcome(result:Object, e:ResultEvent):void {
 	var xml1:XML = new XML("<menuitem label='任务管理' mod='calendar'></menuitem>");
 	event1.item = xml1;
 	onMenuChange(event1);
-}
-
-private function openMessage():void {
-	var point:Point = this.contentToGlobal(new Point(notifyLinkButton.x, notifyLinkButton.y+notifyLinkButton.height));
-	var notifyshow:NotifyList = new NotifyList();
-	notifyshow.x = point.x;
-	notifyshow.y = point.y;
-	PopUpManager.addPopUp(notifyshow, this, false);
-//	var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
-//	var xml1:XML = new XML("<menuitem label='消息' mod='message'></menuitem>");
-//	event1.item = xml1;
-//	var obj:Object = new Object();
-//	obj["messageType"] = "unread";
-//	onMenuChange(event1, obj);
 }
 
 
@@ -247,7 +230,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 		}
 	}
 	if (c != null) {
-		c.label =
+		c.label =label;
 		c.flag = mod;
 		c.param = obj;
 		if (!cbar.setView(mod)) {

@@ -38,15 +38,20 @@
 
 		}
 
-		public function showNotify(notify:Object):NoticeWindow{
-			var notice:NoticeWindow = new NoticeWindow();
-			notice.transparent = true;
-			notice.type = NativeWindowType.UTILITY;
-			notice.systemChrome = NativeWindowSystemChrome.NONE;
-			notice.message = notify;
-			notice.open();
+		public function showNotify(notify:Object, check_status:Boolean=true):NoticeWindow{
 			NotifyTools.notifylist.addItem(notify);
-			return notice;
+			if(!notify.status && check_status){
+				var notice:NoticeWindow = new NoticeWindow();
+				notice.transparent = true;
+				notice.type = NativeWindowType.UTILITY;
+				notice.systemChrome = NativeWindowSystemChrome.NONE;
+				notice.message = notify;
+				notice.open();
+				return notice;
+			}
+
+			return null;
+
 		}
 
 		public function systemMessageHandler(event:PomeloEvent):void{
@@ -94,7 +99,7 @@
 				unread_messagelist[msg.channel].unread += 1;
 				ToolUtil.groupList.refresh();
 				if (cp == null) {
-					var notice:NoticeWindow =showNotify(msg);;
+					var notice:NoticeWindow =showNotify(msg,false);
 					notice.addEventListener(PaoPaoEvent.CHAT, openChatByChannel);
 
 

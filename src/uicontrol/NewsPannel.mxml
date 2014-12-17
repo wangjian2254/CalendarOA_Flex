@@ -12,8 +12,6 @@
 <!--</s:backgroundFill>-->
 
     <fx:Script><![CDATA[
-        import events.PaoPaoEvent;
-
         import flash.filters.BevelFilter;
         import flash.filters.DropShadowFilter;
         import flash.filters.GlowFilter;
@@ -32,24 +30,26 @@
         import org.idream.pomelo.Pomelo;
 
         import util.NotifyTools;
-
         import util.ScheduleUtil;
         import util.ToolUtil;
 
-        [Bindable]
-        private var dropBevelFilter:BevelFilter = new BevelFilter(10, 270, 0, 0, 0xffffff, .5, 8, 8, 8, 8);
-
-        [Bindable]
-        private var dropShadow:DropShadowFilter = new DropShadowFilter(2, 90, 0x000000, 0.35, 4, 4);
-
-        [Bindable]
-        private var Inner:GlowFilter = new GlowFilter(0xffffff, .5, 8, 8, 2, 4, true);
+//        [Bindable]
+//        private var dropBevelFilter:BevelFilter = new BevelFilter(10, 270, 0, 0, 0xffffff, .5, 8, 8, 8, 8);
+//
+//        [Bindable]
+//        private var dropShadow:DropShadowFilter = new DropShadowFilter(2, 90, 0x000000, 0.35, 4, 4);
+//
+//        [Bindable]
+//        private var Inner:GlowFilter = new GlowFilter(0xffffff, .5, 8, 8, 2, 4, true);
 
         public var unReadMessage:ArrayCollection = null;
 
         public var message:Object;
 
         public function init():void {
+            if(message==null){
+                return;
+            }
             if (message is Schedule) {
                 contentLabel.text = message.title;
                 nameLabel.text = "任务提醒";
@@ -99,14 +99,14 @@
                         }
                     }
                 }
-                if(message.hasOwnProperty("is_notify")&&message.is_notify){
+                if (message.hasOwnProperty("is_notify") && message.is_notify) {
                     ExternalInterface.call("notify", "/static/image/notify.png", "动态", message.msg);
                     head.source = "/static/image/notify.png";
                     openButton.label = "已读";
                     nameLabel.text = "动态";
                     contentLabel.text = message.msg;
 
-                    if(message.type=="join_apply"){
+                    if (message.type == "join_apply") {
                         openButton.label = "处理";
                     }
                 }
@@ -137,25 +137,25 @@
                 ScheduleUtil.showSchedulePanel(message.id);
             } else {
                 if (message != null && message.hasOwnProperty("te")) {
-                    var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
-                    event.msg = message;
-                    event.channel = message.channel;
+                    var event:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+                    event.item = {mod: 'message', label: '消息', obj: message.channel};
+
                     FlexGlobals.topLevelApplication.dispatchEvent(event);
                 }
-                if(message.hasOwnProperty("is_notify")&&message.is_notify){
-                    var obj:Object={'id':message._id};
-                    HttpServiceUtil.getCHTTPServiceAndResult("/ca/change_notify_status", function(result:Object, e:ResultEvent):void{
-                        message.status=true;
+                if (message.hasOwnProperty("is_notify") && message.is_notify) {
+                    var obj:Object = {'id': message._id};
+                    HttpServiceUtil.getCHTTPServiceAndResult("/ca/change_notify_status", function (result:Object, e:ResultEvent):void {
+                        message.status = true;
                         NotifyTools.notifylist.refresh();
                     }, "POST").send(obj);
 
-                    if(message.type=="join_apply"){
+                    if (message.type == "join_apply") {
                         var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
 //                        var xml1:XML = new XML("<menuitem label='审批加入申请' mod='checkApply'></menuitem>");
 //                        event1.item = xml1;
 //
 //                        MenuEvent.prototype.obj=null;
-                        event1.item = {mod:'checkApply', label:'审批加入申请',obj:new Object()};
+                        event1.item = {mod: 'checkApply', label: '审批加入申请', obj: new Object()};
                         FlexGlobals.topLevelApplication.dispatchEvent(event1);
                     }
                 }

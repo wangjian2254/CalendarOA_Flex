@@ -11,7 +11,7 @@
         /**
          * @copy spark.skins.spark.ApplicationSkin#hostComponent
          */
-        [HostComponent("uicontrol.NewsPannel")]
+        [HostComponent("spark.components.BorderContainer")]
         ]]>
     </fx:Metadata>
 

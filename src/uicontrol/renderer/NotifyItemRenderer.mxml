@@ -6,11 +6,6 @@
                 autoDrawBackground="true"
         >
     <fx:Script><![CDATA[
-        import events.ListClickEvent;
-
-        import httpcontrol.HttpServiceUtil;
-
-        import mx.rpc.events.ResultEvent;
 
         import util.DateUtil;
 
@@ -28,9 +23,19 @@
             }
             solidColor.color = getColor();
             var now:Date = new Date();
-            var now2:Date = new Date(Number(value._id.substr(0,10))*1000);
-            date.text = DateUtil.dateLblChat(now2).replace(DateUtil.dateLbl(now));
+            var now2:Date = new Date(Number("0x"+value._id.substr(0,8))*1000);
+            date.text = DateUtil.dateLblChat(now2).replace(DateUtil.dateLbl(now),"");
             msg.text = value.msg;
+            if(!value.status){
+                statusEllipse.visible = true;
+                status.color = 0x12DB2D;
+                msg.setStyle('color',0x000000);
+                date.setStyle('color',0x000000);
+            }else{
+                statusEllipse.visible = false;
+                msg.setStyle('color',0x9D9D9D);
+                date.setStyle('color',0x9D9D9D);
+            }
         }
         protected function getColor():uint {
             if (itemIndex % 2 == 1) {
@@ -57,12 +62,17 @@
                 <s:SolidColor color="0xdbdbdb" />
             </s:fill>
         </s:Rect>
-        <s:Rect left="1" right="1" top="0" bottom="1">
+        <s:Rect left="0" right="0" top="0" bottom="1">
             <s:fill>
                 <s:SolidColor id="solidColor"   />
             </s:fill>
         </s:Rect>
-        <s:HGroup width="100%" height="30"  verticalAlign="bottom">
+        <s:HGroup width="100%" height="30"  verticalAlign="middle" paddingLeft="2">
+            <s:Ellipse id="statusEllipse" width="5" height="5">
+                <s:fill>
+                    <s:SolidColor id="status"  />
+                </s:fill>
+            </s:Ellipse>
             <s:Label  id="msg" maxDisplayedLines="1" ></s:Label>
             <s:Spacer width="100%" />
             <s:Label id="date"   ></s:Label>

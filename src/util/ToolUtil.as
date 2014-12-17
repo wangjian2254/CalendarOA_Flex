@@ -139,6 +139,7 @@ public class ToolUtil
             allProjectListRefresh();
             filesRefresh();
             notifyScheduleRefresh();
+            NotifyTools.allUnreadNotifyRefresh();
             timerNotify.addEventListener(TimerEvent.TIMER, scheduleNotify);
             timerNotify.start();
         }else{
@@ -240,7 +241,7 @@ public class ToolUtil
 
                 }
                 projectByDepart.removeAll();
-                projectByDepart.addItem({id:-1,name:"所有任务"});
+                projectByDepart.addItem({id:-1,name:d.name+"中所有任务"});
                 for each(var item:Object in ToolUtil.allProjectList){
                     if(item.department==depart_id){
                         projectByDepart.addItem(item);

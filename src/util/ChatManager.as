@@ -373,12 +373,14 @@ public class ChatManager {
     }
 
     static public function showNotify(msg:Object):void{
-        var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
-        s.message = msg;
-        s.y = 0 - s.height - 10;
-        s.x = FlexGlobals.topLevelApplication.width - s.width-10;
-        s.unReadMessage = unReadMessage;
-        unReadMessage.addItem(s);
+        if(!msg.status){
+            var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+            s.message = msg;
+            s.y = 0 - s.height - 10;
+            s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+            s.unReadMessage = unReadMessage;
+            unReadMessage.addItem(s);
+        }
         NotifyTools.notifylist.addItem(msg);
     }
     static public function systemMessageHandler(event:PomeloEvent):void{

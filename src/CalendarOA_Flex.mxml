@@ -18,7 +18,7 @@
 	<fx:Script source="flex.as">
 		
 	</fx:Script>
-
+	<fx:Style source="styleflex.css" />
 	<fx:Declarations>
 		<httpcontrol:CHTTPService id="menuXML" url="{CHTTPService.baseUrl}/ca/menu.xml" method="GET" resultFormat="xml" result="setMenu(event)" fault="failMenu(event)"/>
 
@@ -33,8 +33,22 @@
 		<s:Group top="12" right="15" visible="false" id="userinfoGroup">
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
-			</s:layout>	
-			<mx:LinkButton  label="{NotifyTools.notifyunreadnum}" click="openMessage()" id="notifyLinkButton" toolTip="动态" styleName="notifylink" textDecoration="underline" />
+			</s:layout>
+			<s:Group>
+				<mx:LinkButton  label="{NotifyTools.notifyunreadnum}" click="notifyPopUpAnchor.displayPopUp=true" id="notifyLinkButton" toolTip="动态" styleName="notifylink" textDecoration="underline" />
+				<s:PopUpAnchor id="notifyPopUpAnchor" popUpPosition="below" height="20" showInAutomationHierarchy="true" >
+					<s:BorderContainer cornerRadius="12" backgroundAlpha="1" borderVisible="true"
+									   borderColor="#000000" borderStyle="solid" width="400" height="500">
+						<s:List borderVisible="false" dataProvider="{NotifyTools.notifylist}" itemRenderer="uicontrol.renderer.NotifyItemRenderer" top="5" left="5" right="5" bottom="30">
+						</s:List>
+						<s:HGroup  right="5" left="5" bottom="5">
+							<s:Button label="隐藏动态面板" click="notifyPopUpAnchor.displayPopUp=false" />
+							<s:Spacer width="100%"/>
+							<s:Button label="全部已读" click="NotifyTools.allReadNotify()" />
+						</s:HGroup>
+					</s:BorderContainer>
+				</s:PopUpAnchor>
+			</s:Group>
 			<s:Label text="{ToolUtil.sessionUser.name} | {ToolUtil.sessionUser.org_name}" styleName="textStyle2"/>
 			<s:SkinnableContainer  id="loginBtnPanel"  height="26" styleName="userinfoclass"   visible="true">
 				<s:layout>

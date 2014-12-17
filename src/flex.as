@@ -52,7 +52,7 @@ public function openChatManager():void{
 }
 
 public function initFlex():void{
-    styleManager.loadStyleDeclarations('styleflex.swf',true,false, ApplicationDomain.currentDomain)
+//    styleManager.loadStyleDeclarations('styleflex.swf',true,false, ApplicationDomain.currentDomain)
     var url:String = ExternalInterface.call('window.location.href.toString');
     if(url.indexOf("addPerson?flag=")>0){
         for each(var u:String in url.split('?')){

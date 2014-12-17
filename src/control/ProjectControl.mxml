@@ -224,6 +224,7 @@
                 <s:layout>
                     <s:HorizontalLayout verticalAlign="middle"></s:HorizontalLayout>
                 </s:layout>
+				 				
                 <mx:ButtonBar id="showModel" itemClick="btnHandler(event)" dataProvider="{btnlist}" height="25" selectedIndex="0" chromeColor="#faf0cc"   labelField="label" />
             </s:BorderContainer>
             <s:DataGrid id="projectGrid" dataProvider="{ToolUtil.projectList}" width="100%" height="200">
