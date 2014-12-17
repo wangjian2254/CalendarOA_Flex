@@ -44,7 +44,7 @@
 			<s:layout>
 				<s:HorizontalLayout gap="20" verticalAlign="middle"/>
 			</s:layout>	
-			<mx:LinkButton icon="{CBorderContainer.refreshimg}" label="{ToolUtil.unreadMessageNum}" click="openMessage()" styleName="textStyle2" textDecoration="underline" />
+			<mx:LinkButton  label="{NotifyTools.notifyunreadnum}" click="openMessage()" id="notifyLinkButton" toolTip="动态" styleName="notifylink" textDecoration="underline" />
 			<s:Label text="{ToolUtil.sessionUser.name} | {ToolUtil.sessionUser.org_name}" styleName="textStyle2"/>
 				
 			<s:SkinnableContainer  id="loginBtnPanel"  height="26"  skinClass="skins.topLinksBoxSkin" visible="true">

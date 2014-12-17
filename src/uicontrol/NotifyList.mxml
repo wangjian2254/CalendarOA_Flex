@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		xmlns:s="library://ns.adobe.com/flex/spark" width="300"  maxHeight="600" creationComplete="init()"
+		 >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+		import httpcontrol.HttpServiceUtil;
+
+		import mx.collections.ArrayCollection;
+		import mx.managers.PopUpManager;
+		import mx.rpc.events.ResultEvent;
+
+		import spark.events.IndexChangeEvent;
+
+		import util.NotifyTools;
+
+		[Bindable]
+		public var datalist:ArrayCollection;
+
+
+		public var a:String;
+//		private var timer:Timer = new Timer(3000,0);
+
+		private function init():void{
+//			timer.start();
+//			timer.addEventListener(TimerEvent.TIMER, closeNotifyList);
+//			addEventListener(MouseEvent.MOUSE_OVER,resetTimer);
+//			addEventListener(MouseEvent.MOUSE_OUT,startTimer);
+			systemManager.addEventListener(MouseEvent.CLICK, closeNotifyList);
+			if(NotifyTools.notifylist.length==0){
+				return;
+			}
+			var obj:Object = new Object();
+			obj["id"]=NotifyTools.notifylist.getItemAt(NotifyTools.notifylist.length-1)._id;
+			HttpServiceUtil.getCHTTPServiceAndResult("/ca/change_all_notify_status", function(result:Object, e:ResultEvent):void{
+				for each(var item:Object in NotifyTools.notifylist){
+					if(item.status==false){
+						item=true;
+					}
+				}
+				NotifyTools.notifylist.refresh();
+			}, "POST").send(obj);
+		}
+		private function resetTimer(e:MouseEvent):void{
+//			timer.reset();
+//			timer.stop();
+		}
+		private function startTimer(e:MouseEvent):void{
+//			timer.reset();
+//			timer.start();
+		}
+
+		private function closeNotifyList(e:MouseEvent):void{
+			var s:Point = this.contentToGlobal(new Point(0, 0));
+			var e2:Point = this.contentToGlobal(new Point(this.width, this.height));
+			if(e.stageX>s.x && e.stageX<e2.x&&e.stageY>s.y&&e.stageY<e2.y){
+
+			}else{
+				PopUpManager.removePopUp(this);
+				systemManager.removeEventListener(MouseEvent.CLICK, closeNotifyList);
+			}
+
+		}
+
+		protected function myl_clickHandler(event:MouseEvent):void {
+			dispatchEvent(event);
+		}
+
+		//
+		private function changeItem(e:IndexChangeEvent):void {
+			dispatchEvent(e);
+		}
+
+		protected function clickItem(event:MouseEvent):void {
+			dispatchEvent(new Event("changed"));
+		}
+		]]>
+	</fx:Script>
+	<s:List  id="myl" dataProvider="{NotifyTools.notifylist}" itemRenderer="uicontrol.renderer.NotifyItemRenderer"    width="100%" >
+		
+	</s:List>
+
+</s:Group>

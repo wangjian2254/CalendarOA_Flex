@@ -205,9 +205,10 @@ public class ChatManager {
 //            Pomelo.getIns().addEventListener('pStatus', personChangedHandler);
 			if(type=="flex"){
 				Pomelo.getIns().addEventListener('onChat', chatHandler);
+                Pomelo.getIns().addEventListener('sys', systemMessageHandler);
 			}
             
-            Pomelo.getIns().addEventListener('sys', systemMessageHandler);
+
             Pomelo.getIns().addEventListener('createChannel', createChannelHandler);
             Pomelo.getIns().addEventListener('updateChannel', updateChannelHandler);
             Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
@@ -370,26 +371,31 @@ public class ChatManager {
 
         trace("chat:"+JParser.encode(event.message.msg));
     }
+
+    static public function showNotify(msg:Object):void{
+        var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
+        s.message = msg;
+        s.y = 0 - s.height - 10;
+        s.x = FlexGlobals.topLevelApplication.width - s.width-10;
+        s.unReadMessage = unReadMessage;
+        unReadMessage.addItem(s);
+        NotifyTools.notifylist.addItem(msg);
+    }
     static public function systemMessageHandler(event:PomeloEvent):void{
         switch (event.message.msg.type){
             case "org_users_changed":
                 ToolUtil.currentOrgRefresh();
                 break;
             case "schedule_status_change":
-                    if (ChatManager.type == 'flex'){
-                        var s:NewsPannel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject,NewsPannel,false) as NewsPannel;
-                        s.message = event.message.msg;
-                        s.y = 0 - s.height - 10;
-                        s.x = FlexGlobals.topLevelApplication.width - s.width-10;
-                        s.unReadMessage = unReadMessage;
-                        unReadMessage.addItem(s);
-                    }
-                break;
-            case "schedule_create":
-
-                break;
+                showNotify(event.message.msg);
+                    break;
+            case "schedule_update":
+                showNotify(event.message.msg);
+                    ToolUtil.getScheduleByDate_repeat();
+                    break;
             case "join_apply":
-                Alert.show(event.message.msg.msg,event.message.msg.type);
+                showNotify(event.message.msg);
+//                Alert.show(event.message.msg.msg,event.message.msg.type);
                 break;
             default :
                 Alert.show(event.message.msg.msg,event.message.msg.type);

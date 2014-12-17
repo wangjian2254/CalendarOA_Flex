@@ -508,7 +508,7 @@
 
             }
             if (showModel.selectedItem.value == "oneday") {
-                onedayLabel.text="星期"+DateUtil.dayNames[date.day];
+                onedayLabel.text = "星期" + DateUtil.dayNames[date.day];
                 if (currentMonth == date.month && currentDaily == date.date) {
                     return;
                 }
@@ -575,26 +575,26 @@
             var dayItem:DayItem = null;
             var row:Number = 0;
             var dayHeight:Number;
-            dayHeight =this.height - 51;
-            dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 -17) / 7;
+            dayHeight = this.height - 51;
+            dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 17) / 7;
             weekHead.height = 0;
             dayHead.height = 25;
             if (showModel.selectedItem.value == "monthly") {
                 row = calendarPanel.numElements / 7;
-                dayHeight = (this.height - 27 - row + 1 - 3 - 11-10) / row;
+                dayHeight = (this.height - 27 - row + 1 - 3 - 11 - 10) / row;
 
                 calendarPanel.requestedColumnCount = 7;
 
                 weekHead.height = 25;
                 dayHead.height = 0;
-                onedayHead.height=0;
+                onedayHead.height = 0;
 
             }
             if (showModel.selectedItem.value == "weekly") {
                 dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 10 + 1 - 15 - 53) / 7;
                 weekHead.height = 25;
                 dayHead.height = 0;
-                onedayHead.height=0;
+                onedayHead.height = 0;
 //                calendarBorder.width = dayWidth * 7 + 4 + 31;
 
             }
@@ -603,16 +603,16 @@
 //                calendarBorder.width = dayWidth * 5 + 4 + 31;
                 weekHead.height = 0;
                 dayHead.height = 25;
-                onedayHead.height=0;
+                onedayHead.height = 0;
 
             }
             if (showModel.selectedItem.value == "oneday") {
 //                dayWidth =(this.width - 12 - taskPanel.width - datePanel.width -18 - 4 - 52);
-                dayWidth =(this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 46);
+                dayWidth = (this.width - 12 - taskPanel.width - datePanel.width - 18 - 4 - 46);
 //                calendarBorder.width = dayWidth+51;
                 weekHead.height = 0;
                 dayHead.height = 0;
-                onedayHead.height=25;
+                onedayHead.height = 25;
 
             }
 
@@ -648,12 +648,12 @@
                         break;
                     } else {
                         dayItem = calendarBorder.getElementAt(i) as DayItem;
-                        if(i==0){
-                            dayItem.height = dayHeight-100;
-                            dayItem.width=50;
+                        if (i == 0) {
+                            dayItem.height = dayHeight - 100;
+                            dayItem.width = 50;
                             dayItem.invalidateSize();
-                        }else{
-                            dayItem.height = dayHeight-100;
+                        } else {
+                            dayItem.height = dayHeight - 100;
                             dayItem.width = dayWidth;
                             dayItem.invalidateSize();
                             dayItem.showTimeLine(dayWidth, row == 0 ? true : false);

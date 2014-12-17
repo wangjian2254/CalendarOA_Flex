@@ -8,69 +8,67 @@
 <fx:Script><![CDATA[
 	import mx.core.FlexGlobals;
 	import mx.events.CloseEvent;
-	import mx.managers.PopUpManager;
 
-	
-	private function init():void{
-		if(imagedata!=null){
-			var w:int=imagedata.width;
-			var scalex:Number=1;
-			var scaley:Number=1;
-			var scale:Number=1;
-			if(FlexGlobals.topLevelApplication.width < imagedata.width){
+	private function init():void {
+		if (imagedata != null) {
+			var w:int = imagedata.width;
+			var scalex:Number = 1;
+			var scaley:Number = 1;
+			var scale:Number = 1;
+			if (FlexGlobals.topLevelApplication.width < imagedata.width) {
 				w = FlexGlobals.topLevelApplication.width;
-				
+
 				scalex = w / imagedata.width;
 			}
-			
+
 			var h:int = imagedata.height;
-			if(FlexGlobals.topLevelApplication.height < imagedata.height+29){
+			if (FlexGlobals.topLevelApplication.height < imagedata.height + 29) {
 				h = FlexGlobals.topLevelApplication.height - 29;
 				scaley = h / imagedata.height;
 			}
-			
-			if(scaley>scalex){
+
+			if (scaley > scalex) {
 				scale = scalex;
-			}else{
+			} else {
 				scale = scaley;
 			}
-			
+
 			imagedata.width *= scale;
 			imagedata.height *= scale;
-			if(imagedata.width>600){
+			if (imagedata.width > 600) {
 				this.width = imagedata.width;
 			}
-			if(imagedata.height>40){
-				this.height  = imagedata.height+29;
+			if (imagedata.height > 40) {
+				this.height = imagedata.height + 29;
 			}
-			
-			
+
+
 			img.source = imagedata;
-			statusRadio.selectedValue=filestatus;
+			statusRadio.selectedValue = filestatus;
 		}
-		if(imagesrc!=null){
-			img.addEventListener(Event.COMPLETE,imgshowcomplete);
+		if (imagesrc != null) {
+			img.addEventListener(Event.COMPLETE, imgshowcomplete);
 			img.source = imagesrc;
 		}
-		if(imagesrc==null&&imagedata==null){
+		if (imagesrc == null && imagedata == null) {
 			this.height = 40;
 		}
-		
-		
+
+
 	}
-	
+
 	override public function releaseListener(e:CloseEvent):void {
 	}
 
-	private function imgshowcomplete(e:Event):void{
+	private function imgshowcomplete(e:Event):void {
 		this.width = img.width;
 		this.height = img.height;
 		this.x = (FlexGlobals.topLevelApplication.width - img.width) / 2;
 		this.y = (FlexGlobals.topLevelApplication.height - img.height) / 2;
 		FlexGlobals.topLevelApplication.addEventListener(MouseEvent.CLICK, closePannel);
 	}
-	
-	private function closePannel():void{
+
+	private function closePannel():void {
 		closeWin();
 	}
 	]]></fx:Script>

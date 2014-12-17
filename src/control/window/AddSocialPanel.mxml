@@ -6,18 +6,16 @@
 
     <fx:Script>
 		<![CDATA[
-        import events.ChangeMenuEvent;
         import events.SocialEvent;
-        
+
         import httpcontrol.HttpServiceUtil;
-        
+
         import mx.collections.ArrayCollection;
-        import mx.controls.Alert;
         import mx.core.FlexGlobals;
         import mx.events.CloseEvent;
         import mx.events.FlexEvent;
         import mx.rpc.events.ResultEvent;
-        
+
         import util.ChatManager;
         import util.ToolUtil;
 
@@ -31,14 +29,14 @@
         }
 
         private function init(e:FlexEvent):void {
-			var panel:AddSocialPanel = this;
-            HttpServiceUtil.getCHTTPServiceAndResult('/riliusers/get_user_social_list',function(result:Object,event:ResultEvent):void{
+            var panel:AddSocialPanel = this;
+            HttpServiceUtil.getCHTTPServiceAndResult('/riliusers/get_user_social_list', function (result:Object, event:ResultEvent):void {
                 var list:ArrayCollection = new ArrayCollection(result.result as Array);
-                for each(var item:Object in list){
-					panel['social_u_'+item.type].visible=false;
-					panel['social_i_'+item.type].visible=true;
-                    if(new Date().time>item.time*1000){
-						panel['social_g_'+item.type].visible=true;
+                for each(var item:Object in list) {
+                    panel['social_u_' + item.type].visible = false;
+                    panel['social_i_' + item.type].visible = true;
+                    if (new Date().time > item.time * 1000) {
+                        panel['social_g_' + item.type].visible = true;
                     }
                 }
             }).send();
@@ -47,12 +45,12 @@
         }
 
 
-        private function loginBySocial(type:String):void{
+        private function loginBySocial(type:String):void {
             var timeline:Date = new Date();
-            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fadd_social_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state="+type+"_user_"+ToolUtil.sessionUser.chatflag;
-            if(ChatManager.type=="flex"){
-                navigateToURL(new URLRequest(url),"_blank");
-            }else{
+            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fadd_social_callback&media_type=" + type + "&t=" + timeline.millisecondsUTC + "&state=" + type + "_user_" + ToolUtil.sessionUser.chatflag;
+            if (ChatManager.type == "flex") {
+                navigateToURL(new URLRequest(url), "_blank");
+            } else {
                 var event:SocialEvent = new SocialEvent(SocialEvent.SOCIAL, url);
                 FlexGlobals.topLevelApplication.dispatchEvent(event);
 
@@ -60,7 +58,6 @@
             closeWin();
 
         }
-
         ]]>
 	</fx:Script>
 	<fx:Declarations>

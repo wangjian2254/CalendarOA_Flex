@@ -1,8 +1,6 @@
 // ActionScript file
 import events.UploadFileEvent;
 
-import flash.events.Event;
-
 public var imagedata:Bitmap = null;
 public var imagesrc:String = null;
 

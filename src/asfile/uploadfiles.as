@@ -1,12 +1,10 @@
 import events.UploadFileEvent;
 
 import flash.display.Bitmap;
-import flash.display.BitmapData;
 import flash.display.Loader;
 import flash.events.DataEvent;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
-import flash.events.MouseEvent;
 import flash.events.ProgressEvent;
 import flash.net.FileReference;
 import flash.net.URLRequest;
@@ -15,13 +13,10 @@ import flash.net.URLVariables;
 import flash.utils.ByteArray;
 
 import httpcontrol.CHTTPService;
-import httpcontrol.HttpServiceUtil;
 
 import json.JParser;
 
 import mx.controls.Alert;
-
-import spark.components.Image;
 
 import uicontrol.CProgressBar;
 

@@ -2,7 +2,6 @@
 import control.CBorderContainer;
 import control.window.AddSocialPanel;
 import control.window.ChangePasswordPanel;
-import control.window.SelectOrgPanel;
 import control.window.UserInfoPanel;
 
 import events.ChangeMenuEvent;
@@ -14,8 +13,6 @@ import events.QuiteEvent;
 
 import flash.display.DisplayObject;
 
-import model.User;
-
 import mx.collections.ArrayCollection;
 import mx.controls.Alert;
 import mx.core.FlexGlobals;
@@ -23,17 +20,16 @@ import mx.managers.PopUpManager;
 import mx.rpc.events.ResultEvent;
 import mx.utils.ObjectUtil;
 
-import org.idream.pomelo.Pomelo;
-
 import spark.components.TitleWindow;
 
 import util.ChatManager;
+import util.NotifyTools;
 import util.RightClickRegister;
 import util.ToolUtil;
-import util.UserUtil;
 
 public function init():void {
     new RightClickRegister();
+    NotifyTools.initNotifyTools();
     Alert.yesLabel = "是";
     Alert.noLabel = "否";
     Alert.cancelLabel = "取消";
@@ -46,6 +42,14 @@ public function init():void {
         this["initFlex"]();
 
     }
+    FlexGlobals.topLevelApplication.addEventListener(MenuEvent.CHANGE,function(event1:MenuEvent):void{
+//        	var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+//	var xml1:XML = new XML("<menuitem label='消息' mod='message'></menuitem>");
+//	event1.item = xml1;
+//	var obj:Object = new Object();
+//	obj["messageType"] = "unread";
+        onMenuChange(event1);
+    });
 	ToolUtil.currentUserFun = currentUser;
 	//				ToolUtil.init();
 	ToolUtil.sessionUserRefresh(currentUser);

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
-						  xmlns:s="library://ns.adobe.com/flex/spark" 
-						  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:control="control.*" 
-						  xmlns:uicontrol="uicontrol.*"
-						  width="700" height="500" >
-	
-	<fx:Script>
+<control:CBorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                          xmlns:s="library://ns.adobe.com/flex/spark"
+                          xmlns:control="control.*"
+                          width="700" height="500">
+
+    <fx:Script>
 		<![CDATA[
         import events.CloseContainerEvent;
         import events.PageChangeEvent;
@@ -16,7 +15,6 @@
         import mx.controls.Alert;
         import mx.events.CloseEvent;
         import mx.events.FlexEvent;
-        import mx.events.ItemClickEvent;
         import mx.rpc.events.FaultEvent;
         import mx.rpc.events.ResultEvent;
 
@@ -110,7 +108,6 @@
         }
 
 
-
         private function searchResult(result:Object, e:ResultEvent):void {
             if (result.result) {
                 list.removeAll();
@@ -122,8 +119,6 @@
         private function loadDataFault(e:FaultEvent):void {
             Alert.show('操作失败', "提示");
         }
-
-
 
 
         public function add():void {
@@ -165,7 +160,6 @@
                 //					InfoUtil.userRefresh(refreshScx);
             }
         }
-
 
 
         [Bindable]

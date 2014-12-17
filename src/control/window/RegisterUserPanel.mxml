@@ -17,7 +17,6 @@
         import mx.rpc.events.ResultEvent;
 
         import util.ChatManager;
-
         import util.ToolUtil;
 
         override public function releaseListener(e:CloseEvent):void {
@@ -210,20 +209,20 @@
             }, "POST").send(data);
         }
 
-        private function loginBySocial(type:String):void{
+        private function loginBySocial(type:String):void {
             var timeline:Date = new Date();
 
-            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fsocial_callback&media_type="+type+"&t="+timeline.millisecondsUTC+"&state=";
+            var url:String = "https://openapi.baidu.com/social/oauth/2.0/authorize?response_type=code&client_id=SyeExPLiXrkTwBK9GUYFLAok&redirect_uri=http%3A%2F%2Fliyuoa.duapp.com%2Friliusers%2Fsocial_callback&media_type=" + type + "&t=" + timeline.millisecondsUTC + "&state=";
 
             if (ToolUtil.joinOrgFlag) {
-                url+=type+"_org_"+ToolUtil.joinOrgFlag;
+                url += type + "_org_" + ToolUtil.joinOrgFlag;
             } else {
-                url+=type;
+                url += type;
             }
 
-            if(ChatManager.type=="flex"){
-                navigateToURL(new URLRequest(url),"_self");
-            }else{
+            if (ChatManager.type == "flex") {
+                navigateToURL(new URLRequest(url), "_self");
+            } else {
                 var event:SocialEvent = new SocialEvent(SocialEvent.SOCIAL, url);
                 FlexGlobals.topLevelApplication.dispatchEvent(event);
                 closeWin();

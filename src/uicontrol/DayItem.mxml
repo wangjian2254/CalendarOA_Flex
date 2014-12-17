@@ -14,7 +14,6 @@
 
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
-        import mx.utils.ObjectUtil;
 
         import spark.layouts.BasicLayout;
         import spark.skins.spark.BorderContainerSkin;
@@ -159,7 +158,7 @@
                     if (is_all_day == 2 && !obj.is_all_day) {
                         var x:Number = 2;
                         var y:Number = 0;
-                        y = getY(Number(obj.time_start.substr(0, 2))*2)+getYbyMin(Number(obj.time_start.substr(2, 2))) + 2;
+                        y = getY(Number(obj.time_start.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_start.substr(2, 2))) + 2;
                         while (schedulePos.hasOwnProperty(y.toString())) {
                             y += 20;
                             if (this.width < 300) {
@@ -177,7 +176,7 @@
                         scheduleItem.x = x;
                         scheduleItem.y = y;
                         scheduleItem.width = this.width - 1 - x;
-                        scheduleItem.height = getY(Number(obj.time_end.substr(0, 2))*2) +getYbyMin(Number(obj.time_end.substr(2, 2)) )- y - 1;
+                        scheduleItem.height = getY(Number(obj.time_end.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_end.substr(2, 2))) - y - 1;
 
 
                         scheduleItem.descShow = true;
@@ -215,21 +214,21 @@
             }
             var d:Date = new Date();
             this.contentGroup.graphics.lineStyle(2, 0xFF0000);
-            this.contentGroup.graphics.moveTo(0, getY(d.hours*2) + getYbyMin(d.minutes));
-            this.contentGroup.graphics.lineTo(w, getY(d.hours*2) + getYbyMin(d.minutes));
+            this.contentGroup.graphics.moveTo(0, getY(d.hours * 2) + getYbyMin(d.minutes));
+            this.contentGroup.graphics.lineTo(w, getY(d.hours * 2) + getYbyMin(d.minutes));
         }
 
         private function drawline(w:Number, i:Number):void {
 
             this.contentGroup.graphics.lineStyle(1, 0x000000);
             if (i % 2 == 1) {
-                this.contentGroup.graphics.moveTo(0, getY(i+1));
-                this.contentGroup.graphics.lineTo(w, getY(i+1));
+                this.contentGroup.graphics.moveTo(0, getY(i + 1));
+                this.contentGroup.graphics.lineTo(w, getY(i + 1));
             } else {
                 for (var s:Number = 0; s < w / 5; s++) {
                     if (s % 2 == 0) {
-                        this.contentGroup.graphics.moveTo(s * 5, getY(i+1));
-                        this.contentGroup.graphics.lineTo(s * 5 + 5, getY(i+1));
+                        this.contentGroup.graphics.moveTo(s * 5, getY(i + 1));
+                        this.contentGroup.graphics.lineTo(s * 5 + 5, getY(i + 1));
                     }
                 }
             }
@@ -237,74 +236,74 @@
         }
 
         private function showTime():void {
-            var d:Date =null;
+            var d:Date = null;
 
             var lbl:Label = null;
-            d= DateUtil.parseDate("201401010000");
+            d = DateUtil.parseDate("201401010000");
             lbl = new Label();
             lbl.text = timestr2.format(d);
             lbl.x = 10;
             lbl.y = getY(1);
             scheduleList.addElement(lbl);
             for (var i:Number = 13; i < 40; i++) {
-                d= DateUtil.parseDate("201401010000");
-                d.minutes += (i+1)*30;
+                d = DateUtil.parseDate("201401010000");
+                d.minutes += (i + 1) * 30;
                 lbl = new Label();
                 lbl.text = timestr2.format(d);
                 lbl.x = 10;
-                lbl.y = getY(i+1);
+                lbl.y = getY(i + 1);
                 scheduleList.addElement(lbl);
             }
-            d= DateUtil.parseDate("201401010000");
-            d.minutes += (47+1)*30-1;
+            d = DateUtil.parseDate("201401010000");
+            d.minutes += (47 + 1) * 30 - 1;
             lbl = new Label();
             lbl.text = timestr2.format(d);
             lbl.x = 10;
-            lbl.y = getY(47)-15;
+            lbl.y = getY(47) - 15;
             scheduleList.addElement(lbl);
         }
 
-        private function getTimeByY(y:int):Date{
-            if(y<=getY(14)){
-                d= DateUtil.parseDate(date);
-                d.minutes+=30*12;
+        private function getTimeByY(y:int):Date {
+            if (y <= getY(14)) {
+                d = DateUtil.parseDate(date);
+                d.minutes += 30 * 12;
                 return d;
             }
-            var d:Date=null;
-            for(var i:int=14;i<41;i++){
-                if(y>getY(i)&&y<getY(i+1)){
-                    d=DateUtil.parseDate(date);
-                    d.minutes+=i*30;
+            var d:Date = null;
+            for (var i:int = 14; i < 41; i++) {
+                if (y > getY(i) && y < getY(i + 1)) {
+                    d = DateUtil.parseDate(date);
+                    d.minutes += i * 30;
                     return d;
                 }
             }
             return DateUtil.parseDate(date + 7);
         }
 
-        private function getY(index:int):Number{
-            var yitem:int=this.height/30;
-            if(index<14){
+        private function getY(index:int):Number {
+            var yitem:int = this.height / 30;
+            if (index < 14) {
                 return -1;
             }
-            if(index==14){
-                return yitem*2;
+            if (index == 14) {
+                return yitem * 2;
             }
-            if(index>14&&index<=39){
-                return yitem*2+(index-14)*yitem;
+            if (index > 14 && index <= 39) {
+                return yitem * 2 + (index - 14) * yitem;
             }
-            if(index==40){
-                return yitem*28;
+            if (index == 40) {
+                return yitem * 28;
             }
-            if(index>40){
+            if (index > 40) {
                 return this.height;
             }
-            return yitem*index;
+            return yitem * index;
         }
 
-        private function getYbyMin(m:int):Number{
-            var yitem:int=this.height/30;
+        private function getYbyMin(m:int):Number {
+            var yitem:int = this.height / 30;
 
-            return yitem/60*m*2;
+            return yitem / 60 * m * 2;
         }
         ]]>
 	</fx:Script>

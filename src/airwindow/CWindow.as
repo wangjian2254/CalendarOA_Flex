@@ -1,14 +1,14 @@
 package airwindow
 {
-	import events.ChangeUserEvent;
-	import events.CloseContainerEvent;
-	
-	import mx.events.FlexEvent;
-	import mx.events.ResizeEvent;
-	
-	import spark.components.Window;
-	
-	public class CWindow extends Window
+import events.ChangeUserEvent;
+import events.CloseContainerEvent;
+
+import mx.events.FlexEvent;
+import mx.events.ResizeEvent;
+
+import spark.components.Window;
+
+public class CWindow extends Window
 	{
 		private var _label:String;
 		private var _flag:String;

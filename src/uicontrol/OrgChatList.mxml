@@ -10,20 +10,20 @@
         [Event(name="listItemZhanKai",type="events.ListClickEvent")]
     </fx:Metadata>
     <fx:Script><![CDATA[
-		import assets.btnimg.ContactList;
-		import assets.btnimg.CurrentContact;
-		import assets.btnimg.Department;
-		
-		import events.ListClickEvent;
-		
-		import model.ChatChannel;
-		
-		import mx.collections.ArrayCollection;
-		import mx.events.CollectionEvent;
-		import mx.utils.ObjectUtil;
-		
-		import util.ChatManager;
-		import util.ToolUtil;
+        import assets.btnimg.ContactList;
+        import assets.btnimg.CurrentContact;
+        import assets.btnimg.Department;
+
+        import events.ListClickEvent;
+
+        import model.ChatChannel;
+
+        import mx.collections.ArrayCollection;
+        import mx.events.CollectionEvent;
+        import mx.utils.ObjectUtil;
+
+        import util.ChatManager;
+        import util.ToolUtil;
 
         [Bindable]
         private var addressMember:ArrayCollection = new ArrayCollection();
@@ -34,11 +34,16 @@
         public var userMember:ArrayCollection = new ArrayCollection();
 
         [Bindable]
-        private var btnlist:ArrayCollection = new ArrayCollection([{icon:new CurrentContact(), label: "最近联系", mod: "group"},
-			{icon:new Department(), 
-            label: "部门",
-            mod: "org"
-        }, {icon:new ContactList(), label: "常用联系人", mod: "user"}]);
+        private var btnlist:ArrayCollection = new ArrayCollection([{
+            icon: new CurrentContact(),
+            label: "最近联系",
+            mod: "group"
+        },
+            {
+                icon: new Department(),
+                label: "部门",
+                mod: "org"
+            }, {icon: new ContactList(), label: "常用联系人", mod: "user"}]);
         ;
 
         public var type:String = "org";

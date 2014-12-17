@@ -21,7 +21,6 @@
 	</fx:Metadata>
 	<fx:Script>
 		<![CDATA[
-			import assets.btnimg.CurrentContact;
 		]]>
 	</fx:Script>
 	

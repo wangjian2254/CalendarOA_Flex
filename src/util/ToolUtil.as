@@ -21,7 +21,6 @@ import model.ChatChannel;
 import model.Schedule;
 
 import mx.collections.ArrayCollection;
-import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
@@ -59,7 +58,6 @@ public class ToolUtil
     public static var taskurgentlist:ArrayCollection=new ArrayCollection([{id:1,label:"普通"},{id:2,label:"优先"},{id:3,label:"紧急"}]);
 
     public static var currentChannel:String="";
-    private static var time:Timer = new Timer(1000*60*5,0);
     private static var timerNotify:Timer = new Timer(1000*60,0);
 
     public static function getTaskStatus(i:int):String{
@@ -100,11 +98,7 @@ public class ToolUtil
 //        taskUnRefresh();
 
 //        unreadMessageRefresh();
-        time.addEventListener(TimerEvent.TIMER,unreadMessageRefresh);
 
-        if(!time.running){
-//            time.start();
-        }
 //			ruleRefresh();
 //			ticketRefresh();
 //			businessRefresh();
@@ -159,19 +153,19 @@ public class ToolUtil
 
 
     [Bindable]
-    public static var unreadMessageNum:String="0未读消息";
+    public static var unreadMessageNum:String="0";
 
-    public static function unreadMessageRefresh(fun:*=null):void{
-//			RemoteUtil.getOperationAndResult("getAllUser",resultAllUser).send();
-        if(fun==null||!(fun is Function)){
-            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getUnReadCount",resultUnReadMessageRefresh,"POST").send()
-//				RemoteUtil.getOperationAndResult("",resultAllUser,false).send();
-        }else{
-            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getUnReadCount",resultUnReadMessageRefresh,"POST");
-            http.resultFunArr.addItem(fun);
-            http.send();
-        }
-    }
+//    public static function unreadMessageRefresh(fun:*=null):void{
+////			RemoteUtil.getOperationAndResult("getAllUser",resultAllUser).send();
+//        if(fun==null||!(fun is Function)){
+//            HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getUnReadCount",resultUnReadMessageRefresh,"POST").send()
+////				RemoteUtil.getOperationAndResult("",resultAllUser,false).send();
+//        }else{
+//            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/oamessage/getUnReadCount",resultUnReadMessageRefresh,"POST");
+//            http.resultFunArr.addItem(fun);
+//            http.send();
+//        }
+//    }
     public static function resultUnReadMessageRefresh(result:Object,e:ResultEvent):void{
         if(result.success==true){
             unreadMessageNum = result.result+"未读消息";
@@ -758,29 +752,21 @@ public class ToolUtil
         obj["startdate"] = start;
         obj["enddate"] = end;
         obj["pid"] = pid;
+        obj['outoftime'] = true;
         if(pid!=sessionUser.pid){
             obj["depart_id"] = departid;
             obj["project_id"] = projectid;
         }
+        queryScheduleTargetObj.start = start;
+        queryScheduleTargetObj.end = end;
+        queryScheduleTargetObj.pid = pid;
+        queryScheduleTargetObj.depart_id = departid;
+        queryScheduleTargetObj.project_id = projectid;
 
-
-
-        if(queryScheduleTargetObj.pid!=pid||queryScheduleTargetObj.depart_id!=departid||queryScheduleTargetObj.project_id!=projectid){
-            queryScheduleTargetObj.pid = pid;
-            queryScheduleTargetObj.depart_id = departid;
-            queryScheduleTargetObj.project_id = projectid;
-            obj['outoftime'] = true;
-        }
         HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST").send(obj);
-//        if(fun==null){
-//
-//        }else{
-//            var http:CHTTPService=HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleByDate",queryResult,"POST");
-//            http.resultFunArr.addItem(fun);
-//            http.send(obj);
-//
-//        }
-
+    }
+    public static function getScheduleByDate_repeat():void{
+        getScheduleByDate(queryScheduleTargetObj.start,queryScheduleTargetObj.end,queryScheduleTargetObj.pid,queryScheduleTargetObj.depart_id,queryScheduleTargetObj.project_id);
     }
 
     public static function queryResult(result:Object,e:ResultEvent):void{

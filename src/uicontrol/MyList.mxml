@@ -12,35 +12,32 @@
 	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
-			import mx.collections.ArrayCollection;
-			
-			import spark.events.IndexChangeEvent;
-			
-			[Bindable]
-			public var datalist:ArrayCollection;
-			
+		import mx.collections.ArrayCollection;
 
-			public var a:String;
+		import spark.events.IndexChangeEvent;
 
-			
-			protected function myl_clickHandler(event:MouseEvent):void
-			{
-				dispatchEvent(event);
-			}
-			
-//	
-			private function changeItem(e:IndexChangeEvent):void{
-				dispatchEvent(e);
-			}
+		[Bindable]
+		public var datalist:ArrayCollection;
 
-			protected function clickItem(event:MouseEvent):void
-			{
-				dispatchEvent(new Event("changed"));
-			}
 
+		public var a:String;
+
+
+		protected function myl_clickHandler(event:MouseEvent):void {
+			dispatchEvent(event);
+		}
+
+		//
+		private function changeItem(e:IndexChangeEvent):void {
+			dispatchEvent(e);
+		}
+
+		protected function clickItem(event:MouseEvent):void {
+			dispatchEvent(new Event("changed"));
+		}
 		]]>
 	</fx:Script>
-	<s:List  id="myl" dataProvider="{datalist}" itemRenderer="uicontrol.ListItem"    width="100%"  change="changeItem(event)" doubleClickEnabled="true" doubleClick="clickItem(event)"  buttonMode="true">
+	<s:List  id="myl" dataProvider="{datalist}" itemRenderer="uicontrol.renderer.ListItem"    width="100%"  change="changeItem(event)" doubleClickEnabled="true" doubleClick="clickItem(event)"  buttonMode="true">
 		
 	</s:List>
 

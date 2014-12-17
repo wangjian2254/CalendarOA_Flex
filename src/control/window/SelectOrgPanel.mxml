@@ -67,24 +67,24 @@
 
         public function listItemClick_handler(e:ListClickEvent):void {
 
-            if(e.data.id==ToolUtil.sessionUser.oid){
-                Alert.show("当前工作的组织或公司就是："+e.data.name,"不能切换组织或公司");
+            if (e.data.id == ToolUtil.sessionUser.oid) {
+                Alert.show("当前工作的组织或公司就是：" + e.data.name, "不能切换组织或公司");
                 return;
             }
             var obj:Object = new Object();
             obj.orgid = e.data.id;
-            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/selectedOrg", function(r:Object, e:ResultEvent):void {
-                ToolUtil.sessionUser.oid=obj.orgid;
+            HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/selectedOrg", function (r:Object, e:ResultEvent):void {
+                ToolUtil.sessionUser.oid = obj.orgid;
                 ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
                 closeWin();
             }, "POST").send(obj);
         }
 
-//        public function refresh(r:Object, e:ResultEvent):void {
-//            e.
-//            ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
-//            closeWin();
-//        }
+        //        public function refresh(r:Object, e:ResultEvent):void {
+        //            e.
+        //            ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+        //            closeWin();
+        //        }
 
         protected function quite():void {
             var e:QuiteEvent = new QuiteEvent(QuiteEvent.Quite, true);

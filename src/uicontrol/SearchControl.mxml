@@ -12,8 +12,6 @@
         import json.JParser;
 
         import mx.collections.ArrayCollection;
-        import mx.containers.Panel;
-        import mx.controls.Alert;
         import mx.managers.PopUpManager;
         import mx.rpc.events.ResultEvent;
         import mx.rpc.http.HTTPService;
@@ -21,9 +19,9 @@
         import util.ToolUtil;
         import util.UUIDUtil;
 
-
         private var tempArr:ArrayCollection = new ArrayCollection();
-        private var searchTimer:Timer= new Timer(1200,1);
+        private var searchTimer:Timer = new Timer(1200, 1);
+
         private function init():void {
             searchTimer.addEventListener(TimerEvent.TIMER, querySchedule);
             l.datalist = tempArr;
@@ -38,12 +36,12 @@
             var a1:Object = l.myl.selectedItem;
         }
 
-//        private var pan:Panel;
-//        private var regexp:RegExp;
+        //        private var pan:Panel;
+        //        private var regexp:RegExp;
 
 
+        private var queryFlag:String = null;
 
-        private var queryFlag:String=null;
         private function checkInput0():void {
 
             //todo: 讨论组 搜索，只能是自己存在的讨论组。自己不存在的部门，可以搜索到，但是无法打开聊天。
@@ -56,30 +54,30 @@
             tempArr.removeAll();
             tempArr.refresh();
             // 成员 过滤
-            var lperson:ArrayCollection=new ArrayCollection();
-            for each(var person:Object in ToolUtil.memberList){
-                if(person.name.indexOf(str)>-1){
+            var lperson:ArrayCollection = new ArrayCollection();
+            for each(var person:Object in ToolUtil.memberList) {
+                if (person.name.indexOf(str) > -1) {
                     person.searchtype = 'person'
                     lperson.addItem(person);
                 }
             }
-            if(lperson.length>0){
+            if (lperson.length > 0) {
                 person = lperson.getItemAt(0);
-                person.typestr="成员";
+                person.typestr = "成员";
                 person.flag = true;
                 tempArr.addAll(lperson);
             }
             // 项目 过滤
-            var lproject:ArrayCollection=new ArrayCollection();
-            for each(person in ToolUtil.allProjectList){
-                if(person.name.indexOf(str)>-1){
+            var lproject:ArrayCollection = new ArrayCollection();
+            for each(person in ToolUtil.allProjectList) {
+                if (person.name.indexOf(str) > -1) {
                     person.searchtype = "project";
                     lproject.addItem(person);
                 }
             }
-            if(lproject.length>0){
+            if (lproject.length > 0) {
                 person = lproject.getItemAt(0);
-                person.typestr="项目";
+                person.typestr = "项目";
                 person.flag = true;
                 tempArr.addAll(lproject)
             }
@@ -98,32 +96,32 @@
 
         }
 
-        private function querySchedule(e:TimerEvent):void{
+        private function querySchedule(e:TimerEvent):void {
             var str:String = input.text;
             if (str == "") {
                 return;
             }
             var query:HTTPService = new HTTPService();
-            query.url = CHTTPService.baseUrl+"/ca/querySchedule";
+            query.url = CHTTPService.baseUrl + "/ca/querySchedule";
             query.resultFormat = "text";
             query.method = "POST";
-            query.addEventListener(ResultEvent.RESULT, function(event:ResultEvent):void{
-                var result:Object=JParser.decode(event.result.toString());
+            query.addEventListener(ResultEvent.RESULT, function (event:ResultEvent):void {
+                var result:Object = JParser.decode(event.result.toString());
                 var item:Object;
-                if(result.success==true && result.result.flagid==queryFlag){
-                    var lschedule:ArrayCollection=new ArrayCollection(result.result.schedulelist as Array);
-                    for each(item in lschedule){
+                if (result.success == true && result.result.flagid == queryFlag) {
+                    var lschedule:ArrayCollection = new ArrayCollection(result.result.schedulelist as Array);
+                    for each(item in lschedule) {
                         item.searchtype = "schedule";
                     }
-                    if(lschedule.length>0){
+                    if (lschedule.length > 0) {
                         item = lschedule.getItemAt(0);
-                        item.typestr="任务";
+                        item.typestr = "任务";
                         item.flag = true;
                         tempArr.addAll(lschedule);
                     }
                 }
             });
-            query.send({"search":str,"flagid":queryFlag});
+            query.send({"search": str, "flagid": queryFlag});
         }
 
         private var l:MyList = new MyList();

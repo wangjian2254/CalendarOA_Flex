@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<airwindow:CWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+		  xmlns:s="library://ns.adobe.com/flex/spark"
+		  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:airwindow="airwindow.*" width="700" height="600" showStatusBar="false"
+		  creationComplete="init(null)" title="使用第三方账号登陆" xmlns:uicontrol="uicontrol.*" skinClass="skins.WindowChannelSkin">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import events.CloseContainerEvent;
+			
+			import httpcontrol.HttpServiceUtil;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import spark.components.WindowedApplication;
+			
+			import util.ToolUtil;
+
+		override public function closeContainer(e:CloseContainerEvent):void {
+
+		}
+
+		public var social_url:String;
+		private var timer:Timer = new Timer(1000, 0);
+
+		override public function init(e:FlexEvent):void {
+			this.alwaysInFront = true;
+			var Stageheight:Number = Capabilities.screenResolutionY;
+
+			var Stagewidth:Number = Capabilities.screenResolutionX;
+
+
+			this.move(Stagewidth / 2 - this.width / 2, Stageheight / 2 - this.height / 2); //（this当前窗体)
+			bower.location = social_url;
+
+			timer.addEventListener(TimerEvent.TIMER, social_login);
+			timer.start();
+
+		}
+
+		private function social_login(e:TimerEvent):void {
+			if (bower.location.indexOf("uuid_flag") > 0) {
+				var uuid_flag:String = bower.location.substr(bower.location.indexOf("uuid_flag") + 10);
+				var obj:Object = new Object();
+				obj.uuid_flag = uuid_flag;
+				HttpServiceUtil.getCHTTPServiceAndResult("/riliusers/login", refresh, "POST").send(obj);
+				timer.stop();
+				close();
+				(FlexGlobals.topLevelApplication as WindowedApplication).orderToFront();
+			}
+		}
+
+		public function refresh(r:Object, e:ResultEvent):void {
+			ToolUtil.sessionUserRefresh(ToolUtil.currentUserFun);
+			close();
+		}
+		]]>
+	</fx:Script>
+	<s:HGroup id="chatTitleContainer" width="100%" height="41" verticalAlign="middle"  >
+		
+		<s:Label id="nameLabel" text="使用第三方账号登陆……" fontWeight="bold" paddingLeft="20"  ></s:Label>
+		
+		<mx:Spacer width="100%" height="10"/>
+		<uicontrol:WindowControlBtn window="{this}">
+			
+		</uicontrol:WindowControlBtn>
+		
+	</s:HGroup>
+	<mx:HTML width="100%" height="100%" id="bower" top="41">
+		
+	</mx:HTML>
+</airwindow:CWindow>

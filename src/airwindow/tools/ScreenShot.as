@@ -1,18 +1,17 @@
 package airwindow.tools
 {
-	import flash.desktop.Clipboard;
-	import flash.desktop.ClipboardFormats;
-	import flash.desktop.NativeProcess;
-	import flash.desktop.NativeProcessStartupInfo;
-	import flash.display.BitmapData;
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.NativeProcessExitEvent;
-	import flash.external.ExtensionContext;
-	import flash.filesystem.File;
-	import flash.system.Capabilities;
+import flash.desktop.Clipboard;
+import flash.desktop.ClipboardFormats;
+import flash.desktop.NativeProcess;
+import flash.desktop.NativeProcessStartupInfo;
+import flash.display.BitmapData;
+import flash.events.Event;
+import flash.events.EventDispatcher;
+import flash.events.NativeProcessExitEvent;
+import flash.filesystem.File;
+import flash.system.Capabilities;
 
-	public class ScreenShot extends EventDispatcher
+public class ScreenShot extends EventDispatcher
 	{
 		public static const SHOT_COMPLETE:String = "shot_complete";
 		private var _shotCompleteEvent:Event = null;

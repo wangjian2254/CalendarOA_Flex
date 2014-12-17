@@ -19,12 +19,12 @@
 
 		public function set source(s:Object):void {
 			if (s is String) {
-				if(s.indexOf("http")!=0){
+				if (s.indexOf("http") != 0) {
 					_source = CHTTPService.baseUrl + s;
-				}else{
+				} else {
 					_source = s;
 				}
-				
+
 			} else {
 				_source = s;
 			}
@@ -40,19 +40,19 @@
 			init();
 		}
 
-		private function init():void{
-			try{
-				if(isPerson){
-					if(this.width>30){
-						backimg.setStyle("cornerRadius",20);
-					}else{
-						backimg.setStyle("cornerRadius",10);
+		private function init():void {
+			try {
+				if (isPerson) {
+					if (this.width > 30) {
+						backimg.setStyle("cornerRadius", 20);
+					} else {
+						backimg.setStyle("cornerRadius", 10);
 					}
 
-				}else{
-					backimg.setStyle("cornerRadius",0);
+				} else {
+					backimg.setStyle("cornerRadius", 0);
 				}
-			}catch(e:Error){
+			} catch (e:Error) {
 
 			}
 

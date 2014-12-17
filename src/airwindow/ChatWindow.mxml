@@ -9,16 +9,17 @@
 		import events.ChatTimelineEvent;
 		import events.ListClickEvent;
 		import events.PaoPaoEvent;
-		
+
 		import model.ChatChannel;
-		
+
 		import mx.core.FlexGlobals;
 		import mx.events.CloseEvent;
-		
+
 		import org.idream.pomelo.Pomelo;
 		import org.idream.pomelo.PomeloEvent;
-		
+
 		import util.ChatManager;
+		import util.NotifyTools;
 		import util.ToolUtil;
 
 		public var chat_map:Object = new Object();
@@ -28,11 +29,43 @@
 		public function closeWindow(e:Event):void {
 			Pomelo.getIns().removeEventListener('removeChannel', removeChannelHandler);
 			Pomelo.getIns().removeEventListener('onChat', chatHandler);
+			Pomelo.getIns().removeEventListener('sys', systemMessageHandler);
 			this.removeEventListener(ListClickEvent.CHATUSER, listItemClick_handler);
 			this.removeEventListener(ListClickEvent.UNSUBSCRIBE, unsubscribe_handler);
 //			this.removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
 			changeCurrentUser(null);
 			Pomelo.getIns().disconnect();
+
+		}
+
+		public function showNotify(notify:Object):NoticeWindow{
+			var notice:NoticeWindow = new NoticeWindow();
+			notice.transparent = true;
+			notice.type = NativeWindowType.UTILITY;
+			notice.systemChrome = NativeWindowSystemChrome.NONE;
+			notice.message = notify;
+			notice.open();
+			NotifyTools.notifylist.addItem(notify);
+			return notice;
+		}
+
+		public function systemMessageHandler(event:PomeloEvent):void{
+			switch (event.message.msg.type){
+				case "org_users_changed":
+						ToolUtil.currentOrgRefresh();
+						break;
+				case "schedule_status_change":
+					showNotify(event.message.msg);
+						break;
+				case "schedule_update":
+					showNotify(event.message.msg);
+						ToolUtil.getScheduleByDate_repeat();
+						break;
+				case "join_apply":
+					showNotify(event.message.msg);
+						break;
+
+			}
 
 		}
 
@@ -44,6 +77,7 @@
 //			this.addEventListener(ChatTimelineEvent.Channel, flagTimeline);
 			Pomelo.getIns().addEventListener('removeChannel', removeChannelHandler);
 			Pomelo.getIns().addEventListener('onChat', chatHandler);
+			Pomelo.getIns().addEventListener('sys', systemMessageHandler);
 
 			addEventListener(CloseEvent.CLOSE, closeWindow);
 			FlexGlobals.topLevelApplication.addEventListener(ChangeUserEvent.ChangeUser_EventStr, changeCurrentUser);
@@ -60,12 +94,7 @@
 				unread_messagelist[msg.channel].unread += 1;
 				ToolUtil.groupList.refresh();
 				if (cp == null) {
-					var notice:NoticeWindow = new NoticeWindow();
-					notice.transparent = true;
-					notice.type = NativeWindowType.UTILITY;
-					notice.systemChrome = NativeWindowSystemChrome.NONE;
-					notice.message = msg;
-					notice.open();
+					var notice:NoticeWindow =showNotify(msg);;
 					notice.addEventListener(PaoPaoEvent.CHAT, openChatByChannel);
 
 
@@ -209,8 +238,8 @@
 			var c:ChatPannel = chat_map[chat.channel];
 			if (c == null) {
 				c = new ChatPannel();
-				c.transparent=true;
-				c.systemChrome=NativeWindowSystemChrome.NONE;
+				c.transparent = true;
+				c.systemChrome = NativeWindowSystemChrome.NONE;
 				c.chatUser = chat;
 				c.open();
 				c.addEventListener(CloseEvent.CLOSE, closeChatPannel);

@@ -7,14 +7,20 @@
 		<![CDATA[
 			import events.PaoPaoEvent;
 			
+			import httpcontrol.HttpServiceUtil;
+			
 			import model.ChatChannel;
 			import model.Schedule;
 			
 			import mx.core.FlexGlobals;
-			import mx.core.WindowedApplication;
+			import mx.events.MenuEvent;
+			import mx.rpc.events.ResultEvent;
 			
 			import org.idream.pomelo.Pomelo;
 			
+			import spark.components.WindowedApplication;
+			
+			import util.NotifyTools;
 			import util.ScheduleUtil;
 			import util.ToolUtil;
 
@@ -36,10 +42,10 @@
 
 		public function init():void {
 			nativeWindow.alwaysInFront = true;
-			if(message is Schedule){
+			if (message is Schedule) {
 				contentLabel.text = message.title;
 				nameLabel.text = "任务提醒";
-			}else{
+			} else {
 				if (message != null && message.hasOwnProperty("te")) {
 					contentLabel.text = message.te;
 					if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
@@ -80,8 +86,13 @@
 						}
 					}
 				}
+				if (message.hasOwnProperty("is_notify") && message.is_notify) {
+					head.source = "/static/image/notify.png";
+					nameLabel.text = "动态";
+					contentLabel.text = message.msg;
+				}
 			}
-			
+
 			this.startPosition();
 			this.Timer1.addEventListener(TimerEvent.TIMER, scorllUp);
 			this.Timer1.start();
@@ -90,6 +101,7 @@
 
 		private function closeW():void {
 			nativeWindow.close();
+			
 			Timer1.stop();
 			Timer2.stop();
 			Timer3.stop();
@@ -100,20 +112,41 @@
 		}
 
 		private function openW():void {
-			if(message is Schedule){
-				(FlexGlobals.topLevelApplication as WindowedApplication).orderToFront();
+			if (message is Schedule) {
+				showMainWindow();
 				ScheduleUtil.showSchedulePanel(message.id);
-			}else{
-				var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
-				event.msg = message;
-				event.channel = message.channel;
-				dispatchEvent(event);
+			} else {
+				if (message != null && message.hasOwnProperty("te")) {
+					var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
+					event.msg = message;
+					event.channel = message.channel;
+					dispatchEvent(event);
+				}
+				if (message.hasOwnProperty("is_notify") && message.is_notify) {
+					var obj:Object = {'id': message._id};
+					HttpServiceUtil.getCHTTPServiceAndResult("/ca/change_notify_status", function (result:Object, e:ResultEvent):void {
+						message.status = true;
+						NotifyTools.notifylist.refresh();
+					}, "POST").send(obj);
+
+					if(message.type=="join_apply"){
+						var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+						event1.item = {mod:'checkApply', label:'审批加入申请',obj:new Object()};
+						FlexGlobals.topLevelApplication.dispatchEvent(event1);
+						showMainWindow();
+					}
+				}
 			}
-			
+
 			closeW();
 
 
 		}
+			private function showMainWindow():void{
+				(FlexGlobals.topLevelApplication as WindowedApplication).orderInFrontOf(this);
+				nativeWindow.alwaysInFront=false;
+				(FlexGlobals.topLevelApplication as WindowedApplication).alwaysInFront=false;
+			}
 
 		/**
 		 *弹出窗口

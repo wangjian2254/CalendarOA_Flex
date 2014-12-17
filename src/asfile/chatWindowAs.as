@@ -7,7 +7,6 @@ import control.window.PersonPanel;
 import events.ChangeUserEvent;
 import events.ChatTimelineEvent;
 import events.ListClickEvent;
-import events.UploadFileEvent;
 
 import httpcontrol.HttpServiceUtil;
 
@@ -20,7 +19,6 @@ import mx.collections.ArrayCollection;
 import mx.controls.Alert;
 import mx.controls.Menu;
 import mx.core.FlexGlobals;
-import mx.events.CloseEvent;
 import mx.events.FlexEvent;
 import mx.events.MenuEvent;
 import mx.managers.PopUpManager;

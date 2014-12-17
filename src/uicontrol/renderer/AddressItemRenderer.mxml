@@ -68,13 +68,13 @@
                 rightContainer.visible = false;
                 rightContainer.width = 0;
 
-                if(data){
-                    if(data is ChatChannel){
-                        if(data.type=='p'){
-                            head.isPerson=true;
+                if (data) {
+                    if (data is ChatChannel) {
+                        if (data.type == 'p') {
+                            head.isPerson = true;
                         }
-                    }else{
-                        head.isPerson=true;
+                    } else {
+                        head.isPerson = true;
                     }
                 }
 

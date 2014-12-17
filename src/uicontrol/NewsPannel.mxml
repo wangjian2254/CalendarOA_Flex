@@ -3,6 +3,7 @@
   Created by WangJian on 2014/11/6.
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+                   xmlns:uicontrol="uicontrol.*"
                    cornerRadius="12"
                    borderColor="#000000" borderStyle="solid" width="250" height="60" styleName="paopaonotify"
                    creationComplete="init()">
@@ -17,17 +18,22 @@
         import flash.filters.DropShadowFilter;
         import flash.filters.GlowFilter;
 
+        import httpcontrol.HttpServiceUtil;
+
         import model.ChatChannel;
         import model.Schedule;
 
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
+        import mx.events.MenuEvent;
         import mx.managers.PopUpManager;
+        import mx.rpc.events.ResultEvent;
 
         import org.idream.pomelo.Pomelo;
 
-        import util.ScheduleUtil;
+        import util.NotifyTools;
 
+        import util.ScheduleUtil;
         import util.ToolUtil;
 
         [Bindable]
@@ -44,10 +50,10 @@
         public var message:Object;
 
         public function init():void {
-            if(message is Schedule){
+            if (message is Schedule) {
                 contentLabel.text = message.title;
                 nameLabel.text = "任务提醒";
-            }else{
+            } else {
                 if (message != null && message.hasOwnProperty("te")) {
                     contentLabel.text = message.te;
                     if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
@@ -56,7 +62,7 @@
                             if (g.channel == message.channel) {
                                 f = true;
                                 nameLabel.text = g.name;
-                                ExternalInterface.call("notify","/static/smalloaicon/group.png", g.name, message.te);
+                                ExternalInterface.call("notify", "/static/smalloaicon/group.png", g.name, message.te);
                             }
                         }
                         if (!f) {
@@ -64,7 +70,7 @@
                                 if (data.code == 200 && data.channel != null) {
                                     ToolUtil.groupList.addItem(new ChatChannel(data.channel));
                                     nameLabel.text = data.channel.name;
-                                    ExternalInterface.call("notify","/static/smalloaicon/group.png", data.channel.name, message.te);
+                                    ExternalInterface.call("notify", "/static/smalloaicon/group.png", data.channel.name, message.te);
 
                                 }
                             });
@@ -77,7 +83,7 @@
                                 if (did == depat.id) {
                                     head.source = depat.icon;
                                     nameLabel.text = depat.name;
-                                    ExternalInterface.call("notify",depat.icon, depat.name, message.te);
+                                    ExternalInterface.call("notify", depat.icon, depat.name, message.te);
                                 }
                             }
                         } else {
@@ -87,10 +93,21 @@
                                     var person:Object = ToolUtil.getAnyPersonById(pid);
                                     head.source = person.icon;
                                     nameLabel.text = person.name;
-                                    ExternalInterface.call("notify",person.icon, person.name, message.te);
+                                    ExternalInterface.call("notify", person.icon, person.name, message.te);
                                 }
                             }
                         }
+                    }
+                }
+                if(message.hasOwnProperty("is_notify")&&message.is_notify){
+                    ExternalInterface.call("notify", "/static/image/notify.png", "动态", message.msg);
+                    head.source = "/static/image/notify.png";
+                    openButton.label = "已读";
+                    nameLabel.text = "动态";
+                    contentLabel.text = message.msg;
+
+                    if(message.type=="join_apply"){
+                        openButton.label = "处理";
                     }
                 }
             }
@@ -116,13 +133,32 @@
         }
 
         private function openW():void {
-            if(message is Schedule){
+            if (message is Schedule) {
                 ScheduleUtil.showSchedulePanel(message.id);
-            }else{
-                var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
-                event.msg = message;
-                event.channel = message.channel;
-                FlexGlobals.topLevelApplication.dispatchEvent(event);
+            } else {
+                if (message != null && message.hasOwnProperty("te")) {
+                    var event:PaoPaoEvent = new PaoPaoEvent(PaoPaoEvent.CHAT);
+                    event.msg = message;
+                    event.channel = message.channel;
+                    FlexGlobals.topLevelApplication.dispatchEvent(event);
+                }
+                if(message.hasOwnProperty("is_notify")&&message.is_notify){
+                    var obj:Object={'id':message._id};
+                    HttpServiceUtil.getCHTTPServiceAndResult("/ca/change_notify_status", function(result:Object, e:ResultEvent):void{
+                        message.status=true;
+                        NotifyTools.notifylist.refresh();
+                    }, "POST").send(obj);
+
+                    if(message.type=="join_apply"){
+                        var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+//                        var xml1:XML = new XML("<menuitem label='审批加入申请' mod='checkApply'></menuitem>");
+//                        event1.item = xml1;
+//
+//                        MenuEvent.prototype.obj=null;
+                        event1.item = {mod:'checkApply', label:'审批加入申请',obj:new Object()};
+                        FlexGlobals.topLevelApplication.dispatchEvent(event1);
+                    }
+                }
             }
 
             closeW();
@@ -130,7 +166,7 @@
 
         }
         ]]></fx:Script>
-    <s:Image id="head" width="45" height="45" top="4" left="4"></s:Image>
+    <uicontrol:HeadImage id="head" width="45" height="45" top="4" left="4" />
     <s:VGroup top="2" bottom="2" right="75" left="55">
         <s:Label id="nameLabel" fontWeight="bold"  ></s:Label>
         <s:Label id="contentLabel" maxDisplayedLines="-1" width="100%" height="100%" ></s:Label>

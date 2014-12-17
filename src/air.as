@@ -1,3 +1,7 @@
+import air.update.events.DownloadErrorEvent;
+import air.update.events.StatusUpdateEvent;
+import air.update.events.UpdateEvent;
+
 import airwindow.ChatWindow;
 import airwindow.NoticeWindow;
 import airwindow.SocialWindow;
@@ -6,9 +10,8 @@ import events.PaoPaoEvent;
 import events.ScheduleNotifyEvent;
 import events.SocialEvent;
 
-import flash.desktop.NativeApplication;
 import flash.display.NativeWindowSystemChrome;
-import flash.display.NativeWindowType;
+import flash.events.ErrorEvent;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.system.Capabilities;
@@ -16,6 +19,7 @@ import flash.system.Capabilities;
 import httpcontrol.CHTTPService;
 import httpcontrol.HttpServiceUtil;
 
+import mx.controls.Alert;
 import mx.core.FlexGlobals;
 import mx.events.AIREvent;
 import mx.events.CloseEvent;
@@ -23,7 +27,6 @@ import mx.rpc.events.ResultEvent;
 
 import org.idream.pomelo.Pomelo;
 
-import util.ChatManager;
 import util.ToolUtil;
 
 public function quiteWindow(e:*=null):void {
@@ -83,8 +86,8 @@ public function openChatWindow():Object
 }
 
 public function initAir():void{
-//    CHTTPService.baseUrl = "http://192.168.101.18:8000";
-    CHTTPService.baseUrl = "http://liyuoa.duapp.com";
+    CHTTPService.baseUrl = "http://192.168.101.18:8000";
+//    CHTTPService.baseUrl = "http://liyuoa.duapp.com";
 	header.addEventListener(MouseEvent.MOUSE_DOWN,pushApp);
 	
 	callLater(moveCenter);
@@ -187,14 +190,6 @@ private function startAtLogin():void{
 		
 	}
 }
-
-import air.update.events.DownloadErrorEvent;
-import air.update.events.StatusUpdateEvent;
-import air.update.events.UpdateEvent;
-
-import mx.controls.Alert;
-import flash.events.ErrorEvent;
-
 
 protected function updater_errorHandler(event:ErrorEvent):void
 {

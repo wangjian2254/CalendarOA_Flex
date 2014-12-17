@@ -15,49 +15,54 @@
 			
 			import events.CloseContainerEvent;
 			
+			import mx.events.CloseEvent;
 			import mx.graphics.codec.JPEGEncoder;
 			import mx.utils.Base64Encoder;
-			private var ss:ScreenShot = new ScreenShot();
-			
-			private function init_owner():void{
-				chatTitleContainer.addEventListener(MouseEvent.MOUSE_DOWN, pushApp);
-				chatList.addEventListener(UploadFileEvent.SHOWBIGIMAGE, showBigImage);
-				
-				stage.addEventListener(KeyboardEvent.KEY_DOWN, onKDown);
-				ss.addEventListener(ScreenShot.SHOT_COMPLETE,onComplete);
-				
-			}
-			
-			
-			
-			public function pushApp(e:MouseEvent):void {
-				if (this.nativeWindow.displayState == NativeWindowDisplayState.NORMAL) {
-					this.nativeWindow.startMove();
-				}
-			}
-			
-			
 
-			
-			override public function closeContainer(e:CloseContainerEvent):void {
-				Pomelo.getIns().removeEventListener('onChat', chatHandler);
-				Pomelo.getIns().removeEventListener('quiteChannel', quiteChannelHandler);
-				Pomelo.getIns().removeEventListener('joinChannel', joinChannelHandler);
-				var event:CloseEvent = new CloseEvent(CloseEvent.CLOSE);
-				dispatchEvent(event);
+		private var ss:ScreenShot = new ScreenShot();
+
+		private function init_owner():void {
+			chatTitleContainer.addEventListener(MouseEvent.MOUSE_DOWN, pushApp);
+			chatList.addEventListener(UploadFileEvent.SHOWBIGIMAGE, showBigImage);
+
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onKDown);
+			ss.addEventListener(ScreenShot.SHOT_COMPLETE, onComplete);
+
+		}
+
+
+		public function pushApp(e:MouseEvent):void {
+			if (this.nativeWindow.displayState == NativeWindowDisplayState.NORMAL) {
+				this.nativeWindow.startMove();
 			}
-			private var notice:ImageWindow;
-			private function closeImage():void{
-				if(notice==null){
-					return;
-				}
-				notice.close();
+		}
+
+
+		override public function closeContainer(e:CloseContainerEvent):void {
+			Pomelo.getIns().removeEventListener('onChat', chatHandler);
+			Pomelo.getIns().removeEventListener('quiteChannel', quiteChannelHandler);
+			Pomelo.getIns().removeEventListener('joinChannel', joinChannelHandler);
+			var event:CloseEvent = new CloseEvent(CloseEvent.CLOSE);
+			dispatchEvent(event);
+		}
+
+		private var notice:ImageWindow;
+
+		private function closeImage():void {
+			if (notice == null) {
+				return;
 			}
-		private function showPic(s:Bitmap, defaultfilename:String=""):void{
-			if(s==null){
-				var event:UploadFileEvent = new UploadFileEvent(UploadFileEvent.UPLOAD,{filename:defaultfilename,status:1},bar);
+			notice.close();
+		}
+
+		private function showPic(s:Bitmap, defaultfilename:String = ""):void {
+			if (s == null) {
+				var event:UploadFileEvent = new UploadFileEvent(UploadFileEvent.UPLOAD, {
+					filename: defaultfilename,
+					status: 1
+				}, bar);
 				event.data.ownertype = chatUser.type;
-				event.data.ownername = chatUser.name.substr(0,60);
+				event.data.ownername = chatUser.name.substr(0, 60);
 				event.data.ownerpk = chatUser.id;
 				proceedWithUpload(event);
 				return;
@@ -66,7 +71,7 @@
 			notice.transparent = true;
 //			notice.type = NativeWindowType.UTILITY;
 			notice.systemChrome = NativeWindowSystemChrome.NONE;
-			if(chatUser.type == 'p' || chatUser.type == 'g'){
+			if (chatUser.type == 'p' || chatUser.type == 'g') {
 				notice.filestatus = 0;
 			}
 
@@ -74,89 +79,87 @@
 			notice.imagedata = s;
 			notice.imgname = defaultfilename;
 
-			
+
 			notice.open();
-			notice.addEventListener(UploadFileEvent.UPLOAD,function(event:UploadFileEvent):void{
+			notice.addEventListener(UploadFileEvent.UPLOAD, function (event:UploadFileEvent):void {
 				event.data.ownertype = chatUser.type;
-				event.data.ownername = chatUser.name.substr(0,60);
+				event.data.ownername = chatUser.name.substr(0, 60);
 				event.data.ownerpk = chatUser.id;
 				proceedWithUpload(event);
 			});
 		}
-			
-			private function showBigImage(e:UploadFileEvent):void{
-				var notice:ImageWindow = new ImageWindow();
-				notice.transparent = true;
-				//			notice.type = NativeWindowType.UTILITY;
-				notice.systemChrome = NativeWindowSystemChrome.NONE;
-				
-				
-				notice.imagesrc = e.data.toString();
-				notice.editfilename = false;
-				notice.open();
-			}
-			
-			private function screenshot():void{
+
+		private function showBigImage(e:UploadFileEvent):void {
+			var notice:ImageWindow = new ImageWindow();
+			notice.transparent = true;
+			//			notice.type = NativeWindowType.UTILITY;
+			notice.systemChrome = NativeWindowSystemChrome.NONE;
+
+
+			notice.imagesrc = e.data.toString();
+			notice.editfilename = false;
+			notice.open();
+		}
+
+		private function screenshot():void {
+			ss.shot();
+		}
+
+		private function onKDown(e:KeyboardEvent):void {
+			if (e.altKey && e.ctrlKey && e.keyCode == 65) {
 				ss.shot();
 			}
-			
-			private function onKDown(e:KeyboardEvent):void {
-				if (e.altKey && e.ctrlKey && e.keyCode == 65) {
-					ss.shot();
-				}
-			}
-			
-			private function saveShotpic(event:Event):void{
+		}
+
+		private function saveShotpic(event:Event):void {
 //				var ff:FileReference =new FileReference(); 
-				var j:JPEGEncoder = new JPEGEncoder();
+			var j:JPEGEncoder = new JPEGEncoder();
 //				var f:File = new File(File.createTempDirectory()+File.separator+"liyu-"+DateUtil.dateLbl3(new Date())+".jpg");
 //				var f:File = File.applicationDirectory.resolvePath("temppic"+File.separator+"liyu-"+DateUtil.dateLbl3(new Date())+".jpg");
-				var f:File = File.createTempFile();
-				
-				
-				var fileStream:FileStream = new FileStream();
-				fileStream.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):void{
-					Alert.show("请重新截屏","提示",0x4,this);
-				});
-				fileStream.open(f, FileMode.WRITE);
-				fileStream.writeBytes(j.encode(ss.bitmapData));
-				fileStream.close();
-				
-				var ff:FileReference =FileReference(f.nativePath);
-				ff.load();
+			var f:File = File.createTempFile();
+
+
+			var fileStream:FileStream = new FileStream();
+			fileStream.addEventListener(IOErrorEvent.IO_ERROR, function (e:IOErrorEvent):void {
+				Alert.show("请重新截屏", "提示", 0x4, this);
+			});
+			fileStream.open(f, FileMode.WRITE);
+			fileStream.writeBytes(j.encode(ss.bitmapData));
+			fileStream.close();
+
+			var ff:FileReference = FileReference(f.nativePath);
+			ff.load();
 //				ff.
+		}
+
+		protected function onComplete(event:Event):void {
+			var j:JPEGEncoder = new JPEGEncoder();
+			var base:Base64Encoder = new Base64Encoder();
+			base.encodeBytes(j.encode(ss.bitmapData));
+			var data:Object = new Object();
+			data.status = 1;
+			data.filename = "liyu-" + DateUtil.dateLbl3(new Date()) + ".jpg";
+			data.pid = ToolUtil.sessionUser.pid;
+			data.oid = ToolUtil.sessionUser.oid;
+			data.chatflag = ToolUtil.sessionUser.chatflag;
+			data.ownertype = chatUser.type;
+			data.ownername = chatUser.name.substr(0, 60)
+			data.ownerpk = chatUser.id;
+			if (ss.bitmapData.height > 300) {
+				data.height = 300;
+			} else {
+				data.height = ss.bitmapData.height;
 			}
-			
-			protected function onComplete(event:Event):void
-			{
-				var j:JPEGEncoder = new JPEGEncoder();
-				var base:Base64Encoder=new Base64Encoder();
-				base.encodeBytes(j.encode(ss.bitmapData));
-				var data:Object = new Object();
-				data.status = 1;
-				data.filename = "liyu-"+DateUtil.dateLbl3(new Date())+".jpg";
-				data.pid=ToolUtil.sessionUser.pid;
-				data.oid = ToolUtil.sessionUser.oid;
-				data.chatflag = ToolUtil.sessionUser.chatflag;
-				data.ownertype = chatUser.type;
-				data.ownername = chatUser.name.substr(0,60)
-				data.ownerpk = chatUser.id;
-				if(ss.bitmapData.height>300){
-					data.height=300;
-				}else{
-					data.height=ss.bitmapData.height;
-				}
-				data.file = base.toString();
-				
-				var h:CHTTPService = HttpServiceUtil.getCHTTPServiceAndResult("/ca/upload_files", function (result:Object, event:ResultEvent):void {
-					uploadResult(result);
-				}, "POST");
-				h.loading = new Loading();
-				h.loading.fatherDisplay = this;
-				h.send(data);
-				
-			}
-			
+			data.file = base.toString();
+
+			var h:CHTTPService = HttpServiceUtil.getCHTTPServiceAndResult("/ca/upload_files", function (result:Object, event:ResultEvent):void {
+				uploadResult(result);
+			}, "POST");
+			h.loading = new Loading();
+			h.loading.fatherDisplay = this;
+			h.send(data);
+
+		}
 		]]>
 	</fx:Script>
 	<fx:Script source="../asfile/uploadfiles.as" />

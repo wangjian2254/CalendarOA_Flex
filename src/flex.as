@@ -3,7 +3,6 @@ import control.IMControl;
 import events.ScheduleNotifyEvent;
 
 import flash.display.DisplayObject;
-
 import flash.external.ExternalInterface;
 import flash.net.URLRequest;
 import flash.net.navigateToURL;
@@ -20,7 +19,6 @@ import org.idream.pomelo.Pomelo;
 import uicontrol.NewsPannel;
 
 import util.ChatManager;
-
 import util.ToolUtil;
 
 public function quite(e:*=null):void {

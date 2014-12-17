@@ -141,3 +141,9 @@ s|BorderContainer{
 .btnRefresh{
 	skinClass: ClassReference("skins.BtnRefreshSkin");
 }
+
+.notifylink{
+	icon: Embed(source="assets/logo_icon2.png");
+	color:#6a7987;
+	fontSize:12;
+}

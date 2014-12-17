@@ -11,6 +11,7 @@ import events.ChangeMenuEvent;
 import flash.display.DisplayObject;
 import flash.events.Event;
 import flash.events.MouseEvent;
+import flash.geom.Point;
 
 import mx.controls.Alert;
 import mx.controls.Menu;
@@ -21,7 +22,10 @@ import mx.managers.PopUpManager;
 import mx.rpc.events.FaultEvent;
 import mx.rpc.events.ResultEvent;
 
+import spark.components.List;
+
 import uicontrol.MenuButton;
+import uicontrol.NotifyList;
 
 public function failMenu(evt:FaultEvent):void {
 	Alert.show("获取用户菜单失败。", "提示");
@@ -35,12 +39,17 @@ private function welcome(result:Object, e:ResultEvent):void {
 }
 
 private function openMessage():void {
-	var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
-	var xml1:XML = new XML("<menuitem label='站内消息' mod='message'></menuitem>");
-	event1.item = xml1;
-	var obj:Object = new Object();
-	obj["messageType"] = "unread";
-	onMenuChange(event1, obj);
+	var point:Point = this.contentToGlobal(new Point(notifyLinkButton.x, notifyLinkButton.y+notifyLinkButton.height));
+	var notifyshow:NotifyList = new NotifyList();
+	notifyshow.x = point.x;
+	notifyshow.y = point.y;
+	PopUpManager.addPopUp(notifyshow, this, false);
+//	var event1:MenuEvent = new MenuEvent(MenuEvent.CHANGE);
+//	var xml1:XML = new XML("<menuitem label='消息' mod='message'></menuitem>");
+//	event1.item = xml1;
+//	var obj:Object = new Object();
+//	obj["messageType"] = "unread";
+//	onMenuChange(event1, obj);
 }
 
 
@@ -174,8 +183,19 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 	//					Alert.show(obj['test'],'d');
 	//				}
 	menuflag = null;
-	var xml:XML = event.item as XML;
-	var mod:String = xml.attribute('mod').toString();
+	if(event.item is XML){
+		var xml:XML = event.item as XML;
+		var mod:String = xml.attribute('mod').toString();
+		var label:String = xml.attribute('label').toString();
+	}else{
+		mod = event.item.mod;
+		label = event.item.lable;
+		if(event.item.obj){
+			obj = event.item.obj;
+		}
+
+	}
+
 
 	var c:CBorderContainer;
 	c = cbar.getView(mod);
@@ -227,7 +247,7 @@ protected function onMenuChange(event:MenuEvent, obj:Object = null):void {
 		}
 	}
 	if (c != null) {
-		c.label = xml.attribute('label').toString();
+		c.label =
 		c.flag = mod;
 		c.param = obj;
 		if (!cbar.setView(mod)) {
