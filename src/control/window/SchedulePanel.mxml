@@ -332,6 +332,7 @@
             }
 
 
+            need_saved();
             this.invalidateDisplayList();
         }
 
@@ -621,6 +622,7 @@
                     dayTile.removeAllElements();
                     for (var i:Number = 0; i < 7; i++) {
                         var cb:CheckBox = new CheckBox();
+                        cb.addEventListener(Event.CHANGE, need_saved);
                         switch (i) {
                             case 0:
                                 cb.label = "日";
@@ -669,7 +671,7 @@
                     dayPanel.height = 130;
                     for (i = 0; i < 31; i++) {
                         cb = new CheckBox();
-
+                        cb.addEventListener(Event.CHANGE, need_saved);
                         cb.label = "" + (i + 1);
                         cb.height = 25;
                         cb.selected = false;
@@ -876,7 +878,7 @@
                     usersGroup.addElement(p);
 //                    usersGroup.validateNow();
                 }
-
+                need_saved();
             });
 
         }
@@ -895,6 +897,7 @@
                     usersGroup.removeElement(p);
                 }
             }
+            need_saved();
         }
 
         private function addProject():void {
@@ -980,11 +983,103 @@
                 }
             });
         }
+
+        private function need_saved(e:Event=null):void{
+            if(check_schedule_changed(schedulData)){
+                btnSave.label="保存";
+                btnSave.enabled=true;
+            }else{
+                btnSave.label="没有变动";
+                btnSave.enabled=false;
+            }
+        }
+
+        private function check_schedule_changed(data:Schedule):Boolean{
+            if(data==null){
+                return true;
+            }
+            var cdata:Object=getData();
+            var flag:Boolean = false;
+            if(data.title!=cdata.title){
+                flag=true;
+            }
+            if(data.department!=cdata.department){
+                flag=true;
+            }
+            if(data.project!=cdata.project){
+                flag=true;
+            }
+            if(data.startdate!=cdata.startdate){
+                flag=true;
+            }
+            if(data.enddate!=cdata.enddate){
+                flag=true;
+            }
+            if(data.is_all_day!=cdata.is_all_day){
+                flag=true;
+            }
+            if(data.time_start!=cdata.time_start){
+                flag=true;
+            }
+            if(data.time_end!=cdata.time_end){
+                flag=true;
+            }
+            if(data.repeat_type!=cdata.repeat_type){
+                flag=true;
+            }
+            if(data.repeat_type==cdata.repeat_type&&!data.check_repeat_data(cdata.repeat_date)){
+                flag=true;
+            }
+            if(data.color!=cdata.color){
+                flag=true;
+            }
+            if(!data.check_users(cdata.users)){
+                flag=true;
+            }
+            if(data.need_check!=cdata.need_check){
+                flag=true;
+            }
+            if(data.need_check==cdata.need_check&&data.checker!=cdata.checker){
+                flag=true;
+            }
+            if(data.notify!=cdata.notify){
+                flag=true;
+            }
+            if(data.notify==cdata.notify&&!data.check_notifyArr(cdata.notifyArr)){
+                flag=true;
+            }
+            if(data.level!=cdata.level){
+                flag=true;
+            }
+            if(data.urgent!=cdata.urgent){
+                flag=true;
+            }
+            if(data.status!=cdata.status){
+                flag=true;
+            }
+            return flag;
+        }
+
+        public function scheduleUpdated(data:Schedule):void{
+            var flag:Boolean = check_schedule_changed(data);
+            if(flag){
+                Alert.show("任务已经被修改,是否刷新数据？","提示",Alert.YES | Alert.CANCEL,this,function(e:CloseEvent){
+                    if(e.detail==Alert.YES){
+                        schedulData=data;
+                        init();
+                    }
+                });
+            }else{
+                schedulData=data;
+                init();
+            }
+
+        }
         ]]>
 	</fx:Script>
     <fx:Declarations>
         <!-- 将非可视元素（例如服务、值对象）放在此处 -->
-        <s:RadioButtonGroup id="repeatType" change="repeatChange()"/>
+        <s:RadioButtonGroup id="repeatType" change="repeatChange();need_saved();"/>
         <mx:DateFormatter id="datestr" formatString="YYYYMMDD" >
 
         </mx:DateFormatter>
@@ -1002,8 +1097,8 @@
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="departmentDownList" width="50%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart()" ></s:DropDownList>
-                <s:DropDownList id="projectDownList" width="50%" labelField="name" dataProvider="{myproject}"></s:DropDownList>
+                <s:DropDownList id="departmentDownList" width="50%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart();need_saved();" ></s:DropDownList>
+                <s:DropDownList id="projectDownList" width="50%" labelField="name" dataProvider="{myproject}" change="need_saved();"></s:DropDownList>
                 <s:Spacer width="30"></s:Spacer>
                 <uicontrol:Btn width="16" height="16" styleName="btnAdd" clickFun="{addProject}" />
             </s:FormItem>
@@ -1011,7 +1106,7 @@
                 <s:layout>
                     <s:HorizontalLayout gap="5" verticalAlign="middle" />
                 </s:layout>
-                <s:TextArea id="scheduleTitle" width="100%" height="135" toolTip="任务内容：描述任务的具体工作" prompt="请写明任务内容、发生地点">
+                <s:TextArea id="scheduleTitle" width="100%" height="135" toolTip="任务内容：描述任务的具体工作" prompt="请写明任务内容、发生地点" change="need_saved();">
                 </s:TextArea>
                 <s:Label text="*" color="red"/>
             </s:FormItem>
@@ -1020,14 +1115,14 @@
                     <s:HorizontalLayout gap="5">
                     </s:HorizontalLayout>
                 </s:layout>
-                <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
-                <s:CheckBox label="设置具体时刻" id="is_all_day" selected="true" change="changeTiXing()">
+                <mx:DateField id="startDate" width="100" selectedDate="{startDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="need_saved();"/>
+                <s:CheckBox label="设置具体时刻" id="is_all_day" selected="true" change="changeTiXing();need_saved();">
                 </s:CheckBox>
-                <mx:ComboBox id="startTime" visible="{is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh()"  >
+                <mx:ComboBox id="startTime" visible="{is_all_day.selected}" dataProvider="{timelist}" labelField="text" width="90"  change="refresh();need_saved();"  >
 
                 </mx:ComboBox>
                 <s:Label text="到" height="100%" verticalAlign="middle" visible="{is_all_day.selected}" />
-                <mx:ComboBox id="endTime"  visible="{is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90"   >
+                <mx:ComboBox id="endTime"  visible="{is_all_day.selected}"  dataProvider="{endtimelist}" labelField="text" width="90" change="need_saved();"  >
 
                 </mx:ComboBox>
             </s:FormItem>
@@ -1037,7 +1132,7 @@
 
                     </s:HorizontalLayout>
                 </s:layout>
-                <mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" />
+                <mx:DateField id="endDate" width="100" selectedDate="{endDateValue}" formatString="YYYY-MM-DD" dayNames="{DateUtil.dayNames}" monthNames="{DateUtil.monthNames}" change="need_saved();" />
                 <mx:LinkButton label="当天" click="setEndDate(0)" color="0x9f9f9f" textDecoration="underline" />
                 <mx:LinkButton label="两天" click="setEndDate(1)"  color="0x9f9f9f" textDecoration="underline" />
                 <mx:LinkButton label="三天" click="setEndDate(2)" color="0x9f9f9f" textDecoration="underline" />
@@ -1061,13 +1156,13 @@
             </s:FormItem>
             <s:FormItem id="dayPanel"  label="重复时间：" includeInLayout="{dayPanel.visible}" height="25" toolTip="重复时间：在任务周期中，按条件循环任务">
                 <s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
-                    <s:CheckBox label="一"  />
-                    <s:CheckBox label="二" />
-                    <s:CheckBox label="三" />
-                    <s:CheckBox label="四" />
-                    <s:CheckBox label="五" />
-                    <s:CheckBox label="六" />
-                    <s:CheckBox label="日" />
+                    <s:CheckBox label="一" change="need_saved();" />
+                    <s:CheckBox label="二" change="need_saved();" />
+                    <s:CheckBox label="三" change="need_saved();" />
+                    <s:CheckBox label="四" change="need_saved();" />
+                    <s:CheckBox label="五" change="need_saved();" />
+                    <s:CheckBox label="六" change="need_saved();" />
+                    <s:CheckBox label="日" change="need_saved();" />
                 </s:TileGroup>
             </s:FormItem>
 
@@ -1101,7 +1196,7 @@
                 </s:BorderContainer>
                 <s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
                 </s:BorderContainer>
-                <mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange()"
+                <mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange();need_saved();"
                                 symbolColor="#030002">
 
                 </mx:ColorPicker>
@@ -1123,27 +1218,27 @@
                     <s:HorizontalLayout gap="10">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" labelField="name" dataProvider="{departmentMembers}"></s:DropDownList>
-                <s:CheckBox label="无需审核" selected="true" id="need_check">
+                <s:DropDownList id="checkerDownList" enabled="{!need_check.selected}" labelField="name" dataProvider="{departmentMembers}" change="need_saved();"></s:DropDownList>
+                <s:CheckBox label="无需审核" selected="true" id="need_check" change="need_saved();">
                 </s:CheckBox>
             </s:FormItem>
             <s:FormItem id="tixingItem" visible="{is_all_day.selected}" label="提醒：" height="25" includeInLayout="{tixingItem.visible}">
-                <s:CheckBox id="boxTiXing" change="changeTiXing()" selected="false" label="无需提醒" />
+                <s:CheckBox id="boxTiXing" change="changeTiXing();need_saved();" selected="false" label="无需提醒" />
             </s:FormItem>
             <s:FormItem id="itemTixing" label="提醒：" height="75">
                 <s:TileGroup id="tixingTile" includeInLayout="{tixingTile.visible}" width="100%" height="75"  columnAlign="justifyUsingGap" >
-                <s:CheckBox id="alertBox0" label="到点提醒" selected="true" ></s:CheckBox>
-                <s:CheckBox id="alertBox1" label="提前5分钟"></s:CheckBox>
-                <s:CheckBox id="alertBox2" label="提前10分钟"></s:CheckBox>
-                <s:CheckBox id="alertBox3" label="提前15分钟"></s:CheckBox>
-                <s:CheckBox id="alertBox4" label="提前30分钟"></s:CheckBox>
-                <s:CheckBox id="alertBox5" label="提前45分钟"></s:CheckBox>
-                <s:CheckBox id="alertBox6" label="提前1小时"></s:CheckBox>
-                <s:CheckBox id="alertBox7" label="提前2小时"></s:CheckBox>
-                <s:CheckBox id="alertBox8" label="提前4小时"></s:CheckBox>
-                <s:CheckBox id="alertBox9" label="提前1天"></s:CheckBox>
-                <s:CheckBox id="alertBox10" label="提前2天"></s:CheckBox>
-                <s:CheckBox id="alertBox11" label="提前1周"></s:CheckBox>
+                <s:CheckBox id="alertBox0" label="到点提醒" selected="true" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox1" label="提前5分钟" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox2" label="提前10分钟" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox3" label="提前15分钟" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox4" label="提前30分钟" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox5" label="提前45分钟" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox6" label="提前1小时" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox7" label="提前2小时" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox8" label="提前4小时" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox9" label="提前1天" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox10" label="提前2天" change="need_saved();" ></s:CheckBox>
+                <s:CheckBox id="alertBox11" label="提前1周" change="need_saved();" ></s:CheckBox>
                 </s:TileGroup>
             </s:FormItem>
             <s:FormItem label="优先级：" height="35" >
@@ -1151,9 +1246,9 @@
                     <s:HorizontalLayout gap="10" verticalAlign="middle">
                     </s:HorizontalLayout>
                 </s:layout>
-                <s:DropDownList id="urgentDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskurgentlist}" toolTip="任务的完成优先级"></s:DropDownList>
+                <s:DropDownList id="urgentDownList" selectedIndex="0"  labelField="label" dataProvider="{ToolUtil.taskurgentlist}" toolTip="任务的完成优先级" change="need_saved();" ></s:DropDownList>
                 <s:Label text="权重："/>
-                <s:NumericStepper id="levleStepper" minimum="0" value="1" maximum="100" width="100" toolTip="权重：完成所需要的工时，或者本任务的重要性" />
+                <s:NumericStepper id="levleStepper" minimum="0" value="1" maximum="100" width="100" toolTip="权重：完成所需要的工时，或者本任务的重要性"  change="need_saved();" />
             </s:FormItem>
             <mx:ControlBar  id="dopanel" width="100%" height="40">
                 <s:Button id="btnSave" chromeColor="red" label="保存" height="25" color="#ffffff" click="save()" />

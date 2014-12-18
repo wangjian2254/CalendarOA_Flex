@@ -393,5 +393,53 @@ public class Schedule {
     public function set notifyArr(value:Array):void {
         _notifyArr = value;
     }
+
+    public function check_repeat_data(v:Array):Boolean{
+        var f:Boolean=false;
+        for each(var i:Object in v){
+            f=false;
+            for each(var k:Object in repeat_date){
+                if(i==k){
+                    f=true;
+                }
+            }
+            if(!f){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function check_users(v:Array):Boolean{
+        var f:Boolean=false;
+        for each(var i:Object in v){
+            f=false;
+            for each(var k:Object in users){
+                if(i==k){
+                    f=true;
+                }
+            }
+            if(!f){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function check_notifyArr(v:Array):Boolean{
+        var f:Boolean=false;
+        for each(var i:Object in v){
+            f=false;
+            for each(var k:Object in notifyArr){
+                if(i==k){
+                    f=true;
+                }
+            }
+            if(!f){
+                return false;
+            }
+        }
+        return true;
+    }
 }
 }
