@@ -45,8 +45,10 @@
 			if (message is Schedule) {
 				contentLabel.text = message.title;
 				nameLabel.text = "任务提醒";
+				openButton.label = "打开";
 			} else {
 				if (message != null && message.hasOwnProperty("te")) {
+					openButton.label = "回复";
 					contentLabel.text = message.te;
 					if (message.channel.substr(0, 1) == "g" || message.channel.substr(0, 1) == "t") {
 						var f:Boolean = false;
@@ -90,6 +92,13 @@
 					head.source = "/static/image/notify.png";
 					nameLabel.text = "动态";
 					contentLabel.text = message.msg;
+
+					if(message.type == 'schedule_status_change'||message.type == 'schedule_update'||message.type == 'schedule_create'){
+						openButton.label = "打开";
+					}
+					if(message.type == 'schedule_del'){
+						openButton.visible=false;
+					}
 				}
 			}
 
@@ -134,6 +143,10 @@
 						event1.item = {mod:'checkApply', label:'审批加入申请',obj:new Object()};
 						FlexGlobals.topLevelApplication.dispatchEvent(event1);
 						showMainWindow();
+					}
+					if(message.type == 'schedule_status_change'||message.type == 'schedule_update'||message.type == 'schedule_create'){
+						showMainWindow();
+						ScheduleUtil.showSchedulePanel(message.schedule_id);
 					}
 				}
 			}
@@ -220,7 +233,7 @@
 		</s:VerticalLayout>
 	</s:layout>
 	
-	<s:HGroup width="100%">
+	<s:HGroup width="100%" verticalAlign="middle">
 		<uicontrol:HeadImage id="head" isPerson="true" width="45" height="45" top="4" left="4" />
 		<s:Label id="nameLabel" fontWeight="bold"  ></s:Label>
 		<s:Spacer width="100%">
@@ -230,6 +243,11 @@
 	</s:HGroup>
 		
 		<s:Label id="contentLabel" maxDisplayedLines="-1" width="100%" height="100%" buttonMode="true" click="openW()" ></s:Label>
-	
-	
+
+	<s:HGroup width="100%"  verticalAlign="middle">
+		<s:Spacer width="100%">
+
+		</s:Spacer>
+		<s:Button id="openButton" label="回复" right="5" top="2" click="openW()"  ></s:Button>
+	</s:HGroup>
 </s:Window>

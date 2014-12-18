@@ -280,56 +280,8 @@
             }
 
 
-            timelist.removeAll();
-            for (var i:Number = 0; i < 24; i++) {
-                var h:String = "0" + i;
-                var s:String = "凌晨 ";
-                if (i >= 5 && i < 9) {
-                    s = "上午 ";
-                }
-                if (i >= 9 && i < 15) {
-                    s = "中午 ";
-                }
-                if (i >= 15 && i < 18) {
-                    s = "下午 ";
-                }
-                if (i >= 18) {
-                    s = "晚上 ";
-                }
 
-                timelist.addItem({
-                    "value": h.substring(h.length - 2) + "00",
-                    "text": s + h.substring(h.length - 2) + ":00"
-                });
-                timelist.addItem({
-                    "value": h.substring(h.length - 2) + "30",
-                    "text": s + h.substring(h.length - 2) + ":30"
-                });
-            }
-
-            try {
-                var index:Number = startDateValue.hours * 2;
-                if (startDateValue.minutes >= 30) {
-                    index += 1;
-                }
-                startTime.selectedItem = timelist.getItemAt(index);
-                endtimelist.removeAll();
-                for (index += 1; index < timelist.length; index++) {
-                    endtimelist.addItem(timelist.getItemAt(index));
-                    if (timeStr.format(endDateValue) >= timelist.getItemAt(index).value) {
-                        endTime.selectedItem = timelist.getItemAt(index);
-                    }
-                }
-                endtimelist.addItem({"value": "2359", "text": "24:00"});
-                if (endtimelist.length == 1) {
-                    endTime.selectedIndex = 0;
-                } else {
-                    endTime.selectedIndex = 1;
-                }
-            } catch (error:Error) {
-
-            }
-
+            makeTimeLineData();
             repeatChange();
             changeTiXing();
 
@@ -381,6 +333,56 @@
 
 
             this.invalidateDisplayList();
+        }
+
+        private function makeTimeLineData():void{
+            timelist.removeAll();
+            for (var i:Number = 0; i < 24; i++) {
+                var h:String = "0" + i;
+                var s:String = "凌晨 ";
+                if (i >= 5 && i < 9) {
+                    s = "上午 ";
+                }
+                if (i >= 9 && i < 15) {
+                    s = "中午 ";
+                }
+                if (i >= 15 && i < 18) {
+                    s = "下午 ";
+                }
+                if (i >= 18) {
+                    s = "晚上 ";
+                }
+
+                timelist.addItem({
+                    "value": h.substring(h.length - 2) + "00",
+                    "text": s + h.substring(h.length - 2) + ":00"
+                });
+                timelist.addItem({
+                    "value": h.substring(h.length - 2) + "30",
+                    "text": s + h.substring(h.length - 2) + ":30"
+                });
+            }
+
+            try {
+                var index:Number = startDateValue.hours * 2;
+                if (startDateValue.minutes >= 30) {
+                    index += 1;
+                }
+                startTime.selectedItem = timelist.getItemAt(index);
+                endtimelist.removeAll();
+                for (index += 1; index < timelist.length; index++) {
+                    endtimelist.addItem(timelist.getItemAt(index));
+                    if (timeStr.format(endDateValue) >= timelist.getItemAt(index).value) {
+                        endTime.selectedItem = timelist.getItemAt(index);
+                    }
+                }
+                endtimelist.addItem({"value": "2359", "text": "24:00"});
+                if (endtimelist.length == 1) {
+                    endTime.selectedIndex = 0;
+                }
+            } catch (error:Error) {
+
+            }
         }
 
         private function changeBorderColor():void {
@@ -969,6 +971,14 @@
                 }
             }
             ToolUtil.groupList.refresh();
+        }
+
+        public function delSchedule():void{
+            Alert.show("任务已经被删除,是否关闭窗口？","提示",Alert.YES | Alert.CANCEL,this,function(e:CloseEvent){
+                if(e.detail==Alert.YES){
+                    closeWin();
+                }
+            });
         }
         ]]>
 	</fx:Script>

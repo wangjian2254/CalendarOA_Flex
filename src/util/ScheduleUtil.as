@@ -4,10 +4,13 @@ import control.window.SchedulePanel;
 
 import flash.display.DisplayObject;
 
+import httpcontrol.HttpServiceUtil;
+
 import model.Schedule;
 
 import mx.core.FlexGlobals;
 import mx.managers.PopUpManager;
+import mx.rpc.events.ResultEvent;
 
 public class ScheduleUtil
 	{
@@ -75,10 +78,38 @@ public class ScheduleUtil
                 showSchedule[scheduleId].init();
 			}
 		}
+
+		public static function delSchedulePanel(scheduleId:String):void{
+			if(showSchedule.hasOwnProperty(scheduleId)){
+				showSchedule[scheduleId].delSchedule();
+			}
+		}
+
+		public static function refreshScheduleById(scheduleId:String):void{
+			var obj:Object = new Object();
+			obj['id'] = scheduleId;
+			HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleById", function (result:Object, e:ResultEvent):void {
+				if (result.success) {
+					var schedulData:Schedule = new Schedule(result.result);
+					ToolUtil.updateSchedul(schedulData.id, schedulData);
+				}
+			}, "POST").send(obj);
+		}
 		
-		public static function showSchedulePanel(scheduleId:String):void{
+		public static function showSchedulePanel(scheduleId:String, refresh:Boolean=false):void{
 			var scheduleData:Schedule = ToolUtil.getSchedule(scheduleId);
-				
+			if(scheduleData==null||refresh){
+				var obj:Object = new Object();
+				obj['id'] = scheduleId;
+				HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleById", function (result:Object, e:ResultEvent):void {
+					if (result.success) {
+						var schedulData:Schedule = new Schedule(result.result);
+						ToolUtil.updateSchedul(schedulData.id, schedulData);
+						ScheduleUtil.showSchedulePanel(schedulData.id);
+					}
+				}, "POST").send(obj);
+				return;
+			}
 			if(showSchedule.hasOwnProperty(scheduleId)){
 				showSchedule[scheduleId].schedulData = scheduleData;
                 showSchedule[scheduleId].init();

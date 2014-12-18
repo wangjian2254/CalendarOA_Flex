@@ -130,37 +130,38 @@
 
 
             var dayItem:DayItem = null;
-            for (var i:Number = 1; i < 50; i++) {
+            for (var i:Number = 0; i < 50; i++) {
                 if (calendarPanel.numElements - 1 >= i) {
-
-                    dayItem = calendarPanel.getElementAt(i - 1) as DayItem;
-
+                    dayItem = calendarPanel.getElementAt(i) as DayItem;
                     dayItem.showSchedule();
-
                 }
                 if (calendarBorder.numElements - 1 >= i) {
                     dayItem = calendarBorder.getElementAt(i) as DayItem;
-
-                    dayItem.showSchedule();
-
+                    if(i==0){
+                        dayItem.showTimeLine(50,true);
+                    }else{
+                        dayItem.showSchedule();
+                    }
                 }
                 if (daySchedule.numElements - 1 >= i) {
                     dayItem = daySchedule.getElementAt(i) as DayItem;
-
-                    dayItem.showSchedule();
-
+                    if(i==0){
+//                        dayItem.showTimeLine(50,true);
+//                        dayItem.showTime();
+                    }else{
+                        dayItem.showSchedule();
+                    }
                 }
-
             }
             //todo:整理逾期任务
-            showTask();
+
             showOutOfTimeSchedule();
-
-
+            showTask();
         }
 
         private function showOutOfTimeSchedule():void {
             taskunpanel.removeAllElements();
+            needCheckPanel.removeAllElements();
             var scheduleItem:ScheduleItem = null;
             var obj:Schedule;
             for each(var i:String in ToolUtil.outScheduleMap['out_schedule_list']) {
@@ -175,6 +176,22 @@
                 scheduleItem.setStyle("borderColor", 0xff0000);
                 scheduleItem.setStyle("backgroundColor", obj.color);
                 taskunpanel.addElement(scheduleItem);
+            }
+
+
+            for (var id:String in ToolUtil.outScheduleMap['schedulemap']){
+                obj = ToolUtil.outScheduleMap['schedulemap'][id];
+                if(obj.need_check&&obj.status==3){
+                    scheduleItem = new ScheduleItem();
+                    scheduleItem.scheduleData = obj;
+                    scheduleItem.scheduleName = obj.title;
+                    scheduleItem.color = obj.color;
+                    scheduleItem.scheduleId = obj.id;
+                    scheduleItem.width = 245;
+                    scheduleItem.setStyle("borderColor", 0xdf9110);
+                    scheduleItem.setStyle("backgroundColor", obj.color);
+                    needCheckPanel.addElement(scheduleItem);
+                }
             }
         }
 
@@ -651,6 +668,7 @@
                         if (i == 0) {
                             dayItem.height = dayHeight - 100;
                             dayItem.width = 50;
+                            dayItem.showTimeLine(50, row == 0 ? true : false);
                             dayItem.invalidateSize();
                         } else {
                             dayItem.height = dayHeight - 100;
@@ -683,8 +701,6 @@
             calendarPanel.invalidateDisplayList();
             calendayGroup.invalidateSize();
             calendayGroup.invalidateDisplayList();
-//            calendarScroller.invalidateSize();
-//            calendarScroller.invalidateDisplayList();
 
 
         }
@@ -699,7 +715,7 @@
         }
 
         private function showTask():void {
-            if (ToolUtil.outScheduleMap['out_schedule_list'].length == 0) {
+            if (needCheckPanel.numElements==0&&taskunpanel.numElements==0) {
                 taskPanel.width = 0;
             } else {
                 taskPanel.width = 250;
@@ -709,13 +725,10 @@
             this.invalidateSize();
         }
 
-        private function showTaskList(result:Object, e:ResultEvent):void {
-
-        }
-
         private function taskChange(e:CollectionEvent):void {
 
             taskunpanel.removeAllElements();
+            needCheckPanel.removeAllElements();
 
 
         }
@@ -843,27 +856,26 @@
 			
 				
 		</s:BorderContainer>
-		<s:Scroller id="taskPanel"  width="250" height="100%">
-			<s:VGroup width="100%" height="100%" gap="5">
-
+			<s:VGroup id="taskPanel"  width="250" height="100%">
 					<s:VGroup width="100%" height="25"  >
 
-						<s:Label text="逾期任务"  fontSize="18"  paddingTop="10" >
+						<s:Label text="逾期任务" visible="{taskPanel.width>0}" fontSize="18"  paddingTop="10" >
 						</s:Label>
-                        <!--<s:Spacer width="100%"></s:Spacer>-->
-                        <!--<uicontrol:BtnAdd clickFun="createTask" />-->
-                        <!--<uicontrol:BtnDel clickFun="showTask" />-->
-                        <!--<s:Spacer width="20"></s:Spacer>-->
 					</s:VGroup>
-					<s:VGroup id="taskunpanel" width="100%">
+                <s:Scroller width="100%" height="50%">
+                    <s:VGroup id="taskunpanel" width="100%" minHeight="300" >
 
-					</s:VGroup>
-					<!--<s:BorderContainer id="taskunpanel" width="100%"   >-->
-						<!--<s:layout>-->
-							<!--<s:VerticalLayout>-->
-							<!--</s:VerticalLayout>-->
-						<!--</s:layout>-->
-					<!--</s:BorderContainer>-->
+                    </s:VGroup>
+                </s:Scroller>
+                <s:VGroup width="100%" height="25"  >
+
+                    <s:Label text="待审核任务" visible="{taskPanel.width>0}" fontSize="18"  paddingTop="10" >
+                    </s:Label>
+                </s:VGroup>
+                <s:Scroller width="100%" height="50%">
+                    <s:VGroup id="needCheckPanel" width="100%">
+
+                    </s:VGroup>
+                </s:Scroller>
 			</s:VGroup>
-		</s:Scroller>
 </control:CBorderContainer>

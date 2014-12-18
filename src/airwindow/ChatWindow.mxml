@@ -20,6 +20,7 @@
 
 		import util.ChatManager;
 		import util.NotifyTools;
+		import util.ScheduleUtil;
 		import util.ToolUtil;
 
 		public var chat_map:Object = new Object();
@@ -66,6 +67,21 @@
 					showNotify(event.message.msg);
 						ToolUtil.getScheduleByDate_repeat();
 						break;
+				case "schedule_create":
+					showNotify(event.message.msg);
+					if(event.message.msg.repeat){
+						ToolUtil.getScheduleByDate_repeat();
+					}else{
+						ScheduleUtil.refreshScheduleById(event.message.msg.schedule_id);
+					}
+					break;
+				case "schedule_del":
+					showNotify(event.message.msg);
+					ToolUtil.getScheduleByDate_repeat();
+					if(!event.message.msg.status){
+						ScheduleUtil.delSchedulePanel(event.message.msg.schedule_id);
+					}
+					break;
 				case "join_apply":
 					showNotify(event.message.msg);
 						break;
@@ -240,6 +256,11 @@
 			if (chat == null) {
 				trace("开启聊天框出错");
 			}
+			if(chat.type=='t'){
+				showMainWindow();
+				ScheduleUtil.showSchedulePanel(chat.channel.substr(1));
+				return;
+			}
 			var c:ChatPannel = chat_map[chat.channel];
 			if (c == null) {
 				c = new ChatPannel();
@@ -292,6 +313,13 @@
 				ToolUtil.currentChannel = null;
 			}
 		}
+
+		private function showMainWindow():void{
+			(FlexGlobals.topLevelApplication as WindowedApplication).orderInFrontOf(this);
+			nativeWindow.alwaysInFront=false;
+			(FlexGlobals.topLevelApplication as WindowedApplication).alwaysInFront=false;
+		}
+
 		]]>
 	</fx:Script>
 	<fx:Declarations>

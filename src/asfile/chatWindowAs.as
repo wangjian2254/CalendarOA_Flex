@@ -86,12 +86,6 @@ override public function init(e:FlexEvent):void {
 		quiteButton.visible = false;
 		
 	}
-	if (chatUser.type == 't') {
-		scheduleButton.visible = true;
-		
-	} else {
-		scheduleButton.visible = false;
-	}
 	memberButton.visible = false;
 	if (chatUser.type == 'g' && chatUser.author == ToolUtil.sessionUser.pid) {
 		memberButton.visible = true;
@@ -449,18 +443,6 @@ private function memberGroup():void {
 	gp.channel = chatUser.channel;
 }
 
-private function showSchedule():void {
-	var obj:Object = new Object();
-	obj['id'] = chatUser.channel.substr(1);
-	HttpServiceUtil.getCHTTPServiceAndResult("/ca/getScheduleById", function (result:Object, e:ResultEvent):void {
-		if (result.success) {
-			var schedulData:Schedule = new Schedule(result.result);
-			ToolUtil.updateSchedul(schedulData.id, schedulData);
-			ScheduleUtil.showSchedulePanel(schedulData.id);
-			closeContainer(null);
-		}
-	}, "POST").send(obj);
-}
 
 private function uploadResult(result:Object):void{
 	var chat:Object = new Object();

@@ -154,7 +154,7 @@
 				<s:Spacer width="100%">
 					
 				</s:Spacer>
-				<s:Button id="scheduleButton" label="显示任务" width="100" buttonMode="true" styleName="btnChat2" click="showSchedule()" includeInLayout="{scheduleButton.visible}"  />
+				<!--<s:Button id="scheduleButton" label="显示任务" width="100" buttonMode="true" styleName="btnChat2" click="showSchedule()" includeInLayout="{scheduleButton.visible}"  />-->
 				<s:Button id="quiteButton" label="退出讨论组" width="100" buttonMode="true" styleName="btnChat2" click="quiteGroup()" includeInLayout="{quiteButton.visible}"  />
 				<s:Button id="memberButton" label="成员管理" width="100" buttonMode="true" styleName="btnChat2" click="memberGroup()" includeInLayout="{memberButton.visible}"  />
 				<s:Button id="usersButton" label="创建讨论组" width="100" buttonMode="true" styleName="btnChat2" click="createGroup()" includeInLayout="{usersButton.visible}"  />

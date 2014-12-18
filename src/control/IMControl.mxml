@@ -17,6 +17,7 @@
         import org.idream.pomelo.PomeloEvent;
 
         import util.ChatManager;
+        import util.ScheduleUtil;
         import util.ToolUtil;
 
         override public function releaseListener():void {
@@ -131,12 +132,16 @@
             if (chat == null) {
                 trace("开启聊天框出错");
             }
-            var mod:String = '';
+            if(chat.type=='t'){
+                ScheduleUtil.showSchedulePanel(chat.channel.substr(1));
+                return;
+            }
+//            var mod:String = '';
 
-            mod = chat.type + chat.id;
+//            mod = chat.type + chat.id;
 
             var c:CBorderContainer;
-            c = cbar.getView(mod);
+            c = cbar.getView(chat.channel);
             if (c == null) {
                 var chatControl:ChatControl = new ChatControl();
                 chatControl.chatUser = chat;
@@ -144,9 +149,9 @@
             }
             if (c != null) {
                 c.label = chat.name;
-                c.flag = mod;
+                c.flag = chat.channel;
                 c.param = null;
-                if (!cbar.setView(mod)) {
+                if (!cbar.setView(chat.channel)) {
                     cbar.addView(c);
                 }
             }

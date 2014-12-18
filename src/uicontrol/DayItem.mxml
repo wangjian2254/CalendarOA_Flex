@@ -15,6 +15,10 @@
         import mx.collections.ArrayCollection;
         import mx.core.FlexGlobals;
 
+        import spark.collections.Sort;
+
+        import spark.collections.SortField;
+
         import spark.layouts.BasicLayout;
         import spark.skins.spark.BorderContainerSkin;
 
@@ -32,7 +36,7 @@
         [Bindable]
         public var is_all_day:Number = 0;
 
-        private var groupShowData:Object = new Object();
+//        private var groupShowData:Object = new Object();
 
         private var scheduleArr:ArrayCollection = new ArrayCollection();
 
@@ -55,7 +59,6 @@
             }
             if (date == "") {
                 showTimeLine(50, true);
-                showTime();
                 return;
             }
 
@@ -79,13 +82,18 @@
         private function getScheduleByDate(e:Event = null):void {
 
             scheduleArr.removeAll();
-            groupShowData = new Object();
+//            groupShowData = new Object();
             if (ToolUtil.scheduleMap.hasOwnProperty("schedulelist") && ToolUtil.scheduleMap.schedulelist.hasOwnProperty(date)) {
                 for each(var i:String in ToolUtil.scheduleMap.schedulelist[date]) {
 
                     scheduleArr.addItem(ToolUtil.scheduleMap.schedulemap[i]);
                 }
             }
+            var sort:Sort=new Sort();
+            //按照ID升序排序
+            sort.fields=[new SortField("time_start"),new SortField("time_end"),new SortField("id")];
+            scheduleArr.sort=sort;
+            scheduleArr.refresh();
             showSchedule();
         }
 
@@ -112,10 +120,39 @@
 
         private var schedulePos:Object = null;
 
-        public function showSchedule(gid:Number = 0, show:Boolean = true):void {
+        public function showSchedule():void {
             schedulePos = new Object();
-            if (gid != 0) {
-                groupShowData[gid + ""] = show;
+            for each(var obj:Schedule in scheduleArr) {
+                if (is_all_day == 2 && !obj.is_all_day) {
+                    schedulePos[obj.id] = {y:getY(Number(obj.time_start.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_start.substr(2, 2))) + 2}
+                    schedulePos[obj.id]['ph']=getY(Number(obj.time_end.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_end.substr(2, 2))) - schedulePos[obj.id].y - 1;
+                }
+            }
+            for each(var obj:Schedule in scheduleArr) {
+                if (is_all_day == 2 && !obj.is_all_day) {
+                    var w:Number = getScheduleWidth(schedulePos[obj.id].y);
+                    schedulePos[obj.id]['w']=w;
+                    schedulePos[obj.id]['p']=getScheduleX_P(schedulePos[obj.id].y,w);
+                }
+            }
+            for each(var obj:Schedule in scheduleArr) {
+                if (is_all_day == 2 && !obj.is_all_day) {
+                    var x:Number = getScheduleX(schedulePos[obj.id].y);
+                    schedulePos[obj.id]['px']=x;
+                }
+            }
+            for each(var obj:Schedule in scheduleArr) {
+                if (is_all_day == 2 && !obj.is_all_day) {
+                    var h:Number = getScheduleH(schedulePos[obj.id].px,schedulePos[obj.id].y,schedulePos[obj.id].ph);
+                    schedulePos[obj.id]['h']=h;
+                }
+            }
+            for each(var obj:Schedule in scheduleArr) {
+                if (is_all_day == 2 && !obj.is_all_day) {
+                    var x:Number = getScheduleW_P(schedulePos[obj.id].px,schedulePos[obj.id].y,schedulePos[obj.id].w,schedulePos[obj.id].ph);
+                    schedulePos[obj.id]['w']-=x-schedulePos[obj.id]['px'];
+                    schedulePos[obj.id]['x']=x;
+                }
             }
             scheduleList.removeAllElements();
             var scheduleItem:ScheduleItem = null;
@@ -153,30 +190,30 @@
 
                 scheduleItem.setStyle("backgroundColor", obj.color);
 
-                if (!groupShowData.hasOwnProperty("" + obj.department) || groupShowData["" + obj.department]) {
+//                if (!groupShowData.hasOwnProperty("" + obj.department) || groupShowData["" + obj.department]) {
 
                     if (is_all_day == 2 && !obj.is_all_day) {
-                        var x:Number = 2;
-                        var y:Number = 0;
-                        y = getY(Number(obj.time_start.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_start.substr(2, 2))) + 2;
-                        while (schedulePos.hasOwnProperty(y.toString())) {
-                            y += 20;
-                            if (this.width < 300) {
-                                x += 25;
-                            } else {
-                                x += 40;
-                            }
-                        }
-                        if (this.width < 300) {
-                            x += 25 * yisused(y);
-                        } else {
-                            x += 40 * yisused(y);
-                        }
-                        schedulePos[y.toString()] = true;
-                        scheduleItem.x = x;
-                        scheduleItem.y = y;
-                        scheduleItem.width = this.width - 1 - x;
-                        scheduleItem.height = getY(Number(obj.time_end.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_end.substr(2, 2))) - y - 1;
+//                        var x:Number = 2;
+//                        var y:Number = 0;
+//                        y = getY(Number(obj.time_start.substr(0, 2)) * 2) + getYbyMin(Number(obj.time_start.substr(2, 2))) + 2;
+//                        while (schedulePos.hasOwnProperty(y.toString())) {
+//                            y += 20;
+//                            if (this.width < 300) {
+//                                x += 25;
+//                            } else {
+//                                x += 40;
+//                            }
+//                        }
+//                        if (this.width < 300) {
+//                            x += 25 * yisused(y);
+//                        } else {
+//                            x += 40 * yisused(y);
+//                        }
+//                        schedulePos[y.toString()] = true;
+                        scheduleItem.x = schedulePos[obj.id].x;
+                        scheduleItem.y = schedulePos[obj.id].y;
+                        scheduleItem.width = schedulePos[obj.id].w;
+                        scheduleItem.height = schedulePos[obj.id].h;
 
 
                         scheduleItem.descShow = true;
@@ -191,7 +228,91 @@
                         scheduleList.addElement(scheduleItem);
                     }
                 }
+//            }
+        }
+
+        private function getScheduleX(y:Number):Number{
+            var x:Number=2;
+            for(var id:String in schedulePos){
+                if(schedulePos[id].y==y){
+                    if(schedulePos[id].px&&schedulePos[id].px>=x){
+                        x=schedulePos[id].px+schedulePos[id].p;
+                    }
+                }
             }
+            return x;
+        }
+
+        private function getScheduleH(x:Number,y:Number,h:Number):Number{
+            for(var id:String in schedulePos){
+                var b:Boolean = getScheduleH_repeat(x,y,h);
+                if(b){
+                    h-=5;
+                }else{
+                    break;
+                }
+            }
+            return h;
+        }
+        private function getScheduleH_repeat(x:Number,y:Number,h:Number):Boolean{
+            for(var id:String in schedulePos){
+                if(schedulePos[id].h&&(schedulePos[id].y+schedulePos[id].h)==(y+h)&&schedulePos[id].px==x){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private function getScheduleW_P_R(x:Number,y:Number,w:Number,h:Number):Boolean{
+            for(var id:String in schedulePos){
+                if(schedulePos[id].x&&schedulePos[id].y<=y&&(schedulePos[id].y+schedulePos[id].h)>=y&&schedulePos[id].x==x&&schedulePos[id].w<=w){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private function getScheduleW_P(x:Number,y:Number,w:Number,h:Number):Number{
+            for(var id:String in schedulePos){
+                var b:Boolean = getScheduleW_P_R(x,y,w,h);
+                if(b){
+                    x+=10;
+                }else{
+                    break;
+                }
+            }
+            return x;
+        }
+
+        private function getScheduleWidth(y:Number):Number{
+            var n:Number=0;
+            for(var id:String in schedulePos){
+                if(schedulePos[id].y==y){
+                    n+=1;
+                }
+            }
+            var w:Number=(this.width-4)/n;
+            if(w<110){
+                w=110;
+            }
+            if(w>this.width-2){
+                w = this.width-50;
+            }
+            return w;
+        }
+
+        private function getScheduleX_P(y:Number, w:Number):Number{
+            var n:Number=0;
+            for(var id:String in schedulePos){
+                if(schedulePos[id].y==y){
+                    n+=1;
+                }
+            }
+            if(n==1){
+                return 2;
+            }
+            var p:Number=(this.width-w)/(n-1);
+            return p;
         }
 
         private function yisused(y:Number):Number {
@@ -216,6 +337,9 @@
             this.contentGroup.graphics.lineStyle(2, 0xFF0000);
             this.contentGroup.graphics.moveTo(0, getY(d.hours * 2) + getYbyMin(d.minutes));
             this.contentGroup.graphics.lineTo(w, getY(d.hours * 2) + getYbyMin(d.minutes));
+            if(date==""){
+                showTime();
+            }
         }
 
         private function drawline(w:Number, i:Number):void {
@@ -236,6 +360,7 @@
         }
 
         private function showTime():void {
+            scheduleList.removeAllElements();
             var d:Date = null;
 
             var lbl:Label = null;

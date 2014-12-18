@@ -828,6 +828,19 @@ public class ToolUtil
     }
 
     public static function updateSchedul(id:String, schedule:Schedule):void{
+        var s:Schedule = scheduleMap['schedulemap'][id];
+        if(s){
+            if(s.repeat_type == 'none'){
+                if(scheduleMap['schedulelist'][s.startdate].indexOf(id)>=0){
+                    scheduleMap['schedulelist'][s.startdate].splice(scheduleMap['schedulelist'][s.startdate].indexOf(id),1);
+                }
+            }else{
+                if(scheduleMap['schedulelist'][s.date].indexOf(id)>=0){
+                    scheduleMap['schedulelist'][s.date].splice(scheduleMap['schedulelist'][s.date].indexOf(id),1);
+                }
+            }
+        }
+        delete scheduleMap['schedulemap'][id];
         if(schedule){
             updateNotifySchedule(schedule);
             scheduleMap['schedulemap'][id] = schedule;
@@ -844,22 +857,6 @@ public class ToolUtil
             }
 
             ScheduleUtil.updateSchedulePanel(schedule.id);
-        }else{
-//            if(scheduleMap['scheduleall'].indexOf(id)>=0){
-//                scheduleMap['scheduleall'].splice(scheduleMap['scheduleall'].indexOf(id),1);
-//            }
-            var s:Schedule = scheduleMap['schedulemap'][id];
-            if(s.repeat_type == 'none'){
-                if(scheduleMap['schedulelist'][s.startdate].indexOf(id)>=0){
-                    scheduleMap['schedulelist'][s.startdate].splice(scheduleMap['schedulelist'][s.startdate].indexOf(id),1);
-                }
-            }else{
-                if(scheduleMap['schedulelist'][s.date].indexOf(id)>=0){
-                    scheduleMap['schedulelist'][s.date].splice(scheduleMap['schedulelist'][s.date].indexOf(id),1);
-                }
-            }
-
-            delete scheduleMap['schedulemap'][id];
         }
         FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
     }

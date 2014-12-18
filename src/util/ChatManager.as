@@ -390,11 +390,31 @@ public class ChatManager {
                 break;
             case "schedule_status_change":
                 showNotify(event.message.msg);
+                    ScheduleUtil.refreshScheduleById(event.message.msg.schedule_id);
                     break;
             case "schedule_update":
                 showNotify(event.message.msg);
-                    ToolUtil.getScheduleByDate_repeat();
+                    if(event.message.msg.repeat){
+                        ToolUtil.getScheduleByDate_repeat();
+                    }else{
+                        ScheduleUtil.refreshScheduleById(event.message.msg.schedule_id);
+                    }
                     break;
+            case "schedule_create":
+                showNotify(event.message.msg);
+                if(event.message.msg.repeat){
+                    ToolUtil.getScheduleByDate_repeat();
+                }else{
+                    ScheduleUtil.refreshScheduleById(event.message.msg.schedule_id);
+                }
+                break;
+            case "schedule_del":
+                showNotify(event.message.msg);
+                ToolUtil.getScheduleByDate_repeat();
+                if(!event.message.msg.status){
+                    ScheduleUtil.delSchedulePanel(event.message.msg.schedule_id);
+                }
+                break;
             case "join_apply":
                 showNotify(event.message.msg);
 //                Alert.show(event.message.msg.msg,event.message.msg.type);

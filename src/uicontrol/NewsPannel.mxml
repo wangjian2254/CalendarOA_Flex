@@ -109,6 +109,13 @@
                     if (message.type == "join_apply") {
                         openButton.label = "处理";
                     }
+
+                    if(message.type == 'schedule_status_change'||message.type == 'schedule_update'||message.type == 'schedule_create'){
+                        openButton.label = "打开";
+                    }
+                    if(message.type == 'schedule_del'){
+                        openButton.visible=false;
+                    }
                 }
             }
 
@@ -157,6 +164,9 @@
 //                        MenuEvent.prototype.obj=null;
                         event1.item = {mod: 'checkApply', label: '审批加入申请', obj: new Object()};
                         FlexGlobals.topLevelApplication.dispatchEvent(event1);
+                    }
+                    if(message.type == 'schedule_status_change'||message.type == 'schedule_update'||message.type == 'schedule_create'){
+                        ScheduleUtil.showSchedulePanel(message.schedule_id);
                     }
                 }
             }
