@@ -95,6 +95,12 @@
             scheduleArr.sort=sort;
             scheduleArr.refresh();
             showSchedule();
+            if(scheduleArr.length>0){
+                scheduleNum.text=scheduleArr.length+" 个任务"
+            }else{
+                scheduleNum.text="";
+            }
+
         }
 
         private function createSchedule(e:MouseEvent):void {
@@ -457,16 +463,16 @@
 			<s:Label id="mstr" fontSize="13"   text="{date.substr(4,2)+'月'}" visible="{date.substr(6,2)=='01'?is_all_day!=2?true:false:false}" textAlign="center" height="100%" verticalAlign="middle">
 				
 			</s:Label>
-			
+            <s:Label id="scheduleNum" visible="{is_all_day!=2?true:false}"   textAlign="center" height="100%" verticalAlign="middle">
+
+            </s:Label>
 		</s:Group>
-		<s:Group id="scheduleList" width="100%" height="100%" >
-			<s:layout>
-				<s:VerticalLayout paddingLeft="3" gap="0">
-					
-				</s:VerticalLayout>
-			</s:layout>
-			
-		</s:Group>
+        <s:Group id="scheduleList" width="100%" height="100%" >
+            <s:layout>
+                <s:VerticalLayout paddingLeft="3" gap="0">
+                </s:VerticalLayout>
+            </s:layout>
+        </s:Group>
 	
 	
 		

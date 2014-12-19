@@ -74,6 +74,12 @@ s|Form s|FormItem mx|DateField{
 	textAlign:left;
 }
 
+mx|ToolTip{
+	font-size:12px;
+	color:#000000;
+	cornerRadius:10;
+}
+
 .userinfoclass{
 	skinClass:ClassReference("skins.topLinksBoxSkin");
 }

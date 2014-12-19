@@ -66,6 +66,7 @@
         private var departmentList:ArrayCollection = new ArrayCollection();
 
 
+        public var inited:Boolean=false;
         private var selectColor:Number = 0x00CCFF;
 
         public var default_checker:int = -1;
@@ -95,7 +96,7 @@
 
         public function init():void {
             addEventListener(CloseEvent.CLOSE, closeSchedule);
-            removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
+//            removeEventListener(ChatTimelineEvent.Channel, flagTimeline);
             ToolUtil.projectList.addEventListener(CollectionEvent.COLLECTION_CHANGE, refreshMyProject);
             usersGroup.addEventListener(MembersEvent.REMOVE_MEMBERS, removeUsersHandler);
 
@@ -334,6 +335,8 @@
 
             need_saved();
             this.invalidateDisplayList();
+
+            inited=true;
         }
 
         private function makeTimeLineData():void{
@@ -963,18 +966,18 @@
             chatControl.init(null);
         }
 
-        private function flagTimeline(e:ChatTimelineEvent):void {
-            for each(var c:ChatChannel in ToolUtil.groupList) {
-                if (c.channel == e.channel) {
-                    c.unread = 0;
-                    Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {
-                        channel: e.channel,
-                        pid: ToolUtil.sessionUser.pid
-                    });
-                }
-            }
-            ToolUtil.groupList.refresh();
-        }
+//        private function flagTimeline(e:ChatTimelineEvent):void {
+//            for each(var c:ChatChannel in ToolUtil.groupList) {
+//                if (c.channel == e.channel) {
+//                    c.unread = 0;
+//                    Pomelo.getIns().notify("connector.entryHandler.updatetimeline", {
+//                        channel: e.channel,
+//                        pid: ToolUtil.sessionUser.pid
+//                    });
+//                }
+//            }
+//            ToolUtil.groupList.refresh();
+//        }
 
         public function delSchedule():void{
             Alert.show("任务已经被删除,是否关闭窗口？","提示",Alert.YES | Alert.CANCEL,this,function(e:CloseEvent){
@@ -987,9 +990,11 @@
         private function need_saved(e:Event=null):void{
             if(check_schedule_changed(schedulData)){
                 btnSave.label="保存";
+                btnSave.setStyle("color",0xffffff);
                 btnSave.enabled=true;
             }else{
                 btnSave.label="没有变动";
+                btnSave.setStyle("color",0x000000);
                 btnSave.enabled=false;
             }
         }
@@ -1039,7 +1044,7 @@
             if(data.need_check!=cdata.need_check){
                 flag=true;
             }
-            if(data.need_check==cdata.need_check&&data.checker!=cdata.checker){
+            if(data.need_check==cdata.need_check&&data.need_check==true&&data.checker!=cdata.checker){
                 flag=true;
             }
             if(data.notify!=cdata.notify){
@@ -1054,9 +1059,9 @@
             if(data.urgent!=cdata.urgent){
                 flag=true;
             }
-            if(data.status!=cdata.status){
-                flag=true;
-            }
+//            if(data.status!=cdata.status){
+//                flag=true;
+//            }
             return flag;
         }
 

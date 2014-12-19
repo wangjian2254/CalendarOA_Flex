@@ -28,6 +28,8 @@ import mx.utils.ObjectUtil;
 
 import spark.components.DropDownList;
 
+import util.ScheduleUtil;
+
 public class ToolUtil
 {
     public function ToolUtil()
@@ -83,6 +85,11 @@ public class ToolUtil
 		regUser = new RegisterUserPanel();
 		selectOrg = new SelectOrgPanel();
 		sessionUser=new Object();
+        clearGroupList();
+        clearOutScheduleMap();
+        clearScheduleTarget();
+        ScheduleUtil.hiddenAllSchedulePanel();
+
 
 	}
     public static function init():void{
@@ -825,6 +832,8 @@ public class ToolUtil
         outScheduleMap= new Object();
         outScheduleMap['out_schedule_list']=new Array();
         outScheduleMap['schedulemap']=new Object();
+        FlexGlobals.topLevelApplication.dispatchEvent(new ChangeScheduleEvent(true));
+        ScheduleUtil.clearNewSchedule();
     }
 
     public static function updateSchedul(id:String, schedule:Schedule):void{

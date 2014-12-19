@@ -21,14 +21,14 @@
         import util.ToolUtil;
 
         [Bindable]
-        private var list:ArrayCollection = new ArrayCollection();
+        private var filelist:ArrayCollection = new ArrayCollection();
 
         override public function releaseListener():void {
         }
 
         override public function init(e:FlexEvent):void {
-
-
+            var data:Object={};
+            HttpServiceUtil.getCHTTPServiceAndResult("/ca/get_all_my_files", getAllMyFilesResult, "POST").send(data);
         }
 
         override public function closeContainer(e:CloseContainerEvent):void {
@@ -36,24 +36,19 @@
 
         }
 
-        private function getDataResult(o:Object, e:ResultEvent):void {
-            if (o && o.success) {
-                list = new ArrayCollection(o.result as Array);
-            }
 
-        }
 
         public function initpassword(e:Event):void {
             var data:Object = getData();
             if (data == null) {
                 return;
             }
-            HttpServiceUtil.getCHTTPServiceAndResult("/ft/initUser", initUserResult, "POST").send(data);
+
         }
 
-        private function initUserResult(result:Object, e:ResultEvent):void {
+        private function getAllMyFilesResult(result:Object, e:ResultEvent):void {
             if (result.success) {
-                Alert.show(result.message, "提示");
+                filelist = new ArrayCollection(result.result as Array);
             }
         }
 
@@ -89,79 +84,6 @@
             }
         }
 
-        private function addContact():void {
-            var data:Object = new Object();
-            var username:Array = new Array();
-            for each(var item:Object in list) {
-                if (item.selected) {
-                    username.push(item.username);
-                }
-            }
-            if (username.length == 0) {
-                Alert.show("请选择用户", "警告");
-                return;
-            }
-            data["usernames"] = username;
-            data["do"] = "join";
-            HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts", ToolUtil.contactsRefresh, "POST").send(data);
-
-        }
-
-
-        private function searchResult(result:Object, e:ResultEvent):void {
-            if (result.result) {
-                list.removeAll();
-                list.addAll(new ArrayCollection(result.result as Array));
-            }
-
-        }
-
-        private function loadDataFault(e:FaultEvent):void {
-            Alert.show('操作失败', "提示");
-        }
-
-
-        public function add():void {
-        }
-
-        public function del():void {
-            var userArr:ArrayCollection = new ArrayCollection();
-            var obj:Object;
-            var item:Object;
-            for (var i:int = list.length - 1; i >= 0; i--) {
-                item = list.getItemAt(i);
-                if (!item.selected) {
-                    continue;
-                }
-                obj = new Object();
-                if (item.hasOwnProperty("id")) {
-                    obj.id = item.id;
-                    userArr.addItem(obj);
-                }
-                //					obj.name=item.name;
-
-            }
-            if (userArr.length > 0) {
-//					ToolUtil.deptRefresh(refresh);
-//					ToolUtil.areaRefresh(refresh);
-//					ToolUtil.userRefresh(refresh);
-                //					HttpServiceUtil.getCHTTPServiceAndResultAndFault("/htcsgl/_100_BaseInfosAction_deletedept.action",loadDataResult,loadDataFault,"POST").send(userArr);
-            }
-        }
-
-        public function show(obj:Object):void {
-        }
-
-
-        public function refresh(result:Object, e:ResultEvent):void {
-            if (result.success) {
-                add();
-                init(null);
-                //					InfoUtil.userRefresh(refreshScx);
-            }
-        }
-
-
         [Bindable]
         private var buttonArr:ArrayCollection = new ArrayCollection([
             {'label': '新增', 'ico': addimg},
@@ -182,5 +104,14 @@
 			
 		</s:RadioButtonGroup>
 	</fx:Declarations>
+    <s:Scroller width="100%" height="100%">
+        <s:Group width="100%" height="100%">
+            <s:TileGroup id="fileGroup" includeInLayout="{fileGroup.visible}"   width="100%" height="100%"  columnAlign="justifyUsingGap">
 
+            </s:TileGroup>
+            <s:TileGroup id="imageGroup" includeInLayout="{imageGroup.visible}"   width="100%" height="100%"  columnAlign="justifyUsingGap">
+
+            </s:TileGroup>
+        </s:Group>
+    </s:Scroller>
 </control:CBorderContainer>

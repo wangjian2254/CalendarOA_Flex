@@ -5,23 +5,25 @@
 
 	<fx:Script>
 		<![CDATA[
-		import events.ChangeUserEvent;
-		import events.ChatTimelineEvent;
-		import events.ListClickEvent;
-		import events.PaoPaoEvent;
-
-		import model.ChatChannel;
-
-		import mx.core.FlexGlobals;
-		import mx.events.CloseEvent;
-
-		import org.idream.pomelo.Pomelo;
-		import org.idream.pomelo.PomeloEvent;
-
-		import util.ChatManager;
-		import util.NotifyTools;
-		import util.ScheduleUtil;
-		import util.ToolUtil;
+			import events.ChangeUserEvent;
+			import events.ChatTimelineEvent;
+			import events.ListClickEvent;
+			import events.PaoPaoEvent;
+			
+			import model.ChatChannel;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			
+			import org.idream.pomelo.Pomelo;
+			import org.idream.pomelo.PomeloEvent;
+			
+			import spark.components.WindowedApplication;
+			
+			import util.ChatManager;
+			import util.NotifyTools;
+			import util.ScheduleUtil;
+			import util.ToolUtil;
 
 		public var chat_map:Object = new Object();
 

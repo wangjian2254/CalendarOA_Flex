@@ -49,11 +49,13 @@ public class ScheduleUtil
 //			PopUpManager.centerPopUp(newSchedule);
 		}
 		
-		public static function clearNewSchedule(s:SchedulePanel):void{
+		public static function clearNewSchedule(s:SchedulePanel=null):void{
 			if(s==newSchedule){
 				newSchedule=null;
 			}
-
+			if(s==null){
+				newSchedule.closeWin();
+			}
 		}
 		
 		public static function closeSchedulePanel(scheduleId:String):void{
@@ -63,7 +65,14 @@ public class ScheduleUtil
 			}
 		}
 
+		public static function hiddenAllSchedulePanel():void{
+			for(var scheduleId:String in showSchedule){
+				if(showSchedule[scheduleId]){
+					showSchedule[scheduleId].closeWin();
+				}
 
+			}
+		}
 
         public static function rememberSchedulePanel(scheduleId:String, panel:Object):void{
             showSchedule[scheduleId] = panel;
@@ -75,7 +84,10 @@ public class ScheduleUtil
 			
 			if(showSchedule.hasOwnProperty(scheduleId)){
 				showSchedule[scheduleId].schedulData = scheduleData;
-                showSchedule[scheduleId].init();
+				if(showSchedule[scheduleId].inited){
+					showSchedule[scheduleId].init();
+				}
+
 			}
 		}
 
@@ -112,7 +124,9 @@ public class ScheduleUtil
 			}
 			if(showSchedule.hasOwnProperty(scheduleId)){
 				showSchedule[scheduleId].schedulData = scheduleData;
-                showSchedule[scheduleId].init();
+				if(showSchedule[scheduleId].inited){
+					showSchedule[scheduleId].init();
+				}
 				PopUpManager.bringToFront(showSchedule[scheduleId]);
                 showSchedule[scheduleId].showAnimation2(null);
 			}else{
