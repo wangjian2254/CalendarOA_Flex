@@ -37,52 +37,17 @@
         }
 
 
-
-        public function initpassword(e:Event):void {
-            var data:Object = getData();
-            if (data == null) {
-                return;
-            }
-
-        }
-
         private function getAllMyFilesResult(result:Object, e:ResultEvent):void {
             if (result.success) {
                 filelist = new ArrayCollection(result.result as Array);
             }
         }
 
-
-        public function getData():Object {
-            var o:Object = {};
-
-
-            return o;
-        }
-
-        private function delContactAsk():void {
-
-            Alert.show("确认移除选中的联系人?", "提示", Alert.YES | Alert.NO, null, delContact);
+        private function showFileItem():void{
 
         }
 
-        //删除日程
-        private function delContact(e:CloseEvent):void {
-            if (e.detail == Alert.YES) {
-                var data:Object = new Object();
-                var username:Array = new Array();
-                for each(var item:Object in ToolUtil.contactsList) {
-                    if (item.selected) {
-                        username.push(item.username);
-                    }
-                }
-                data["usernames"] = username;
-                data["do"] = "out";
-                HttpServiceUtil.getCHTTPServiceAndResult("/ca/joinContacts", ToolUtil.contactsRefresh, "POST").send(data);
 
-
-            }
-        }
 
         [Bindable]
         private var buttonArr:ArrayCollection = new ArrayCollection([
