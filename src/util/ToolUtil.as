@@ -848,6 +848,9 @@ public class ToolUtil
                     scheduleMap['schedulelist'][s.date].splice(scheduleMap['schedulelist'][s.date].indexOf(id),1);
                 }
             }
+            if(schedule==null&&outScheduleMap['out_schedule_list'].indexOf(id)>=0){
+                outScheduleMap['out_schedule_list'].splice(outScheduleMap['out_schedule_list'].indexOf(id),1);
+            }
         }
         delete scheduleMap['schedulemap'][id];
         if(schedule){
@@ -864,6 +867,15 @@ public class ToolUtil
                 }
                 scheduleMap['schedulelist'][schedule.startdate].push(schedule.id);
             }
+            //如果是过期任务，则添加至过期列表
+            if(schedule.isOutOfDate()){
+                outScheduleMap['schedulemap'][schedule.id] = schedule;
+                if(outScheduleMap['out_schedule_list'].indexOf(id)<0){
+                    outScheduleMap['out_schedule_list'].push(schedule.id);
+                }
+
+            }
+
 
             ScheduleUtil.updateSchedulePanel(schedule.id);
         }

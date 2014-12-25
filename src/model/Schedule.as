@@ -55,6 +55,9 @@ public class Schedule {
     public function getDesc():String{
         if(_desc==null){
             var desc:String = "";
+            if(repeat_type!='none'){
+                desc += '任务日('+startdate.substr(0,4)+"-"+startdate.substr(4,2)+"-"+startdate.substr(6,2)+')\n';
+            }
             if(!is_all_day){
                 desc +="时间："+showTime() +"\n";
             }

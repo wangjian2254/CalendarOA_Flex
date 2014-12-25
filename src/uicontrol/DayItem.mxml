@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
                    xmlns:s="library://ns.adobe.com/flex/spark"
-                   xmlns:mx="library://ns.adobe.com/flex/mx" width="100"  height="110" backgroundAlpha="1"
-                   click="createSchedule(event)" creationComplete="init()">
+                   xmlns:mx="library://ns.adobe.com/flex/mx" width="100"  height="110" backgroundAlpha="1" doubleClickEnabled="true"
+                   doubleClick="createSchedule(event)" creationComplete="init()">
     <s:layout>
 		<s:VerticalLayout gap="0"/>
 	</s:layout>
