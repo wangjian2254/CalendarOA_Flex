@@ -64,10 +64,15 @@
 						break;
 				case "schedule_status_change":
 					showNotify(event.message.msg);
+					ScheduleUtil.refreshScheduleById(event.message.msg.schedule_id);
 						break;
 				case "schedule_update":
 					showNotify(event.message.msg);
+					if(event.message.msg.repeat){
 						ToolUtil.getScheduleByDate_repeat();
+					}else{
+						ScheduleUtil.refreshScheduleById(event.message.msg.schedule_id);
+					}
 						break;
 				case "schedule_create":
 					showNotify(event.message.msg);
