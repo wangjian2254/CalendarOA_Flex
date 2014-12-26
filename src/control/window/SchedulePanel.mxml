@@ -815,6 +815,7 @@
             }
             myproject.addItem({id: 0, name: "无项目"});
             projectDownList.selectedIndex = 0;
+            changeProject();
 
 
             //todo:审核人 范围验证
@@ -858,6 +859,15 @@
                     usersGroup.removeElement(p);
                 }
             }
+        }
+
+        private function changeProject():void{
+            if(projectDownList.selectedItem && projectDownList.selectedItem.id==0){
+                colorFormItem.visible = true;
+            }else{
+                colorFormItem.visible = false;
+            }
+
         }
 
         private function openUserChoice():void {
@@ -1103,7 +1113,7 @@
                     </s:HorizontalLayout>
                 </s:layout>
                 <s:DropDownList id="departmentDownList" width="50%" labelField="label" selectedIndex="0" dataProvider="{ToolUtil.myDepartmentList}" change="changeProjectByDepart();need_saved();" ></s:DropDownList>
-                <s:DropDownList id="projectDownList" width="50%" labelField="name" dataProvider="{myproject}" change="need_saved();"></s:DropDownList>
+                <s:DropDownList id="projectDownList" width="50%" labelField="name" dataProvider="{myproject}" change="changeProject();need_saved();"></s:DropDownList>
                 <s:Spacer width="30"></s:Spacer>
                 <uicontrol:Btn width="16" height="16" styleName="btnAdd" clickFun="{addProject}" />
             </s:FormItem>
@@ -1172,7 +1182,7 @@
             </s:FormItem>
 
 
-            <s:FormItem label="颜色：" height="33" toolTip="区分任务">
+            <s:FormItem id="colorFormItem" visible="false" includeInLayout="{colorFormItem.visible}" label="颜色：" height="33" toolTip="区分任务">
                 <s:layout>
                     <s:HorizontalLayout gap="3">
 

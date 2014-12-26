@@ -2,7 +2,7 @@
 <window:EfficientTitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
                              xmlns:s="library://ns.adobe.com/flex/spark"
                              xmlns:mx="library://ns.adobe.com/flex/mx"
-                             width="430" height="{getWindowHeight}" creationComplete="init()"
+                             width="500"  creationComplete="init()"
                              title="创建项目" xmlns:window="control.window.*">
     <fx:Script>
 		<![CDATA[
@@ -18,10 +18,7 @@
         import util.DateUtil;
         import util.ToolUtil;
 
-        [Bindable]
-        public function get getWindowHeight():Number {
-            return form.height;
-        }
+
 
 
         [Bindable]
@@ -51,6 +48,7 @@
             } else {
                 projectname.text = projectData.name;
                 projectdesc.text = projectData.desc;
+                colorClick(projectData.color);
                 startDate.selectedDate = DateUtil.parseLblDate(projectData.start_date);
                 if (projectData.hasOwnProperty("end_date")) {
                     endDate.selectedDate = DateUtil.parseLblDate(projectData.end_date);
@@ -149,6 +147,7 @@
             }
             obj.name = projectname.text;
             obj.desc = projectdesc.text;
+            obj.color = selectColor;
             obj.manager = managerDownList.selectedItem.id;
             obj.father = fatherDownList.selectedItem.id;
             obj.department = departmentDownList.selectedItem.id;
@@ -174,6 +173,63 @@
         public function foucePass(obj:Object):void {
             obj.setFocus();
         }
+
+        private var selectColor:Number = 0x00CCFF;
+        private function colorClick(c:Number):void {
+            selectColor = c;
+            color0.setStyle("backgroundColor", c);
+            color1.setStyle("borderColor", 0xffffff);
+            color2.setStyle("borderColor", 0xffffff);
+            color3.setStyle("borderColor", 0xffffff);
+            color4.setStyle("borderColor", 0xffffff);
+            color5.setStyle("borderColor", 0xffffff);
+            color6.setStyle("borderColor", 0xffffff);
+            color7.setStyle("borderColor", 0xffffff);
+            color8.setStyle("borderColor", 0xffffff);
+            color9.setStyle("borderColor", 0xffffff);
+            color10.setStyle("borderColor", 0xffffff);
+            switch (c) {
+                case 0xaecfea:
+                    color1.setStyle("borderColor", 0x000000);
+                    break;
+                case 0x5484ed:
+                    color2.setStyle("borderColor", 0x000000);
+                    break;
+                case 0xa4bdfc:
+                    color3.setStyle("borderColor", 0x000000);
+                    break;
+                case 0x46d6db:
+                    color4.setStyle("borderColor", 0x000000);
+                    break;
+                case 0x7ae7bf:
+                    color5.setStyle("borderColor", 0x000000);
+                    break;
+                case 0x51b749:
+                    color6.setStyle("borderColor", 0x000000);
+                    break;
+                case 0xfbd75b:
+                    color7.setStyle("borderColor", 0x000000);
+                    break;
+                case 0xffb878:
+                    color8.setStyle("borderColor", 0x000000);
+                    break;
+                case 0xff887c:
+                    color9.setStyle("borderColor", 0x000000);
+                    break;
+                case 0xdbadff:
+                    color10.setStyle("borderColor", 0x000000);
+                    break;
+                default:
+                    if (colorPicker.selectedColor != c) {
+                        colorPicker.selectedColor = c;
+                    }
+
+            }
+        }
+        private function colorChange():void {
+            colorClick(colorPicker.selectedColor);
+        }
+
         ]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -181,7 +237,7 @@
 	</fx:Declarations>
 
 
-	<s:Form width="400" id="form" >
+	<s:Form width="100%" id="form" >
 
 
 		<s:FormItem  label="项目名称:" textAlign="right">
@@ -209,6 +265,38 @@
         </s:FormItem>
         <s:FormItem  label="负责人:" textAlign="right">
             <s:DropDownList id="managerDownList" width="100%" labelField="name"  dataProvider="{managerList}" tabIndex="5"  ></s:DropDownList>
+        </s:FormItem>
+        <s:FormItem  label="任务颜色:" toolTip="方便区分任务所属项目，建议同一时间段内的项目使用不同的颜色" textAlign="right">
+            <s:layout>
+                <s:HorizontalLayout gap="3" />
+            </s:layout>
+            <s:BorderContainer id="color0" backgroundAlpha="1" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:Label text="|" fontWeight="bold" fontSize="18" textAlign="center"  width="10" height="25" verticalAlign="middle"/>
+            <s:BorderContainer id="color1" click="colorClick(0xaecfea)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#aecfea" borderColor="#000000" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color2" click="colorClick(0x5484ed)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#5484ed" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color3" click="colorClick(0xa4bdfc)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#a4bdfc" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color4" click="colorClick(0x46d6db)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#46d6db" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color5" click="colorClick(0x7ae7bf)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#7ae7bf" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color6" click="colorClick(0x51b749)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#51b749" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color7" click="colorClick(0xfbd75b)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#fbd75b" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color8" click="colorClick(0xffb878)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#ffb878" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color9" click="colorClick(0xff887c)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#ff887c" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <s:BorderContainer id="color10" click="colorClick(0xdbadff)" useHandCursor="true" buttonMode="true"  mouseEnabled="true" backgroundAlpha="1" backgroundColor="#dbadff" borderColor="#ffffff" borderWeight="2" width="20" height="20">
+            </s:BorderContainer>
+            <mx:ColorPicker id="colorPicker" color="#010000" selectedColor="#ffffff" change="colorChange();"
+                            symbolColor="#030002">
+
+            </mx:ColorPicker>
         </s:FormItem>
         <s:FormItem  label="开始日期:" textAlign="right">
             <s:layout>

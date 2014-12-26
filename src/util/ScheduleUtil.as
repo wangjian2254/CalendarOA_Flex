@@ -50,12 +50,16 @@ public class ScheduleUtil
 		}
 		
 		public static function clearNewSchedule(s:SchedulePanel=null):void{
+			if(s==null){
+				if(newSchedule!=null){
+					newSchedule.closeWin();
+				}
+				return
+			}
 			if(s==newSchedule){
 				newSchedule=null;
 			}
-			if(s==null){
-				newSchedule.closeWin();
-			}
+
 		}
 		
 		public static function closeSchedulePanel(scheduleId:String):void{

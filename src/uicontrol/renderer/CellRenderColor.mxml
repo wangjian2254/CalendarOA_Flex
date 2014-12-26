@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+  Created by WangJian on 2014/12/26.
+-->
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
+  <fx:Script>
+  <![CDATA[
+            override public function prepare(hasBeenRecycled:Boolean):void {
+                if(this.data) {
+                  if(!this.data.hasOwnProperty('color')){
+                    bgColor.color = 0xaecfea;
+                  }else{
+                    bgColor.color = this.data.color;
+                  }
+
+                }
+
+            }
+        ]]>
+  </fx:Script>
+
+  <s:Rect top="5" bottom="5" left="5" right="5">
+  <s:fill>
+    <s:SolidColor id="bgColor" color="0xaecfea"/>
+
+  </s:fill>
+  </s:Rect>
+</s:GridItemRenderer>

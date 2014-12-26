@@ -254,6 +254,9 @@ public class Schedule {
     }
 
     public function get color():uint {
+        if(project!=0){
+            return ToolUtil.getColorByProject(project);
+        }
         return _color;
     }
 

@@ -523,6 +523,26 @@ public class ToolUtil
     [Bindable]
     public static var allProjectList:ArrayCollection=new ArrayCollection();
 
+    private static var project_color:Object=new Object();
+    public static function getColorByProject(id:int):int{
+        if(project_color.hasOwnProperty("p"+id)){
+            return project_color["p"+id];
+        }
+        for each(var p:Object in allProjectList){
+            if(p.id==id){
+                if(p.hasOwnProperty('color')){
+                    project_color["p"+id]=p.color;
+                }else{
+                    project_color["p"+id]=0xaecfea;
+                }
+
+                return project_color["p"+id];
+            }
+        }
+        return 0xaecfea;
+
+}
+
     public static function allProjectListRefresh(fun:Function=null):void{
 
         if(fun==null){
@@ -538,7 +558,7 @@ public class ToolUtil
     public static function resultAllProjectList(result:Object,e:ResultEvent):void{
         if(result.success==true){
             ArrayTools.createArray(allProjectList,result.result);
-
+            project_color = new Object();
         }
     }
 

@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
                    xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+                   xmlns:uicontrol="uicontrol.*"
                    width="100" height="25" borderColor="#ff0000" cornerRadius="7" borderVisible="true" borderWeight="4"
                    backgroundAlpha="1" creationComplete="init()" mouseOver="btn_mouseOverHandler(event)"
-                   mouseOut="btn_mouseOutHandler(event)" >
-    <s:layout>
-		<s:VerticalLayout gap="2" paddingLeft="10" verticalAlign="top" paddingTop="1" horizontalAlign="left"/>
-	</s:layout>
+                   mouseOut="btn_mouseOutHandler(event)">
 	<fx:Script>
 		<![CDATA[
         import flash.filters.BitmapFilterQuality;
@@ -45,7 +43,29 @@
             var c:Array=generateTransitionalColor(color,0xffffff,3);
             entry1.color = color;
             entry2.color = c[1];
+            if(scheduleData!=null&&this.height>=64){
+				statsImage.visible=true;
+                switch (scheduleData.status){
+                    case 1:
+                        statsImage.source="/static/image/clock.png";
+                        break;
+                    case 2:
+                        statsImage.source="/static/image/right.png";
+                        break;
+                    case 3:
+                        statsImage.source="/static/image/ligthbulb_on.png";
+                        break;
+                    case 4:
+                        statsImage.source="/static/image/checkmark.png";
+                        break;
 
+                }
+                if(scheduleData.isOutOfDate()){
+                    statsImage.source="/static/image/bomb.png";
+                }
+            }else{
+				statsImage.visible=false;
+			}
         }
 
         private function openSchedule(e:MouseEvent):void {
@@ -151,10 +171,11 @@
                 <s:GradientEntry alpha="1" color="0xFFFFFF" ratio="255"/>
             </s:entries>
         </s:GradientGlowFilter>
-        <s:AnimateFilter id="glower" target="{this}" bitmapFilter="{glow}"
+        <s:AnimateFilter id="glower" target="{lbldesc}" bitmapFilter="{glow}"
                          duration="600" repeatCount="0" repeatBehavior="{RepeatBehavior.REVERSE}">
             <s:SimpleMotionPath property="strength" valueFrom="0" valueTo="5" />
         </s:AnimateFilter>
 	</fx:Declarations>
-		<s:Label id="lbldesc" width="100%" height="100%" text="{scheduleName}"   buttonMode="true" click="openSchedule(event)"  />
+    <uicontrol:HeadImage id="statsImage" includeInLayout="{statsImage.visible}" top="0" right="0" width="64" height="64" />
+		<s:Label id="lbldesc" top="0" right="0" bottom="0" left="0" text="{scheduleName}"   buttonMode="true" click="openSchedule(event)"  />
 </s:BorderContainer>

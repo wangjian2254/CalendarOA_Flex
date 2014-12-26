@@ -231,6 +231,9 @@
                 <s:columns>
                     <s:ArrayList>
                         <s:GridColumn dataField="name" headerText="项目名称" dataTipField="desc"  minWidth="100"></s:GridColumn>
+                        <s:GridColumn dataField="color" headerText="任务颜色" minWidth="100" maxWidth="100" itemRenderer="uicontrol.renderer.CellRenderColor">
+
+                        </s:GridColumn>
                         <s:GridColumn dataField="manager" headerText="负责人" labelFunction="managerLabel" minWidth="80"></s:GridColumn>
                         <s:GridColumn dataField="fproject" headerText="父级项目" labelFunction="fatherProjectLabel" minWidth="100"></s:GridColumn>
                         <s:GridColumn dataField="department" headerText="隶属部门" labelFunction="departmentLabel" minWidth="80"></s:GridColumn>
