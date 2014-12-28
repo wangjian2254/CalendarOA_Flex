@@ -4,8 +4,8 @@
 -->
 <s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
                    xmlns:uicontrol="uicontrol.*"
-                   width="{personName.width+32}" height="18"  borderColor="#000000" cornerRadius="7"
-                   creationComplete="init()"
+                   width="55" height="55"  borderColor="#000000" cornerRadius="7"
+                   creationComplete="init()" mouseOut="m_out()" mouseOver="m_over()"
         >
     <!--<fx:Metadata>-->
         <!--[Event(name="click",type="flash.events.MouseEvent")]-->
@@ -15,60 +15,54 @@
 
         import events.MembersEvent;
 
+        import model.File;
+
         import mx.core.FlexGlobals;
         import mx.managers.PopUpManager;
 
         import spark.skins.spark.BorderContainerSkin;
 
-        private var _person:Object = null;
+        import util.ToolUtil;
+
+        private var _file:File = null;
 
         [Bindable]
         public var showBtn:Boolean = false;
 
         private function init():void {
-            try {
-                personName.text = _person.name;
-//                personName.validateNow();
-//                if (showBtn) {
-//                    this.width = personName.width + btnDel.width;
-//                }
-//                this.width = personName.width;
-            } catch (e:Error) {
-
+            if(ToolUtil.filetypemap[file.filetype]){
+                filetypeImage.source = file.shareurl;
+            }else{
+                filetypeImage.source = '/static/image/fileicon/'+file.filetype+'.png';
             }
 
         }
 
 
-        public function get person():Object {
-            return _person;
+
+
+        public function get file():File {
+            return _file;
         }
 
-        public function set person(value:Object):void {
-            _person = value;
-            init();
+        public function set file(value:File):void {
+            _file = value;
         }
 
-        private function delPerson():void {
-            var chatevent:MembersEvent = new MembersEvent(MembersEvent.REMOVE_MEMBERS, person);
-            dispatchEvent(chatevent);
+        protected function m_over():void {
+            toolGroup.visible=true;
         }
 
-
-        public function showDetail(e:MouseEvent):void {
-            if (e.target is BorderContainerSkin) {
-                var p:PersonPanel = PopUpManager.createPopUp(FlexGlobals.topLevelApplication as DisplayObject, PersonPanel, true) as PersonPanel;
-                p.personData = person;
-//                p.departmentData = department;
-            }
-
+        protected function m_out():void {
+            toolGroup.visible=false;
         }
         ]]></fx:Script>
-    <s:layout>
-        <s:HorizontalLayout gap="5" verticalAlign="middle"  horizontalAlign="left" paddingRight="10" paddingLeft="10">
+    <uicontrol:HeadImage id="filetypeImage" width="45" height="45" top="5" right="5" left="5" />
+    <s:VGroup id="toolGroup" width="100%" bottom="2">
+        <s:Button id="downButton" label="下载"  width="90%" />
+        <s:Button id="getButton" label="获取分享链接"  width="90%" />
+        <s:Button id="delButton" label="删除"  width="90%" chromeColor="#ff0000" color="#ffffff" />
+    </s:VGroup>
 
-        </s:HorizontalLayout>
-    </s:layout>
-    <s:Label id="personName" buttonMode="true"  ></s:Label>
-    <uicontrol:Btn width="16" height="16" styleName="btnDel" id="btnDel" visible="{showBtn}" clickFun="delPerson" />
+
 </s:BorderContainer>
