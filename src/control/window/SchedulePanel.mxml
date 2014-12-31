@@ -1154,7 +1154,7 @@
                 <mx:LinkButton label="四天" click="setEndDate(3)" color="0x9f9f9f" textDecoration="underline" />
                 <mx:LinkButton label="一星期" click="setEndDate(6)" color="0x9f9f9f" textDecoration="underline" />
             </s:FormItem>
-            <s:FormItem label="重复" height="25" toolTip="重复：周期性任务，的循环条件">
+            <s:FormItem label="重复" height="30" toolTip="重复：周期性任务，的循环条件">
                 <s:layout>
                     <s:HorizontalLayout gap="5">
 
@@ -1169,7 +1169,7 @@
                 <s:RadioButton group="{repeatType}" label="每月" value="monthly">
                 </s:RadioButton>
             </s:FormItem>
-            <s:FormItem id="dayPanel"  label="重复时间：" includeInLayout="{dayPanel.visible}" height="25" toolTip="重复时间：在任务周期中，按条件循环任务">
+            <s:FormItem id="dayPanel"  label="重复时间：" includeInLayout="{dayPanel.visible}" height="30" toolTip="重复时间：在任务周期中，按条件循环任务">
                 <s:TileGroup id="dayTile" width="100%" height="100%" requestedColumnCount="7" horizontalGap="10" verticalGap="0"   >
                     <s:CheckBox label="一" change="need_saved();" />
                     <s:CheckBox label="二" change="need_saved();" />
