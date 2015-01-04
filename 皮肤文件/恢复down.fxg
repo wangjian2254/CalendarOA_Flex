@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="28.5" viewWidth="28.5" ai:appVersion="16.0.0.682" ATE:version="1.0.0" flm:version="1.0.0" d:using="" xmlns="http://ns.adobe.com/fxg/2008" xmlns:ATE="http://ns.adobe.com/ate/2009" xmlns:ai="http://ns.adobe.com/ai/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:flm="http://ns.adobe.com/flame/2008">
+  <Library/>
+  <Group blendMode="normal" d:layerType="page" d:pageHeight="28.5" d:pageWidth="28.5" d:type="layer" d:userLabel="画板 1">
+    <Group d:type="layer" d:userLabel="图层 1">
+      <Group y="0.000488281" ai:seqID="1">
+        <Rect width="28.5" height="28.4995" ai:seqID="2">
+          <fill>
+            <SolidColor color="#3C7EDD"/>
+          </fill>
+        </Rect>
+        <Group x="7.7832" y="8.55078" ai:seqID="3">
+          <Path x="5.57813" y="3.021" winding="nonZero" ai:seqID="4" data="M1.77637 1.73535 1.77637 3.28223 3.39063 3.28223 3.39063 0 0 0 0 1.73535 1.77637 1.73535Z">
+            <fill>
+              <SolidColor color="#FFFFFF"/>
+            </fill>
+          </Path>
+          <Path y="3.021" winding="nonZero" ai:seqID="5" data="M7.35449 6.25391 1.61426 6.25391 1.61426 1.73535 3.96387 1.73535 3.96387 0 0 0 0 7.98926 8.96875 7.98926 8.96875 5.03125 7.35449 5.03125 7.35449 6.25391Z">
+            <fill>
+              <SolidColor color="#FFFFFF"/>
+            </fill>
+          </Path>
+          <Path x="3.96387" winding="nonZero" ai:seqID="6" data="M8.96875 0 0 0 0 3.021 1.61426 3.021 1.61426 1.74902 7.35449 1.74902 7.35449 6.30322 5.00488 6.30322 5.00488 8.05225 8.96875 8.05225 8.96875 0Z">
+            <fill>
+              <SolidColor color="#FFFFFF"/>
+            </fill>
+          </Path>
+          <Rect x="7.35449" y="6.30322" width="1.61426" height="1.74902" ai:seqID="7">
+            <fill>
+              <SolidColor color="#FFFFFF"/>
+            </fill>
+          </Rect>
+          <Rect x="3.96387" y="3.021" width="1.61426" height="1.73535" ai:seqID="8">
+            <fill>
+              <SolidColor color="#FFFFFF"/>
+            </fill>
+          </Rect>
+        </Group>
+      </Group>
+    </Group>
+  </Group>
+  <Private/>
+</Graphic>

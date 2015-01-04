@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Graphic version="2.0" viewHeight="1900" viewWidth="1900" ai:appVersion="16.0.0.682" ATE:version="1.0.0" flm:version="1.0.0" d:using="" xmlns="http://ns.adobe.com/fxg/2008" xmlns:ATE="http://ns.adobe.com/ate/2009" xmlns:ai="http://ns.adobe.com/ai/2009" xmlns:d="http://ns.adobe.com/fxg/2008/dt" xmlns:flm="http://ns.adobe.com/flame/2008">
+  <Library/>
+  <Group blendMode="normal" d:layerType="page" d:pageHeight="1900" d:pageWidth="1900" d:type="layer" d:userLabel="画板 1">
+    <Group d:type="layer" d:userLabel="图层 1">
+      <Rect x="636" y="282" width="531" height="86" radiusX="7.99944" radiusY="7.99944" ai:seqID="1">
+        <fill>
+          <LinearGradient x="265.5" y="86" scaleX="86" rotation="270">
+            <GradientEntry ratio="0" color="#E8E8E8"/>
+            <GradientEntry ratio="1" color="#FFFFFF"/>
+          </LinearGradient>
+        </fill>
+        <stroke>
+          <SolidColorStroke caps="none" joints="miter" miterLimit="10" color="#606060"/>
+        </stroke>
+        <filters>
+          <DropShadowFilter blurX="14" blurY="14" quality="2" alpha="0.6" angle="0" distance="0"/>
+        </filters>
+      </Rect>
+    </Group>
+  </Group>
+  <Private/>
+</Graphic>

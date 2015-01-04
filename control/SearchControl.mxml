@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" xmlns:control="control.*" creationComplete="init()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import control.ListItem;
+			
+			import flashx.textLayout.tlf_internal;
+			
+			import mx.collections.ArrayCollection;
+			import mx.collections.Grouping;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
+			import mx.containers.Panel;
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.controls.Label;
+			import mx.controls.List;
+			import mx.controls.Tree;
+			import mx.managers.PopUpManager;
+			
+			import node.Node;
+			
+			import spark.components.ComboBox;
+			import spark.components.supportClasses.ItemRenderer;
+			import spark.events.IndexChangeEvent;
+			
+			public var type:int = 1;
+
+			private var d:Array = ["cat","milk", "orange", "pepper", "recipe"];
+			private var dg:ArrayCollection=new ArrayCollection([{label:"cat",type:"01"},{label:"milk",type:"02"},{label:"orange",type:"01"}]);
+			private var a:ArrayCollection=new ArrayCollection([
+				{icon:"a.png",label:"make",type:"短信"},
+				{icon:"a.png",label:"oranges",type:"短信"},
+				{icon:"a.png",label:"cak",type:"微信"},
+				{icon:"a.png",label:"pepper",type:"微信"},
+				{icon:"a.png",label:"cap",type:"邮件"},
+				{icon:"a.png",label:"cat",type:"系统消息"},
+				{icon:"a.png",label:"can",type:"短信"},
+				{icon:"a.png",label:"milk",type:"邮件"},
+				{icon:"a.png",label:"recipe",type:"邮件"},
+				{icon:"a.png",label:"orange",type:"微信"},
+				{icon:"a.png",label:"milk",type:"系统消息"},
+				{icon:"a.png",label:"milks",type:"微信"},
+				{icon:"a.png",label:"oranged",type:"系统消息"}
+			]);
+//			private var a:ArrayCollection=new ArrayCollection([
+//				{icon:"a.png",label:"cat",type:"短信",flag:true},
+//				{icon:"a.png",label:"milk",type:"短信"},
+//				{icon:"a.png",label:"orange",type:"短信"},
+//				{icon:"a.png",label:"cat",type:"微信",flag:true},
+//				{icon:"a.png",label:"milk",type:"微信"},
+//				{icon:"a.png",label:"orange",type:"微信"},
+//				{icon:"a.png",label:"cat",type:"邮件",flag:true},
+//				{icon:"a.png",label:"milk",type:"邮件"},
+//				{icon:"a.png",label:"orange",type:"邮件"},
+//				{icon:"a.png",label:"cat",type:"系统消息",flag:true},
+//				{icon:"a.png",label:"milk",type:"系统消息"},
+//				{icon:"a.png",label:"orange",type:"系统消息"}
+//			]);
+			//private var a:ArrayCollection=new ArrayCollection([{icon:"a.png",label:"cat",name:"sad"},{icon:"a.png",label:"milk", name:"dad"},{icon:"a.png",label:"truck" ,name:"xcvcxv"}]);
+//			private var kg:ArrayCollection=new ArrayCollection([    
+//               {Region:"TCP3399", categories: [    
+//                   {label:"cat"},    
+//                   {label:"milk"}]}, 
+//                  {Region:"Host", categories: [    
+//                     {label:"orange"}]}                   
+//           ]);  
+
+			private function init():void{
+				l.datalist = a;
+				l.addEventListener("changed",getalert);
+				l.addEventListener("change",getvaluelabel);
+				//l.addEventListener("click",getalert);
+				a.filterFunction=filterA;
+			}
+			
+			private function getalert(e:Event):void{
+			 
+				var a1:Object=l.myl.selectedItem;
+				Alert.show(a1.label);
+			}
+			private var pan:Panel;
+			private var ti:List=new List();;
+			//private var exampleTree:Tree=new Tree();
+			private var regexp:RegExp;
+			//			private function checkInput():void{
+			//				var tmp:Array = allWords.filter(filter);
+			//				input.text = tmp[0];
+			//			}
+			//			private function filter(element:*,index:int,arr:Array):Boolean{
+			//				regexp = new RegExp(input.text);
+			//				return (regexp.test(element as String));
+			
+			
+			//			}
+			
+			private function checkInput0():void{
+				switch(type){
+					case 1:
+						checkInput1();
+						break;
+					case 2:
+						checkInput2();
+						break;
+					case 3:
+						checkInput3();
+						break;
+				}
+			}
+			
+			private function checkInput1():void{
+				
+				var str:String=input.text;
+				var e:Array=new Array();
+				if(str=="")
+				{
+					e=d;
+				}
+				else
+				{
+				    for(var i:int=0;i<d.length-1;i++)
+				   {
+					
+					    var dstr:String=d[i].toString();
+					    if(dstr.indexOf(str)>-1)
+					    {
+						   e.push(dstr);
+					    }
+					
+				    }
+				}
+				 var x:int=this.x;
+				 ti.x=x;
+				 var y:int=this.y+input.height;
+				 ti.y=y;
+				 ti.top=20;
+				 ti.width=200;
+				 ti.dataProvider=e;
+				 ti.addEventListener("change",getvalue);
+				PopUpManager.addPopUp(ti,this,false);
+				
+				
+			}
+            
+			
+			private  function checkInput2():void{
+			    
+				var s:SearchControl2=new SearchControl2();
+				s.x=this.x;
+				s.y=this.y+input.height;
+				//s.y=this.y
+				s.width=100;
+				//s.height=500;
+				var str:String=input.text;
+				//input.visible=true;
+				var eg:ArrayCollection=new ArrayCollection();
+				for(var i:int=0;i<dg.length;i++)
+				{
+					
+					var estr:String=dg[i].label.toString();
+					if(estr.indexOf(str)>-1)
+					{
+						eg.addItem(dg[i]);
+					}
+				}
+				s.gc.source=eg;
+				//input.visible=false;
+				PopUpManager.addPopUp(s,this,false);	
+				
+			}
+			private var l:MyList =new MyList();
+			
+			private function filterA(item:Object):Boolean{
+				if(item.label.indexOf(input.text)>=0){
+					return true;
+					
+				}
+				return false;
+			}
+			
+			private  function checkInput3():void{
+				
+				var str:String=input.text;
+				//input.visible=true;
+				l.x=this.x;
+				l.y=this.y+input.height;
+				l.width=200;
+				if(str=="")
+				{
+					var eg:ArrayCollection=new ArrayCollection();
+					PopUpManager.addPopUp(l,this,false);	
+					PopUpManager.removePopUp(l);
+					
+					
+				}
+				else
+				{
+//				 var eg:ArrayCollection=new ArrayCollection();
+//				 for(var i:int=0;i<a.length;i++)
+//				{
+//					
+//					var estr:String=a[i].label.toString();
+//					if(estr.indexOf(str)>-1)
+//					{
+//						eg.addItem(a[i]);
+//					}
+//				 }
+					a.refresh();
+      			// eg 排序 type
+				if(a.length>0)
+				{
+				 var sort:Sort=new Sort();
+				 sort.fields = [new SortField("type")];
+				 a.sort=sort;
+				 a.refresh();
+				 var kg:ArrayCollection=new ArrayCollection();
+				//kg=eg;
+				// eg 标示 flag
+				var object0:Object=a.getItemAt(0);
+				object0.flag=true;
+				for(var j:int=1;j<a.length;j++)
+				{
+					var object1:Object=a.getItemAt(j);
+					//trace(object1.type);
+					var object2:Object=a.getItemAt(j-1);
+					//trace(object2.type);
+				    if(object2.type!=object1.type)
+					{
+						object1.flag=true;
+					}
+				   //object.flag=true;
+				}
+				//trace(eg);
+				}
+				
+			
+			  //l.height=500;
+//			 l.datalist=eg;
+
+			 
+			 PopUpManager.addPopUp(l,this,false);	
+			 }
+			}
+			
+			
+			private function getvalue(e:Event):void{
+
+				   input.text=ti.selectedItem.toString();
+				   PopUpManager.removePopUp(ti);
+			}
+			private function getvaluelabel(e:Event):void{
+				
+				var a1:Object=l.myl.selectedItem;
+				//Alert.show(a1.label);
+				input.text=a1.label;
+				PopUpManager.removePopUp(l);
+			}
+			
+			
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+	</fx:Declarations>
+	<s:TextInput id="input" change="checkInput0()" width="100%" height="20" />
+<!--	<mx:AdvancedDataGrid
+		id="searchDG"
+		creationComplete="gc.refresh()"
+		displayItemsExpanded="true"
+		draggableColumns="false"
+		sortableColumns="false">
+		<mx:dataProvider >
+			<mx:GroupingCollection id="gc" source="{dg}">
+					<mx:Grouping>
+						<mx:GroupingField name="type"/>
+					</mx:Grouping>
+			</mx:GroupingCollection>
+		</mx:dataProvider>       
+		<mx:columns>
+			<mx:AdvancedDataGridColumn dataField="label" headerText="姓名"/>
+		</mx:columns>
+	</mx:AdvancedDataGrid>-->
+
+
+	<!-- <mx:DataGrid id="dg1" enabled="false"/>-->
+	 <!--<mx:AdvancedDataGrid top="21" id="dg1" designViewDataType="flat">
+	 	 <mx:columns>
+	 	 	 <mx:AdvancedDataGridColumn headerText="label" dataField="{dg}"/>
+	 	 </mx:columns>
+	 </mx:AdvancedDataGrid>-->
+
+		<!--<mx:List id="list"  enabled="false" change="getvalue()" />-->
+
+</s:Group>
